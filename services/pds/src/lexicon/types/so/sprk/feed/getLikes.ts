@@ -7,12 +7,17 @@ import { CID } from 'multiformats/cid'
 import { validate as _validate } from '../../../../lexicons'
 import { $Typed, is$typed as _is$typed, OmitKey } from '../../../../util'
 import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
+import type * as SoSprkActorDefs from '../actor/defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'com.atproto.sync.listRepos'
+const id = 'so.sprk.feed.getLikes'
 
 export interface QueryParams {
+  /** AT-URI of the subject (eg, a post record). */
+  uri: string
+  /** CID of the subject record (aka, specific version of record), to filter likes. */
+  cid?: string
   limit: number
   cursor?: string
 }
@@ -20,8 +25,10 @@ export interface QueryParams {
 export type InputSchema = undefined
 
 export interface OutputSchema {
+  uri: string
+  cid?: string
   cursor?: string
-  repos: Repo[]
+  likes: Like[]
 }
 
 export type HandlerInput = undefined
@@ -50,23 +57,19 @@ export type Handler<HA extends HandlerAuth = never> = (
   ctx: HandlerReqCtx<HA>,
 ) => Promise<HandlerOutput> | HandlerOutput
 
-export interface Repo {
-  $type?: 'com.atproto.sync.listRepos#repo'
-  did: string
-  /** Current repo commit CID */
-  head: string
-  rev: string
-  active?: boolean
-  /** If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted. */
-  status?: 'takendown' | 'suspended' | 'deactivated' | (string & {})
+export interface Like {
+  $type?: 'so.sprk.feed.getLikes#like'
+  indexedAt: string
+  createdAt: string
+  actor: SoSprkActorDefs.ProfileView
 }
 
-const hashRepo = 'repo'
+const hashLike = 'like'
 
-export function isRepo<V>(v: V) {
-  return is$typed(v, id, hashRepo)
+export function isLike<V>(v: V) {
+  return is$typed(v, id, hashLike)
 }
 
-export function validateRepo<V>(v: V) {
-  return validate<Repo & V>(v, id, hashRepo)
+export function validateLike<V>(v: V) {
+  return validate<Like & V>(v, id, hashLike)
 }

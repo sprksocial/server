@@ -7,12 +7,14 @@ import { CID } from 'multiformats/cid'
 import { validate as _validate } from '../../../../lexicons'
 import { $Typed, is$typed as _is$typed, OmitKey } from '../../../../util'
 import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
+import type * as SoSprkActorDefs from '../actor/defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'com.atproto.sync.listRepos'
+const id = 'so.sprk.graph.getKnownFollowers'
 
 export interface QueryParams {
+  actor: string
   limit: number
   cursor?: string
 }
@@ -20,8 +22,9 @@ export interface QueryParams {
 export type InputSchema = undefined
 
 export interface OutputSchema {
+  subject: SoSprkActorDefs.ProfileView
   cursor?: string
-  repos: Repo[]
+  followers: SoSprkActorDefs.ProfileView[]
 }
 
 export type HandlerInput = undefined
@@ -49,24 +52,3 @@ export type HandlerReqCtx<HA extends HandlerAuth = never> = {
 export type Handler<HA extends HandlerAuth = never> = (
   ctx: HandlerReqCtx<HA>,
 ) => Promise<HandlerOutput> | HandlerOutput
-
-export interface Repo {
-  $type?: 'com.atproto.sync.listRepos#repo'
-  did: string
-  /** Current repo commit CID */
-  head: string
-  rev: string
-  active?: boolean
-  /** If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted. */
-  status?: 'takendown' | 'suspended' | 'deactivated' | (string & {})
-}
-
-const hashRepo = 'repo'
-
-export function isRepo<V>(v: V) {
-  return is$typed(v, id, hashRepo)
-}
-
-export function validateRepo<V>(v: V) {
-  return validate<Repo & V>(v, id, hashRepo)
-}

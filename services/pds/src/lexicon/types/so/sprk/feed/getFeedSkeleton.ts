@@ -7,12 +7,15 @@ import { CID } from 'multiformats/cid'
 import { validate as _validate } from '../../../../lexicons'
 import { $Typed, is$typed as _is$typed, OmitKey } from '../../../../util'
 import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
+import type * as SoSprkFeedDefs from './defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'com.atproto.sync.listRepos'
+const id = 'so.sprk.feed.getFeedSkeleton'
 
 export interface QueryParams {
+  /** Reference to feed generator record describing the specific feed being requested. */
+  feed: string
   limit: number
   cursor?: string
 }
@@ -21,7 +24,7 @@ export type InputSchema = undefined
 
 export interface OutputSchema {
   cursor?: string
-  repos: Repo[]
+  feed: SoSprkFeedDefs.SkeletonFeedPost[]
 }
 
 export type HandlerInput = undefined
@@ -35,6 +38,7 @@ export interface HandlerSuccess {
 export interface HandlerError {
   status: number
   message?: string
+  error?: 'UnknownFeed'
 }
 
 export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough
@@ -49,24 +53,3 @@ export type HandlerReqCtx<HA extends HandlerAuth = never> = {
 export type Handler<HA extends HandlerAuth = never> = (
   ctx: HandlerReqCtx<HA>,
 ) => Promise<HandlerOutput> | HandlerOutput
-
-export interface Repo {
-  $type?: 'com.atproto.sync.listRepos#repo'
-  did: string
-  /** Current repo commit CID */
-  head: string
-  rev: string
-  active?: boolean
-  /** If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted. */
-  status?: 'takendown' | 'suspended' | 'deactivated' | (string & {})
-}
-
-const hashRepo = 'repo'
-
-export function isRepo<V>(v: V) {
-  return is$typed(v, id, hashRepo)
-}
-
-export function validateRepo<V>(v: V) {
-  return validate<Repo & V>(v, id, hashRepo)
-}

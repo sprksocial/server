@@ -7,13 +7,19 @@ import { CID } from 'multiformats/cid'
 import { validate as _validate } from '../../../../lexicons'
 import { $Typed, is$typed as _is$typed, OmitKey } from '../../../../util'
 import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
+import type * as SoSprkUnspeccedDefs from './defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'com.atproto.sync.listRepos'
+const id = 'so.sprk.unspecced.searchStarterPacksSkeleton'
 
 export interface QueryParams {
+  /** Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended. */
+  q: string
+  /** DID of the account making the request (not included for public/unauthenticated queries). */
+  viewer?: string
   limit: number
+  /** Optional pagination mechanism; may not necessarily allow scrolling through entire result set. */
   cursor?: string
 }
 
@@ -21,7 +27,9 @@ export type InputSchema = undefined
 
 export interface OutputSchema {
   cursor?: string
-  repos: Repo[]
+  /** Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits. */
+  hitsTotal?: number
+  starterPacks: SoSprkUnspeccedDefs.SkeletonSearchStarterPack[]
 }
 
 export type HandlerInput = undefined
@@ -35,6 +43,7 @@ export interface HandlerSuccess {
 export interface HandlerError {
   status: number
   message?: string
+  error?: 'BadQueryString'
 }
 
 export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough
@@ -49,24 +58,3 @@ export type HandlerReqCtx<HA extends HandlerAuth = never> = {
 export type Handler<HA extends HandlerAuth = never> = (
   ctx: HandlerReqCtx<HA>,
 ) => Promise<HandlerOutput> | HandlerOutput
-
-export interface Repo {
-  $type?: 'com.atproto.sync.listRepos#repo'
-  did: string
-  /** Current repo commit CID */
-  head: string
-  rev: string
-  active?: boolean
-  /** If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted. */
-  status?: 'takendown' | 'suspended' | 'deactivated' | (string & {})
-}
-
-const hashRepo = 'repo'
-
-export function isRepo<V>(v: V) {
-  return is$typed(v, id, hashRepo)
-}
-
-export function validateRepo<V>(v: V) {
-  return validate<Repo & V>(v, id, hashRepo)
-}

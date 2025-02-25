@@ -7,21 +7,29 @@ import { CID } from 'multiformats/cid'
 import { validate as _validate } from '../../../../lexicons'
 import { $Typed, is$typed as _is$typed, OmitKey } from '../../../../util'
 import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
+import type * as SoSprkActorDefs from '../actor/defs.js'
+import type * as ComAtprotoLabelDefs from '../../../com/atproto/label/defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'com.atproto.sync.listRepos'
+const id = 'so.sprk.notification.listNotifications'
 
 export interface QueryParams {
+  /** Notification reasons to include in response. */
+  reasons?: string[]
   limit: number
+  priority?: boolean
   cursor?: string
+  seenAt?: string
 }
 
 export type InputSchema = undefined
 
 export interface OutputSchema {
   cursor?: string
-  repos: Repo[]
+  notifications: Notification[]
+  priority?: boolean
+  seenAt?: string
 }
 
 export type HandlerInput = undefined
@@ -50,23 +58,34 @@ export type Handler<HA extends HandlerAuth = never> = (
   ctx: HandlerReqCtx<HA>,
 ) => Promise<HandlerOutput> | HandlerOutput
 
-export interface Repo {
-  $type?: 'com.atproto.sync.listRepos#repo'
-  did: string
-  /** Current repo commit CID */
-  head: string
-  rev: string
-  active?: boolean
-  /** If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted. */
-  status?: 'takendown' | 'suspended' | 'deactivated' | (string & {})
+export interface Notification {
+  $type?: 'so.sprk.notification.listNotifications#notification'
+  uri: string
+  cid: string
+  author: SoSprkActorDefs.ProfileView
+  /** Expected values are 'like', 'repost', 'follow', 'mention', 'reply', 'quote', and 'starterpack-joined'. */
+  reason:
+    | 'like'
+    | 'repost'
+    | 'follow'
+    | 'mention'
+    | 'reply'
+    | 'quote'
+    | 'starterpack-joined'
+    | (string & {})
+  reasonSubject?: string
+  record: { [_ in string]: unknown }
+  isRead: boolean
+  indexedAt: string
+  labels?: ComAtprotoLabelDefs.Label[]
 }
 
-const hashRepo = 'repo'
+const hashNotification = 'notification'
 
-export function isRepo<V>(v: V) {
-  return is$typed(v, id, hashRepo)
+export function isNotification<V>(v: V) {
+  return is$typed(v, id, hashNotification)
 }
 
-export function validateRepo<V>(v: V) {
-  return validate<Repo & V>(v, id, hashRepo)
+export function validateNotification<V>(v: V) {
+  return validate<Notification & V>(v, id, hashNotification)
 }

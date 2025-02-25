@@ -10,18 +10,16 @@ import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
 
 const is$typed = _is$typed,
   validate = _validate
-const id = 'com.atproto.sync.listRepos'
+const id = 'so.sprk.feed.describeFeedGenerator'
 
-export interface QueryParams {
-  limit: number
-  cursor?: string
-}
+export interface QueryParams {}
 
 export type InputSchema = undefined
 
 export interface OutputSchema {
-  cursor?: string
-  repos: Repo[]
+  did: string
+  feeds: Feed[]
+  links?: Links
 }
 
 export type HandlerInput = undefined
@@ -50,23 +48,33 @@ export type Handler<HA extends HandlerAuth = never> = (
   ctx: HandlerReqCtx<HA>,
 ) => Promise<HandlerOutput> | HandlerOutput
 
-export interface Repo {
-  $type?: 'com.atproto.sync.listRepos#repo'
-  did: string
-  /** Current repo commit CID */
-  head: string
-  rev: string
-  active?: boolean
-  /** If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted. */
-  status?: 'takendown' | 'suspended' | 'deactivated' | (string & {})
+export interface Feed {
+  $type?: 'so.sprk.feed.describeFeedGenerator#feed'
+  uri: string
 }
 
-const hashRepo = 'repo'
+const hashFeed = 'feed'
 
-export function isRepo<V>(v: V) {
-  return is$typed(v, id, hashRepo)
+export function isFeed<V>(v: V) {
+  return is$typed(v, id, hashFeed)
 }
 
-export function validateRepo<V>(v: V) {
-  return validate<Repo & V>(v, id, hashRepo)
+export function validateFeed<V>(v: V) {
+  return validate<Feed & V>(v, id, hashFeed)
+}
+
+export interface Links {
+  $type?: 'so.sprk.feed.describeFeedGenerator#links'
+  privacyPolicy?: string
+  termsOfService?: string
+}
+
+const hashLinks = 'links'
+
+export function isLinks<V>(v: V) {
+  return is$typed(v, id, hashLinks)
+}
+
+export function validateLinks<V>(v: V) {
+  return validate<Links & V>(v, id, hashLinks)
 }
