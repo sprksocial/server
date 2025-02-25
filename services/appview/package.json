@@ -2,7 +2,7 @@
   "name": "app",
   "version": "1.0.50",
   "scripts": {
-    "codegen": "lex gen-server --yes src/lexicons lexicons/com/atproto/*/* lexicons/app/bsky/*/*",
+    "codegen": "node ./scripts/generate-code.mjs && lex gen-api --yes ./src/client ../../lexicons/com/atproto/*/* ../../lexicons/so/sprk/*/*",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx watch src/index.ts",
     "build": "tsc src/index.ts --outDir dist",
@@ -15,6 +15,7 @@
     "@atproto/sync": "^0.1.14",
     "@atproto/syntax": "^0.3.3",
     "@atproto/xrpc-server": "^0.7.11",
+    "multiformats": "^9.9.0",
     "dotenv": "^16.4.7",
     "envalid": "^8.0.0",
     "express": "^4.21.2",
@@ -29,6 +30,7 @@
     "@types/node": "^22.13.5",
     "@types/pg": "^8.11.11",
     "bun-types": "latest",
+    "prettier": "^3.2.5",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3"
   },

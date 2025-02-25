@@ -41,6 +41,9 @@ importers:
       kysely:
         specifier: ^0.27.5
         version: 0.27.5
+      multiformats:
+        specifier: ^9.9.0
+        version: 9.9.0
       pg:
         specifier: ^8.13.3
         version: 8.13.3
@@ -63,6 +66,9 @@ importers:
       bun-types:
         specifier: latest
         version: 1.2.2
+      prettier:
+        specifier: ^3.2.5
+        version: 3.2.5
       tsx:
         specifier: ^4.19.3
         version: 4.19.3
@@ -918,8 +924,8 @@ packages:
   postgres-range@1.1.4:
     resolution: {integrity: sha512-i/hbxIE9803Alj/6ytL7UHQxRvZkI9O4Sy+J3HGc4F4oo/2eQAjTSNJ0bfxyse3bH0nuVesCk+3IRLaMtG3H6w==}
 
-  prettier@3.5.1:
-    resolution: {integrity: sha512-hPpFQvHwL3Qv5AdRvBFMhnKo4tYxp0ReXiPn2bxkiohEX6mBeBwEpBSQTkD458RaaDKQMYSp4hX4UtfUTA5wDw==}
+  prettier@3.2.5:
+    resolution: {integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -1231,7 +1237,7 @@ snapshots:
       '@atproto/syntax': 0.3.3
       chalk: 4.1.2
       commander: 9.5.0
-      prettier: 3.5.1
+      prettier: 3.2.5
       ts-morph: 16.0.0
       yesno: 0.4.0
       zod: 3.24.2
@@ -2041,7 +2047,7 @@ snapshots:
 
   postgres-range@1.1.4: {}
 
-  prettier@3.5.1: {}
+  prettier@3.2.5: {}
 
   process-warning@3.0.0: {}
 
