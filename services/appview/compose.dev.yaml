@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dev
+    ports:
+      - 5432:5432
+    volumes:
+      - ./devdb:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p 5432 -u postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      NODE_ENV: development
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: dev
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+    develop:
+      watch:
+        - path: ./src
+          action: sync+restart
+          target: /app/src
+        - path: ./package.json
+          action: rebuild
+          target: /app/package.json

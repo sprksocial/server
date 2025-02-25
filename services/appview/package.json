@@ -1,0 +1,42 @@
+{
+  "name": "app",
+  "version": "1.0.50",
+  "scripts": {
+    "codegen": "lex gen-server --yes src/lexicons lexicons/com/atproto/*/* lexicons/app/bsky/*/*",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc src/index.ts --outDir dist",
+    "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
+  },
+  "dependencies": {
+    "@atproto/identity": "^0.4.6",
+    "@atproto/lexicon": "^0.4.7",
+    "@atproto/oauth-client-node": "^0.2.11",
+    "@atproto/sync": "^0.1.14",
+    "@atproto/syntax": "^0.3.3",
+    "@atproto/xrpc-server": "^0.7.11",
+    "dotenv": "^16.4.7",
+    "envalid": "^8.0.0",
+    "express": "^4.21.2",
+    "iron-session": "^8.0.4",
+    "kysely": "^0.27.5",
+    "pg": "^8.13.3",
+    "pino": "^9.6.0"
+  },
+  "devDependencies": {
+    "@atproto/lex-cli": "^0.6.1",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.5",
+    "@types/pg": "^8.11.11",
+    "bun-types": "latest",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  },
+  "module": "src/index.js",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "cbor-extract",
+      "esbuild"
+    ]
+  }
+}
