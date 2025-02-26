@@ -20,6 +20,14 @@ export type ReasonType =
   | 'com.atproto.moderation.defs#reasonAppeal'
   | (string & {})
 
+export type SubjectType =
+  | 'com.atproto.moderation.defs#subjectAccount'
+  | 'com.atproto.moderation.defs#subjectRecord'
+  | (string & {})
+
+export const SUBJECTACCOUNT = `${id}#subjectAccount`
+export const SUBJECTRECORD = `${id}#subjectRecord`
+
 /** Spam: frequent unwanted promotion, replies, mentions */
 export const REASONSPAM = `${id}#reasonSpam`
 /** Direct violation of server rules, laws, terms of service */
