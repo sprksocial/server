@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@atproto/api':
+        specifier: ^0.14.6
+        version: 0.14.6
+      '@atproto/common':
+        specifier: ^0.4.8
+        version: 0.4.8
       '@atproto/identity':
         specifier: ^0.4.6
         version: 0.4.6
@@ -23,6 +29,9 @@ importers:
       '@atproto/syntax':
         specifier: ^0.3.3
         version: 0.3.3
+      '@atproto/xrpc':
+        specifier: ^0.6.9
+        version: 0.6.9
       '@atproto/xrpc-server':
         specifier: ^0.7.11
         version: 0.7.11
@@ -106,6 +115,9 @@ packages:
 
   '@atproto-labs/simple-store@0.1.2':
     resolution: {integrity: sha512-9vTNvyPPBs44tKVFht16wGlilW8u4wpEtKwLkWbuNEh3h9TTQ8zjVhEoGZh/v73G4Otr9JUOSIq+/5+8OZD2mQ==}
+
+  '@atproto/api@0.14.6':
+    resolution: {integrity: sha512-v0NppALgBa62O7cItDmhPwv6pyt4ClfOvcfaWh+wfTW877D9Em6rFrelY5p54yiWdqRUfgbTTD2plynLKUFQJQ==}
 
   '@atproto/common-web@0.4.0':
     resolution: {integrity: sha512-ZYL0P9myHybNgwh/hBY0HaBzqiLR1B5/ie5bJpLQAg0whRzNA28t8/nU2vh99tbsWcAF0LOD29M8++LyENJLNQ==}
@@ -436,6 +448,9 @@ packages:
   atomic-sleep@1.0.0:
     resolution: {integrity: sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ==}
     engines: {node: '>=8.0.0'}
+
+  await-lock@2.2.2:
+    resolution: {integrity: sha512-aDczADvlvTGajTDjcjpJMqRkOF6Qdz3YbPZm/PyW6tKPkx2hlYBzxMhEywM/tU72HrVZjgl5VCdRuMlA7pZ8Gw==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -1053,6 +1068,10 @@ packages:
   thread-stream@3.1.0:
     resolution: {integrity: sha512-OqyPZ9u96VohAyMfJykzmivOrY2wfMSf3C5TtFJVgN+Hm6aj+voFhlK+kZEIv2FBh1X6Xp3DlnCOfEQ3B2J86A==}
 
+  tlds@1.255.0:
+    resolution: {integrity: sha512-tcwMRIioTcF/FcxLev8MJWxCp+GUALRhFEqbDoZrnowmKSGqPrl5pqS+Sut2m8BgJ6S4FExCSSpGffZ0Tks6Aw==}
+    hasBin: true
+
   to-regex-range@5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
     engines: {node: '>=8.0'}
@@ -1183,6 +1202,17 @@ snapshots:
       lru-cache: 10.4.3
 
   '@atproto-labs/simple-store@0.1.2': {}
+
+  '@atproto/api@0.14.6':
+    dependencies:
+      '@atproto/common-web': 0.4.0
+      '@atproto/lexicon': 0.4.7
+      '@atproto/syntax': 0.3.3
+      '@atproto/xrpc': 0.6.9
+      await-lock: 2.2.2
+      multiformats: 9.9.0
+      tlds: 1.255.0
+      zod: 3.24.2
 
   '@atproto/common-web@0.4.0':
     dependencies:
@@ -1537,6 +1567,8 @@ snapshots:
   array-flatten@1.1.1: {}
 
   atomic-sleep@1.0.0: {}
+
+  await-lock@2.2.2: {}
 
   balanced-match@1.0.2: {}
 
@@ -2193,6 +2225,8 @@ snapshots:
   thread-stream@3.1.0:
     dependencies:
       real-require: 0.2.0
+
+  tlds@1.255.0: {}
 
   to-regex-range@5.0.1:
     dependencies:
