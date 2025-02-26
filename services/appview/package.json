@@ -2,10 +2,10 @@
   "name": "app",
   "version": "1.0.50",
   "scripts": {
-    "codegen": "node ./scripts/generate-code.mjs && lex gen-api --yes ./src/client ../../lexicons/com/atproto/*/* ../../lexicons/so/sprk/*/*",
+    "codegen": "lex gen-api --yes ./src/client ../../lexicons/com/atproto/*/* ../../lexicons/so/sprk/*/*",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx watch src/index.ts",
-    "build": "tsc src/index.ts --outDir dist",
+    "build": "tsc --build tsconfig.json",
     "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
   },
   "dependencies": {
@@ -14,6 +14,9 @@
     "@atproto/oauth-client-node": "^0.2.11",
     "@atproto/sync": "^0.1.14",
     "@atproto/syntax": "^0.3.3",
+    "@atproto/common": "^0.4.8",
+    "@atproto/api": "^0.14.6",
+    "@atproto/xrpc": "^0.6.9",
     "@atproto/xrpc-server": "^0.7.11",
     "multiformats": "^9.9.0",
     "dotenv": "^16.4.7",
