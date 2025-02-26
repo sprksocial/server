@@ -232,20 +232,25 @@ function assertNoExplicitSlurs(rkey: string, record: RepoRecord) {
   const toCheck: string[] = []
 
   if (isValidProfile(record)) {
-    if (record.displayName) toCheck.push(record.displayName)
+    const profileRecord = record as AppBskyActorProfile.Record
+    if (profileRecord.displayName) toCheck.push(profileRecord.displayName)
   } else if (isValidList(record)) {
-    toCheck.push(record.name)
+    const listRecord = record as AppBskyGraphList.Record
+    toCheck.push(listRecord.name)
   } else if (isValidStarterPack(record)) {
-    toCheck.push(record.name)
+    const starterPackRecord = record as AppBskyGraphStarterpack.Record
+    toCheck.push(starterPackRecord.name)
   } else if (isValidFeedGenerator(record)) {
+    const generatorRecord = record as AppBskyFeedGenerator.Record
     toCheck.push(rkey)
-    toCheck.push(record.displayName)
+    toCheck.push(generatorRecord.displayName)
   } else if (isValidPost(record)) {
-    if (record.tags) {
-      toCheck.push(...record.tags)
+    const postRecord = record as AppBskyFeedPost.Record
+    if (postRecord.tags) {
+      toCheck.push(...postRecord.tags)
     }
 
-    for (const facet of record.facets || []) {
+    for (const facet of postRecord.facets || []) {
       for (const feat of facet.features) {
         if (isTag(feat)) {
           toCheck.push(feat.tag)
