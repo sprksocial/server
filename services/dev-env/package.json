@@ -1,0 +1,60 @@
+{
+  "name": "@atproto/dev-env",
+  "version": "0.3.97",
+  "license": "MIT",
+  "description": "Local development environment helper for atproto development",
+  "keywords": [
+    "atproto"
+  ],
+  "homepage": "https://atproto.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bluesky-social/atproto",
+    "directory": "packages/dev-env"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": "dist/bin.js",
+  "scripts": {
+    "build": "tsc --build tsconfig.build.json",
+    "start": "../dev-infra/with-test-redis-and-db.sh node dist/bin.js",
+    "dev": "../dev-infra/with-test-redis-and-db.sh node --watch dist/bin.js"
+  },
+  "engines": {
+    "node": ">=18.7.0"
+  },
+  "dependencies": {
+    "@atproto/api": "0.14.7",
+    "@atproto/bsky": "0.0.124",
+    "@atproto/bsync": "0.0.14",
+    "@atproto/common-web": "0.4.0",
+    "@atproto/crypto": "0.4.4",
+    "@atproto/identity": "0.4.6",
+    "@atproto/lexicon": "0.4.7",
+    "@atproto/ozone": "0.1.86",
+    "@atproto/pds": "0.4.104",
+    "@atproto/sync": "0.1.15",
+    "@atproto/syntax": "0.3.3",
+    "@atproto/xrpc-server": "0.7.11",
+    "@did-plc/lib": "^0.0.1",
+    "@did-plc/server": "^0.0.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "get-port": "^5.1.1",
+    "multiformats": "^9.9.0",
+    "uint8arrays": "3.0.0",
+    "undici": "^6.14.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^22.13.5",
+    "typescript": "^5.6.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "cbor-extract",
+      "sharp"
+    ]
+  }
+}
