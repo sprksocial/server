@@ -1,0 +1,11 @@
+services:
+  pds:
+    container_name: pds
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - ./devData/pds:/pds
+    env_file: .dev.env
