@@ -1,46 +1,46 @@
 FROM node:20.11-alpine3.18 AS build
 
+WORKDIR /app
+
 RUN corepack enable
 
-# Move files into the image and install
-WORKDIR /app
-COPY . .
+COPY package.json pnpm-lock.yaml ./
+
 RUN corepack prepare --activate
+
 RUN pnpm install --frozen-lockfile
-RUN pnpm run build
-RUN pnpm run postbuild
 
-# Uses assets from build stage to reduce build size
-FROM node:20.11-alpine3.18
+COPY . .
+
+RUN pnpm run build && pnpm run postbuild
+
+FROM node:20.11-alpine3.18 AS production
+
 WORKDIR /app
 
-COPY --from=build /app/package.json /app
-COPY --from=build /app/pnpm-lock.yaml /app
+ENV NODE_ENV=production
+ENV PDS_PORT=3000
+ENV UV_USE_IO_URING=0
 
-RUN corepack enable
-RUN corepack prepare --activate
-RUN apk add --update dumb-init
+COPY --from=build /app/package.json /app/pnpm-lock.yaml ./
 
-# Avoid zombie processes, handle signal forwarding
-ENTRYPOINT ["dumb-init", "--"]
-
-COPY --from=build /app /app
+RUN corepack enable && \
+  corepack prepare --activate && \
+  apk add --no-cache dumb-init bash curl openssl jq util-linux-misc && \
+  curl --silent --show-error --fail --output '/usr/local/bin/pdsadmin' 'https://raw.githubusercontent.com/bluesky-social/pds/main/pdsadmin.sh' && \
+  sed -i 's/--force/-f/g' /usr/local/bin/pdsadmin && \
+  chmod +x /usr/local/bin/pdsadmin
 
 RUN pnpm install --frozen-lockfile --prod
 
-RUN apk add bash curl openssl jq util-linux-misc
-RUN curl --silent --show-error --fail --output '/usr/local/bin/pdsadmin' 'https://raw.githubusercontent.com/bluesky-social/pds/main/pdsadmin.sh'
-RUN sed -i 's/--force/-f/g' /usr/local/bin/pdsadmin
-RUN chmod +x /usr/local/bin/pdsadmin
+COPY --from=build /app/dist ./dist
+
+ENTRYPOINT ["dumb-init", "--"]
 
 EXPOSE 3000
-ENV PDS_PORT=3000
-ENV NODE_ENV=production
-# potential perf issues w/ io_uring on this version of node
-ENV UV_USE_IO_URING=0
 
 CMD ["node", "--enable-source-maps", "dist/startpds.js"]
 
-LABEL org.opencontainers.image.source=https://github.com/bluesky-social/pds
-LABEL org.opencontainers.image.description="AT Protocol PDS (Sprk Version)"
+LABEL org.opencontainers.image.source=https://github.com/sprksocial/spark-back-end
+LABEL org.opencontainers.image.description="AT Protocol PDS (Spark Version)"
 LABEL org.opencontainers.image.licenses=MIT
