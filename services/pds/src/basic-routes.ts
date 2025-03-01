@@ -7,7 +7,20 @@ export const createRouter = (ctx: AppContext): Router => {
 
   router.get('/', function (req, res) {
     res.type('text/plain')
-    res.send(`This is Spark Social Personal Data Server (PDS).`)
+    res.send(`
+
+   _____                  _       _____            _       _
+  / ____|                | |     / ____|          (_)     | |
+ | (___  _ __   __ _ _ __| | __ | (___   ___   ___ _  __ _| |
+  \\___ \\| '_ \\ / _\` | '__| |/ /  \\___ \\ / _ \\ / __| |/ _\` | |
+  ____) | |_) | (_| | |  |   <   ____) | (_) | (__| | (_| | |
+ |_____/| .__/ \\__,_|_|  |_|\_\   |_____/ \\___/ \\___|_|\\__,_|_|
+        | |
+        |_|
+
+
+      This is Spark Social Personal Data Server (PDS).
+      `)
   })
 
   router.get('/robots.txt', function (req, res) {
