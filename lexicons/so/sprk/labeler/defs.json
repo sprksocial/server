@@ -10,6 +10,7 @@
         "cid": { "type": "string", "format": "cid" },
         "creator": { "type": "ref", "ref": "so.sprk.actor.defs#profileView" },
         "likeCount": { "type": "integer", "minimum": 0 },
+        "lookCount": { "type": "integer", "minimum": 0 },
         "viewer": { "type": "ref", "ref": "#labelerViewerState" },
         "indexedAt": { "type": "string", "format": "datetime" },
         "labels": {
@@ -30,6 +31,7 @@
           "ref": "so.sprk.labeler.defs#labelerPolicies"
         },
         "likeCount": { "type": "integer", "minimum": 0 },
+        "lookCount": { "type": "integer", "minimum": 0 },
         "viewer": { "type": "ref", "ref": "#labelerViewerState" },
         "indexedAt": { "type": "string", "format": "datetime" },
         "labels": {
@@ -41,7 +43,8 @@
     "labelerViewerState": {
       "type": "object",
       "properties": {
-        "like": { "type": "string", "format": "at-uri" }
+        "like": { "type": "string", "format": "at-uri" },
+        "look": { "type": "string", "format": "at-uri" }
       }
     },
     "labelerPolicies": {

@@ -287,6 +287,10 @@
           "type": "integer",
           "description": "Hide replies in the feed if they do not have this number of likes."
         },
+        "hideRepliesByLookCount": {
+          "type": "integer",
+          "description": "Hide replies in the feed if they do not have this number of looks."
+        },
         "hideReposts": {
           "type": "boolean",
           "description": "Hide reposts in the feed."
@@ -303,7 +307,7 @@
         "sort": {
           "type": "string",
           "description": "Sorting mode for threads.",
-          "knownValues": ["oldest", "newest", "most-likes", "random", "hotness"]
+          "knownValues": ["oldest", "newest", "most-likes", "most-looks", "random", "hotness"]
         },
         "prioritizeFollowedUsers": {
           "type": "boolean",

@@ -24,6 +24,7 @@
         "replyCount": { "type": "integer" },
         "repostCount": { "type": "integer" },
         "likeCount": { "type": "integer" },
+        "lookCount": {"type": "integer"},
         "indexedAt": { "type": "string", "format": "datetime" },
         "viewer": { "type": "ref", "ref": "#viewerState" },
         "labels": {
@@ -59,6 +60,7 @@
       "properties": {
         "repost": { "type": "string", "format": "at-uri" },
         "like": { "type": "string", "format": "at-uri" },
+        "look": { "type": "string", "format": "at-uri" },
         "threadMuted": { "type": "boolean" },
         "replyDisabled": { "type": "boolean" },
         "embeddingDisabled": { "type": "boolean" },
@@ -181,6 +183,7 @@
         },
         "avatar": { "type": "string", "format": "uri" },
         "likeCount": { "type": "integer", "minimum": 0 },
+        "lookCount": { "type": "integer", "minimum": 0 },
         "acceptsInteractions": { "type": "boolean" },
         "labels": {
           "type": "array",
@@ -200,7 +203,8 @@
     "generatorViewerState": {
       "type": "object",
       "properties": {
-        "like": { "type": "string", "format": "at-uri" }
+        "like": { "type": "string", "format": "at-uri" },
+        "look": { "type": "string", "format": "at-uri" }
       }
     },
     "skeletonFeedPost": {
