@@ -29,6 +29,10 @@
               "so.sprk.embed.video"
             ]
           },
+          "sound": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
           "langs": {
             "type": "array",
             "description": "Indicates human language of post primary text content.",

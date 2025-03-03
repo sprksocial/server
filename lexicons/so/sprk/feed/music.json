@@ -1,0 +1,85 @@
+{
+  "lexicon": 1,
+  "id": "so.sprk.feed.music",
+  "description": "A music record usable in a Spark record (e.g, a post)",
+  "defs": {
+    "main": {
+      "type": "record",
+      "required": ["sound", "title", "author", "releaseDate", "createdAt"],
+      "properties": {
+        "sound": {
+          "type": "blob",
+          "accept": ["audio/mp3"],
+          "maxSize": 10485760
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 1000,
+          "maxGraphemes": 100,
+          "description": "The music's title."
+        },
+        "releaseDate": { "type": "string", "format": "datetime" },
+        "album": {
+          "type": "string",
+          "maxLength": 1000,
+          "maxGraphemes": 100,
+          "description": "The music's album name."
+        },
+        "recordLabel": {
+          "type": "string",
+          "maxLength": 1000,
+          "maxGraphemes": 100,
+          "description": "The music's record label."
+        },
+        "cover": {
+          "type": "blob",
+          "description": "Image to be displayed in music's page. AKA, 'cover image'",
+          "accept": ["image/png", "image/jpeg"],
+          "maxSize": 5242880
+        },
+        "author": {
+          "type": "string",
+          "maxLength": 1000,
+          "maxGraphemes": 100,
+          "description": "The music's author."
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 3000,
+          "maxGraphemes": 300,
+          "description": "The music's description."
+        },
+        "copyright": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "minLength": 1
+        },
+        "facets": {
+          "type": "array",
+          "description": "Annotations of text (mentions, URLs, hashtags, etc)",
+          "items": { "type": "ref", "ref": "so.sprk.richtext.facet" }
+        },
+        "labels": {
+          "type": "union",
+          "description": "Self-label values for this music. Effectively content warnings.",
+          "refs": ["com.atproto.label.defs#selfLabels"]
+        },
+        "tags": {
+          "type": "array",
+          "description": "The music's Hashtags",
+          "maxLength": 8,
+          "items": { "type": "string", "maxLength": 640, "maxGraphemes": 64 }
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Client-declared timestamp when this post was originally created."
+        }
+      }
+    }
+  }
+}
