@@ -1,19 +1,20 @@
 services:
   db:
-    image: postgres:14
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: dev
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - ./devdb:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -p 5432 -u postgres"]
+      test: ["CMD-SHELL", "pg_isready -p 5432 -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 3
+    restart: unless-stopped
 
   app:
     build:
@@ -21,15 +22,22 @@ services:
       dockerfile: Dockerfile.dev
     environment:
       NODE_ENV: development
+      HOST: 0.0.0.0
+      PORT: 3000
       DB_HOST: db
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: dev
+      COOKIE_SECRET: "00000000000000000000000000000000"
     ports:
-      - 3000:3000
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src
+      - ./tsconfig.json:/app/tsconfig.json
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     develop:
       watch:
         - path: ./src
@@ -38,3 +46,4 @@ services:
         - path: ./package.json
           action: rebuild
           target: /app/package.json
+    restart: unless-stopped

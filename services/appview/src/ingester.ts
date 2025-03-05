@@ -1,10 +1,10 @@
-import pino from "pino";
-import { IdResolver } from "@atproto/identity";
-import { Firehose } from "@atproto/sync";
-import type { Database } from "./db";
-
+// @ts-nocheck TODO: REMOVE
+import { pino } from 'pino'
+import { IdResolver } from '@atproto/identity'
+import { Firehose } from '@atproto/sync'
+import type { Database } from './db.js'
 export function createIngester(db: Database, idResolver: IdResolver) {
-  const logger = pino({ name: "firehose ingestion" });
+  const logger = pino({ name: 'firehose ingestion' })
   return new Firehose({
     idResolver,
     handleEvent: async (evt) => {
@@ -12,7 +12,6 @@ export function createIngester(db: Database, idResolver: IdResolver) {
       // if (evt.event === "create" || evt.event === "update") {
       //   const now = new Date();
       //   const record = evt.record;
-
       //   // If the write is a valid status update
       //   if (
       //     evt.collection === "xyz.statusphere.status" &&
@@ -49,10 +48,10 @@ export function createIngester(db: Database, idResolver: IdResolver) {
       // }
     },
     onError: (err) => {
-      logger.error({ err }, "error on firehose ingestion");
+      logger.error({ err }, 'error on firehose ingestion')
     },
-    filterCollections: ["xyz.statusphere.status", ],
+    filterCollections: ['xyz.statusphere.status'],
     excludeIdentity: true,
     excludeAccount: true,
-  });
+  })
 }

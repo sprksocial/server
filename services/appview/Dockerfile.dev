@@ -2,11 +2,11 @@ FROM node:latest
 
 WORKDIR /app
 
-COPY package.json ./
-COPY pnpm-lock.yaml ./
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-RUN npm install -g pnpm
-RUN pnpm install
+COPY package.json pnpm-lock.yaml ./
+
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 

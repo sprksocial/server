@@ -1,139 +1,125 @@
-import { createDb, migrateToLatest } from "./db";
-import { createClient } from "./auth/client";
-import { isValidHandle } from "@atproto/syntax";
-import { pino } from "pino";
-import { Database } from "./db";
-import { createIngester } from "./ingester";
+import { createDb, migrateToLatest } from './db.js'
+import { createClient } from './auth/client.js'
+import { pino } from 'pino'
+import { Database } from './db.js'
+import { createIngester } from './ingester.js'
 import {
   BidirectionalResolver,
   createBidirectionalResolver,
   createIdResolver,
-} from "./id-resolver";
-import type { OAuthClient } from "@atproto/oauth-client-node";
-import { Firehose } from "@atproto/sync";
-import { getIronSession } from "iron-session";
-import { env } from "./env";
-import assert from "node:assert";
-import express from "express";
+} from './id-resolver.js'
+import type { OAuthClient } from '@atproto/oauth-client-node'
+import { Firehose } from '@atproto/sync'
+import { Hono } from 'hono'
+import { logger } from 'hono/logger'
+import { createAuthRouter } from './auth/login.js'
+import { env } from './env.js'
+import { serve } from '@hono/node-server'
+import { HTTPException } from 'hono/http-exception'
 
 export type AppContext = {
-  db: Database;
-  ingester: Firehose;
-  logger: pino.Logger;
-  oauthClient: OAuthClient;
-  resolver: BidirectionalResolver;
-};
-
-type Session = { did: string };
+  db: Database
+  ingester: Firehose
+  logger: pino.Logger
+  oauthClient: OAuthClient
+  resolver: BidirectionalResolver
+}
 
 export class Server {
-  constructor(public app: express.Application, public ctx: AppContext) {}
+  constructor(
+    public app: Hono,
+    public ctx: AppContext,
+  ) {}
 
   static async create() {
-    const express = require("express");
-    const logger = pino({ name: "server start" });
+    const appLogger = pino({ name: 'server start' })
 
-    const db = createDb();
-    await migrateToLatest(db);
+    const db = createDb()
+    await migrateToLatest(db)
 
-    const oauthClient = await createClient(db);
-    const baseIdResolver = createIdResolver();
-    const ingester = createIngester(db, baseIdResolver);
-    const resolver = createBidirectionalResolver(baseIdResolver);
+    const oauthClient = await createClient(db)
+    const baseIdResolver = createIdResolver()
+    const ingester = createIngester(db, baseIdResolver)
+    const resolver = createBidirectionalResolver(baseIdResolver)
 
     const ctx = {
       db,
       ingester,
-      logger,
+      logger: appLogger,
       oauthClient,
       resolver,
-    };
+    }
 
     // Subscribe to events on the firehose
-    ingester.start();
+    ingester.start()
 
-    const app = express();
-    app.use(express.json());
+    const app = new Hono()
 
-    app.get("/login", async (req: express.Request, res: express.Response) => {
-      // const handle = req.body.handle;
+    // Middleware
+    app.use('*', logger())
 
-      const handle = req.query.handle?.toString() || "";
+    // Auth routes
+    const authRouter = createAuthRouter(ctx)
+    app.route('/', authRouter)
 
-      if (!isValidHandle(handle)) {
-        return res.status(400).json({ error: "Invalid handle" });
+    // Root route
+    app.get('/', (c) => {
+      return c.text('Hello Hono')
+    })
+
+    app.onError((err, c) => {
+      if (err instanceof HTTPException) {
+        // Known HTTP error, just return it
+        return err.getResponse()
       }
+      appLogger.error({ err }, 'Server error')
+      return c.json(
+        {
+          error: 'Internal Server Error',
+          message: 'An unexpected error occurred',
+        },
+        500,
+      )
+    })
 
-      const url = await oauthClient.authorize(handle, {
-        scope: "atproto transition:generic",
-      });
-      return res.redirect(url.toString());
-    });
-
-    app.get(
-      "/oauth/callback",
-      async (req: express.Request, res: express.Response) => {
-        const params = new URLSearchParams(req.originalUrl.split("?")[1]);
-        try {
-          const { session } = await ctx.oauthClient.callback(params);
-          const clientSession = await getIronSession<Session>(req, res, {
-            cookieName: "sid",
-            password: env.COOKIE_SECRET,
-          });
-          assert(!clientSession.did, "session already exists");
-          clientSession.did = session.did;
-          await clientSession.save();
-        } catch (err) {
-          ctx.logger.error({ err }, "oauth callback failed");
-          return res.redirect("/?error");
-        }
-        return res.redirect("/");
-      }
-    );
-
-    app.get("/session", async (req: express.Request, res: express.Response) => {
-      const clientSession = await getIronSession<Session>(req, res, {
-        cookieName: "sid",
-        password: env.COOKIE_SECRET,
-      });
-      const session = clientSession.did;
-      res.send(session);
-    });
-
-    app.get("/", (req: express.Request, res: express.Response) => {
-      res.header("Content-Type", "text/plain");
-      res.send("Hello Express");
-    });
-
-    const server = app.listen(3000, () => {
-      logger.info(`Server running on port http://localhost:3000`);
-    });
-
-    return new Server(server, ctx);
+    return new Server(app, ctx)
   }
 
   async close() {
-    this.ctx.logger.info("sigint received, shutting down");
-    await this.ctx.ingester.destroy();
-    // return new Promise<void>((resolve) => {
-    //   this.server.close(() => {
-    //     this.ctx.logger.info("server closed");
-    //     resolve();
-    //   });
-    // });
+    this.ctx.logger.info('Shutting down server')
+    await this.ctx.ingester.destroy()
+  }
+
+  start() {
+    const { HOST, PORT } = env
+    this.ctx.logger.info(`Server starting on http://${HOST}:${PORT}`)
+    return serve({
+      fetch: this.app.fetch,
+      port: PORT,
+      hostname: HOST,
+    })
   }
 }
+
 const run = async () => {
-  const server = await Server.create();
+  try {
+    const server = await Server.create()
+    server.start()
 
-  // const onCloseSignal = async () => {
-  //   setTimeout(() => process.exit(1), 10000).unref(); // Force shutdown after 10s
-  //   await server.close();
-  //   process.exit();
-  // };
+    // Handle shutdown gracefully
+    process.on('SIGINT', async () => {
+      await server.close()
+      process.exit(0)
+    })
 
-  // process.on("SIGINT", onCloseSignal);
-  // process.on("SIGTERM", onCloseSignal);
-};
+    process.on('SIGTERM', async () => {
+      await server.close()
+      process.exit(0)
+    })
+  } catch (err) {
+    console.error('Failed to start server:', err)
+    process.exit(1)
+  }
+}
 
-run();
+run()

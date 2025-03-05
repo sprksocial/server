@@ -1,43 +1,54 @@
 {
   "name": "app",
   "version": "1.0.50",
+  "packageManager": "pnpm@8.6.11",
   "scripts": {
     "codegen": "lex gen-server --yes ./src/lexicon ../../lexicons/com/atproto/*/* ../../lexicons/so/sprk/*/*",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
     "build": "tsc --build tsconfig.json",
-    "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
+    "docker-dev": "docker compose -f compose.dev.yaml up --build --watch",
+    "lint": "eslint . --ext .ts --config ../../.eslintrc",
+    "format": "prettier --write src/*.ts src/**/*.ts --config ../../.prettierrc --ignore-path ../../.prettierignore"
   },
   "dependencies": {
+    "@atproto/api": "^0.14.6",
+    "@atproto/common": "^0.4.8",
     "@atproto/identity": "^0.4.6",
     "@atproto/lexicon": "^0.4.7",
     "@atproto/oauth-client-node": "^0.2.11",
     "@atproto/sync": "^0.1.14",
     "@atproto/syntax": "^0.3.3",
-    "@atproto/common": "^0.4.8",
-    "@atproto/api": "^0.14.6",
     "@atproto/xrpc": "^0.6.9",
     "@atproto/xrpc-server": "^0.7.11",
-    "multiformats": "^9.9.0",
+    "@hono/node-server": "^1.7.0",
     "dotenv": "^16.4.7",
     "envalid": "^8.0.0",
     "express": "^4.21.2",
+    "hono": "^4.0.7",
     "iron-session": "^8.0.4",
     "kysely": "^0.27.5",
+    "multiformats": "^9.9.0",
     "pg": "^8.13.3",
-    "pino": "^9.6.0"
+    "pino": "^9.6.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@atproto/lex-cli": "^0.6.1",
+    "@hono/zod-validator": "^0.4.3",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.5",
     "@types/pg": "^8.11.11",
-    "bun-types": "latest",
+    "@typescript-eslint/eslint-plugin": "^8.26.0",
+    "@typescript-eslint/parser": "^8.26.0",
+    "eslint": "^9.21.0",
     "prettier": "^3.2.5",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3"
   },
   "module": "src/index.js",
+  "type": "module",
   "pnpm": {
     "onlyBuiltDependencies": [
       "cbor-extract",
