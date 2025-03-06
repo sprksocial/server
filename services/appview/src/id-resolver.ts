@@ -1,4 +1,4 @@
-import { IdResolver, MemoryCache } from '@atproto/identity'
+import { AtprotoData, IdResolver, MemoryCache } from '@atproto/identity'
 
 const HOUR = 60e3 * 60
 const DAY = HOUR * 24
@@ -11,6 +11,7 @@ export function createIdResolver() {
 
 export interface BidirectionalResolver {
   resolveDidToHandle(did: string): Promise<string>
+  resolveHandleToDidDoc(handle: string): Promise<AtprotoData>
   resolveDidsToHandles(dids: string[]): Promise<Record<string, string>>
 }
 
@@ -23,6 +24,15 @@ export function createBidirectionalResolver(resolver: IdResolver) {
         return didDoc.handle
       }
       return did
+    },
+
+    async resolveHandleToDidDoc(handle: string): Promise<AtprotoData> {
+      const did = await resolver.handle.resolve(handle)
+      if (!did) {
+        throw new Error('Handle not found')
+      }
+      const didDoc = await resolver.did.resolveAtprotoData(did)
+      return didDoc
     },
 
     async resolveDidsToHandles(

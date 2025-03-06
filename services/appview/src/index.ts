@@ -16,6 +16,7 @@ import { createAuthRouter } from './auth/login.js'
 import { env } from './env.js'
 import { serve } from '@hono/node-server'
 import { HTTPException } from 'hono/http-exception'
+import { authMiddleware } from './auth/middleware.js'
 
 export type AppContext = {
   db: Database
@@ -57,6 +58,8 @@ export class Server {
 
     // Middleware
     app.use('*', logger())
+
+    app.use("/session", authMiddleware)
 
     // Auth routes
     const authRouter = createAuthRouter(ctx)

@@ -12,7 +12,6 @@ export const env = cleanEnv(process.env, {
   PORT: port({ devDefault: 3000 }),
   PUBLIC_URL: str({ devDefault: '' }),
 
-  COOKIE_SECRET: str({ devDefault: '00000000000000000000000000000000' }),
   DB_NAME: str({ devDefault: 'dev' }),
   DB_HOST: str({ devDefault: 'localhost' }),
   DB_PORT: port({ devDefault: 5432 }),
