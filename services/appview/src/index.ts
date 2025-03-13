@@ -1,7 +1,6 @@
-import { createDb, migrateToLatest } from './db.js'
+import { Database } from './db.js'
 import { createClient } from './auth/client.js'
 import { pino } from 'pino'
-import { Database } from './db.js'
 import { createIngester } from './ingester.js'
 import {
   BidirectionalResolver,
@@ -9,7 +8,6 @@ import {
   createIdResolver,
 } from './id-resolver.js'
 import type { OAuthClient } from '@atproto/oauth-client-node'
-import { Firehose } from '@atproto/sync'
 import { Hono } from 'hono'
 import { logger } from 'hono/logger'
 import { createAuthRouter } from './auth/login.js'
@@ -17,10 +15,13 @@ import { env } from './env.js'
 import { serve } from '@hono/node-server'
 import { HTTPException } from 'hono/http-exception'
 import { authMiddleware } from './auth/middleware.js'
+import { createFeedRouter } from './feed/feed.js'
 
 export type AppContext = {
   db: Database
-  ingester: Firehose
+  ingester: {
+    close: () => void
+  }
   logger: pino.Logger
   oauthClient: OAuthClient
   resolver: BidirectionalResolver
@@ -35,13 +36,13 @@ export class Server {
   static async create() {
     const appLogger = pino({ name: 'server start' })
 
-    const db = createDb()
-    await migrateToLatest(db)
+    const db = new Database()
+    await db.connect()
 
     const oauthClient = await createClient(db)
     const baseIdResolver = createIdResolver()
-    const ingester = createIngester(db, baseIdResolver)
     const resolver = createBidirectionalResolver(baseIdResolver)
+    const ingester = createIngester(db, resolver).start()
 
     const ctx = {
       db,
@@ -51,19 +52,19 @@ export class Server {
       resolver,
     }
 
-    // Subscribe to events on the firehose
-    ingester.start()
-
     const app = new Hono()
 
     // Middleware
     app.use('*', logger())
 
-    app.use("/session", authMiddleware)
+    app.use('/session', authMiddleware)
 
     // Auth routes
     const authRouter = createAuthRouter(ctx)
     app.route('/', authRouter)
+
+    const feedRouter = createFeedRouter(ctx)
+    app.route('/', feedRouter)
 
     // Root route
     app.get('/', (c) => {
@@ -90,7 +91,10 @@ export class Server {
 
   async close() {
     this.ctx.logger.info('Shutting down server')
-    await this.ctx.ingester.destroy()
+    this.ctx.ingester.close()
+    if (this.ctx.db instanceof Database) {
+      await this.ctx.db.disconnect()
+    }
   }
 
   start() {

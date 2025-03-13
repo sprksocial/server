@@ -28,10 +28,10 @@
     "express": "^4.21.2",
     "hono": "^4.0.7",
     "iron-session": "^8.0.4",
-    "kysely": "^0.27.5",
+    "mongoose": "^8.12.1",
     "multiformats": "^9.9.0",
-    "pg": "^8.13.3",
     "pino": "^9.6.0",
+    "ws": "^8.18.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -40,6 +40,7 @@
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.5",
     "@types/pg": "^8.11.11",
+    "@types/ws": "^8.18.0",
     "@typescript-eslint/eslint-plugin": "^8.26.0",
     "@typescript-eslint/parser": "^8.26.0",
     "eslint": "^9.21.0",

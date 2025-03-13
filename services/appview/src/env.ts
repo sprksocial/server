@@ -14,7 +14,7 @@ export const env = cleanEnv(process.env, {
 
   DB_NAME: str({ devDefault: 'dev' }),
   DB_HOST: str({ devDefault: 'localhost' }),
-  DB_PORT: port({ devDefault: 5432 }),
-  DB_USER: str({ devDefault: 'postgres' }),
-  DB_PASSWORD: str({ devDefault: 'postgres' }),
+  DB_PORT: port({ devDefault: 27017 }),
+  DB_USER: str({ devDefault: 'mongo' }),
+  DB_PASSWORD: str({ devDefault: 'mongo' }),
 })

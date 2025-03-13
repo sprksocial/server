@@ -1,81 +1,64 @@
-import {
-  Kysely,
-  Migrator,
-  Migration,
-  MigrationProvider,
-  PostgresDialect,
-} from 'kysely'
+import mongoose, { Schema, Document, Model, Connection } from 'mongoose'
 import { env } from './env.js'
-import pg from 'pg'
 
-export type DatabaseSchema = {
-  auth_session: AuthSession
-  auth_state: AuthState
+export interface LikeDocument extends Document {
+  uri: string // URI of the like event
+  subject: string // URI of the post being liked
+  subjectCid: string // CID of the post being liked
+  authorDid: string // DID of the user who liked the post
+  authorHandle: string // Handle of the user who liked the post
+  createdAt: string // When the like was created
+  indexedAt: string // When the like was indexed
 }
 
-export type AuthSession = {
-  key: string
-  session: AuthSessionJson
+const likeSchema = new Schema<LikeDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  subject: { type: String, required: true, index: true },
+  subjectCid: { type: String, required: true },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+})
+
+// Model types
+export interface DatabaseModels {
+  Like: Model<LikeDocument>
 }
 
-export type AuthState = {
-  key: string
-  state: AuthStateJson
+// Database connection and models
+export class Database {
+  private connection: Connection
+  public models: DatabaseModels
+
+  constructor() {
+    this.connection = mongoose.createConnection()
+    this.models = {
+      Like: this.connection.model<LikeDocument>('Like', likeSchema),
+    }
+  }
+
+  async connect(): Promise<void> {
+    const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = env
+    const uri = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/`
+    console.log('Connecting to MongoDB:', uri)
+
+    try {
+      await this.connection.openUri(uri, {
+        autoIndex: true,
+        autoCreate: true,
+      })
+      console.log('Connected to MongoDB')
+    } catch (error) {
+      console.error('MongoDB connection error:', error)
+      throw error
+    }
+  }
+
+  async disconnect(): Promise<void> {
+    if (this.connection) {
+      await this.connection.close()
+      console.log('Disconnected from MongoDB')
+    }
+  }
 }
-
-type AuthStateJson = string
-
-type AuthSessionJson = string
-
-// Migrations
-
-const migrations: Record<string, Migration> = {}
-
-const migrationProvider: MigrationProvider = {
-  async getMigrations() {
-    return migrations
-  },
-}
-
-migrations['001'] = {
-  async up(db: Kysely<unknown>) {
-    await db.schema
-      .createTable('auth_session')
-      .addColumn('key', 'varchar', (col) => col.primaryKey())
-      .addColumn('session', 'varchar', (col) => col.notNull())
-      .execute()
-    await db.schema
-      .createTable('auth_state')
-      .addColumn('key', 'varchar', (col) => col.primaryKey())
-      .addColumn('state', 'varchar', (col) => col.notNull())
-      .execute()
-  },
-  async down(db: Kysely<unknown>) {
-    await db.schema.dropTable('auth_state').execute()
-    await db.schema.dropTable('auth_session').execute()
-  },
-}
-
-// APIs
-
-export const createDb = (): Database => {
-  return new Kysely<DatabaseSchema>({
-    dialect: new PostgresDialect({
-      pool: new pg.Pool({
-        database: env.DB_NAME,
-        host: env.DB_HOST,
-        port: env.DB_PORT,
-        user: env.DB_USER,
-        password: env.DB_PASSWORD,
-      }),
-    }),
-  })
-}
-
-export const migrateToLatest = async (db: Database) => {
-  const migrator = new Migrator({ db, provider: migrationProvider })
-  const { error } = await migrator.migrateToLatest()
-  if (error) throw error
-}
-
-export type Database = Kysely<DatabaseSchema>

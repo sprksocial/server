@@ -1,17 +1,17 @@
 services:
   db:
-    image: postgres:16-alpine
+    image: mongo:8
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: dev
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+      MONGO_INITDB_DATABASE: dev
     ports:
-      - "5432:5432"
+      - "27017:27017"
     volumes:
-      - ./devdb:/var/lib/postgresql/data
+      - ./devdb:/data/db
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -p 5432 -U postgres"]
-      interval: 5s
+      test: ["CMD", "mongosh", "--eval", "'db.adminCommand(\"ping\")'"]
+      interval: 10s
       timeout: 5s
       retries: 3
     restart: unless-stopped
@@ -25,10 +25,10 @@ services:
       HOST: 0.0.0.0
       PORT: 3000
       DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: dev
+      DB_PORT: 27017
+      DB_USER: mongo
+      DB_PASSWORD: mongo
+      DB_NAME: appviewdev
       COOKIE_SECRET: "00000000000000000000000000000000"
     ports:
       - "3000:3000"
