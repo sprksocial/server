@@ -68,7 +68,7 @@ export class Server {
 
     // Root route
     app.get('/', (c) => {
-      return c.text('Hello Hono')
+      return c.text('✧･ﾟ: ✧･ﾟ:. ݁₊ ⊹ . ݁˖ . ݁ 𝚂𝙿𝙰𝚁𝙺 𝙰𝙿𝙸 . ݁₊ ⊹ . ݁˖ . ݁ :･ﾟ✧:･ﾟ✧')
     })
 
     app.onError((err, c) => {
