@@ -1,6 +1,6 @@
 import { Context, Next } from 'hono'
 import { HTTPException } from 'hono/http-exception'
-import { getSessionFromHeader, Session } from './login'
+import { getSessionFromHeader, Session } from './login.js'
 
 // Extend the Context type to include the session
 declare module 'hono' {
