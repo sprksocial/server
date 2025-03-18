@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { AppContext } from '..'
 import { Agent } from '@atproto/api'
 import { HTTPException } from 'hono/http-exception'
+import { CID } from 'multiformats/cid'
 
 export const createFeedRouter = (ctx: AppContext) => {
   const router = new Hono()
@@ -83,9 +84,11 @@ export const createFeedRouter = (ctx: AppContext) => {
     const feed = {
       feed: listRes.data.records.map((record) => {
         // Get the like count for this post, defaulting to 0 if not found
+        if ((record.value as any).embed?.$type !== 'so.sprk.embed.video') {
+          return undefined
+        }
         const likeCount = likeCounts.get(record.uri) || 0
-        const blobCid =
-          'bafkreichlrd7xi3y7foqryxlgrzg6jf65brzpdqpql6jte3kqseru4chi4'
+        const blobCid: CID = (record.value as any).embed?.video?.ref
 
         return {
           post: {
@@ -107,12 +110,8 @@ export const createFeedRouter = (ctx: AppContext) => {
             embed: {
               $type: 'so.sprk.embed.video#view',
               cid: record.cid,
-              playlist: `https://${pdsUrl}/xrpc/com.atproto.sync.getBlob?cid=${blobCid}&did=${actorDid}`,
-              thumbnail: 'https://cdn.justdavi.dev/runnig.png',
-              aspectRatio: {
-                width: 1,
-                height: 1,
-              },
+              playlist: `https://${pdsUrl}/xrpc/com.atproto.sync.getBlob?cid=${blobCid.toString()}&did=${actorDid}`,
+              thumbnail: `https://cdn.sprk.so/${actorDid}/${blobCid.toString()}/thumbnail`,
             },
             replyCount: 0,
             repostCount: 0,

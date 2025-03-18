@@ -31,7 +31,7 @@ services:
       DB_NAME: appviewdev
       COOKIE_SECRET: "00000000000000000000000000000000"
     ports:
-      - "3000:3000"
+      - "4000:3000"
     volumes:
       - ./src:/app/src
       - ./tsconfig.json:/app/tsconfig.json
