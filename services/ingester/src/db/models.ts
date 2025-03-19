@@ -20,6 +20,168 @@ export const likeSchema = new Schema<LikeDocument>({
   indexedAt: { type: String, required: true },
 })
 
+export interface FollowDocument extends Document {
+  uri: string
+  subject: string
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+}
+
+export const followSchema = new Schema<FollowDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  subject: { type: String, required: true, index: true },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+})
+
+export interface BlockDocument extends Document {
+  uri: string
+  subject: string
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+}
+
+export const blockSchema = new Schema<BlockDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  subject: { type: String, required: true, index: true },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+})
+
+export interface ProfileDocument extends Document {
+  uri: string
+  displayName?: string
+  description?: string
+  avatar?: string
+  banner?: string
+  labels?: Record<string, any>
+  joinedViaStarterPack?: Record<string, any>
+  pinnedPost?: Record<string, any>
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+}
+
+export const profileSchema = new Schema<ProfileDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  displayName: { type: String, required: false },
+  description: { type: String, required: false },
+  avatar: { type: String, required: false },
+  banner: { type: String, required: false },
+  labels: { type: Object, required: false },
+  joinedViaStarterPack: { type: Object, required: false },
+  pinnedPost: { type: Object, required: false },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+})
+
+export interface AudioDocument extends Document {
+  uri: string
+  sound: string
+  origin: {
+    uri: string
+    cid: string
+  }
+  title?: string
+  text?: string
+  labels?: Record<string, any>
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+}
+
+export const audioSchema = new Schema<AudioDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  sound: { type: String, required: true },
+  origin: {
+    uri: { type: String, required: true },
+    cid: { type: String, required: true }
+  },
+  title: { type: String, required: false },
+  text: { type: String, required: false },
+  labels: { type: Object, required: false },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+})
+
+export interface RepostDocument extends Document {
+  uri: string
+  subject: {
+    uri: string
+    cid: string
+  }
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+}
+
+export const repostSchema = new Schema<RepostDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  subject: {
+    uri: { type: String, required: true },
+    cid: { type: String, required: true }
+  },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+})
+
+export interface MusicDocument extends Document {
+  uri: string
+  sound: string
+  title: string
+  author: string
+  releaseDate: string
+  album?: string
+  recordLabel?: string
+  cover?: string
+  text?: string
+  copyright?: string[]
+  facets?: Array<Record<string, any>>
+  labels?: Record<string, any>
+  tags?: string[]
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+}
+
+export const musicSchema = new Schema<MusicDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  sound: { type: String, required: true },
+  title: { type: String, required: true },
+  author: { type: String, required: true },
+  releaseDate: { type: String, required: true },
+  album: { type: String, required: false },
+  recordLabel: { type: String, required: false },
+  cover: { type: String, required: false },
+  text: { type: String, required: false },
+  copyright: { type: [String], required: false },
+  facets: { type: [Object], required: false },
+  labels: { type: Object, required: false },
+  tags: { type: [String], required: false },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+})
+
 export interface PostDocument extends Document {
   uri: string
   text: string
@@ -88,7 +250,27 @@ export const postSchema = new Schema<PostDocument>({
 postSchema.index({ authorDid: 1, createdAt: -1 })
 postSchema.index({ tags: 1, createdAt: -1 })
 
+// Add compound indexes for new schemas
+followSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
+followSchema.index({ subject: 1, createdAt: -1 })
+
+blockSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
+blockSchema.index({ subject: 1, createdAt: -1 })
+
+audioSchema.index({ authorDid: 1, createdAt: -1 })
+repostSchema.index({ authorDid: 1, createdAt: -1 })
+repostSchema.index({ 'subject.uri': 1, createdAt: -1 })
+
+musicSchema.index({ authorDid: 1, createdAt: -1 })
+musicSchema.index({ tags: 1, createdAt: -1 })
+
 export interface DatabaseModels {
   Like: Model<LikeDocument>
   Post: Model<PostDocument>
+  Follow: Model<FollowDocument>
+  Block: Model<BlockDocument>
+  Profile: Model<ProfileDocument>
+  Audio: Model<AudioDocument>
+  Repost: Model<RepostDocument>
+  Music: Model<MusicDocument>
 }

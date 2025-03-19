@@ -1,0 +1,91 @@
+import { pino } from 'pino'
+import { Database } from '../db/connection.js'
+import type { NormalizedEvent } from '../types/events.js'
+
+const logger = pino({ name: 'music-handler' })
+
+export async function handleMusicEvent(evt: NormalizedEvent, db: Database): Promise<void> {
+  if (evt.collection !== 'so.sprk.feed.music') {
+    return
+  }
+
+  if (evt.event === 'create' || evt.event === 'update') {
+    await handleCreateOrUpdate(evt, db)
+    return
+  }
+
+  if (evt.event === 'delete') {
+    await handleDelete(evt, db)
+    return
+  }
+}
+
+async function handleCreateOrUpdate(evt: NormalizedEvent, db: Database): Promise<void> {
+  const now = new Date()
+  const record = evt.record
+
+  if (!record) {
+    logger.warn({ uri: evt.uri }, 'Music event missing record data')
+    return
+  }
+
+  logger.info({
+    did: evt.did,
+    handle: evt.handle,
+    collection: evt.collection,
+    uri: evt.uri,
+  }, 'Processing music event')
+
+  try {
+    const musicData = {
+      uri: evt.uri,
+      sound: record.sound?.ref,
+      title: record.title,
+      author: record.author,
+      releaseDate: record.releaseDate,
+      album: record.album,
+      recordLabel: record.recordLabel,
+      cover: record.cover?.ref,
+      text: record.text,
+      copyright: record.copyright,
+      facets: record.facets || [],
+      labels: record.labels,
+      tags: record.tags || [],
+      authorDid: evt.did,
+      authorHandle: evt.handle || 'unknown',
+      createdAt: record.createdAt,
+      indexedAt: now.toISOString()
+    }
+
+    await db.models.Music.findOneAndUpdate(
+      { uri: evt.uri },
+      musicData,
+      { upsert: true, new: true }
+    )
+
+    logger.info(
+      { uri: evt.uri },
+      'Successfully saved music to database'
+    )
+  } catch (error) {
+    logger.error(
+      { error, uri: evt.uri },
+      'Failed to save music to database'
+    )
+  }
+}
+
+async function handleDelete(evt: NormalizedEvent, db: Database): Promise<void> {
+  try {
+    const result = await db.models.Music.deleteOne({ uri: evt.uri })
+
+    if (result.deletedCount > 0) {
+      logger.info({ uri: evt.uri }, 'Successfully removed music from database')
+      return
+    }
+
+    logger.warn({ uri: evt.uri }, 'Music not found in database for deletion')
+  } catch (error) {
+    logger.error({ error, uri: evt.uri }, 'Failed to delete music from database')
+  }
+}

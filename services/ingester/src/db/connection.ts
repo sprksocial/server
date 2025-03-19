@@ -1,5 +1,15 @@
 import mongoose, { Connection } from 'mongoose'
-import { type DatabaseModels, likeSchema, postSchema } from './models.js'
+import {
+  type DatabaseModels,
+  likeSchema,
+  postSchema,
+  followSchema,
+  blockSchema,
+  profileSchema,
+  audioSchema,
+  repostSchema,
+  musicSchema
+} from './models.js'
 import { env } from '../utils/env.js'
 import { pino } from 'pino'
 
@@ -13,6 +23,12 @@ export class Database {
     this.models = {
       Like: this.connection.model('Like', likeSchema),
       Post: this.connection.model('Post', postSchema),
+      Follow: this.connection.model('Follow', followSchema),
+      Block: this.connection.model('Block', blockSchema),
+      Profile: this.connection.model('Profile', profileSchema),
+      Audio: this.connection.model('Audio', audioSchema),
+      Repost: this.connection.model('Repost', repostSchema),
+      Music: this.connection.model('Music', musicSchema),
     }
   }
 
