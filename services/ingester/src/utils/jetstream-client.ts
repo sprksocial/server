@@ -13,20 +13,26 @@ export interface JetstreamClientOptions {
   initialCursor?: number | null
 }
 
-export function createJetstreamClient(db: Database, resolver: BidirectionalResolver) {
+export function createJetstreamClient(
+  db: Database,
+  resolver: BidirectionalResolver,
+) {
   let cursorPosition: number | null = null
   let wsConnection: WebSocket | null = null
   let heartbeatInterval: Timer | null = null
 
-  function connect(options: JetstreamClientOptions = {}): { close: () => void } {
+  function connect(options: JetstreamClientOptions = {}): {
+    close: () => void
+  } {
     const { filterCollections = ['so.sprk.*'], initialCursor = null } = options
 
     if (initialCursor) {
       cursorPosition = initialCursor
     }
 
-    const collectionsParam = filterCollections.join(',')
-    let url = `${env.JETSTREAM_URL}?wantedCollections=${collectionsParam}`
+    let url = filterCollections.reduce((acc, collection) => {
+      return `${acc}&wantedCollections=${collection}`
+    }, `${env.JETSTREAM_URL}?`)
 
     if (cursorPosition) {
       // Subtract a few seconds (in microseconds) to ensure no gaps
