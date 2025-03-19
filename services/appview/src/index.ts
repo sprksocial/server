@@ -1,7 +1,6 @@
 import { Database } from './db.js'
 import { createClient } from './auth/client.js'
 import { pino } from 'pino'
-import { createIngester } from './ingester.js'
 import {
   BidirectionalResolver,
   createBidirectionalResolver,
@@ -19,9 +18,6 @@ import { createFeedRouter } from './feed/feed.js'
 
 export type AppContext = {
   db: Database
-  ingester: {
-    close: () => void
-  }
   logger: pino.Logger
   oauthClient: OAuthClient
   resolver: BidirectionalResolver
@@ -42,11 +38,9 @@ export class Server {
     const oauthClient = await createClient(db)
     const baseIdResolver = createIdResolver()
     const resolver = createBidirectionalResolver(baseIdResolver)
-    const ingester = createIngester(db, resolver).start()
 
     const ctx = {
       db,
-      ingester,
       logger: appLogger,
       oauthClient,
       resolver,
@@ -91,7 +85,6 @@ export class Server {
 
   async close() {
     this.ctx.logger.info('Shutting down server')
-    this.ctx.ingester.close()
     if (this.ctx.db instanceof Database) {
       await this.ctx.db.disconnect()
     }
