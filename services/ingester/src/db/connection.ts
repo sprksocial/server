@@ -1,5 +1,5 @@
 import mongoose, { Connection } from 'mongoose'
-import { type DatabaseModels, likeSchema } from './models.js'
+import { type DatabaseModels, likeSchema, postSchema } from './models.js'
 import { env } from '../utils/env.js'
 import { pino } from 'pino'
 
@@ -12,6 +12,7 @@ export class Database {
     this.connection = mongoose.createConnection()
     this.models = {
       Like: this.connection.model('Like', likeSchema),
+      Post: this.connection.model('Post', postSchema),
     }
   }
 

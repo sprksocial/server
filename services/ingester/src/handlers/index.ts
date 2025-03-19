@@ -2,14 +2,20 @@ import { pino } from 'pino'
 import { Database } from '../db/connection.js'
 import type { NormalizedEvent } from '../types/events.js'
 import { handleLikeEvent } from './like-handler.js'
+import { handlePostEvent } from './post-handler.js'
 
 const logger = pino({ name: 'event-handler' })
 
 export async function handleEvent(evt: NormalizedEvent, db: Database): Promise<void> {
   try {
     // Handle different events based on collection
-    if (evt.collection.startsWith('so.sprk.feed.like')) {
+    if (evt.collection === 'so.sprk.feed.like') {
       await handleLikeEvent(evt, db)
+      return
+    }
+
+    if (evt.collection === 'so.sprk.feed.post') {
+      await handlePostEvent(evt, db)
       return
     }
 
