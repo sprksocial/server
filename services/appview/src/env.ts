@@ -11,6 +11,7 @@ export const env = cleanEnv(process.env, {
   HOST: host({ devDefault: '0.0.0.0' }),
   PORT: port({ devDefault: 3000 }),
   PUBLIC_URL: str({ devDefault: '' }),
+  APPVIEW_K256_PRIVATE_KEY_HEX: str({ devDefault: '' }),
 
   DB_NAME: str({ devDefault: 'dev' }),
   DB_HOST: str({ devDefault: 'localhost' }),

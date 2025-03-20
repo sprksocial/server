@@ -15,6 +15,7 @@ import { serve } from '@hono/node-server'
 import { HTTPException } from 'hono/http-exception'
 import { authMiddleware } from './auth/middleware.js'
 import { createFeedRouter } from './feed/feed.js'
+import wellKnownRouter from './well-known.js'
 
 export type AppContext = {
   db: Database
@@ -59,6 +60,8 @@ export class Server {
 
     const feedRouter = createFeedRouter(ctx)
     app.route('/', feedRouter)
+
+    app.route('/', wellKnownRouter())
 
     // Root route
     app.get('/', (c) => {

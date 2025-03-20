@@ -15,6 +15,7 @@
   "dependencies": {
     "@atproto/api": "^0.14.9",
     "@atproto/common": "^0.4.8",
+    "@atproto/crypto": "^0.4.4",
     "@atproto/identity": "^0.4.6",
     "@atproto/lexicon": "^0.4.8",
     "@atproto/oauth-client-node": "^0.2.12",
@@ -31,6 +32,7 @@
     "mongoose": "^8.12.1",
     "multiformats": "^9.9.0",
     "pino": "^9.6.0",
+    "uint8arrays": "^5.1.0",
     "ws": "^8.18.1",
     "zod": "^3.24.2"
   },
