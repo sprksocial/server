@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { env } from './env'
+import { env } from './env.js'
 import { Secp256k1Keypair, formatMultikey, randomStr } from '@atproto/crypto'
 
 const wellKnownRouter = () => {
