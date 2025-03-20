@@ -110,7 +110,7 @@ export const createFeedRouter = (ctx: AppContext) => {
             embed: {
               $type: 'so.sprk.embed.video#view',
               cid: record.cid,
-              playlist: `https://${pdsUrl}/xrpc/com.atproto.sync.getBlob?cid=${blobCid.toString()}&did=${actorDid}`,
+              playlist: `https://videocdn.sprk.so/${pdsUrl}/${actorDid}/${blobCid.toString()}`,
               thumbnail: `https://cdn.sprk.so/${actorDid}/${blobCid.toString()}/thumbnail`,
             },
             replyCount: 0,
