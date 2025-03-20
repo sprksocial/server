@@ -41,3 +41,8 @@ yarn-error.log*
 package-lock.json
 **/*.bun
 /devdb
+
+.git
+.env
+tsconfig.tsbuildinfo
+README.md
