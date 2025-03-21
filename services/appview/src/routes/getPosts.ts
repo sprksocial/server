@@ -7,11 +7,14 @@ import type { Label } from '../lexicon/types/com/atproto/label/defs.js'
 import type * as SoSprkEmbedImages from '../lexicon/types/so/sprk/embed/images.js'
 import type * as SoSprkEmbedVideo from '../lexicon/types/so/sprk/embed/video.js'
 import { Database, PostDocument } from '../db.js'
+import { BidirectionalResolver } from '../id-resolver.js'
+import { AppContext } from '../index.js'
 
 // Transform DB post to PostView format
 async function transformPostToPostView(
   post: PostDocument,
   db: Database,
+  resolver: BidirectionalResolver,
 ): Promise<SoSprkFeedDefs.PostView> {
   // Get like count
   const likeCount = await db.models.Like.countDocuments({ subject: post.uri })
@@ -61,10 +64,12 @@ async function transformPostToPostView(
       })),
     } satisfies SoSprkEmbedImages.View
   } else if (post.embed?.$type === 'so.sprk.embed.video') {
+    const did = await resolver.resolveDidToDidDoc(post.authorDid)
+    const pdsDomain = did.pds.replace('https://', '')
     embed = {
       $type: 'so.sprk.embed.video#view',
       cid: post.cid,
-      playlist: `https://videocdn.sprk.so/${post.authorDid}/${post.embed.video.ref.$link}`,
+      playlist: `https://videocdn.sprk.so/${pdsDomain}/${post.authorDid}/${post.embed.video.ref.$link}`,
       thumbnail: `https://cdn.sprk.so/${post.authorDid}/${post.embed.video.ref.$link}/thumbnail`,
     } satisfies SoSprkEmbedVideo.View
   }
@@ -100,6 +105,7 @@ async function transformPostToPostView(
 async function getPosts(
   uris: string | string[],
   db: Database,
+  resolver: BidirectionalResolver,
 ): Promise<SoSprkFeedDefs.PostView[]> {
   if (!uris) {
     return []
@@ -115,13 +121,13 @@ async function getPosts(
 
   // Transform each post to PostView format
   const postViews = await Promise.all(
-    dbPosts.map((post) => transformPostToPostView(post, db)),
+    dbPosts.map((post) => transformPostToPostView(post, db, resolver)),
   )
 
   return postViews
 }
 
-export const createGetPostsRouter = (db: Database) => {
+export const createGetPostsRouter = (ctx: AppContext) => {
   const router = new Hono()
 
   router.get('/xrpc/so.sprk.feed.getPosts', async (c) => {
@@ -131,7 +137,7 @@ export const createGetPostsRouter = (db: Database) => {
       return c.json({ posts: [] } as GetPostsView)
     }
 
-    const posts = await getPosts(uris, db)
+    const posts = await getPosts(uris, ctx.db, ctx.resolver)
 
     return c.json({ posts } as GetPostsView)
   })

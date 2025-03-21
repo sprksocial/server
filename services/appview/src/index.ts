@@ -62,7 +62,7 @@ export class Server {
     const feedRouter = createFeedRouter(ctx)
     app.route('/', feedRouter)
 
-    const getPostsRouter = createGetPostsRouter(ctx.db)
+    const getPostsRouter = createGetPostsRouter(ctx)
     app.route('/', getPostsRouter)
 
     app.route('/', wellKnownRouter())
