@@ -1,17 +1,19 @@
 import mongoose, { Schema, Document, Model, Connection } from 'mongoose'
 import { env } from './env.js'
+import { pino } from 'pino'
 
 export interface LikeDocument extends Document {
-  uri: string // URI of the like event
-  subject: string // URI of the post being liked
-  subjectCid: string // CID of the post being liked
-  authorDid: string // DID of the user who liked the post
-  authorHandle: string // Handle of the user who liked the post
-  createdAt: string // When the like was created
-  indexedAt: string // When the like was indexed
+  uri: string
+  subject: string
+  subjectCid: string
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+  cid: string
 }
 
-const likeSchema = new Schema<LikeDocument>({
+export const likeSchema = new Schema<LikeDocument>({
   uri: { type: String, required: true, unique: true, index: true },
   subject: { type: String, required: true, index: true },
   subjectCid: { type: String, required: true },
@@ -19,38 +21,337 @@ const likeSchema = new Schema<LikeDocument>({
   authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
 })
 
-// Model types
-export interface DatabaseModels {
-  Like: Model<LikeDocument>
+export interface LookDocument extends Document {
+  uri: string
+  subject: string
+  subjectCid: string
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+  cid: string
 }
 
-// Database connection and models
+export const lookSchema = new Schema<LookDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  subject: { type: String, required: true, index: true },
+  subjectCid: { type: String, required: true },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
+})
+
+export interface FollowDocument extends Document {
+  uri: string
+  subject: string
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+  cid: string
+}
+
+export const followSchema = new Schema<FollowDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  subject: { type: String, required: true, index: true },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
+})
+
+export interface BlockDocument extends Document {
+  uri: string
+  subject: string
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+  cid: string
+}
+
+export const blockSchema = new Schema<BlockDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  subject: { type: String, required: true, index: true },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
+})
+
+export interface ProfileDocument extends Document {
+  uri: string
+  displayName?: string
+  description?: string
+  avatar?: string
+  banner?: string
+  labels?: Record<string, any>
+  joinedViaStarterPack?: Record<string, any>
+  pinnedPost?: Record<string, any>
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+  cid: string
+}
+
+export const profileSchema = new Schema<ProfileDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  displayName: { type: String, required: false },
+  description: { type: String, required: false },
+  avatar: { type: String, required: false },
+  banner: { type: String, required: false },
+  labels: { type: Object, required: false },
+  joinedViaStarterPack: { type: Object, required: false },
+  pinnedPost: { type: Object, required: false },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
+})
+
+export interface AudioDocument extends Document {
+  uri: string
+  sound: string
+  origin: {
+    uri: string
+    cid: string
+  }
+  title?: string
+  text?: string
+  labels?: Record<string, any>
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+  cid: string
+}
+
+export const audioSchema = new Schema<AudioDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  sound: { type: String, required: true },
+  origin: {
+    uri: { type: String, required: true },
+    cid: { type: String, required: true },
+  },
+  title: { type: String, required: false },
+  text: { type: String, required: false },
+  labels: { type: Object, required: false },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
+})
+
+export interface RepostDocument extends Document {
+  uri: string
+  subject: {
+    uri: string
+    cid: string
+  }
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+  cid: string
+}
+
+export const repostSchema = new Schema<RepostDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  subject: {
+    uri: { type: String, required: true },
+    cid: { type: String, required: true },
+  },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
+})
+
+export interface MusicDocument extends Document {
+  uri: string
+  sound: string
+  title: string
+  author: string
+  releaseDate: string
+  album?: string
+  recordLabel?: string
+  cover?: string
+  text?: string
+  copyright?: string[]
+  facets?: Array<Record<string, any>>
+  labels?: Record<string, any>
+  tags?: string[]
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+  cid: string
+}
+
+export const musicSchema = new Schema<MusicDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  sound: { type: String, required: true },
+  title: { type: String, required: true },
+  author: { type: String, required: true },
+  releaseDate: { type: String, required: true },
+  album: { type: String, required: false },
+  recordLabel: { type: String, required: false },
+  cover: { type: String, required: false },
+  text: { type: String, required: false },
+  copyright: { type: [String], required: false },
+  facets: { type: [Object], required: false },
+  labels: { type: Object, required: false },
+  tags: { type: [String], required: false },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
+})
+
+export interface PostDocument extends Document {
+  uri: string
+  text: string
+  facets: Array<Record<string, any>>
+  reply: {
+    root: {
+      uri: string
+      cid: string
+    }
+    parent: {
+      uri: string
+      cid: string
+    }
+  } | null
+  embed: Record<string, any> | null
+  sound: {
+    uri: string
+    cid: string
+  } | null
+  langs: string[]
+  labels: Record<string, any> | null
+  tags: string[]
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+  cid: string
+}
+
+export const postSchema = new Schema<PostDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  text: { type: String, required: false },
+  facets: { type: [Object], required: false, default: [] },
+  reply: {
+    type: {
+      root: {
+        uri: { type: String, required: true },
+        cid: { type: String, required: true },
+      },
+      parent: {
+        uri: { type: String, required: true },
+        cid: { type: String, required: true },
+      },
+    },
+    required: false,
+    default: null,
+  },
+  embed: { type: Object, required: false, default: null },
+  sound: {
+    type: {
+      uri: { type: String, required: true },
+      cid: { type: String, required: true },
+    },
+    required: false,
+    default: null,
+  },
+  langs: { type: [String], required: false, default: [] },
+  labels: { type: Object, required: false, default: null },
+  tags: { type: [String], required: false, default: [] },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
+})
+
+// Add compound indexes for more efficient queries
+postSchema.index({ authorDid: 1, createdAt: -1 })
+postSchema.index({ tags: 1, createdAt: -1 })
+
+// Add compound indexes for new schemas
+followSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
+followSchema.index({ subject: 1, createdAt: -1 })
+
+blockSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
+blockSchema.index({ subject: 1, createdAt: -1 })
+
+audioSchema.index({ authorDid: 1, createdAt: -1 })
+repostSchema.index({ authorDid: 1, createdAt: -1 })
+repostSchema.index({ 'subject.uri': 1, createdAt: -1 })
+
+musicSchema.index({ authorDid: 1, createdAt: -1 })
+musicSchema.index({ tags: 1, createdAt: -1 })
+
+export interface DatabaseModels {
+  Like: Model<LikeDocument>
+  Post: Model<PostDocument>
+  Follow: Model<FollowDocument>
+  Block: Model<BlockDocument>
+  Profile: Model<ProfileDocument>
+  Audio: Model<AudioDocument>
+  Repost: Model<RepostDocument>
+  Music: Model<MusicDocument>
+  Look: Model<LookDocument>
+}
+
 export class Database {
   private connection: Connection
   public models: DatabaseModels
+  private logger = pino({ name: 'database' })
 
   constructor() {
     this.connection = mongoose.createConnection()
     this.models = {
       Like: this.connection.model<LikeDocument>('Like', likeSchema),
+      Post: this.connection.model<PostDocument>('Post', postSchema),
+      Follow: this.connection.model<FollowDocument>('Follow', followSchema),
+      Block: this.connection.model<BlockDocument>('Block', blockSchema),
+      Profile: this.connection.model<ProfileDocument>('Profile', profileSchema),
+      Audio: this.connection.model<AudioDocument>('Audio', audioSchema),
+      Repost: this.connection.model<RepostDocument>('Repost', repostSchema),
+      Music: this.connection.model<MusicDocument>('Music', musicSchema),
+      Look: this.connection.model<LookDocument>('Look', lookSchema),
     }
   }
 
   async connect(): Promise<void> {
     const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = env
-    const uri = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/`
-    console.log('Connecting to MongoDB:', uri)
+    const uri = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/?appName=appview`
+    this.logger.info(
+      `Connecting to MongoDB at ${DB_HOST}:${DB_PORT}/?appName=appview`,
+    )
 
     try {
       await this.connection.openUri(uri, {
         autoIndex: true,
         autoCreate: true,
+        dbName: DB_NAME,
       })
-      console.log('Connected to MongoDB')
+      this.logger.info('Connected to MongoDB')
     } catch (error) {
-      console.error('MongoDB connection error:', error)
+      this.logger.error({ error }, 'MongoDB connection error')
       throw error
     }
   }
@@ -58,7 +359,7 @@ export class Database {
   async disconnect(): Promise<void> {
     if (this.connection) {
       await this.connection.close()
-      console.log('Disconnected from MongoDB')
+      this.logger.info('Disconnected from MongoDB')
     }
   }
 }
