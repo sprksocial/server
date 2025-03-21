@@ -10,11 +10,9 @@ export const createFeedRouter = (ctx: AppContext) => {
   router.get('/actorFeed/:actorDid', async (c) => {
     const { actorDid } = c.req.param()
 
-    const accessJwt = c.req.header('Authorization')?.split(' ')[1] || ''
 
-    const pdsUrl = accessJwt
-      ? JSON.parse(atob(accessJwt.split('.')[1])).aud.replace('did:web:', '')
-      : ''
+    const didDoc = await ctx.resolver.resolveDidToDidDoc(actorDid)
+    const pdsUrl = didDoc.pds
 
     if (!pdsUrl) {
       throw new HTTPException(400, {
@@ -22,18 +20,13 @@ export const createFeedRouter = (ctx: AppContext) => {
       })
     }
 
-    const agent = new Agent(new URL(`https://${pdsUrl}`))
+    const agent = new Agent(new URL(pdsUrl))
 
     const listRes = await agent.com.atproto.repo.listRecords(
       {
         collection: 'so.sprk.feed.post',
         repo: actorDid,
         limit: 30,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${accessJwt}`,
-        },
       },
     )
 
