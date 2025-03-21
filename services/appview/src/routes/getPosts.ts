@@ -63,9 +63,9 @@ async function transformPostToPostView(
   } else if (post.embed?.$type === 'so.sprk.embed.video') {
     embed = {
       $type: 'so.sprk.embed.video#view',
-      cid: post.embed.cid,
-      playlist: post.embed.playlist,
-      thumbnail: post.embed.thumbnail,
+      cid: post.cid,
+      playlist: `https://videocdn.sprk.so/${post.authorDid}/${post.embed.video.ref.$link}`,
+      thumbnail: `https://cdn.sprk.so/${post.authorDid}/${post.embed.video.ref.$link}/thumbnail`,
     } satisfies SoSprkEmbedVideo.View
   }
 
