@@ -48,7 +48,8 @@ async function handleCreateOrUpdate(evt: NormalizedEvent, db: Database): Promise
       authorDid: evt.did,
       authorHandle: evt.handle || 'unknown',
       createdAt: record.createdAt,
-      indexedAt: now.toISOString()
+      indexedAt: now.toISOString(),
+      cid: evt.commit.cid
     }
 
     // Create or update the post record

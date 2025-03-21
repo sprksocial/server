@@ -47,6 +47,7 @@ async function handleCreateOrUpdate(evt: NormalizedEvent, db: Database): Promise
         authorHandle: evt.handle || 'unknown',
         createdAt: record.createdAt || now.toISOString(),
         indexedAt: now.toISOString(),
+        cid: evt.commit.cid,
       },
       { upsert: true, new: true },
     )

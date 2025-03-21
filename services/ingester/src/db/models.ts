@@ -8,6 +8,7 @@ export interface LikeDocument extends Document {
   authorHandle: string
   createdAt: string
   indexedAt: string
+  cid: string
 }
 
 export const likeSchema = new Schema<LikeDocument>({
@@ -18,6 +19,7 @@ export const likeSchema = new Schema<LikeDocument>({
   authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
 })
 
 export interface FollowDocument extends Document {
@@ -27,6 +29,7 @@ export interface FollowDocument extends Document {
   authorHandle: string
   createdAt: string
   indexedAt: string
+  cid: string
 }
 
 export const followSchema = new Schema<FollowDocument>({
@@ -36,6 +39,7 @@ export const followSchema = new Schema<FollowDocument>({
   authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
 })
 
 export interface BlockDocument extends Document {
@@ -45,6 +49,7 @@ export interface BlockDocument extends Document {
   authorHandle: string
   createdAt: string
   indexedAt: string
+  cid: string
 }
 
 export const blockSchema = new Schema<BlockDocument>({
@@ -54,6 +59,7 @@ export const blockSchema = new Schema<BlockDocument>({
   authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
 })
 
 export interface ProfileDocument extends Document {
@@ -69,6 +75,7 @@ export interface ProfileDocument extends Document {
   authorHandle: string
   createdAt: string
   indexedAt: string
+  cid: string
 }
 
 export const profileSchema = new Schema<ProfileDocument>({
@@ -84,6 +91,7 @@ export const profileSchema = new Schema<ProfileDocument>({
   authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
 })
 
 export interface AudioDocument extends Document {
@@ -100,6 +108,7 @@ export interface AudioDocument extends Document {
   authorHandle: string
   createdAt: string
   indexedAt: string
+  cid: string
 }
 
 export const audioSchema = new Schema<AudioDocument>({
@@ -116,6 +125,7 @@ export const audioSchema = new Schema<AudioDocument>({
   authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
 })
 
 export interface RepostDocument extends Document {
@@ -128,6 +138,7 @@ export interface RepostDocument extends Document {
   authorHandle: string
   createdAt: string
   indexedAt: string
+  cid: string
 }
 
 export const repostSchema = new Schema<RepostDocument>({
@@ -140,6 +151,7 @@ export const repostSchema = new Schema<RepostDocument>({
   authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
 })
 
 export interface MusicDocument extends Document {
@@ -160,6 +172,7 @@ export interface MusicDocument extends Document {
   authorHandle: string
   createdAt: string
   indexedAt: string
+  cid: string
 }
 
 export const musicSchema = new Schema<MusicDocument>({
@@ -180,6 +193,7 @@ export const musicSchema = new Schema<MusicDocument>({
   authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
 })
 
 export interface PostDocument extends Document {
@@ -208,6 +222,7 @@ export interface PostDocument extends Document {
   authorHandle: string
   createdAt: string
   indexedAt: string
+  cid: string
 }
 
 export const postSchema = new Schema<PostDocument>({
@@ -243,7 +258,8 @@ export const postSchema = new Schema<PostDocument>({
   authorDid: { type: String, required: true, index: true },
   authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true }
+  indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
 })
 
 // Add compound indexes for more efficient queries
