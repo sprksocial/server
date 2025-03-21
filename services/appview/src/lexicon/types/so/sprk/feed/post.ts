@@ -8,8 +8,8 @@ import { $Typed, is$typed as _is$typed, OmitKey } from '../../../../util'
 import type * as SoSprkRichtextFacet from '../richtext/facet.js'
 import type * as SoSprkEmbedImages from '../embed/images.js'
 import type * as SoSprkEmbedVideo from '../embed/video.js'
-import type * as ComAtprotoLabelDefs from '../../../com/atproto/label/defs.js'
 import type * as ComAtprotoRepoStrongRef from '../../../com/atproto/repo/strongRef.js'
+import type * as ComAtprotoLabelDefs from '../../../com/atproto/label/defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
@@ -26,6 +26,7 @@ export interface Record {
     | $Typed<SoSprkEmbedImages.Main>
     | $Typed<SoSprkEmbedVideo.Main>
     | { $type: string }
+  sound?: ComAtprotoRepoStrongRef.Main
   /** Indicates human language of post primary text content. */
   langs?: string[]
   labels?: $Typed<ComAtprotoLabelDefs.SelfLabels> | { $type: string }

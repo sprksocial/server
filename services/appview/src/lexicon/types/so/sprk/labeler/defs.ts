@@ -18,6 +18,7 @@ export interface LabelerView {
   cid: string
   creator: SoSprkActorDefs.ProfileView
   likeCount?: number
+  lookCount?: number
   viewer?: LabelerViewerState
   indexedAt: string
   labels?: ComAtprotoLabelDefs.Label[]
@@ -40,6 +41,7 @@ export interface LabelerViewDetailed {
   creator: SoSprkActorDefs.ProfileView
   policies: LabelerPolicies
   likeCount?: number
+  lookCount?: number
   viewer?: LabelerViewerState
   indexedAt: string
   labels?: ComAtprotoLabelDefs.Label[]
@@ -58,6 +60,7 @@ export function validateLabelerViewDetailed<V>(v: V) {
 export interface LabelerViewerState {
   $type?: 'so.sprk.labeler.defs#labelerViewerState'
   like?: string
+  look?: string
 }
 
 const hashLabelerViewerState = 'labelerViewerState'

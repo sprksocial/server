@@ -4569,6 +4569,11 @@ export const schemaDict = {
             description:
               'Hide replies in the feed if they do not have this number of likes.',
           },
+          hideRepliesByLookCount: {
+            type: 'integer',
+            description:
+              'Hide replies in the feed if they do not have this number of looks.',
+          },
           hideReposts: {
             type: 'boolean',
             description: 'Hide reposts in the feed.',
@@ -4589,6 +4594,7 @@ export const schemaDict = {
               'oldest',
               'newest',
               'most-likes',
+              'most-looks',
               'random',
               'hotness',
             ],
@@ -5268,6 +5274,10 @@ export const schemaDict = {
               'lex:so.sprk.embed.video#view',
             ],
           },
+          sound: {
+            type: 'ref',
+            ref: 'lex:so.sprk.feed.defs#soundView',
+          },
           replyCount: {
             type: 'integer',
           },
@@ -5277,7 +5287,7 @@ export const schemaDict = {
           likeCount: {
             type: 'integer',
           },
-          quoteCount: {
+          lookCount: {
             type: 'integer',
           },
           indexedAt: {
@@ -5301,6 +5311,44 @@ export const schemaDict = {
           },
         },
       },
+      soundView: {
+        type: 'object',
+        required: ['uri', 'cid', 'author', 'record', 'indexedAt'],
+        properties: {
+          uri: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          cid: {
+            type: 'string',
+            format: 'cid',
+          },
+          author: {
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileViewBasic',
+          },
+          record: {
+            type: 'unknown',
+          },
+          useCount: {
+            type: 'integer',
+          },
+          likeCount: {
+            type: 'integer',
+          },
+          indexedAt: {
+            type: 'string',
+            format: 'datetime',
+          },
+          labels: {
+            type: 'array',
+            items: {
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
+            },
+          },
+        },
+      },
       viewerState: {
         type: 'object',
         description:
@@ -5311,6 +5359,10 @@ export const schemaDict = {
             format: 'at-uri',
           },
           like: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          look: {
             type: 'string',
             format: 'at-uri',
           },
@@ -5534,6 +5586,10 @@ export const schemaDict = {
             type: 'integer',
             minimum: 0,
           },
+          lookCount: {
+            type: 'integer',
+            minimum: 0,
+          },
           acceptsInteractions: {
             type: 'boolean',
           },
@@ -5565,6 +5621,10 @@ export const schemaDict = {
         type: 'object',
         properties: {
           like: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          look: {
             type: 'string',
             format: 'at-uri',
           },
@@ -5902,6 +5962,63 @@ export const schemaDict = {
         type: 'query',
         description:
           'Get a list of posts liked by an actor. Requires auth, actor must be the requesting account.',
+        parameters: {
+          type: 'params',
+          required: ['actor'],
+          properties: {
+            actor: {
+              type: 'string',
+              format: 'at-identifier',
+            },
+            limit: {
+              type: 'integer',
+              minimum: 1,
+              maximum: 100,
+              default: 50,
+            },
+            cursor: {
+              type: 'string',
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['feed'],
+            properties: {
+              cursor: {
+                type: 'string',
+              },
+              feed: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#feedViewPost',
+                },
+              },
+            },
+          },
+        },
+        errors: [
+          {
+            name: 'BlockedActor',
+          },
+          {
+            name: 'BlockedByActor',
+          },
+        ],
+      },
+    },
+  },
+  SoSprkFeedGetActorLooks: {
+    lexicon: 1,
+    id: 'so.sprk.feed.getActorLooks',
+    defs: {
+      main: {
+        type: 'query',
+        description:
+          'Get a list of posts looked by an actor. Requires auth, actor must be the requesting account.',
         parameters: {
           type: 'params',
           required: ['actor'],
@@ -6356,6 +6473,88 @@ export const schemaDict = {
       },
     },
   },
+  SoSprkFeedGetLooks: {
+    lexicon: 1,
+    id: 'so.sprk.feed.getLooks',
+    defs: {
+      main: {
+        type: 'query',
+        description:
+          'Get look records which reference a subject (by AT-URI and CID).',
+        parameters: {
+          type: 'params',
+          required: ['uri'],
+          properties: {
+            uri: {
+              type: 'string',
+              format: 'at-uri',
+              description: 'AT-URI of the subject (eg, a post record).',
+            },
+            cid: {
+              type: 'string',
+              format: 'cid',
+              description:
+                'CID of the subject record (aka, specific version of record), to filter looks.',
+            },
+            limit: {
+              type: 'integer',
+              minimum: 1,
+              maximum: 100,
+              default: 50,
+            },
+            cursor: {
+              type: 'string',
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['uri', 'looks'],
+            properties: {
+              uri: {
+                type: 'string',
+                format: 'at-uri',
+              },
+              cid: {
+                type: 'string',
+                format: 'cid',
+              },
+              cursor: {
+                type: 'string',
+              },
+              looks: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.getLooks#look',
+                },
+              },
+            },
+          },
+        },
+      },
+      look: {
+        type: 'object',
+        required: ['indexedAt', 'createdAt', 'actor'],
+        properties: {
+          indexedAt: {
+            type: 'string',
+            format: 'datetime',
+          },
+          createdAt: {
+            type: 'string',
+            format: 'datetime',
+          },
+          actor: {
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileView',
+          },
+        },
+      },
+    },
+  },
   SoSprkFeedGetPosts: {
     lexicon: 1,
     id: 'so.sprk.feed.getPosts',
@@ -6706,6 +6905,32 @@ export const schemaDict = {
       },
     },
   },
+  SoSprkFeedLook: {
+    lexicon: 1,
+    id: 'so.sprk.feed.look',
+    defs: {
+      main: {
+        type: 'record',
+        description:
+          "Record declaring a 'look' of a piece of subject content. Equivalent to a 'view'",
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['subject', 'createdAt'],
+          properties: {
+            subject: {
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'datetime',
+            },
+          },
+        },
+      },
+    },
+  },
   SoSprkFeedPostgate: {
     lexicon: 1,
     id: 'so.sprk.feed.postgate',
@@ -6792,6 +7017,10 @@ export const schemaDict = {
             embed: {
               type: 'union',
               refs: ['lex:so.sprk.embed.images', 'lex:so.sprk.embed.video'],
+            },
+            sound: {
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
             },
             langs: {
               type: 'array',
@@ -8523,6 +8752,10 @@ export const schemaDict = {
             type: 'integer',
             minimum: 0,
           },
+          lookCount: {
+            type: 'integer',
+            minimum: 0,
+          },
           viewer: {
             type: 'ref',
             ref: 'lex:so.sprk.labeler.defs#labelerViewerState',
@@ -8564,6 +8797,10 @@ export const schemaDict = {
             type: 'integer',
             minimum: 0,
           },
+          lookCount: {
+            type: 'integer',
+            minimum: 0,
+          },
           viewer: {
             type: 'ref',
             ref: 'lex:so.sprk.labeler.defs#labelerViewerState',
@@ -8585,6 +8822,10 @@ export const schemaDict = {
         type: 'object',
         properties: {
           like: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          look: {
             type: 'string',
             format: 'at-uri',
           },
@@ -9839,6 +10080,7 @@ export const ids = {
   SoSprkFeedGenerator: 'so.sprk.feed.generator',
   SoSprkFeedGetActorFeeds: 'so.sprk.feed.getActorFeeds',
   SoSprkFeedGetActorLikes: 'so.sprk.feed.getActorLikes',
+  SoSprkFeedGetActorLooks: 'so.sprk.feed.getActorLooks',
   SoSprkFeedGetAuthorFeed: 'so.sprk.feed.getAuthorFeed',
   SoSprkFeedGetFeedGenerator: 'so.sprk.feed.getFeedGenerator',
   SoSprkFeedGetFeedGenerators: 'so.sprk.feed.getFeedGenerators',
@@ -9846,6 +10088,7 @@ export const ids = {
   SoSprkFeedGetFeedSkeleton: 'so.sprk.feed.getFeedSkeleton',
   SoSprkFeedGetLikes: 'so.sprk.feed.getLikes',
   SoSprkFeedGetListFeed: 'so.sprk.feed.getListFeed',
+  SoSprkFeedGetLooks: 'so.sprk.feed.getLooks',
   SoSprkFeedGetPosts: 'so.sprk.feed.getPosts',
   SoSprkFeedGetPostThread: 'so.sprk.feed.getPostThread',
   SoSprkFeedGetQuotes: 'so.sprk.feed.getQuotes',
@@ -9853,6 +10096,7 @@ export const ids = {
   SoSprkFeedGetSuggestedFeeds: 'so.sprk.feed.getSuggestedFeeds',
   SoSprkFeedGetTimeline: 'so.sprk.feed.getTimeline',
   SoSprkFeedLike: 'so.sprk.feed.like',
+  SoSprkFeedLook: 'so.sprk.feed.look',
   SoSprkFeedPostgate: 'so.sprk.feed.postgate',
   SoSprkFeedPost: 'so.sprk.feed.post',
   SoSprkFeedRepost: 'so.sprk.feed.repost',

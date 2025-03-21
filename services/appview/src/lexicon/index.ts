@@ -95,6 +95,7 @@ import * as SoSprkActorSearchActorsTypeahead from './types/so/sprk/actor/searchA
 import * as SoSprkFeedDescribeFeedGenerator from './types/so/sprk/feed/describeFeedGenerator.js'
 import * as SoSprkFeedGetActorFeeds from './types/so/sprk/feed/getActorFeeds.js'
 import * as SoSprkFeedGetActorLikes from './types/so/sprk/feed/getActorLikes.js'
+import * as SoSprkFeedGetActorLooks from './types/so/sprk/feed/getActorLooks.js'
 import * as SoSprkFeedGetAuthorFeed from './types/so/sprk/feed/getAuthorFeed.js'
 import * as SoSprkFeedGetFeedGenerator from './types/so/sprk/feed/getFeedGenerator.js'
 import * as SoSprkFeedGetFeedGenerators from './types/so/sprk/feed/getFeedGenerators.js'
@@ -102,6 +103,7 @@ import * as SoSprkFeedGetFeed from './types/so/sprk/feed/getFeed.js'
 import * as SoSprkFeedGetFeedSkeleton from './types/so/sprk/feed/getFeedSkeleton.js'
 import * as SoSprkFeedGetLikes from './types/so/sprk/feed/getLikes.js'
 import * as SoSprkFeedGetListFeed from './types/so/sprk/feed/getListFeed.js'
+import * as SoSprkFeedGetLooks from './types/so/sprk/feed/getLooks.js'
 import * as SoSprkFeedGetPosts from './types/so/sprk/feed/getPosts.js'
 import * as SoSprkFeedGetPostThread from './types/so/sprk/feed/getPostThread.js'
 import * as SoSprkFeedGetQuotes from './types/so/sprk/feed/getQuotes.js'
@@ -1313,6 +1315,17 @@ export class SoSprkFeedNS {
     return this._server.xrpc.method(nsid, cfg)
   }
 
+  getActorLooks<AV extends AuthVerifier>(
+    cfg: ConfigOf<
+      AV,
+      SoSprkFeedGetActorLooks.Handler<ExtractAuth<AV>>,
+      SoSprkFeedGetActorLooks.HandlerReqCtx<ExtractAuth<AV>>
+    >,
+  ) {
+    const nsid = 'so.sprk.feed.getActorLooks' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
   getAuthorFeed<AV extends AuthVerifier>(
     cfg: ConfigOf<
       AV,
@@ -1387,6 +1400,17 @@ export class SoSprkFeedNS {
     >,
   ) {
     const nsid = 'so.sprk.feed.getListFeed' // @ts-ignore
+    return this._server.xrpc.method(nsid, cfg)
+  }
+
+  getLooks<AV extends AuthVerifier>(
+    cfg: ConfigOf<
+      AV,
+      SoSprkFeedGetLooks.Handler<ExtractAuth<AV>>,
+      SoSprkFeedGetLooks.HandlerReqCtx<ExtractAuth<AV>>
+    >,
+  ) {
+    const nsid = 'so.sprk.feed.getLooks' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
   }
 

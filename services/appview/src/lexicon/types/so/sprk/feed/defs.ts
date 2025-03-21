@@ -26,10 +26,11 @@ export interface PostView {
     | $Typed<SoSprkEmbedImages.View>
     | $Typed<SoSprkEmbedVideo.View>
     | { $type: string }
+  sound?: SoundView
   replyCount?: number
   repostCount?: number
   likeCount?: number
-  quoteCount?: number
+  lookCount?: number
   indexedAt: string
   viewer?: ViewerState
   labels?: ComAtprotoLabelDefs.Label[]
@@ -46,11 +47,34 @@ export function validatePostView<V>(v: V) {
   return validate<PostView & V>(v, id, hashPostView)
 }
 
+export interface SoundView {
+  $type?: 'so.sprk.feed.defs#soundView'
+  uri: string
+  cid: string
+  author: SoSprkActorDefs.ProfileViewBasic
+  record: { [_ in string]: unknown }
+  useCount?: number
+  likeCount?: number
+  indexedAt: string
+  labels?: ComAtprotoLabelDefs.Label[]
+}
+
+const hashSoundView = 'soundView'
+
+export function isSoundView<V>(v: V) {
+  return is$typed(v, id, hashSoundView)
+}
+
+export function validateSoundView<V>(v: V) {
+  return validate<SoundView & V>(v, id, hashSoundView)
+}
+
 /** Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests. */
 export interface ViewerState {
   $type?: 'so.sprk.feed.defs#viewerState'
   repost?: string
   like?: string
+  look?: string
   threadMuted?: boolean
   replyDisabled?: boolean
   embeddingDisabled?: boolean
@@ -244,6 +268,7 @@ export interface GeneratorView {
   descriptionFacets?: SoSprkRichtextFacet.Main[]
   avatar?: string
   likeCount?: number
+  lookCount?: number
   acceptsInteractions?: boolean
   labels?: ComAtprotoLabelDefs.Label[]
   viewer?: GeneratorViewerState
@@ -267,6 +292,7 @@ export function validateGeneratorView<V>(v: V) {
 export interface GeneratorViewerState {
   $type?: 'so.sprk.feed.defs#generatorViewerState'
   like?: string
+  look?: string
 }
 
 const hashGeneratorViewerState = 'generatorViewerState'
