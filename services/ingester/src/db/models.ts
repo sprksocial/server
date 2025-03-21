@@ -22,6 +22,28 @@ export const likeSchema = new Schema<LikeDocument>({
   cid: { type: String, required: true },
 })
 
+export interface LookDocument extends Document {
+  uri: string
+  subject: string
+  subjectCid: string
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+  cid: string
+}
+
+export const lookSchema = new Schema<LookDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  subject: { type: String, required: true, index: true },
+  subjectCid: { type: String, required: true },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
+})
+
 export interface FollowDocument extends Document {
   uri: string
   subject: string
@@ -277,6 +299,9 @@ audioSchema.index({ authorDid: 1, createdAt: -1 })
 repostSchema.index({ authorDid: 1, createdAt: -1 })
 repostSchema.index({ 'subject.uri': 1, createdAt: -1 })
 
+lookSchema.index({ authorDid: 1, createdAt: -1 })
+lookSchema.index({ 'subject.uri': 1, createdAt: -1 })
+
 musicSchema.index({ authorDid: 1, createdAt: -1 })
 musicSchema.index({ tags: 1, createdAt: -1 })
 
@@ -289,4 +314,5 @@ export interface DatabaseModels {
   Audio: Model<AudioDocument>
   Repost: Model<RepostDocument>
   Music: Model<MusicDocument>
+  Look: Model<LookDocument>
 }

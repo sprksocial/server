@@ -8,7 +8,8 @@ import {
   profileSchema,
   audioSchema,
   repostSchema,
-  musicSchema
+  musicSchema,
+  lookSchema,
 } from './models.js'
 import { env } from '../utils/env.js'
 import { pino } from 'pino'
@@ -29,6 +30,7 @@ export class Database {
       Audio: this.connection.model('Audio', audioSchema),
       Repost: this.connection.model('Repost', repostSchema),
       Music: this.connection.model('Music', musicSchema),
+      Look: this.connection.model('Look', lookSchema),
     }
   }
 
