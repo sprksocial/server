@@ -10,6 +10,7 @@ import { handleAudioEvent } from './audio-handler.js'
 import { handleRepostEvent } from './repost-handler.js'
 import { handleMusicEvent } from './music-handler.js'
 import { handleLookEvent } from './look-handler.js'
+import { handleGeneratorEvent } from './generator-handler.js'
 
 const logger = pino({ name: 'event-handler' })
 
@@ -58,6 +59,11 @@ export async function handleEvent(evt: NormalizedEvent, db: Database): Promise<v
 
     if (evt.collection === 'so.sprk.feed.look') {
       await handleLookEvent(evt, db)
+      return
+    }
+
+    if (evt.collection === 'so.sprk.feed.generator') {
+      await handleGeneratorEvent(evt, db)
       return
     }
 

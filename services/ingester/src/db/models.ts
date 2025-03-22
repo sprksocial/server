@@ -305,6 +305,43 @@ lookSchema.index({ 'subject.uri': 1, createdAt: -1 })
 musicSchema.index({ authorDid: 1, createdAt: -1 })
 musicSchema.index({ tags: 1, createdAt: -1 })
 
+export interface GeneratorDocument extends Document {
+  uri: string
+  did: string
+  displayName: string
+  description?: string
+  descriptionFacets?: Array<any>
+  avatar?: string
+  acceptsInteractions?: boolean
+  labels?: any
+  contentMode?: string
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+  cid: string
+}
+
+export const generatorSchema = new Schema<GeneratorDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  did: { type: String, required: true, index: true },
+  displayName: { type: String, required: true },
+  description: { type: String, required: false },
+  descriptionFacets: { type: [Object], required: false },
+  avatar: { type: String, required: false },
+  acceptsInteractions: { type: Boolean, required: false },
+  labels: { type: Object, required: false },
+  contentMode: { type: String, required: false },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
+})
+
+generatorSchema.index({ authorDid: 1, createdAt: -1 })
+generatorSchema.index({ did: 1, createdAt: -1 })
+
 export interface DatabaseModels {
   Like: Model<LikeDocument>
   Post: Model<PostDocument>
@@ -315,4 +352,5 @@ export interface DatabaseModels {
   Repost: Model<RepostDocument>
   Music: Model<MusicDocument>
   Look: Model<LookDocument>
+  Generator: Model<GeneratorDocument>
 }

@@ -10,6 +10,7 @@ import {
   repostSchema,
   musicSchema,
   lookSchema,
+  generatorSchema,
 } from './models.js'
 import { env } from '../utils/env.js'
 import { pino } from 'pino'
@@ -31,6 +32,7 @@ export class Database {
       Repost: this.connection.model('Repost', repostSchema),
       Music: this.connection.model('Music', musicSchema),
       Look: this.connection.model('Look', lookSchema),
+      Generator: this.connection.model('Generator', generatorSchema),
     }
   }
 
