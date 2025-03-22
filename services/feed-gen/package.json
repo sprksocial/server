@@ -6,6 +6,8 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
+    "@atproto/identity": "^0.4.6",
+    "@atproto/xrpc-server": "^0.7.13",
     "dotenv": "^16.4.7",
     "envalid": "^8.0.0",
     "hono": "^4.7.4",

@@ -1,11 +1,10 @@
-
-import { Database } from '../db/connection'
 import * as simpleDesc from './simpleDesc'
+import * as following from './following'
+import { AlgoInfo } from './types'
 
-type AlgoHandler = (db: Database, params: any) => Promise<any>
-
-const algos: Record<string, AlgoHandler> = {
-  [simpleDesc.shortname]: simpleDesc.handler,
+const algos: Record<string, AlgoInfo> = {
+  [simpleDesc.shortname]: simpleDesc.info,
+  [following.shortname]: following.info
 }
 
 export default algos

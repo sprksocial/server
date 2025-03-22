@@ -1,8 +1,9 @@
 import { Database } from '../db/connection';
+import { AlgoInfo, feedParams } from './types'
 
 export const shortname = 'simple-desc'
 
-export const handler = async (db: Database, params: any) => {
+const handler = async (db: Database, params: feedParams) => {
   const { limit = 50, cursor } = params;
 
   // Build the query
@@ -36,3 +37,8 @@ export const handler = async (db: Database, params: any) => {
     feed,
   };
 }
+
+export const info = {
+  handler,
+  needsAuth: false
+} as AlgoInfo

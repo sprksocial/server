@@ -1,9 +1,10 @@
 import { Database } from '../db/connection';
+import { AlgoInfo, feedParams } from './types'
 
 export const shortname = 'following'
 
-export const handler = async (db: Database, params: any) => {
-  const { limit = 50, userDid, cursor } = params;
+const handler = async (db: Database, params: feedParams) => {
+  const { limit = 50, requesterDid, cursor } = params;
 
   // Build the query
   const query: any = {};
@@ -15,7 +16,7 @@ export const handler = async (db: Database, params: any) => {
   }
 
   const followers = (await db.models.Follow.find(
-    { authorDid: userDid }
+    { authorDid: requesterDid }
   )).map((follow) => follow.subject)
 
   // Get posts from MongoDB, sorted by most recent
@@ -41,3 +42,8 @@ export const handler = async (db: Database, params: any) => {
     feed,
   };
 }
+
+export const info = {
+  handler,
+  needsAuth: true
+} as AlgoInfo
