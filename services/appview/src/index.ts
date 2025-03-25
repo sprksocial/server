@@ -1,28 +1,27 @@
 import { Database } from './db.js'
-import { createClient } from './auth/client.js'
 import { pino } from 'pino'
 import {
   BidirectionalResolver,
   createBidirectionalResolver,
   createIdResolver,
 } from './id-resolver.js'
-import type { OAuthClient } from '@atproto/oauth-client-node'
 import { Hono } from 'hono'
 import { logger } from 'hono/logger'
-import { createAuthRouter } from './auth/login.js'
 import { env } from './env.js'
 import { serve } from '@hono/node-server'
 import { HTTPException } from 'hono/http-exception'
-import { authMiddleware } from './auth/middleware.js'
+import { authMiddleware, optionalAuthMiddleware } from './auth/middleware.js'
 import { createFeedRouter } from './feed/feed.js'
 import { createGetPostsRouter } from './routes/getPosts.js'
 import wellKnownRouter from './well-known.js'
+import { DidResolver } from '@atproto/identity'
 
 export type AppContext = {
   db: Database
   logger: pino.Logger
-  oauthClient: OAuthClient
   resolver: BidirectionalResolver
+  serviceDid: string
+  didResolver: DidResolver
 }
 
 export class Server {
@@ -37,15 +36,18 @@ export class Server {
     const db = new Database()
     await db.connect()
 
-    const oauthClient = await createClient(db)
     const baseIdResolver = createIdResolver()
     const resolver = createBidirectionalResolver(baseIdResolver)
+
+    // Get service DID from environment
+    const serviceDid = env.SERVICE_DID
 
     const ctx = {
       db,
       logger: appLogger,
-      oauthClient,
       resolver,
+      serviceDid,
+      didResolver: baseIdResolver.did,
     }
 
     const app = new Hono()
@@ -53,12 +55,18 @@ export class Server {
     // Middleware
     app.use('*', logger())
 
-    app.use('/session', authMiddleware)
+    // Set context variables for auth middleware
+    app.use('*', async (c, next) => {
+      // Type-safe way to set context variables
+      c.set('serviceDid', serviceDid)
+      c.set('didResolver', baseIdResolver.did)
+      await next()
+    })
+
+    // Apply optional auth to getPosts - enables auth but doesn't require it
+    app.use('/xrpc/so.sprk.feed.getPosts', optionalAuthMiddleware)
 
     // Auth routes
-    const authRouter = createAuthRouter(ctx)
-    app.route('/', authRouter)
-
     const feedRouter = createFeedRouter(ctx)
     app.route('/', feedRouter)
 

@@ -15,6 +15,7 @@ async function transformPostToPostView(
   post: PostDocument,
   db: Database,
   resolver: BidirectionalResolver,
+  userDid?: string,
 ): Promise<SoSprkFeedDefs.PostView> {
   // Get like count
   const likeCount = await db.models.Like.countDocuments({ subject: post.uri })
@@ -81,6 +82,41 @@ async function transformPostToPostView(
       : undefined
     : undefined
 
+  // Build viewer state with information about the current user's interactions with the post
+  const viewer: SoSprkFeedDefs.ViewerState = {
+    // $type: 'so.sprk.feed.defs#viewerState',
+  }
+
+  // Only check user interactions if a userDid is provided
+  if (userDid) {
+    // Check if the user has liked this post
+    const like = await db.models.Like.findOne({
+      subject: post.uri,
+      authorDid: userDid,
+    })
+    if (like) {
+      viewer.like = like.uri
+    }
+
+    // Check if the user has reposted this post
+    const repost = await db.models.Repost.findOne({
+      'subject.uri': post.uri,
+      authorDid: userDid,
+    })
+    if (repost) {
+      viewer.repost = repost.uri
+    }
+
+    // Check if the user has looked at this post
+    const look = await db.models.Look.findOne({
+      'subject.uri': post.uri,
+      authorDid: userDid,
+    })
+    if (look) {
+      viewer.look = look.uri
+    }
+  }
+
   return {
     uri: post.uri,
     cid: post.cid,
@@ -92,6 +128,7 @@ async function transformPostToPostView(
       tags: post.tags,
     },
     embed: embed,
+    viewer,
     replyCount,
     repostCount,
     likeCount,
@@ -106,6 +143,7 @@ async function getPosts(
   uris: string | string[],
   db: Database,
   resolver: BidirectionalResolver,
+  userDid?: string,
 ): Promise<SoSprkFeedDefs.PostView[]> {
   if (!uris) {
     return []
@@ -121,7 +159,7 @@ async function getPosts(
 
   // Transform each post to PostView format
   const postViews = await Promise.all(
-    dbPosts.map((post) => transformPostToPostView(post, db, resolver)),
+    dbPosts.map((post) => transformPostToPostView(post, db, resolver, userDid)),
   )
 
   return postViews
@@ -132,12 +170,13 @@ export const createGetPostsRouter = (ctx: AppContext) => {
 
   router.get('/xrpc/so.sprk.feed.getPosts', async (c) => {
     const uris = c.req.queries('uris')
+    const userDid = c.get('did') as string | undefined
 
     if (!uris || uris.length === 0) {
       return c.json({ posts: [] } as GetPostsView)
     }
 
-    const posts = await getPosts(uris, ctx.db, ctx.resolver)
+    const posts = await getPosts(uris, ctx.db, ctx.resolver, userDid)
 
     return c.json({ posts } as GetPostsView)
   })
