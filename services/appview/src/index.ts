@@ -13,6 +13,7 @@ import { HTTPException } from 'hono/http-exception'
 import { authMiddleware, optionalAuthMiddleware } from './auth/middleware.js'
 import { createFeedRouter } from './feed/feed.js'
 import { createGetPostsRouter } from './routes/getPosts.js'
+import { createGetPostThreadRouter } from './routes/getPostThread.js'
 import wellKnownRouter from './well-known.js'
 import { DidResolver } from '@atproto/identity'
 
@@ -71,7 +72,9 @@ export class Server {
     app.route('/', feedRouter)
 
     const getPostsRouter = createGetPostsRouter(ctx)
+    const getPostThreadRouter = createGetPostThreadRouter(ctx)
     app.route('/', getPostsRouter)
+    app.route('/', getPostThreadRouter)
 
     app.route('/', wellKnownRouter())
 
