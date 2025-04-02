@@ -1,21 +1,22 @@
-import { Database } from './db.js'
+import { DidResolver } from '@atproto/identity'
+import { serve } from '@hono/node-server'
+import { Hono } from 'hono'
+import { HTTPException } from 'hono/http-exception'
+import { logger } from 'hono/logger'
 import { pino } from 'pino'
+import { optionalAuthMiddleware } from './auth/middleware.js'
+import { Database } from './db.js'
+import { env } from './env.js'
+import { createFeedRouter } from './feed/feed.js'
 import {
   BidirectionalResolver,
   createBidirectionalResolver,
   createIdResolver,
 } from './id-resolver.js'
-import { Hono } from 'hono'
-import { logger } from 'hono/logger'
-import { env } from './env.js'
-import { serve } from '@hono/node-server'
-import { HTTPException } from 'hono/http-exception'
-import { authMiddleware, optionalAuthMiddleware } from './auth/middleware.js'
-import { createFeedRouter } from './feed/feed.js'
 import { createGetPostsRouter } from './routes/getPosts.js'
 import { createGetPostThreadRouter } from './routes/getPostThread.js'
+import { createGetProfileRouter } from './routes/getProfile.js'
 import wellKnownRouter from './well-known.js'
-import { DidResolver } from '@atproto/identity'
 
 export type AppContext = {
   db: Database
@@ -73,14 +74,18 @@ export class Server {
 
     const getPostsRouter = createGetPostsRouter(ctx)
     const getPostThreadRouter = createGetPostThreadRouter(ctx)
+    const getProfileRouter = createGetProfileRouter(ctx)
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
+    app.route('/', getProfileRouter)
 
     app.route('/', wellKnownRouter())
 
     // Root route
     app.get('/', (c) => {
-      return c.text('✧･ﾟ: ✧･ﾟ:. ݁₊ ⊹ . ݁˖ . ݁ 𝚂𝙿𝙰𝚁𝙺 𝙰𝙿𝙸 . ݁₊ ⊹ . ݁˖ . ݁ :･ﾟ✧:･ﾟ✧')
+      return c.text(
+        '✧･ﾟ: ✧･ﾟ:. ݁₊ ⊹ . ݁˖ . ݁ 𝚂𝙿𝙰𝚁𝙺 𝙰𝙿𝙸 . ݁₊ ⊹ . ݁˖ . ݁ :･ﾟ✧:･ﾟ✧',
+      )
     })
 
     app.onError((err, c) => {

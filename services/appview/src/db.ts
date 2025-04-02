@@ -90,8 +90,8 @@ export interface ProfileDocument extends Document {
   uri: string
   displayName?: string
   description?: string
-  avatar?: string
-  banner?: string
+  avatar?: Record<string, any>
+  banner?: Record<string, any>
   labels?: Record<string, any>
   joinedViaStarterPack?: Record<string, any>
   pinnedPost?: Record<string, any>
@@ -106,8 +106,8 @@ export const profileSchema = new Schema<ProfileDocument>({
   uri: { type: String, required: true, unique: true, index: true },
   displayName: { type: String, required: false },
   description: { type: String, required: false },
-  avatar: { type: String, required: false },
-  banner: { type: String, required: false },
+  avatar: { type: Object, required: false },
+  banner: { type: Object, required: false },
   labels: { type: Object, required: false },
   joinedViaStarterPack: { type: Object, required: false },
   pinnedPost: { type: Object, required: false },
