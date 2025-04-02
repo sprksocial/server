@@ -1,12 +1,12 @@
 import { ensureValidDid, isValidHandle } from '@atproto/syntax'
 import { Hono } from 'hono'
 
-import { optionalAuthMiddleware } from '../auth/middleware.js'
-import { AppContext } from '../index.js'
-import type { Label } from '../lexicon/types/com/atproto/label/defs.js'
-import type * as ComAtprotoRepoStrongRef from '../lexicon/types/com/atproto/repo/strongRef.js'
-import type * as SoSprkActorDefs from '../lexicon/types/so/sprk/actor/defs.js'
-import type * as SoSprkGraphDefs from '../lexicon/types/so/sprk/graph/defs.js'
+import { optionalAuthMiddleware } from '../../auth/middleware.js'
+import { AppContext } from '../../index.js'
+import type { Label } from '../../lexicon/types/com/atproto/label/defs.js'
+import type * as ComAtprotoRepoStrongRef from '../../lexicon/types/com/atproto/repo/strongRef.js'
+import type * as SoSprkActorDefs from '../../lexicon/types/so/sprk/actor/defs.js'
+import type * as SoSprkGraphDefs from '../../lexicon/types/so/sprk/graph/defs.js'
 
 export const createGetProfileRouter = (ctx: AppContext) => {
   const router = new Hono()

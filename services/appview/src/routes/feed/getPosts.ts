@@ -1,11 +1,11 @@
 import { Hono } from 'hono'
 
-import { OutputSchema as GetPostsView } from '../lexicon/types/so/sprk/feed/getPosts.js'
-import { AppContext } from '../index.js'
-import { transformPostToPostView } from '../utils/post-transformer.js'
-import { BidirectionalResolver } from '../id-resolver.js'
-import { Database } from '../db.js'
-import type * as SoSprkFeedDefs from '../lexicon/types/so/sprk/feed/defs.js'
+import { OutputSchema as GetPostsView } from '../../lexicon/types/so/sprk/feed/getPosts.js'
+import { AppContext } from '../../index.js'
+import { transformPostToPostView } from '../../utils/post-transformer.js'
+import { BidirectionalResolver } from '../../id-resolver.js'
+import { Database } from '../../db.js'
+import type * as SoSprkFeedDefs from '../../lexicon/types/so/sprk/feed/defs.js'
 
 // Function to fetch posts by URIs
 async function getPosts(

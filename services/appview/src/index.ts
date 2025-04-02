@@ -13,9 +13,9 @@ import {
   createBidirectionalResolver,
   createIdResolver,
 } from './id-resolver.js'
-import { createGetPostsRouter } from './routes/getPosts.js'
-import { createGetPostThreadRouter } from './routes/getPostThread.js'
-import { createGetProfileRouter } from './routes/getProfile.js'
+import { createGetPostsRouter } from './routes/feed/getPosts.js'
+import { createGetPostThreadRouter } from './routes/feed/getPostThread.js'
+import { createGetProfileRouter } from './routes/actor/getProfile.js'
 import wellKnownRouter from './well-known.js'
 
 export type AppContext = {
