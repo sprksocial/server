@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { pino } from 'pino'
 import { createBidirectionalResolver, createIdResolver } from './id-resolver'
+import { imageHandler } from './imageHandler'
 import { videoHandler } from './videoHandler'
 
 const logger = pino({
@@ -22,7 +23,6 @@ async function main() {
   logger.info('Starting Spark CDN service')
 
   try {
-    // Create ID resolver
     const resolver = createIdResolver()
     const bidirectionalResolver = createBidirectionalResolver(resolver)
     app = new Hono()
@@ -33,8 +33,11 @@ async function main() {
       )
     })
 
-    // Apply video route
     app.get('/video/:did/:cid', (c) => videoHandler(c, bidirectionalResolver))
+
+    app.get('/avatar/:did/:cid', (c) => imageHandler(c, bidirectionalResolver))
+
+    app.get('/img/:did/:cid', (c) => imageHandler(c, bidirectionalResolver))
 
     logger.info({ port }, 'CDN service is running')
   } catch (err) {
