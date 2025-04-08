@@ -28,7 +28,7 @@ services:
       DB_PORT: 27017
       DB_USER: mongo
       DB_PASSWORD: mongo
-      DB_NAME: appviewdev
+      DB_NAME: dev
       COOKIE_SECRET: "00000000000000000000000000000000"
     ports:
       - "4000:3000"

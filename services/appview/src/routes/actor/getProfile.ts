@@ -49,46 +49,20 @@ export const createGetProfileRouter = (ctx: AppContext) => {
         profile.authorDid,
       )
 
-      // Get Spark follower count
-      const sparkFollowersCount = await ctx.db.models.Follow.countDocuments({
+      // Get follower count
+      const followersCount = await ctx.db.models.Follow.countDocuments({
         subject: actorDid,
       })
 
-      // Get Spark follows count
-      const sparkFollowsCount = await ctx.db.models.Follow.countDocuments({
+      // Get follows count
+      const followsCount = await ctx.db.models.Follow.countDocuments({
         authorDid: actorDid,
       })
 
-      // Get Spark posts count
-      const sparkPostsCount = await ctx.db.models.Post.countDocuments({
+      // Get posts count
+      const postsCount = await ctx.db.models.Post.countDocuments({
         authorDid: actorDid,
       })
-
-      // Get Bluesky profile and stats
-      let blueskyFollowersCount = 0
-      let blueskyFollowsCount = 0
-      let blueskyPostsCount = 0
-
-      try {
-        // Get the Bluesky profile using the DID
-        const didDoc = await ctx.didResolver.resolveAtprotoData(actorDid)
-        if (didDoc?.pds) {
-          const response = await fetch(`${didDoc.pds}/xrpc/app.bsky.actor.getProfile?actor=${actorDid}`)
-          if (response.ok) {
-            const data = await response.json()
-            blueskyFollowersCount = data.followersCount || 0
-            blueskyFollowsCount = data.followsCount || 0
-            blueskyPostsCount = data.postsCount || 0
-          }
-        }
-      } catch (err) {
-        // Ignore errors from Bluesky fetch, we'll just use Spark stats
-      }
-
-      // Combine stats, ensuring we don't count duplicates
-      const followersCount = Math.max(sparkFollowersCount, blueskyFollowersCount)
-      const followsCount = Math.max(sparkFollowsCount, blueskyFollowsCount)
-      const postsCount = Math.max(sparkPostsCount, blueskyPostsCount)
 
       // Build viewer state if a user is authenticated
       const viewer: SoSprkActorDefs.ViewerState = {}

@@ -10,7 +10,6 @@ test.sqlite
 *.log
 *.tsbuildinfo
 .*.env
-.env.*
 .env
 \#*\#
 *~
