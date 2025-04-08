@@ -33,6 +33,10 @@ The service exposes the following API routes:
 - `GET /xrpc/so.sprk.actor.getProfile` - Get profile details for an actor
 - `GET /xrpc/so.sprk.actor.searchActors` - Search for actors
 
+### Graph Routes  
+- `GET /xrpc/so.sprk.graph.getFollowers` - Get followers for an actor
+- `GET /xrpc/so.sprk.graph.getFollows` - Get accounts an actor follows
+
 ### Feed Routes
 - `GET /xrpc/so.sprk.feed.getPosts` - Get post objects from URIs
 - `GET /xrpc/so.sprk.feed.getAuthorFeed` - Get a post and all replies to it

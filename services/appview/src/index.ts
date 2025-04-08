@@ -16,6 +16,8 @@ import {
 import { createGetPostsRouter } from './routes/feed/getPosts.js'
 import { createGetPostThreadRouter } from './routes/feed/getPostThread.js'
 import { createGetProfileRouter } from './routes/actor/getProfile.js'
+import { createGetFollowersRouter } from './routes/graph/getFollowers.js'
+import { createGetFollowsRouter } from './routes/graph/getFollows.js'
 import wellKnownRouter from './well-known.js'
 
 export type AppContext = {
@@ -75,9 +77,13 @@ export class Server {
     const getPostsRouter = createGetPostsRouter(ctx)
     const getPostThreadRouter = createGetPostThreadRouter(ctx)
     const getProfileRouter = createGetProfileRouter(ctx)
+    const getFollowersRouter = createGetFollowersRouter(ctx)
+    const getFollowsRouter = createGetFollowsRouter(ctx)
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
     app.route('/', getProfileRouter)
+    app.route('/', getFollowersRouter)
+    app.route('/', getFollowsRouter)
 
     app.route('/', wellKnownRouter())
 
