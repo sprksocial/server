@@ -35,9 +35,32 @@ async function main() {
 
     app.get('/video/:did/:cid', (c) => videoHandler(c, bidirectionalResolver))
 
-    app.get('/avatar/:did/:cid', (c) => imageHandler(c, bidirectionalResolver))
+    // Routes for avatar images with size and format options
+    app.get('/avatar/:size/:did/:cid', (c) =>
+      imageHandler(c, bidirectionalResolver),
+    )
+    app.get('/avatar/:size/:did/:cid/:format', (c) =>
+      imageHandler(c, bidirectionalResolver),
+    )
 
-    app.get('/img/:did/:cid', (c) => imageHandler(c, bidirectionalResolver))
+    // Routes for regular images with size and format options
+    app.get('/img/:size/:did/:cid', (c) =>
+      imageHandler(c, bidirectionalResolver),
+    )
+    app.get('/img/:size/:did/:cid/:format', (c) =>
+      imageHandler(c, bidirectionalResolver),
+    )
+
+    // Backward compatibility routes (default to 'full' size)
+    app.get('/avatar/:did/:cid', (c) => {
+      c.req.param = Object.assign(c.req.param, { size: 'full' })
+      return imageHandler(c, bidirectionalResolver)
+    })
+
+    app.get('/img/:did/:cid', (c) => {
+      c.req.param = Object.assign(c.req.param, { size: 'full' })
+      return imageHandler(c, bidirectionalResolver)
+    })
 
     logger.info({ port }, 'CDN service is running')
   } catch (err) {

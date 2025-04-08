@@ -1,5 +1,6 @@
 import type { Context } from 'hono'
 import { pino } from 'pino'
+import sharp from 'sharp'
 import type { BidirectionalResolver } from './id-resolver'
 
 // Get logger instance from parent
@@ -10,9 +11,20 @@ const logger = pino({
   },
 })
 
-// In-memory image cache: did:cid -> {buffer, timestamp}
+// Size dimensions for different size options
+interface SizeDimension {
+  width: number
+}
+
+const SIZE_DIMENSIONS: Record<string, SizeDimension | null> = {
+  tiny: { width: 150 },
+  medium: { width: 600 },
+  full: null, // original size
+}
+
+// In-memory image cache: did:cid:size:format -> {buffer, timestamp}
 interface CachedImage {
-  buffer: ArrayBuffer
+  buffer: Buffer | ArrayBuffer
   timestamp: number
   contentType: string
 }
@@ -44,6 +56,57 @@ export const getImage = async (
   return { buffer: imageBytes, contentType }
 }
 
+// Transform image based on size and format
+export const transformImage = async (
+  imageBuffer: ArrayBuffer,
+  originalContentType: string,
+  size: string,
+  format?: string,
+): Promise<{ buffer: Buffer; contentType: string }> => {
+  // Convert ArrayBuffer to Buffer for Sharp
+  const buffer = Buffer.from(imageBuffer)
+  let transformer = sharp(buffer)
+
+  // Apply resize if not "full"
+  if (size !== 'full' && SIZE_DIMENSIONS[size]) {
+    transformer = transformer.resize({
+      ...(SIZE_DIMENSIONS[size] as SizeDimension),
+      withoutEnlargement: true, // Don't upscale images smaller than target size
+      fit: 'inside', // Maintain aspect ratio and ensure dimensions don't exceed specified values
+    })
+  }
+
+  // Apply format conversion if specified
+  let contentType = originalContentType
+  if (format) {
+    switch (format.toLowerCase()) {
+      case 'webp':
+        transformer = transformer.webp()
+        contentType = 'image/webp'
+        break
+      case 'png':
+        transformer = transformer.png()
+        contentType = 'image/png'
+        break
+      case 'jpg':
+      case 'jpeg':
+        transformer = transformer.jpeg()
+        contentType = 'image/jpeg'
+        break
+      case 'avif':
+        transformer = transformer.avif()
+        contentType = 'image/avif'
+        break
+      default:
+        // Keep original format if unsupported
+        break
+    }
+  }
+
+  const outputBuffer = await transformer.toBuffer()
+  return { buffer: outputBuffer, contentType }
+}
+
 // Cleanup old cache entries
 export function cleanupCache() {
   const now = Date.now()
@@ -67,24 +130,47 @@ export function cleanupCache() {
   }
 }
 
+// Parse format from path if present
+function parseFormat(path: string): string | undefined {
+  const formatMatch = path.match(/@([a-zA-Z0-9]+)$/)
+  return formatMatch ? formatMatch[1].toLowerCase() : undefined
+}
+
 // Generic image handler for both avatar and regular images
 export const imageHandler = async (
   c: Context,
   bidirectionalResolver: BidirectionalResolver,
 ) => {
+  const size = c.req.param('size') || 'full'
+  if (!['tiny', 'medium', 'full'].includes(size)) {
+    return c.json(
+      { error: 'Invalid size parameter. Must be tiny, medium, or full' },
+      400,
+    )
+  }
+
   const did = c.req.param('did')
   const cid = c.req.param('cid')
-  const cacheKey = `${did}:${cid}`
+  const format = parseFormat(c.req.path)
+
+  // Create a unique cache key that includes size and format
+  const cacheKey = `${did}:${cid}:${size}:${format || 'original'}`
 
   try {
-    let imageBuffer: ArrayBuffer
+    let transformedBuffer: Buffer
     let contentType: string
     let fromCache = false
 
     const cachedEntry = imageCache.get(cacheKey)
     if (cachedEntry) {
-      logger.info({ did, cid, cached: true }, 'Found image in cache')
-      imageBuffer = cachedEntry.buffer
+      logger.info(
+        { did, cid, size, format, cached: true },
+        'Found transformed image in cache',
+      )
+      transformedBuffer =
+        cachedEntry.buffer instanceof Buffer
+          ? cachedEntry.buffer
+          : Buffer.from(new Uint8Array(cachedEntry.buffer))
       contentType = cachedEntry.contentType
       fromCache = true
     } else {
@@ -101,12 +187,22 @@ export const imageHandler = async (
         'Fetching image from PDS',
       )
       const result = await getImage(didDoc.pds, did, cid)
-      imageBuffer = result.buffer
-      contentType = result.contentType
 
-      // Cache the image
+      // Transform the image according to size and format
+      logger.info({ did, cid, size, format }, 'Transforming image')
+      const transformed = await transformImage(
+        result.buffer,
+        result.contentType,
+        size,
+        format,
+      )
+
+      transformedBuffer = transformed.buffer
+      contentType = transformed.contentType
+
+      // Cache the transformed image
       imageCache.set(cacheKey, {
-        buffer: imageBuffer,
+        buffer: transformedBuffer,
         timestamp: Date.now(),
         contentType,
       })
@@ -114,22 +210,30 @@ export const imageHandler = async (
       cleanupCache()
     }
 
-    const fileSize = imageBuffer.byteLength
+    const fileSize = transformedBuffer.byteLength
 
     // Set headers
     c.header('Content-Type', contentType)
     c.header('Content-Length', fileSize.toString())
-    c.header('ETag', cid)
+    c.header('ETag', `${cid}-${size}-${format || 'original'}`)
     c.header('Cache-Control', 'public, max-age=86400')
 
     logger.info(
-      { did, cid, size: fileSize, cached: fromCache, type: contentType },
-      'Serving image',
+      {
+        did,
+        cid,
+        size,
+        format,
+        fileSize,
+        cached: fromCache,
+        type: contentType,
+      },
+      'Serving transformed image',
     )
 
-    return c.body(imageBuffer)
+    return c.body(transformedBuffer)
   } catch (err) {
-    logger.error({ err, did, cid }, 'Error serving image')
+    logger.error({ err, did, cid, size, format }, 'Error serving image')
     return c.json({ error: 'Error serving image' }, 500)
   }
 }
