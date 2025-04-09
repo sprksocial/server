@@ -40,7 +40,7 @@ export async function transformPostToPostView(
     did: post.authorDid,
     handle: post.authorHandle,
     displayName: profile?.displayName ?? post.authorHandle,
-    avatar: `https://cdn.sprk.so/avatar/${post.authorDid}`,
+    avatar: `https://media.sprk.so/avatar/tiny/${profile?.authorDid}/${profile?.avatar?.ref?.$link}/webp`,
   }
 
   let embed
@@ -49,20 +49,18 @@ export async function transformPostToPostView(
     embed = {
       $type: 'so.sprk.embed.images#view',
       images: post.embed.images.map((img: any) => ({
-        thumb: `https://cdn.bsky.app/img/feed_thumbnail/plain/${post.authorDid}/${img.image.ref.$link}@jpeg`,
-        fullsize: `https://cdn.bsky.app/img/feed_fullsize/plain/${post.authorDid}/${img.image.ref.$link}@jpeg`,
+        thumb: `https://media.bsky.app/img/medium/${post.authorDid}/${img.image.ref.$link}/webp`,
+        fullsize: `https://media.bsky.app/img/full/${post.authorDid}/${img.image.ref.$link}/webp`,
         alt: img.alt,
         aspectRatio: img.aspectRatio,
       })),
     } satisfies SoSprkEmbedImages.View
   } else if (post.embed?.$type === 'so.sprk.embed.video') {
-    const did = await resolver.resolveDidToDidDoc(post.authorDid)
-    const pdsDomain = did.pds.replace('https://', '')
     embed = {
       $type: 'so.sprk.embed.video#view',
       cid: post.cid,
-      playlist: `https://videocdn.sprk.so/${pdsDomain}/${post.authorDid}/${post.embed.video.ref.$link}`,
-      thumbnail: `https://cdn.sprk.so/${post.authorDid}/${post.embed.video.ref.$link}/thumbnail`,
+      playlist: `https://media.sprk.so/video/${post.authorDid}/${post.embed.video.ref.$link}`,
+      thumbnail: `https://thumb.sprk.so/${post.authorDid}/${post.embed.video.ref.$link}/thumbnail`,
     } satisfies SoSprkEmbedVideo.View
   }
 

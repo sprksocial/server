@@ -139,7 +139,7 @@ export const createGetProfileRouter = (ctx: AppContext) => {
                   handle,
                   displayName: p.displayName,
                   avatar: p.avatar
-                    ? `https://cdn.sprk.so/avatar/${p.authorDid}`
+                    ? `https://media.sprk.so/avatar/tiny/${p.authorDid}/${p.avatar.ref.$link}/webp`
                     : undefined,
                 } as SoSprkActorDefs.ProfileViewBasic
               }),
@@ -174,10 +174,10 @@ export const createGetProfileRouter = (ctx: AppContext) => {
 
       // Get avatar and banner URLs
       const avatar = profile.avatar
-        ? `https://cdn.sprk.so/avatar/${actorDid}/${profile.avatar.ref.$link}`
+        ? `https://media.sprk.so/avatar/tiny/${actorDid}/${profile.avatar.ref.$link}/webp`
         : undefined
       const banner = profile.banner
-        ? `https://cdn.sprk.so/banner/${actorDid}/${profile.banner.ref.$link}`
+        ? `https://media.sprk.so/img/tiny/${actorDid}/${profile.banner.ref.$link}/webp`
         : undefined
 
       // Convert joinedViaStarterPack to the correct type if it exists

@@ -83,8 +83,6 @@ export const createFeedRouter = (ctx: AppContext) => {
         const likeCount = likeCounts.get(record.uri) || 0
         const blobCid: CID = (record.value as any).embed?.video?.ref
 
-        const pdsDomain = new URL(pdsUrl).hostname
-
         return {
           post: {
             uri: record.uri,
@@ -105,8 +103,8 @@ export const createFeedRouter = (ctx: AppContext) => {
             embed: {
               $type: 'so.sprk.embed.video#view',
               cid: record.cid,
-              playlist: `https://videocdn.sprk.so/${pdsDomain}/${actorDid}/${blobCid.toString()}`,
-              thumbnail: `https://cdn.sprk.so/${actorDid}/${blobCid.toString()}/thumbnail`,
+              playlist: `https://media.sprk.so/video/${actorDid}/${blobCid.toString()}`,
+              thumbnail: `https://thumb.sprk.so/${actorDid}/${blobCid.toString()}/thumbnail`,
             },
             replyCount: 0,
             repostCount: 0,
