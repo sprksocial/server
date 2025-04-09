@@ -49,8 +49,8 @@ export async function transformPostToPostView(
     embed = {
       $type: 'so.sprk.embed.images#view',
       images: post.embed.images.map((img: any) => ({
-        thumb: `https://media.bsky.app/img/medium/${post.authorDid}/${img.image.ref.$link}/webp`,
-        fullsize: `https://media.bsky.app/img/full/${post.authorDid}/${img.image.ref.$link}/webp`,
+        thumb: `https://media.sprk.so/img/medium/${post.authorDid}/${img.image.ref.$link}/webp`,
+        fullsize: `https://media.sprk.so/img/full/${post.authorDid}/${img.image.ref.$link}/webp`,
         alt: img.alt,
         aspectRatio: img.aspectRatio,
       })),
