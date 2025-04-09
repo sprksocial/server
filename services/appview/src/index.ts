@@ -13,9 +13,10 @@ import {
   createBidirectionalResolver,
   createIdResolver,
 } from './id-resolver.js'
+import { createGetProfileRouter } from './routes/actor/getProfile.js'
+import { createGetAuthorFeedRouter } from './routes/feed/getAuthorFeed.js'
 import { createGetPostsRouter } from './routes/feed/getPosts.js'
 import { createGetPostThreadRouter } from './routes/feed/getPostThread.js'
-import { createGetProfileRouter } from './routes/actor/getProfile.js'
 import { createGetFollowersRouter } from './routes/graph/getFollowers.js'
 import { createGetFollowsRouter } from './routes/graph/getFollows.js'
 import wellKnownRouter from './well-known.js'
@@ -79,11 +80,13 @@ export class Server {
     const getProfileRouter = createGetProfileRouter(ctx)
     const getFollowersRouter = createGetFollowersRouter(ctx)
     const getFollowsRouter = createGetFollowsRouter(ctx)
+    const getAuthorFeedRouter = createGetAuthorFeedRouter(ctx)
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
     app.route('/', getProfileRouter)
     app.route('/', getFollowersRouter)
     app.route('/', getFollowsRouter)
+    app.route('/', getAuthorFeedRouter)
 
     app.route('/', wellKnownRouter())
 
