@@ -4,13 +4,11 @@ import type { Label } from '../lexicon/types/com/atproto/label/defs.js'
 import type * as SoSprkEmbedImages from '../lexicon/types/so/sprk/embed/images.js'
 import type * as SoSprkEmbedVideo from '../lexicon/types/so/sprk/embed/video.js'
 import { Database, PostDocument } from '../db.js'
-import { BidirectionalResolver } from '../id-resolver.js'
 
 // Transform DB post to PostView format
 export async function transformPostToPostView(
   post: PostDocument,
   db: Database,
-  resolver: BidirectionalResolver,
   userDid?: string,
 ): Promise<SoSprkFeedDefs.PostView> {
   // Get like count

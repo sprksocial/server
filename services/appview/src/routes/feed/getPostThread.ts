@@ -33,7 +33,7 @@ export const createGetPostThreadRouter = (ctx: AppContext) => {
       }
 
       // Convert the main post to a PostView
-      const mainPostView = await transformPostToPostView(mainPost, ctx.db, ctx.resolver, userDid)
+      const mainPostView = await transformPostToPostView(mainPost, ctx.db, userDid)
 
       // Get parent posts if this is a reply
       const parentPosts: SoSprkFeedDefs.PostView[] = []
@@ -50,7 +50,7 @@ export const createGetPostThreadRouter = (ctx: AppContext) => {
             break
           }
 
-          const parentPostView = await transformPostToPostView(parentPost, ctx.db, ctx.resolver, userDid)
+          const parentPostView = await transformPostToPostView(parentPost, ctx.db, userDid)
           parentPosts.unshift(parentPostView) // Add at the beginning so root is first
 
           // If we reached the root, stop
@@ -125,7 +125,7 @@ async function buildThreadView(
   depth = 0,
 ): Promise<SoSprkFeedDefs.ThreadViewPost> {
   // Convert the post to a post view
-  const postView = await transformPostToPostView(post, ctx.db, ctx.resolver, userDid)
+  const postView = await transformPostToPostView(post, ctx.db, userDid)
 
   // If we've reached the maximum depth, don't fetch replies
   if (depth <= 0) {

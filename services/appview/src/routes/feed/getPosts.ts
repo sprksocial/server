@@ -3,7 +3,6 @@ import { Hono } from 'hono'
 import { OutputSchema as GetPostsView } from '../../lexicon/types/so/sprk/feed/getPosts.js'
 import { AppContext } from '../../index.js'
 import { transformPostToPostView } from '../../utils/post-transformer.js'
-import { BidirectionalResolver } from '../../id-resolver.js'
 import { Database } from '../../db.js'
 import type * as SoSprkFeedDefs from '../../lexicon/types/so/sprk/feed/defs.js'
 
@@ -11,7 +10,6 @@ import type * as SoSprkFeedDefs from '../../lexicon/types/so/sprk/feed/defs.js'
 async function getPosts(
   uris: string | string[],
   db: Database,
-  resolver: BidirectionalResolver,
   userDid?: string,
 ): Promise<SoSprkFeedDefs.PostView[]> {
   if (!uris) {
@@ -28,7 +26,7 @@ async function getPosts(
 
   // Transform each post to PostView format
   const postViews = await Promise.all(
-    dbPosts.map((post) => transformPostToPostView(post, db, resolver, userDid)),
+    dbPosts.map((post) => transformPostToPostView(post, db, userDid)),
   )
 
   return postViews
@@ -45,7 +43,7 @@ export const createGetPostsRouter = (ctx: AppContext) => {
       return c.json({ posts: [] } as GetPostsView)
     }
 
-    const posts = await getPosts(uris, ctx.db, ctx.resolver, userDid)
+    const posts = await getPosts(uris, ctx.db, userDid)
 
     return c.json({ posts } as GetPostsView)
   })

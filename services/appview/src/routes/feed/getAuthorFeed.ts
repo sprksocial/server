@@ -141,7 +141,6 @@ export const createGetAuthorFeedRouter = (ctx: AppContext) => {
             const postView = await transformPostToPostView(
               post,
               ctx.db,
-              ctx.resolver,
               viewerDid,
             )
 
