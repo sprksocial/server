@@ -1,0 +1,70 @@
+name: Build and Push Ingester Image
+
+# Trigger only for tags starting with 'ingester/v'
+on:
+  push:
+    tags:
+      - 'ingester/v*'
+
+jobs:
+  build-and-push-ingester:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract Version from Tag
+        id: extract_version
+        run: |
+          # GITHUB_REF_NAME is like 'refs/tags/ingester/v1.0.0'
+          # Or directly github.ref_name which is 'ingester/v1.0.0'
+          TAG_NAME="${{ github.ref_name }}"
+          # Remove the known service prefix 'ingester/'
+          VERSION=$(echo "$TAG_NAME" | sed 's#^ingester/##')
+          echo "Extracted Version: $VERSION"
+          if [ -z "$VERSION" ]; then
+             echo "::error::Could not extract version from tag '$TAG_NAME'."
+             exit 1
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "ghcr_image_name=ghcr.io/${{ github.repository_owner }}/ingester" >> $GITHUB_OUTPUT
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image for Ingester
+        uses: docker/build-push-action@v6
+        with:
+          context: ./services/ingester
+          file: ./services/ingester/Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ steps.extract_version.outputs.ghcr_image_name }}:${{ steps.extract_version.outputs.version }}
+            ${{ steps.extract_version.outputs.ghcr_image_name }}:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.created=${{ github.event.head_commit.timestamp }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ steps.extract_version.outputs.version }}
+            org.opencontainers.image.title=ingester
+
+      - name: Image Push Summary
+        run: |
+          echo "Successfully pushed ingester:"
+          echo "Image: ${{ steps.extract_version.outputs.ghcr_image_name }}"
+          echo "Tags: ${{ steps.extract_version.outputs.version }}, latest"
