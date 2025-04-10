@@ -5,6 +5,7 @@ import { AppContext } from '../../index.js'
 import { transformPostToPostView } from '../../utils/post-transformer.js'
 import { Database } from '../../db.js'
 import type * as SoSprkFeedDefs from '../../lexicon/types/so/sprk/feed/defs.js'
+import { optionalAuthMiddleware } from '../../auth/middleware.js'
 
 // Function to fetch posts by URIs
 async function getPosts(
@@ -35,7 +36,9 @@ async function getPosts(
 export const createGetPostsRouter = (ctx: AppContext) => {
   const router = new Hono()
 
-  router.get('/xrpc/so.sprk.feed.getPosts', async (c) => {
+  router.get('/xrpc/so.sprk.feed.getPosts',
+    optionalAuthMiddleware,
+    async (c) => {
     const uris = c.req.queries('uris')
     const userDid = c.get('did') as string | undefined
 

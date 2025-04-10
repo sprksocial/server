@@ -4,7 +4,6 @@ import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { logger } from 'hono/logger'
 import { pino } from 'pino'
-import { optionalAuthMiddleware } from './auth/middleware.js'
 import { Database } from './db.js'
 import { env } from './env.js'
 import { createFeedRouter } from './feed/feed.js'
@@ -68,10 +67,7 @@ export class Server {
       await next()
     })
 
-    // Apply optional auth to getPosts - enables auth but doesn't require it
-    app.use('/xrpc/so.sprk.feed.getPosts', optionalAuthMiddleware)
-
-    // Auth routes
+    // TODO: Remove this after getAuthorFeedRouter is properly implemented on frontend
     const feedRouter = createFeedRouter(ctx)
     app.route('/', feedRouter)
 
@@ -93,7 +89,7 @@ export class Server {
     // Root route
     app.get('/', (c) => {
       return c.text(
-        '✧･ﾟ: ✧･ﾟ:. ݁₊ ⊹ . ݁˖ . ݁ 𝚂𝙿𝙰𝚁𝙺 𝙰𝙿𝙸 . ݁₊ ⊹ . ݁˖ . ݁ :･ﾟ✧:･ﾟ✧',
+        '✧･ﾟ: ✧･ﾟ:. ݁₊ ⊹ . ݁˖ . ݁ SPARK API . ݁₊ ⊹ . ݁˖ . ݁ :･ﾟ✧:･ﾟ✧',
       )
     })
 
