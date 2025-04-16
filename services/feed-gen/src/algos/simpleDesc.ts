@@ -6,8 +6,8 @@ export const shortname = 'simple-desc'
 const handler = async (db: Database, params: feedParams) => {
   const { limit = 50, cursor } = params;
 
-  // Build the query
-  const query: any = {};
+  // Build the query, filtering out replies so only original posts are included
+  const query: any = { reply: null };
 
   // Apply cursor if provided
   if (cursor) {
