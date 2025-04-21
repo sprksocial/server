@@ -53,6 +53,8 @@ jobs:
           file: ./services/ingester/Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ${{ steps.extract_version.outputs.ghcr_image_name }}:${{ steps.extract_version.outputs.version }}
             ${{ steps.extract_version.outputs.ghcr_image_name }}:latest
