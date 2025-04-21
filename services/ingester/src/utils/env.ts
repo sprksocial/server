@@ -1,22 +1,18 @@
-import dotenv from 'dotenv'
-import { cleanEnv, host, port, str, testOnly } from 'envalid'
+import * as dotenv from 'dotenv'
+import { envBool, envInt, envList, envStr } from '@atproto/common'
 
 dotenv.config()
 
-export const env = cleanEnv(process.env, {
-  NODE_ENV: str({
-    devDefault: testOnly('test'),
-    choices: ['development', 'production', 'test'],
-  }),
+export const env = {
+  NODE_ENV: envStr('NODE_ENV') ?? 'test',
 
-  JETSTREAM_URL: str({
-    default: 'wss://jetstream2.us-east.bsky.network/subscribe',
-    desc: 'Websocket URL for Jetstream connection'
-  }),
+  JETSTREAM_URL:
+    envStr('JETSTREAM_URL') ??
+    'wss://jetstream2.us-east.bsky.network/subscribe',
 
-  DB_NAME: str({ devDefault: 'dev' }),
-  DB_HOST: str({ devDefault: 'localhost' }),
-  DB_PORT: port({ devDefault: 27017 }),
-  DB_USER: str({ devDefault: 'mongo' }),
-  DB_PASSWORD: str({ devDefault: 'mongo' }),
-})
+  DB_NAME: envStr('DB_NAME') ?? 'dev',
+  DB_HOST: envStr('DB_HOST') ?? 'localhost',
+  DB_PORT: envInt('DB_PORT') ?? 27017,
+  DB_USER: envStr('DB_USER') ?? 'mongo',
+  DB_PASSWORD: envStr('DB_PASSWORD') ?? 'mongo',
+}

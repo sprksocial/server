@@ -12,6 +12,7 @@
     "@types/ws": "^8.18.0"
   },
   "dependencies": {
+    "@atproto/common": "^0.4.6",
     "@atproto/identity": "^0.4.6",
     "dotenv": "^16.4.7",
     "envalid": "^8.0.0",

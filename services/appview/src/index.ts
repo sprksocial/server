@@ -19,6 +19,9 @@ import { createGetPostThreadRouter } from './routes/feed/getPostThread.js'
 import { createGetFollowersRouter } from './routes/graph/getFollowers.js'
 import { createGetFollowsRouter } from './routes/graph/getFollows.js'
 import wellKnownRouter from './well-known.js'
+import { TakedownService } from './services/takedown.js'
+import takedownRoutes from './routes/admin/takedowns.js'
+import { takedownFilterMiddleware } from './middleware/takedown-filter.js'
 
 export type AppContext = {
   db: Database
@@ -26,6 +29,7 @@ export type AppContext = {
   resolver: BidirectionalResolver
   serviceDid: string
   didResolver: DidResolver
+  takedownService: TakedownService
 }
 
 export class Server {
@@ -45,6 +49,9 @@ export class Server {
 
     // Get service DID from environment
     const serviceDid = env.SERVICE_DID
+    
+    // Create takedown service
+    const takedownService = new TakedownService(db)
 
     const ctx = {
       db,
@@ -52,6 +59,7 @@ export class Server {
       resolver,
       serviceDid,
       didResolver: baseIdResolver.did,
+      takedownService,
     }
 
     const app = new Hono()
@@ -64,6 +72,7 @@ export class Server {
       // Type-safe way to set context variables
       c.set('serviceDid', serviceDid)
       c.set('didResolver', baseIdResolver.did)
+      c.set('takedownService', takedownService)
       await next()
     })
 
@@ -77,12 +86,24 @@ export class Server {
     const getFollowersRouter = createGetFollowersRouter(ctx)
     const getFollowsRouter = createGetFollowsRouter(ctx)
     const getAuthorFeedRouter = createGetAuthorFeedRouter(ctx)
+    
+    // Apply takedown filter middleware to content routes
+    app.use('/xrpc/app.bsky.feed.*', takedownFilterMiddleware)
+    app.use('/feed/*', takedownFilterMiddleware)
+    app.use('/posts/*', takedownFilterMiddleware)
+    
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
     app.route('/', getProfileRouter)
     app.route('/', getFollowersRouter)
     app.route('/', getFollowsRouter)
     app.route('/', getAuthorFeedRouter)
+
+    // Admin routes
+    app.route('/admin/takedowns', takedownRoutes)
+
+    // XRPC routes - make sure the Ozone endpoint is accessible
+    app.route('/xrpc', takedownRoutes)
 
     app.route('/', wellKnownRouter())
 
