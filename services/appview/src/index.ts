@@ -88,9 +88,7 @@ export class Server {
     const getAuthorFeedRouter = createGetAuthorFeedRouter(ctx)
     
     // Apply takedown filter middleware to content routes
-    app.use('/xrpc/app.bsky.feed.*', takedownFilterMiddleware)
-    app.use('/feed/*', takedownFilterMiddleware)
-    app.use('/posts/*', takedownFilterMiddleware)
+    app.use('/', takedownFilterMiddleware)
     
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
