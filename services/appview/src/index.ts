@@ -13,16 +13,17 @@ import {
   createIdResolver,
 } from './id-resolver.js'
 import { takedownFilterMiddleware } from './middleware/takedown-filter.js'
-import { createGetProfileRouter } from './routes/actor/getProfile.js'
-import { createSearchActorRouter } from './routes/actor/searchActor.js'
+import { createGetProfileRouter } from './routes/so/sprk/actor/getProfile.js'
+import { createSearchActorRouter } from './routes/so/sprk/actor/searchActor.js'
+import { createGetAuthorFeedRouter } from './routes/so/sprk/feed/getAuthorFeed.js'
+import { createGetPostsRouter } from './routes/so/sprk/feed/getPosts.js'
+import { createGetPostThreadRouter } from './routes/so/sprk/feed/getPostThread.js'
+import { createGetFollowersRouter } from './routes/so/sprk/graph/getFollowers.js'
+import { createGetFollowsRouter } from './routes/so/sprk/graph/getFollows.js'
 import { createTakedownRouter } from './routes/admin/takedowns.js'
-import { createGetAuthorFeedRouter } from './routes/feed/getAuthorFeed.js'
-import { createGetPostsRouter } from './routes/feed/getPosts.js'
-import { createGetPostThreadRouter } from './routes/feed/getPostThread.js'
-import { createGetFollowersRouter } from './routes/graph/getFollowers.js'
-import { createGetFollowsRouter } from './routes/graph/getFollows.js'
-import { TakedownService } from './services/takedown.js'
+import { createUpdateSubjectStatusRouter } from './routes/com/atproto/admin/updateSubjectStatus.js'
 import wellKnownRouter from './well-known.js'
+import { TakedownService } from './services/takedown.js'
 
 export type AppContext = {
   db: Database
@@ -65,19 +66,15 @@ export class Server {
 
     const app = new Hono()
 
-    // Middleware
     app.use('*', logger())
 
-    // Set context variables for auth middleware
     app.use('*', async (c, next) => {
-      // Type-safe way to set context variables
       c.set('serviceDid', serviceDid)
       c.set('didResolver', baseIdResolver.did)
       c.set('takedownService', takedownService)
       await next()
     })
 
-    // Apply takedown filter middleware to all routes
     app.use('*', takedownFilterMiddleware)
 
     // TODO: Remove this after getAuthorFeedRouter is properly implemented on frontend
@@ -91,6 +88,8 @@ export class Server {
     const getFollowsRouter = createGetFollowsRouter(ctx)
     const getAuthorFeedRouter = createGetAuthorFeedRouter(ctx)
     const searchActorRouter = createSearchActorRouter(ctx)
+    const updateSubjectStatusRouter = createUpdateSubjectStatusRouter(ctx)
+    const takedownRouter = createTakedownRouter(ctx)
 
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
@@ -99,9 +98,7 @@ export class Server {
     app.route('/', getFollowsRouter)
     app.route('/', getAuthorFeedRouter)
     app.route('/', searchActorRouter)
-
-    // Create and configure the takedown router
-    const takedownRouter = createTakedownRouter({ takedownService })
+    app.route('/', updateSubjectStatusRouter)
     app.route('/', takedownRouter)
 
     app.route('/', wellKnownRouter())

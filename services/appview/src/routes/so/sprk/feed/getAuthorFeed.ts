@@ -1,8 +1,8 @@
 import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
-import { optionalAuthMiddleware } from '../../auth/middleware.js'
-import { AppContext } from '../../index.js'
-import { transformPostToPostView } from '../../utils/post-transformer.js'
+import { optionalAuthMiddleware } from '../../../../auth/middleware.js'
+import { AppContext } from '../../../../index.js'
+import { transformPostToPostView } from '../../../../utils/post-transformer.js'
 
 export const createGetAuthorFeedRouter = (ctx: AppContext) => {
   const router = new Hono()

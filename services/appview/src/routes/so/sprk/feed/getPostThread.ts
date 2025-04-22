@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
-import { OutputSchema as GetPostThreadView } from '../../lexicon/types/so/sprk/feed/getPostThread.js'
-import type * as SoSprkFeedDefs from '../../lexicon/types/so/sprk/feed/defs.js'
-import { AppContext } from '../../index.js'
-import { transformPostToPostView } from '../../utils/post-transformer.js'
-import { optionalAuthMiddleware } from '../../auth/middleware.js'
+import { OutputSchema as GetPostThreadView } from '../../../../lexicon/types/so/sprk/feed/getPostThread.js'
+import type * as SoSprkFeedDefs from '../../../../lexicon/types/so/sprk/feed/defs.js'
+import { AppContext } from '../../../../index.js'
+import { transformPostToPostView } from '../../../../utils/post-transformer.js'
+import { optionalAuthMiddleware } from '../../../../auth/middleware.js'
 
 export const createGetPostThreadRouter = (ctx: AppContext) => {
   const router = new Hono()

@@ -437,10 +437,22 @@ export class Database {
       Repost: this.connection.model<RepostDocument>('Repost', repostSchema),
       Music: this.connection.model<MusicDocument>('Music', musicSchema),
       Look: this.connection.model<LookDocument>('Look', lookSchema),
-      Generator: this.connection.model<GeneratorDocument>('Generator', generatorSchema),
-      Takedown: this.connection.model<TakedownDocument>('Takedown', takedownSchema),
-      RepoTakedown: this.connection.model<RepoTakedownDocument>('RepoTakedown', repoTakedownSchema),
-      BlobTakedown: this.connection.model<BlobTakedownDocument>('BlobTakedown', blobTakedownSchema),
+      Generator: this.connection.model<GeneratorDocument>(
+        'Generator',
+        generatorSchema,
+      ),
+      Takedown: this.connection.model<TakedownDocument>(
+        'Takedown',
+        takedownSchema,
+      ),
+      RepoTakedown: this.connection.model<RepoTakedownDocument>(
+        'RepoTakedown',
+        repoTakedownSchema,
+      ),
+      BlobTakedown: this.connection.model<BlobTakedownDocument>(
+        'BlobTakedown',
+        blobTakedownSchema,
+      ),
     }
   }
 
