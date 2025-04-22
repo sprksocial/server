@@ -7,6 +7,13 @@ import { TakedownService } from '../services/takedown.js'
  * that might have been taken down by admins
  */
 export const takedownFilterMiddleware = async (c: Context, next: Next) => {
+  // Skip filtering for admin routes and non-content routes
+  const path = c.req.path
+  if (path.startsWith('/admin/') || path === '/' || path.includes('favicon') || path.includes('xrpc/com.atproto.admin.updateSubjectStatus')) {
+    await next()
+    return
+  }
+  
   // Call the next middleware/route handler first
   await next()
   
@@ -49,12 +56,59 @@ export const takedownFilterMiddleware = async (c: Context, next: Next) => {
       const filteredProfiles = await filterTakenDownRepos(body.profiles, takedownService)
       body.profiles = filteredProfiles
     } else if (body.profile) {
-      // For single profile view
       if (body.profile.did) {
         const isRepoTakenDown = await takedownService.isRepoTakenDown(body.profile.did)
         if (isRepoTakenDown) {
           body.profile = null
         }
+      }
+    } else if (body.did && body.$type && body.$type.includes('profileView')) {
+      // For direct ProfileViewDetailed objects (so.sprk.actor.getProfile)
+      const isRepoTakenDown = await takedownService.isRepoTakenDown(body.did)
+      if (isRepoTakenDown) {
+        // Return a minimal placeholder object for taken-down profiles
+        const takenDownProfile = {
+          $type: body.$type,
+          did: body.did,
+          handle: body.handle || 'unavailable',
+          moderation: {
+            takenDown: true
+          }
+        }
+        
+        // Create a new response with the placeholder instead of trying to modify body
+        c.res = new Response(JSON.stringify(takenDownProfile), {
+          status: c.res.status,
+          headers: c.res.headers,
+        })
+        
+        // Skip the rest of the processing
+        return
+      }
+    } else if (body.subject) {
+      // For followers/follows response that has a subject profile
+      if (body.subject.did) {
+        const isRepoTakenDown = await takedownService.isRepoTakenDown(body.subject.did)
+        if (isRepoTakenDown) {
+          // Keep minimal info about the profile but mark it as taken down
+          body.subject = {
+            $type: body.subject.$type,
+            did: body.subject.did,
+            handle: body.subject.handle || 'unavailable',
+            moderation: {
+              takenDown: true
+            }
+          }
+        }
+      }
+      
+      // Also filter any followers/follows list
+      if (body.followers && Array.isArray(body.followers)) {
+        body.followers = await filterTakenDownRepos(body.followers, takedownService)
+      }
+      
+      if (body.follows && Array.isArray(body.follows)) {
+        body.follows = await filterTakenDownRepos(body.follows, takedownService)
       }
     }
     
@@ -125,6 +179,17 @@ async function filterTakenDownRepos(
       const isRepoTakenDown = await takedownService.isRepoTakenDown(profile.did)
       if (!isRepoTakenDown) {
         filteredProfiles.push(profile)
+      } else {
+        // For UI consistency, push a minimal placeholder for taken-down profiles
+        // if they need to be represented in lists (follows, followers, etc.)
+        filteredProfiles.push({
+          $type: profile.$type,
+          did: profile.did,
+          handle: profile.handle || 'unavailable',
+          moderation: {
+            takenDown: true
+          }
+        })
       }
     } else {
       // If no DID, keep the profile

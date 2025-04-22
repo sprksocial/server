@@ -20,7 +20,7 @@ import { createGetFollowersRouter } from './routes/graph/getFollowers.js'
 import { createGetFollowsRouter } from './routes/graph/getFollows.js'
 import wellKnownRouter from './well-known.js'
 import { TakedownService } from './services/takedown.js'
-import takedownRoutes from './routes/admin/takedowns.js'
+import { createTakedownRouter } from './routes/admin/takedowns.js'
 import { takedownFilterMiddleware } from './middleware/takedown-filter.js'
 
 export type AppContext = {
@@ -76,6 +76,9 @@ export class Server {
       await next()
     })
 
+    // Apply takedown filter middleware to all routes
+    app.use('*', takedownFilterMiddleware)
+    
     // TODO: Remove this after getAuthorFeedRouter is properly implemented on frontend
     const feedRouter = createFeedRouter(ctx)
     app.route('/', feedRouter)
@@ -87,9 +90,6 @@ export class Server {
     const getFollowsRouter = createGetFollowsRouter(ctx)
     const getAuthorFeedRouter = createGetAuthorFeedRouter(ctx)
     
-    // Apply takedown filter middleware to content routes
-    app.use('/', takedownFilterMiddleware)
-    
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
     app.route('/', getProfileRouter)
@@ -97,11 +97,9 @@ export class Server {
     app.route('/', getFollowsRouter)
     app.route('/', getAuthorFeedRouter)
 
-    // Admin routes
-    app.route('/admin/takedowns', takedownRoutes)
-
-    // XRPC routes - make sure the Ozone endpoint is accessible
-    app.route('/xrpc', takedownRoutes)
+    // Create and configure the takedown router
+    const takedownRouter = createTakedownRouter({ takedownService })
+    app.route('/', takedownRouter)
 
     app.route('/', wellKnownRouter())
 
