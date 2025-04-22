@@ -7,9 +7,9 @@ import { TakedownService } from '../services/takedown.js'
  * that might have been taken down by admins
  */
 export const takedownFilterMiddleware = async (c: Context, next: Next) => {
-  // Skip filtering for admin routes and non-content routes
-  const path = c.req.path
-  if (path.startsWith('/admin/') || path === '/' || path.includes('favicon') || path.includes('xrpc/com.atproto.admin.updateSubjectStatus')) {
+  // Skip filtering if user is an admin
+  const isAdmin = c.get('isAdmin') as boolean | undefined
+  if (isAdmin) {
     await next()
     return
   }

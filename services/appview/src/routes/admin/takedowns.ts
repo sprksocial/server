@@ -3,10 +3,13 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { HTTPException } from 'hono/http-exception'
 import { TakedownService } from '../../services/takedown.js'
-import { adminAuthMiddleware } from '../../auth/middleware.js'
+import { authMiddleware } from '../../auth/middleware.js'
+import { Database } from '../../db.js'
+import { AtUri } from '@atproto/syntax'
 
 type TakedownContext = {
   takedownService: TakedownService
+  db: Database
 }
 
 export const createTakedownRouter = (ctx: TakedownContext) => {
@@ -14,10 +17,7 @@ export const createTakedownRouter = (ctx: TakedownContext) => {
   const takedownService = ctx.takedownService
 
   // Apply admin auth middleware to all admin routes
-  takedownRoutes.use('/admin/*', adminAuthMiddleware)
-
-  // No auth needed for the Ozone integration endpoint as it will use its own auth
-  // This will be protected by adminAuthMiddleware before processing
+  takedownRoutes.use('/admin/*', (c, next) => authMiddleware(c, next, true))
 
   takedownRoutes.post('/admin/takedowns', zValidator('json', z.object({
     targetUri: z.string(),
@@ -220,6 +220,52 @@ export const createTakedownRouter = (ctx: TakedownContext) => {
       return c.json({ isTakenDown })
     } catch (error) {
       throw new HTTPException(500, { message: 'Failed to check blob takedown status' })
+    }
+  })
+
+  // Get a specific taken down record with its content
+  takedownRoutes.get('/admin/takedowns/content/:uri', async (c) => {
+    const uri = c.req.param('uri')
+    
+    try {
+      // First check if this content is taken down
+      const takedown = await takedownService.getTakedown(uri)
+      if (!takedown) {
+        return c.json({ error: 'Content is not taken down' }, 404)
+      }
+
+      // Parse the URI to extract components
+      const atUri = new AtUri(uri)
+      const collection = atUri.collection
+      const did = atUri.hostname
+      let record = null
+
+      // Get record based on collection
+      if (collection.includes('post')) {
+        record = await ctx.db.models.Post.findOne({ uri }).lean()
+      } else if (collection.includes('repost')) {
+        record = await ctx.db.models.Repost.findOne({ uri }).lean()
+      } else if (collection.includes('like')) {
+        record = await ctx.db.models.Like.findOne({ uri }).lean()
+      } else if (collection.includes('follow')) {
+        record = await ctx.db.models.Follow.findOne({ uri }).lean()
+      } else if (collection.includes('block')) {
+        record = await ctx.db.models.Block.findOne({ uri }).lean()
+      } else if (collection.includes('profile')) {
+        // For profiles we need to extract the DID
+        record = await ctx.db.models.Profile.findOne({ authorDid: did }).lean()
+      }
+
+      if (!record) {
+        return c.json({ error: 'Record content not found in database' }, 404)
+      }
+
+      return c.json({
+        takedown,
+        record
+      })
+    } catch (error) {
+      throw new HTTPException(500, { message: 'Failed to fetch taken down content' })
     }
   })
 

@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { HTTPException } from 'hono/http-exception'
 import { TakedownService } from '../../../../services/takedown.js'
-import { adminAuthMiddleware } from '../../../../auth/middleware.js'
+import { authMiddleware } from '../../../../auth/middleware.js'
 import type * as ComAtprotoAdminUpdateSubjectStatus from '../../../../lexicon/types/com/atproto/admin/updateSubjectStatus.js'
 import type * as ComAtprotoAdminDefs from '../../../../lexicon/types/com/atproto/admin/defs.js'
 import type * as ComAtprotoRepoStrongRef from '../../../../lexicon/types/com/atproto/repo/strongRef.js'
@@ -21,7 +21,7 @@ export const createUpdateSubjectStatusRouter = (
   // XRPC endpoint for Ozone integration: com.atproto.admin.updateSubjectStatus
   router.post(
     '/xrpc/com.atproto.admin.updateSubjectStatus',
-    adminAuthMiddleware,
+    (c, next) => authMiddleware(c, next, true),
     zValidator(
       'json',
       z.object({
