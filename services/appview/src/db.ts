@@ -1,6 +1,6 @@
-import mongoose, { Schema, Document, Model, Connection } from 'mongoose'
-import { env } from './env.js'
+import mongoose, { Connection, Document, Model, Schema } from 'mongoose'
 import { pino } from 'pino'
+import { env } from './env.js'
 
 export interface LikeDocument extends Document {
   uri: string
@@ -116,6 +116,13 @@ export const profileSchema = new Schema<ProfileDocument>({
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
+})
+
+// Add text index for profile search
+profileSchema.index({
+  displayName: 'text',
+  authorHandle: 'text',
+  description: 'text',
 })
 
 export interface AudioDocument extends Document {
