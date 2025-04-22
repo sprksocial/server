@@ -1,8 +1,8 @@
 import { Hono } from 'hono'
-import { AppContext } from '../../index.js'
-import type { Label } from '../../lexicon/types/com/atproto/label/defs.js'
-import type * as SoSprkActorDefs from '../../lexicon/types/so/sprk/actor/defs.js'
-import type * as SoSprkActorSearch from '../../lexicon/types/so/sprk/actor/searchActors.js'
+import { AppContext } from '../../../../index.js'
+import type { Label } from '../../../../lexicon/types/com/atproto/label/defs.js'
+import type * as SoSprkActorDefs from '../../../../lexicon/types/so/sprk/actor/defs.js'
+import type * as SoSprkActorSearch from '../../../../lexicon/types/so/sprk/actor/searchActors.js'
 
 // Helper to escape user input for safe RegExp usage
 function escapeRegExp(str: string): string {

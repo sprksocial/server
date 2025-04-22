@@ -1,13 +1,13 @@
 import { Hono } from 'hono'
 
-import { optionalAuthMiddleware } from '../../auth/middleware.js'
-import { AppContext } from '../../index.js'
-import type * as SoSprkActorDefs from '../../lexicon/types/so/sprk/actor/defs.js'
+import { optionalAuthMiddleware } from '../../../../auth/middleware.js'
+import { AppContext } from '../../../../index.js'
+import type * as SoSprkActorDefs from '../../../../lexicon/types/so/sprk/actor/defs.js'
 
-export const createGetFollowersRouter = (ctx: AppContext) => {
+export const createGetFollowsRouter = (ctx: AppContext) => {
   const router = new Hono()
 
-  router.get('/xrpc/so.sprk.graph.getFollowers', optionalAuthMiddleware, async (c) => {
+  router.get('/xrpc/so.sprk.graph.getFollows', optionalAuthMiddleware, async (c) => {
     const actor = c.req.query('actor')
     const limit = parseInt(c.req.query('limit') ?? '50')
     const cursor = c.req.query('cursor')
@@ -22,30 +22,29 @@ export const createGetFollowersRouter = (ctx: AppContext) => {
     }
 
     // Build query
-    const query: any = { subject: actor }
+    const query: any = { authorDid: actor }
     if (cursor) {
       query._id = { $gt: cursor }
     }
 
-    // Get followers with pagination
-    const followers = await ctx.db.models.Follow.find(query)
+    // Get follows with pagination
+    const follows = await ctx.db.models.Follow.find(query)
       .sort({ _id: 1 })
       .limit(limit)
       .lean()
 
-    // Get profile views for each follower
+    // Get profile views for each follow
     const profileViews = await Promise.all(
-      followers.map(async (follow) => {
-        const profile = await ctx.db.models.Profile.findOne({ authorDid: follow.authorDid })
-        
-        // Basic profile view with just DID and handle
+      follows.map(async (follow) => {
+        const profile = await ctx.db.models.Profile.findOne({ authorDid: follow.subject })
+        // Basic profile view with just DID
         const basicProfileView: SoSprkActorDefs.ProfileView = {
           $type: 'so.sprk.actor.defs#profileView',
           did: follow.authorDid,
           handle: follow.authorHandle,
           viewer: {
             $type: 'so.sprk.actor.defs#viewerState',
-            following: follow.uri
+            followedBy: follow.uri
           }
         }
 
@@ -53,6 +52,7 @@ export const createGetFollowersRouter = (ctx: AppContext) => {
         if (profile) {
           return {
             ...basicProfileView,
+            handle: profile.authorHandle,
             displayName: profile.displayName,
             description: profile.description,
             avatar: profile.avatar?.ref?.link,
@@ -66,31 +66,15 @@ export const createGetFollowersRouter = (ctx: AppContext) => {
     )
 
     // Get next cursor
-    const nextCursor = followers.length === limit ? followers[followers.length - 1]._id : undefined
-    console.log('nextCursor', nextCursor)
+    const nextCursor = follows.length === limit ? follows[follows.length - 1]._id : undefined
 
     // Get subject profile if it exists
     const subjectProfile = await ctx.db.models.Profile.findOne({ authorDid: actor })
-    
-    // Basic subject profile view with just DID and handle
-    let handle = null
-    try {
-      if (actor) {
-        const didData = await ctx.resolver.resolveDidToDidDoc(actor)
-        handle = didData.handle
-      }
-    } catch (error) {
-      ctx.logger.warn(
-        { did: actor, error: (error as Error).message },
-        'Failed to resolve DID to handle',
-      )
-    }
     const subjectProfileView: SoSprkActorDefs.ProfileView = {
       $type: 'so.sprk.actor.defs#profileView',
       did: actor,
-      handle: handle ?? 'unknown'
+      handle: 'unknown'
     }
-
     // If we found the subject profile, add the additional fields
     if (subjectProfile) {
       Object.assign(subjectProfileView, {
@@ -101,14 +85,30 @@ export const createGetFollowersRouter = (ctx: AppContext) => {
         indexedAt: subjectProfile.indexedAt,
         createdAt: subjectProfile.createdAt
       })
+    } else {
+        let handle = null
+        try {
+          if (actor) {
+            const didData = await ctx.resolver.resolveDidToDidDoc(actor)
+            handle = didData.handle
+          }
+        } catch (error) {
+          ctx.logger.warn(
+            { did: actor, error: (error as Error).message },
+            'Failed to resolve DID to handle',
+          )
+        }
+        Object.assign(subjectProfileView, {
+          handle: handle ?? 'unknown'
+        })
     }
 
     return c.json({
       subject: subjectProfileView,
-      followers: profileViews,
+      follows: profileViews,
       cursor: nextCursor
     })
   })
 
   return router
-}   
+}
