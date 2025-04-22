@@ -42,6 +42,9 @@ dependencies:
   '@hono/node-server':
     specifier: ^1.13.8
     version: 1.13.8(hono@4.7.4)
+  '@hono/zod-validator':
+    specifier: ^0.4.3
+    version: 0.4.3(hono@4.7.4)(zod@3.24.2)
   dotenv:
     specifier: ^16.4.7
     version: 16.4.7
@@ -80,9 +83,6 @@ devDependencies:
   '@atproto/lex-cli':
     specifier: ^0.6.2
     version: 0.6.2
-  '@hono/zod-validator':
-    specifier: ^0.4.3
-    version: 0.4.3(hono@4.7.4)(zod@3.24.2)
   '@types/express':
     specifier: ^5.0.0
     version: 5.0.0
@@ -724,7 +724,7 @@ packages:
     dependencies:
       hono: 4.7.4
       zod: 3.24.2
-    dev: true
+    dev: false
 
   /@humanfs/core@0.19.1:
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1750,6 +1750,7 @@ packages:
   /hono@4.7.4:
     resolution: {integrity: sha512-Pst8FuGqz3L7tFF+u9Pu70eI0xa5S3LPUmrNd5Jm8nTHze9FxLTK9Kaj5g/k4UcwuJSXTP65SyHOPLrffpcAJg==}
     engines: {node: '>=16.9.0'}
+    dev: false
 
   /http-errors@2.0.0:
     resolution: {integrity: sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==}
