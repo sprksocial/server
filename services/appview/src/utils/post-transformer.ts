@@ -1,9 +1,9 @@
-import type * as SoSprkFeedDefs from '../lexicon/types/so/sprk/feed/defs.js'
-import type { ProfileViewBasic } from '../lexicon/types/so/sprk/actor/defs.js'
+import { Database, PostDocument } from '../db.js'
 import type { Label } from '../lexicon/types/com/atproto/label/defs.js'
+import type { ProfileViewBasic } from '../lexicon/types/so/sprk/actor/defs.js'
 import type * as SoSprkEmbedImages from '../lexicon/types/so/sprk/embed/images.js'
 import type * as SoSprkEmbedVideo from '../lexicon/types/so/sprk/embed/video.js'
-import { Database, PostDocument } from '../db.js'
+import type * as SoSprkFeedDefs from '../lexicon/types/so/sprk/feed/defs.js'
 
 // Transform DB post to PostView format
 export async function transformPostToPostView(
@@ -57,6 +57,7 @@ export async function transformPostToPostView(
     embed = {
       $type: 'so.sprk.embed.video#view',
       cid: post.cid,
+      alt: post.embed.alt,
       playlist: `https://media.sprk.so/video/${post.authorDid}/${post.embed.video.ref.$link}`,
       thumbnail: `https://thumb.sprk.so/${post.authorDid}/${post.embed.video.ref.$link}/thumbnail`,
     } satisfies SoSprkEmbedVideo.View
