@@ -11,7 +11,7 @@ export const env = {
   APPVIEW_K256_PRIVATE_KEY_HEX: envStr('APPVIEW_K256_PRIVATE_KEY_HEX') ?? '',
   SERVICE_DID: envStr('SERVICE_DID') ?? 'did:web:localhost',
   MOD_SERVICE_DID: envStr('MOD_SERVICE_DID') ?? 'did:web:localhost',
-  ADMIN_PASSWORDS: envList('ADMIN_PASSWORDS') ?? [],
+  ADMIN_DIDS: envList('ADMIN_DIDS') ?? [],
 
   DB_NAME: envStr('DB_NAME') ?? 'dev',
   DB_HOST: envStr('DB_HOST') ?? 'localhost',

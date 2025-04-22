@@ -66,6 +66,22 @@ export class TakedownService {
     return !!takedown
   }
 
+  /**
+   * Get takedown information for a URI if it exists
+   * @param uri The URI of the content to check
+   * @returns Takedown information or null if not taken down
+   */
+  async getTakedown(uri: string): Promise<{
+    targetUri: string
+    targetCid: string
+    reason: string
+    takenDownBy: string
+    takenDownAt: string
+  } | null> {
+    const takedown = await this.db.models.Takedown.findOne({ targetUri: uri }).lean()
+    return takedown
+  }
+
   // Add a method to check if a repo is taken down
   async isRepoTakenDown(did: string): Promise<boolean> {
     const takedown = await this.db.models.RepoTakedown.findOne({ did })
