@@ -12,16 +12,17 @@ import {
   createBidirectionalResolver,
   createIdResolver,
 } from './id-resolver.js'
+import { takedownFilterMiddleware } from './middleware/takedown-filter.js'
 import { createGetProfileRouter } from './routes/actor/getProfile.js'
+import { createSearchActorRouter } from './routes/actor/searchActor.js'
+import { createTakedownRouter } from './routes/admin/takedowns.js'
 import { createGetAuthorFeedRouter } from './routes/feed/getAuthorFeed.js'
 import { createGetPostsRouter } from './routes/feed/getPosts.js'
 import { createGetPostThreadRouter } from './routes/feed/getPostThread.js'
 import { createGetFollowersRouter } from './routes/graph/getFollowers.js'
 import { createGetFollowsRouter } from './routes/graph/getFollows.js'
-import wellKnownRouter from './well-known.js'
 import { TakedownService } from './services/takedown.js'
-import { createTakedownRouter } from './routes/admin/takedowns.js'
-import { takedownFilterMiddleware } from './middleware/takedown-filter.js'
+import wellKnownRouter from './well-known.js'
 
 export type AppContext = {
   db: Database
@@ -49,7 +50,7 @@ export class Server {
 
     // Get service DID from environment
     const serviceDid = env.SERVICE_DID
-    
+
     // Create takedown service
     const takedownService = new TakedownService(db)
 
@@ -78,7 +79,7 @@ export class Server {
 
     // Apply takedown filter middleware to all routes
     app.use('*', takedownFilterMiddleware)
-    
+
     // TODO: Remove this after getAuthorFeedRouter is properly implemented on frontend
     const feedRouter = createFeedRouter(ctx)
     app.route('/', feedRouter)
@@ -89,13 +90,15 @@ export class Server {
     const getFollowersRouter = createGetFollowersRouter(ctx)
     const getFollowsRouter = createGetFollowsRouter(ctx)
     const getAuthorFeedRouter = createGetAuthorFeedRouter(ctx)
-    
+    const searchActorRouter = createSearchActorRouter(ctx)
+
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
     app.route('/', getProfileRouter)
     app.route('/', getFollowersRouter)
     app.route('/', getFollowsRouter)
     app.route('/', getAuthorFeedRouter)
+    app.route('/', searchActorRouter)
 
     // Create and configure the takedown router
     const takedownRouter = createTakedownRouter({ takedownService })
