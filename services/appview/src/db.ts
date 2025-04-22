@@ -342,6 +342,61 @@ export const generatorSchema = new Schema<GeneratorDocument>({
 generatorSchema.index({ authorDid: 1, createdAt: -1 })
 generatorSchema.index({ did: 1, createdAt: -1 })
 
+export interface TakedownDocument extends Document {
+  targetUri: string
+  targetCid: string
+  reason: string
+  takenDownBy: string
+  takenDownAt: string
+}
+
+export const takedownSchema = new Schema<TakedownDocument>({
+  targetUri: { type: String, required: true, unique: true, index: true },
+  targetCid: { type: String, required: true },
+  reason: { type: String, required: true },
+  takenDownBy: { type: String, required: true },
+  takenDownAt: { type: String, required: true },
+})
+
+// Repository takedown schema
+export interface RepoTakedownDocument extends Document {
+  did: string
+  reason: string
+  takenDownBy: string
+  takenDownAt: string
+  ref: string | null
+}
+
+export const repoTakedownSchema = new Schema<RepoTakedownDocument>({
+  did: { type: String, required: true, unique: true, index: true },
+  reason: { type: String, required: true },
+  takenDownBy: { type: String, required: true },
+  takenDownAt: { type: String, required: true },
+  ref: { type: String, required: false, default: null },
+})
+
+// Blob takedown schema
+export interface BlobTakedownDocument extends Document {
+  did: string
+  cid: string
+  reason: string
+  takenDownBy: string
+  takenDownAt: string
+  ref: string | null
+}
+
+export const blobTakedownSchema = new Schema<BlobTakedownDocument>({
+  did: { type: String, required: true, index: true },
+  cid: { type: String, required: true, index: true },
+  reason: { type: String, required: true },
+  takenDownBy: { type: String, required: true },
+  takenDownAt: { type: String, required: true },
+  ref: { type: String, required: false, default: null },
+})
+
+// Ensure compound index on did + cid for blob takedowns
+blobTakedownSchema.index({ did: 1, cid: 1 }, { unique: true })
+
 export interface DatabaseModels {
   Like: Model<LikeDocument>
   Post: Model<PostDocument>
@@ -353,6 +408,9 @@ export interface DatabaseModels {
   Music: Model<MusicDocument>
   Look: Model<LookDocument>
   Generator: Model<GeneratorDocument>
+  Takedown: Model<TakedownDocument>
+  RepoTakedown: Model<RepoTakedownDocument>
+  BlobTakedown: Model<BlobTakedownDocument>
 }
 
 export class Database {
@@ -373,6 +431,9 @@ export class Database {
       Music: this.connection.model<MusicDocument>('Music', musicSchema),
       Look: this.connection.model<LookDocument>('Look', lookSchema),
       Generator: this.connection.model<GeneratorDocument>('Generator', generatorSchema),
+      Takedown: this.connection.model<TakedownDocument>('Takedown', takedownSchema),
+      RepoTakedown: this.connection.model<RepoTakedownDocument>('RepoTakedown', repoTakedownSchema),
+      BlobTakedown: this.connection.model<BlobTakedownDocument>('BlobTakedown', blobTakedownSchema),
     }
   }
 

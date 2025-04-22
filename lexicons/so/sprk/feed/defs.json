@@ -15,16 +15,13 @@
         "record": { "type": "unknown" },
         "embed": {
           "type": "union",
-          "refs": [
-            "so.sprk.embed.images#view",
-            "so.sprk.embed.video#view"
-          ]
+          "refs": ["so.sprk.embed.images#view", "so.sprk.embed.video#view"]
         },
-        "sound": { "type": "ref", "ref": "#soundView"},
+        "sound": { "type": "ref", "ref": "#soundView" },
         "replyCount": { "type": "integer" },
         "repostCount": { "type": "integer" },
         "likeCount": { "type": "integer" },
-        "lookCount": {"type": "integer"},
+        "lookCount": { "type": "integer" },
         "indexedAt": { "type": "string", "format": "datetime" },
         "viewer": { "type": "ref", "ref": "#viewerState" },
         "labels": {
@@ -45,7 +42,7 @@
           "ref": "so.sprk.actor.defs#profileViewBasic"
         },
         "record": { "type": "unknown" },
-        "useCount": { "type": "integer"},
+        "useCount": { "type": "integer" },
         "likeCount": { "type": "integer" },
         "indexedAt": { "type": "string", "format": "datetime" },
         "labels": {
