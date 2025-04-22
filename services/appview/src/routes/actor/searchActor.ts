@@ -4,6 +4,11 @@ import type { Label } from '../../lexicon/types/com/atproto/label/defs.js'
 import type * as SoSprkActorDefs from '../../lexicon/types/so/sprk/actor/defs.js'
 import type * as SoSprkActorSearch from '../../lexicon/types/so/sprk/actor/searchActors.js'
 
+// Helper to escape user input for safe RegExp usage
+function escapeRegExp(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 export const createSearchActorRouter = (ctx: AppContext) => {
   const router = new Hono()
 
@@ -28,8 +33,15 @@ export const createSearchActorRouter = (ctx: AppContext) => {
     const sort: any = {}
 
     if (q) {
-      filter.$text = { $search: q }
-      sort.score = { $meta: 'textScore' }
+      const escaped = escapeRegExp(q)
+      const regex = new RegExp(escaped, 'i')
+      filter.$or = [
+        { displayName: regex },
+        { description: regex },
+        { handle: regex },
+      ]
+      // fall back to sorting by createdAt
+      sort.createdAt = -1
     } else {
       sort.createdAt = -1
     }
