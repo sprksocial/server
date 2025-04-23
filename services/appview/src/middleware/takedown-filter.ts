@@ -1,6 +1,7 @@
 import { Context, Next } from 'hono'
 import { TakedownService } from '../services/takedown.js'
-import { get } from 'lodash'
+import lodash from 'lodash'
+const { get } = lodash
 
 /**
  * Middleware that filters out taken-down content from responses
