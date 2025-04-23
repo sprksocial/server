@@ -15,10 +15,8 @@ export const takedownFilterMiddleware = async (c: Context, next: Next) => {
     return
   }
 
-  // Call the next middleware/route handler first
   await next()
 
-  // Skip filtering if not a JSON response
   const contentType = c.res.headers.get('Content-Type')
   if (!contentType || !contentType.includes('application/json')) {
     return
@@ -30,7 +28,12 @@ export const takedownFilterMiddleware = async (c: Context, next: Next) => {
 
     const body = await c.res.json()
 
-    const targetDid = body.did || body.user?.did || body.actor?.did || body.profile?.did || body.subject?.did
+    const targetDid =
+      body.did ||
+      body.user?.did ||
+      body.actor?.did ||
+      body.profile?.did ||
+      body.subject?.did
     if (targetDid) {
       const isRepoTakenDown = await takedownService.isRepoTakenDown(targetDid)
       if (isRepoTakenDown) {
@@ -51,13 +54,16 @@ export const takedownFilterMiddleware = async (c: Context, next: Next) => {
           return
         } else {
           // For other single-user responses, null out or minimize the content
-          c.res = new Response(JSON.stringify({
-            error: 'Content unavailable - repository has been taken down',
-            code: 404
-          }), {
-            status: 404,
-            headers: c.res.headers,
-          })
+          c.res = new Response(
+            JSON.stringify({
+              error: 'Content unavailable - repository has been taken down',
+              code: 404,
+            }),
+            {
+              status: 404,
+              headers: c.res.headers,
+            },
+          )
           return
         }
       }
@@ -82,15 +88,15 @@ export const takedownFilterMiddleware = async (c: Context, next: Next) => {
       const isThreadTakenDown = await takedownService.isTakenDown(
         body.thread.post.uri,
       )
-      
+
       // Also check if the thread author repo is taken down
       let isAuthorTakenDown = false
       if (body.thread.post.author?.did) {
         isAuthorTakenDown = await takedownService.isRepoTakenDown(
-          body.thread.post.author.did
+          body.thread.post.author.did,
         )
       }
-      
+
       if (isThreadTakenDown || isAuthorTakenDown) {
         body.thread = null
       } else if (body.thread.replies) {
@@ -207,11 +213,12 @@ async function filterTakenDownItems(
     // Check if author's repo is taken down
     let isAuthorTakenDown = false
     // Look for author DID in common locations
-    const authorDid = get(item, 'author.did') || 
-                      get(item, 'post.author.did') || 
-                      get(item, 'user.did') || 
-                      get(item, 'actor.did')
-    
+    const authorDid =
+      get(item, 'author.did') ||
+      get(item, 'post.author.did') ||
+      get(item, 'user.did') ||
+      get(item, 'actor.did')
+
     if (authorDid) {
       isAuthorTakenDown = await takedownService.isRepoTakenDown(authorDid)
     }
@@ -220,20 +227,24 @@ async function filterTakenDownItems(
     if (!isTakenDown && !isAuthorTakenDown) {
       // Also check for any embedded items like quotes or replies
       if (item.embed && item.embed.record && item.embed.record.author?.did) {
-        const embedAuthorTakenDown = await takedownService.isRepoTakenDown(item.embed.record.author.did)
+        const embedAuthorTakenDown = await takedownService.isRepoTakenDown(
+          item.embed.record.author.did,
+        )
         if (embedAuthorTakenDown) {
           // Null out the embed if from a taken-down repo
           item.embed = {
             $type: item.embed.$type,
-            takenDown: true
+            takenDown: true,
           }
         } else if (item.embed.record.uri) {
           // Check if the specific embedded content is taken down
-          const embedContentTakenDown = await takedownService.isTakenDown(item.embed.record.uri)
+          const embedContentTakenDown = await takedownService.isTakenDown(
+            item.embed.record.uri,
+          )
           if (embedContentTakenDown) {
             item.embed = {
               $type: item.embed.$type,
-              takenDown: true
+              takenDown: true,
             }
           }
         }
