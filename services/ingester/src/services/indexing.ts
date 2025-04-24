@@ -69,7 +69,7 @@ export class IndexingService {
             } : {})
           },
           $setOnInsert: {
-            uri: `at://${did}/app.bsky.actor.profile`,
+            uri: `at://${did}/so.sprk.actor.profile`,
             followersCount: 0,
             followingCount: 0,
             postsCount: 0,

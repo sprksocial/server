@@ -38,7 +38,7 @@ export async function ensureActor(
 
     // Create new actor if none exists
     const now = new Date()
-    const uri = `at://${did}/app.bsky.actor.profile`
+    const uri = `at://${did}/so.sprk.actor.profile`
     
     const newActor = await db.models.Actor.create({
       uri,
