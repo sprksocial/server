@@ -29,84 +29,54 @@ export const createSearchActorRouter = (ctx: AppContext) => {
       }
     }
 
-    // Build the filter for actors instead of directly searching profiles
-    const actorFilter: any = {}
+    const filter: any = {}
     const sort: any = {}
-
-    // Only search for actors that already have profiles
-    actorFilter.profile = { $exists: true, $ne: null }
 
     if (q) {
       const escaped = escapeRegExp(q)
       const regex = new RegExp(escaped, 'i')
-      
-      // Search by handle directly on actor model
-      actorFilter.$or = [
-        { handle: regex }
+      filter.$or = [
+        { displayName: regex },
+        { description: regex },
+        { handle: regex },
       ]
-      
-      // For queries matching profile fields, we need to find actors by their profiles
-      const profileIds = await ctx.db.models.Profile.find({
-        $or: [
-          { displayName: regex },
-          { description: regex }
-        ]
-      })
-      .select('_id authorDid')
-      .lean()
-      
-      // Add actor DIDs from matching profiles
-      if (profileIds.length > 0) {
-        const profileDids = profileIds.map(p => p.authorDid)
-        // Add to $or condition
-        actorFilter.$or.push({ did: { $in: profileDids } })
-      }
-      
-      // Sort by recency and relevance
-      sort.indexedAt = -1
+      // fall back to sorting by createdAt
+      sort.createdAt = -1
     } else {
-      // Default sort for discovery - prioritize recently indexed actors
-      sort.indexedAt = -1
+      sort.createdAt = -1
     }
 
-    // Find actors with populated profiles - no need to index them
-    const actorsWithProfiles = await ctx.db.models.Actor.find(actorFilter)
-      .populate('profile')
+    const profiles = await ctx.db.models.Profile.find(filter)
       .sort(sort)
       .skip(skip)
       .limit(limit)
       .lean()
 
-    // Filter out any invalid profiles and transform to profile views
-    const actors: SoSprkActorDefs.ProfileView[] = actorsWithProfiles
-      .filter(actor => actor.profile)
-      .map(actor => {
-        const profile = actor.profile as any
-        
-        const avatar = profile?.avatar
-          ? `https://media.sprk.so/avatar/tiny/${actor.did}/${profile.avatar.ref.$link}/webp`
+    const actors: SoSprkActorDefs.ProfileView[] = await Promise.all(
+      profiles.map(async (p) => {
+        const avatar = p.avatar
+          ? `https://media.sprk.so/avatar/tiny/${p.authorDid}/${(p.avatar as any).ref.$link}/webp`
           : undefined
-        
-        const labels = profile?.labels && Array.isArray(profile.labels)
-          ? (profile.labels as Label[])
+        const labels = Array.isArray(p.labels)
+          ? (p.labels as Label[])
           : undefined
-        
+        const handle = await ctx.resolver.resolveDidToHandle(p.authorDid)
         return {
           $type: 'so.sprk.actor.defs#profileView',
-          did: actor.did,
-          handle: actor.handle || actor.did,
-          displayName: profile?.displayName,
-          description: profile?.description,
+          did: p.authorDid,
+          handle: handle,
+          displayName: p.displayName,
+          description: p.description,
           avatar,
-          indexedAt: actor.indexedAt,
-          createdAt: actor.createdAt ? new Date(actor.createdAt).toISOString() : undefined,
+          indexedAt: p.indexedAt,
+          createdAt: p.createdAt,
           labels,
         } satisfies SoSprkActorDefs.ProfileView
-      })
+      }),
+    )
 
-    // Calculate cursor for pagination
     const nextCursor =
-      actorsWithProfiles.length === limit ? String(skip + limit) : undefined
+      profiles.length === limit ? String(skip + limit) : undefined
     const result: SoSprkActorSearch.OutputSchema = { actors }
     if (nextCursor) {
       result.cursor = nextCursor

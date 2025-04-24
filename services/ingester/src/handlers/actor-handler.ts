@@ -1,7 +1,8 @@
 import { pino } from 'pino'
 import { Database } from '../db/connection.js'
 import type { NormalizedEvent } from '../types/events.js'
-import { ensureActor } from '../utils/actor-utils.js'
+import { IndexingService } from '../services/indexing.js'
+import { BidirectionalResolver } from '../id-resolver.js'
 
 const logger = pino({ name: 'actor-handler' })
 
@@ -14,9 +15,13 @@ const logger = pino({ name: 'actor-handler' })
  */
 export async function handleActorReferences(evt: NormalizedEvent, db: Database): Promise<void> {
   try {
+    const now = new Date().toISOString()
+    const resolver = new BidirectionalResolver()
+    const indexingService = new IndexingService(db, resolver)
+
     // Always ensure the author DID has an actor
     if (evt.did) {
-      await ensureActor(evt.did, evt.handle || undefined, db)
+      await indexingService.indexHandle(evt.did, now)
     }
 
     // Handle subject DIDs for follow, block, like events
@@ -24,7 +29,7 @@ export async function handleActorReferences(evt: NormalizedEvent, db: Database):
       // Subject is usually a DID in format did:plc:12345
       const subjectDid = evt.record.subject as string
       if (subjectDid && subjectDid.startsWith('did:')) {
-        await ensureActor(subjectDid, undefined, db)
+        await indexingService.indexHandle(subjectDid, now)
       }
     }
 
@@ -36,14 +41,14 @@ export async function handleActorReferences(evt: NormalizedEvent, db: Database):
       if (reply.root?.uri) {
         const rootDid = extractDidFromUri(reply.root.uri)
         if (rootDid) {
-          await ensureActor(rootDid, undefined, db)
+          await indexingService.indexHandle(rootDid, now)
         }
       }
       
       if (reply.parent?.uri) {
         const parentDid = extractDidFromUri(reply.parent.uri)
         if (parentDid && parentDid !== extractDidFromUri(reply.root?.uri || '')) {
-          await ensureActor(parentDid, undefined, db)
+          await indexingService.indexHandle(parentDid, now)
         }
       }
     }
@@ -53,7 +58,7 @@ export async function handleActorReferences(evt: NormalizedEvent, db: Database):
       const subjectUri = evt.record.subject.uri as string
       const subjectDid = extractDidFromUri(subjectUri)
       if (subjectDid) {
-        await ensureActor(subjectDid, undefined, db)
+        await indexingService.indexHandle(subjectDid, now)
       }
     }
   } catch (error) {
@@ -62,15 +67,9 @@ export async function handleActorReferences(evt: NormalizedEvent, db: Database):
 }
 
 /**
- * Extracts a DID from an AT URI (at://did:plc:12345/...)
- * 
- * @param uri The URI to extract the DID from
- * @returns The extracted DID or undefined
+ * Helper function to extract DID from a URI
  */
-function extractDidFromUri(uri: string): string | undefined {
-  if (!uri) return undefined
-  
-  // Match a DID in an AT URI format
-  const match = uri.match(/at:\/\/(did:[a-zA-Z0-9:]+)\//)
-  return match ? match[1] : undefined
+function extractDidFromUri(uri: string): string | null {
+  const match = uri.match(/at:\/\/(did:[^/]+)/)
+  return match ? match[1] : null
 } 

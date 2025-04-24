@@ -122,7 +122,7 @@ export class IndexingService {
       const actor = await this.db.models.Actor.findOne({ did })
       
       // Skip if recently indexed and not forced
-      if (!force && actor && this.isHandleRecentlyIndexed(actor, timestamp)) {
+      if (!force && actor  && this.isHandleRecentlyIndexed(actor, timestamp)) {
         return
       }
 
@@ -148,13 +148,22 @@ export class IndexingService {
         }
       }
 
+      const existingProfile = await this.db.models.Profile.findOne({ authorDid: did })
+      if (existingProfile) {
+        console.log('existingProfile: ', existingProfile)
+      }
+
       // Update or create actor
       await this.db.models.Actor.updateOne(
         { did },
         { 
           $set: { 
             handle,
-            indexedAt: timestamp
+            indexedAt: timestamp,
+            ...(existingProfile && existingProfile._id ? {
+              profile: existingProfile._id,
+              profileCid: existingProfile.cid
+            } : {})
           },
           $setOnInsert: {
             uri: `at://${did}/app.bsky.actor.profile`,
@@ -167,6 +176,10 @@ export class IndexingService {
         },
         { upsert: true }
       )
+
+      if (existingProfile) {
+        this.logger.info({ did, profileId: existingProfile._id }, 'Linked existing profile to actor during indexing')
+      }
     } catch (error) {
       this.logger.error({ error, did }, 'Error indexing handle')
     }
