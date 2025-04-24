@@ -1,6 +1,8 @@
 import { pino } from 'pino'
 import { Database } from '../db/connection.js'
 import type { NormalizedEvent } from '../types/events.js'
+import { ensureActor, linkProfileToActor } from '../utils/actor-utils.js'
+import type { ProfileDocument } from '../db/models.js'
 
 const logger = pino({ name: 'profile-handler' })
 
@@ -37,6 +39,9 @@ async function handleCreateOrUpdate(evt: NormalizedEvent, db: Database): Promise
   }, 'Processing profile event')
 
   try {
+    // First, ensure we have an actor for this DID
+    await ensureActor(evt.did, evt.handle || undefined, db)
+
     const profileData = {
       uri: evt.uri,
       displayName: record.displayName,
@@ -53,15 +58,21 @@ async function handleCreateOrUpdate(evt: NormalizedEvent, db: Database): Promise
       cid: evt.commit.cid
     }
 
-    await db.models.Profile.findOneAndUpdate(
+    // Save the profile
+    const profile = await db.models.Profile.findOneAndUpdate(
       { uri: evt.uri },
       profileData,
       { upsert: true, new: true }
-    )
+    ) as ProfileDocument
+
+    if (profile && profile._id) {
+      // Link the profile to the actor
+      await linkProfileToActor(evt.did, profile._id.toString(), evt.commit.cid, db)
+    }
 
     logger.info(
       { uri: evt.uri },
-      'Successfully saved profile to database'
+      'Successfully saved profile to database and linked to actor'
     )
   } catch (error) {
     logger.error(
