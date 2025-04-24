@@ -15,20 +15,20 @@ export const createGetProfileRouter = (ctx: AppContext) => {
     '/xrpc/so.sprk.actor.getProfile',
     optionalAuthMiddleware,
     async (c) => {
-      const actor = c.req.query('actor')
+      const actorParam = c.req.query('actor')
       const viewerDid = c.get('did') as string | undefined
 
-      if (!actor) {
+      if (!actorParam) {
         return c.json({ error: 'Actor not provided' }, 400)
       }
 
       let actorDidDoc
-      if (isValidHandle(actor)) {
-        actorDidDoc = await ctx.resolver.resolveHandleToDidDoc(actor)
+      if (isValidHandle(actorParam)) {
+        actorDidDoc = await ctx.resolver.resolveHandleToDidDoc(actorParam)
       } else {
         try {
-          ensureValidDid(actor)
-          actorDidDoc = await ctx.resolver.resolveDidToDidDoc(actor)
+          ensureValidDid(actorParam)
+          actorDidDoc = await ctx.resolver.resolveDidToDidDoc(actorParam)
         } catch (err) {
           return c.json({ error: 'Invalid actor' }, 400)
         }
@@ -36,33 +36,61 @@ export const createGetProfileRouter = (ctx: AppContext) => {
 
       const actorDid = actorDidDoc.did
 
-      // Get profile data
-      const profile = await ctx.db.models.Profile.findOne({
-        authorDid: actorDid,
-      }).lean()
+      const now = new Date().toISOString()
 
-      if (!profile) {
+      await ctx.indexingService.indexHandle(actorDid, now)
+      
+      // First check if actor exists and has profile
+      let actorDoc = await ctx.db.models.Actor.findOne({
+        did: actorDid,
+      })
+      .populate('profile')
+      .lean()
+
+      // If no actor or no profile, try indexing
+      if (!actorDoc || !actorDoc.profile) {
+        try {
+          ctx.logger.info({ did: actorDid }, 'No profile found, attempting to index')
+          await ctx.indexingService.indexHandle(actorDid, now, true)
+          
+          // Refetch after indexing
+          actorDoc = await ctx.db.models.Actor.findOne({
+            did: actorDid,
+          })
+          .populate('profile')
+          .lean()
+          
+          ctx.logger.info({ 
+            did: actorDid, 
+            hasActor: !!actorDoc,
+            hasProfile: !!(actorDoc?.profile)
+          }, 'State after indexing')
+        } catch (error) {
+          ctx.logger.error({ error, did: actorDid }, 'Failed to index handle')
+        }
+      }
+
+      if (!actorDoc) {
+        return c.json({ error: 'Actor not found' }, 404)
+      }
+
+      if (!actorDoc.profile) {
         return c.json({ error: 'Profile not found' }, 404)
       }
 
-      const profileHandle = await ctx.resolver.resolveDidToHandle(
-        profile.authorDid,
-      )
+      const profile = actorDoc.profile
 
       // Get follower count
-      const followersCount = await ctx.db.models.Follow.countDocuments({
-        subject: actorDid,
-      })
+      const followersCount = actorDoc.followersCount || 0
 
       // Get follows count
-      const followsCount = await ctx.db.models.Follow.countDocuments({
-        authorDid: actorDid,
-      })
+      const followsCount = actorDoc.followingCount || 0
 
       // Get posts count
-      const postsCount = await ctx.db.models.Post.countDocuments({
-        authorDid: actorDid,
-      })
+      const postsCount = actorDoc.postsCount || 0
+
+      // Use actor's handle if available, otherwise resolve from DID
+      const profileHandle = actorDoc.handle || await ctx.resolver.resolveDidToHandle(actorDid)
 
       // Build viewer state if a user is authenticated
       const viewer: SoSprkActorDefs.ViewerState = {}

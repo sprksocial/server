@@ -11,12 +11,16 @@ import { handleRepostEvent } from './repost-handler.js'
 import { handleMusicEvent } from './music-handler.js'
 import { handleLookEvent } from './look-handler.js'
 import { handleGeneratorEvent } from './generator-handler.js'
+import { handleActorReferences } from './actor-handler.js'
 
 const logger = pino({ name: 'event-handler' })
 
 export async function handleEvent(evt: NormalizedEvent, db: Database): Promise<void> {
   try {
-    // Handle different events based on collection
+    // First, ensure all actor references are handled properly
+    await handleActorReferences(evt, db)
+    
+    // Then handle different events based on collection
     if (evt.collection === 'so.sprk.feed.like') {
       await handleLikeEvent(evt, db)
       return
