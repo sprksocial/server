@@ -11,7 +11,6 @@ import {
   musicSchema,
   lookSchema,
   generatorSchema,
-  actorSchema,
 } from './models.js'
 import { env } from '../utils/env.js'
 import { pino } from 'pino'
@@ -34,7 +33,6 @@ export class Database {
       Music: this.connection.model('Music', musicSchema),
       Look: this.connection.model('Look', lookSchema),
       Generator: this.connection.model('Generator', generatorSchema),
-      Actor: this.connection.model('Actor', actorSchema),
     }
   }
 

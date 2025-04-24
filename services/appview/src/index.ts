@@ -25,17 +25,6 @@ import { createUpdateSubjectStatusRouter } from './routes/com/atproto/admin/upda
 import { createGetRecordRouter } from './routes/com/atproto/repo/getRecord.js'
 import wellKnownRouter from './well-known.js'
 import { TakedownService } from './services/takedown.js'
-import { IndexingService } from './services/indexing.js'
-
-// Extend Hono's context variable map to include our services
-declare module 'hono' {
-  interface ContextVariableMap {
-    serviceDid: string
-    didResolver: DidResolver
-    takedownService: TakedownService
-    indexingService: IndexingService
-  }
-}
 
 export type AppContext = {
   db: Database
@@ -44,7 +33,6 @@ export type AppContext = {
   serviceDid: string
   didResolver: DidResolver
   takedownService: TakedownService
-  indexingService: IndexingService
 }
 
 export class Server {
@@ -65,9 +53,8 @@ export class Server {
     // Get service DID from environment
     const serviceDid = env.SERVICE_DID
 
-    // Create services
+    // Create takedown service
     const takedownService = new TakedownService(db)
-    const indexingService = new IndexingService(db, resolver)
 
     const ctx = {
       db,
@@ -76,7 +63,6 @@ export class Server {
       serviceDid,
       didResolver: baseIdResolver.did,
       takedownService,
-      indexingService,
     }
 
     const app = new Hono()
@@ -87,7 +73,6 @@ export class Server {
       c.set('serviceDid', serviceDid)
       c.set('didResolver', baseIdResolver.did)
       c.set('takedownService', takedownService)
-      c.set('indexingService', indexingService)
       await next()
     })
 
