@@ -9,7 +9,7 @@ import type * as ComAtprotoAdminUpdateSubjectStatus from '../../../../lexicon/ty
 import type * as ComAtprotoAdminDefs from '../../../../lexicon/types/com/atproto/admin/defs.js'
 import type * as ComAtprotoRepoStrongRef from '../../../../lexicon/types/com/atproto/repo/strongRef.js'
 
-export const createGetAccountInfosRouter = (ctx: AppContext) => {
+export const createGetAccountInfosRouter = (_ctx: AppContext) => {
   const router = new Hono()
 
   // XRPC endpoint for Ozone integration: com.atproto.admin.getAccountInfos
@@ -23,7 +23,9 @@ export const createGetAccountInfosRouter = (ctx: AppContext) => {
       }),
     ),
     async (c) => {
-      
+      const { dids } = c.req.valid('json')
     }
   )
+
+  return router
 }

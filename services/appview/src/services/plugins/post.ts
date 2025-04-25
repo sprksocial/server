@@ -26,7 +26,6 @@ export type PostPluginType = {
     cid: CID,
     record: unknown,
     timestamp: string,
-    opts?: { disableNotifs?: boolean },
   ) => Promise<PostDocument | null>
   updateRecord: (
     uri: AtUri,
@@ -49,7 +48,6 @@ export function makePlugin(db: Database): PostPluginType {
       cid: CID,
       recordObj: unknown,
       timestamp: string,
-      opts = {},
     ): Promise<PostDocument | null> {
       const record = recordObj as PostRecord
       if (!record) return null
@@ -121,6 +119,7 @@ export function makePlugin(db: Database): PostPluginType {
 
         // Update post data
         const postData = {
+          uri: uri.toString(),
           cid: cid.toString(),
           text: record.text,
           facets: record.facets || [],
@@ -129,6 +128,7 @@ export function makePlugin(db: Database): PostPluginType {
           langs: record.langs || [],
           labels: record.labels || null,
           tags: record.tags || [],
+          authorDid: uri.hostname,
           authorHandle: actor.handle || uri.hostname,
           indexedAt: timestamp,
         }
@@ -150,22 +150,26 @@ export function makePlugin(db: Database): PostPluginType {
       }
     },
 
-    async deleteRecord(uri: AtUri): Promise<void> {
+    async deleteRecord(uri: AtUri, cascading = false): Promise<void> {
       try {
+        // Get the post to check author
         const post = await db.models.Post.findOne({ uri: uri.toString() })
-        
-        if (post) {
-          // Delete the post
-          await db.models.Post.deleteOne({ uri: uri.toString() })
-          
-          // Decrement post count for actor
-          await db.models.Actor.updateOne(
-            { did: uri.hostname },
-            { $inc: { postsCount: -1 } }
-          )
-          
-          // Delete any associated likes, reposts, etc. as needed
-          // This would be the cascading deletion logic
+        if (!post) {
+          logger.warn({ uri: uri.toString() }, 'Post not found for deletion')
+          return
+        }
+
+        // Delete the post
+        await db.models.Post.deleteOne({ uri: uri.toString() })
+
+        // Decrement post count for author
+        await db.models.Actor.updateOne(
+          { did: post.authorDid },
+          { $inc: { postsCount: -1 } }
+        )
+
+        if (cascading) {
+          // TODO: Handle cascading deletion (e.g. delete replies, reposts, etc.)
         }
       } catch (error) {
         logger.error(
