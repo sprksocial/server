@@ -342,48 +342,21 @@ export const generatorSchema = new Schema<GeneratorDocument>({
 generatorSchema.index({ authorDid: 1, createdAt: -1 })
 generatorSchema.index({ did: 1, createdAt: -1 })
 
+
 export interface ActorDocument extends Document {
-  uri: string
   did: string
-  handle?: string
-  profile?: ProfileDocument
-  profileCid?: string
-  profileTakedownRef?: string
-  followersCount: number
-  followingCount: number
-  postsCount: number
-  sortedAt?: Date
+  handle: string | null
   indexedAt: string
-  takedownRef?: string
-  isLabeler: boolean
-  allowIncomingChatsFrom?: string
-  upstreamStatus?: string
-  createdAt?: Date
-  priorityNotifications: boolean
-  trustedVerifier?: boolean
-  labelsDeclaration?: Record<string, any>
+  takedownRef: string | null  
+  upstreamStatus: string | null
 }
 
 export const actorSchema = new Schema<ActorDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
   did: { type: String, required: true, index: true },
   handle: { type: String, required: false, index: true },
-  profile: { type: Schema.Types.ObjectId, ref: 'Profile', required: false },
-  profileCid: { type: String, required: false },
-  profileTakedownRef: { type: String, required: false },
-  followersCount: { type: Number, required: true, default: 0 },
-  followingCount: { type: Number, required: true, default: 0 },
-  postsCount: { type: Number, required: true, default: 0 },
-  sortedAt: { type: Date, required: false },
   indexedAt: { type: String, required: true },
   takedownRef: { type: String, required: false },
-  isLabeler: { type: Boolean, required: true, default: false },
-  allowIncomingChatsFrom: { type: String, required: false },
   upstreamStatus: { type: String, required: false },
-  createdAt: { type: Date, required: false },
-  priorityNotifications: { type: Boolean, required: true, default: false },
-  trustedVerifier: { type: Boolean, required: false },
-  labelsDeclaration: { type: Object, required: false },
 })
 
 // Add compound indexes for Actor

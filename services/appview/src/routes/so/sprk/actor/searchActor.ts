@@ -52,19 +52,37 @@ export const createSearchActorRouter = (ctx: AppContext) => {
       .limit(limit)
       .lean()
 
-    const actors: SoSprkActorDefs.ProfileView[] = await Promise.all(
-      profiles.map(async (p) => {
+    // For handle search, exclude DIDs already found
+    const foundDids = profiles.map(p => p.authorDid)
+    const handleFilter = { ...filter, did: { $nin: foundDids } }
+    const handles = await ctx.db.models.Actor.find(handleFilter)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .lean()
+
+    const handleProfiles = await ctx.db.models.Profile.find({ authorDid: { $in: handles.map(h => h.did) } }).lean()
+    
+    const fullProfiles = [...profiles, ...handleProfiles]
+       
+    const actors: SoSprkActorDefs.ProfileView[] = (await Promise.all(
+      fullProfiles.map(async (p) => {
         const avatar = p.avatar
           ? `https://media.sprk.so/avatar/tiny/${p.authorDid}/${(p.avatar as any).ref.$link}/webp`
           : undefined
         const labels = Array.isArray(p.labels)
           ? (p.labels as Label[])
           : undefined
-        const handle = await ctx.resolver.resolveDidToHandle(p.authorDid)
+        const now = new Date().toISOString()
+        await ctx.indexingService.indexHandle(p.authorDid, now)
+        const actor = await ctx.db.models.Actor.findOne({ did: p.authorDid })
+        if (!actor || !actor.handle) {
+          return null
+        }
         return {
           $type: 'so.sprk.actor.defs#profileView',
           did: p.authorDid,
-          handle: handle,
+          handle: actor.handle,
           displayName: p.displayName,
           description: p.description,
           avatar,
@@ -73,7 +91,7 @@ export const createSearchActorRouter = (ctx: AppContext) => {
           labels,
         } satisfies SoSprkActorDefs.ProfileView
       }),
-    )
+    )).filter((actor): actor is { $type: "so.sprk.actor.defs#profileView"; did: string; handle: string; displayName: string | undefined; description: string | undefined; avatar: string | undefined; indexedAt: string; createdAt: string; labels: Label[] | undefined; } => actor !== null)
 
     const nextCursor =
       profiles.length === limit ? String(skip + limit) : undefined

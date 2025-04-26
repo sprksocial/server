@@ -148,38 +148,17 @@ export class IndexingService {
         }
       }
 
-      const existingProfile = await this.db.models.Profile.findOne({ authorDid: did })
-      if (existingProfile) {
-        console.log('existingProfile: ', existingProfile)
-      }
-
-      // Update or create actor
       await this.db.models.Actor.updateOne(
         { did },
         { 
           $set: { 
             handle,
             indexedAt: timestamp,
-            ...(existingProfile && existingProfile._id ? {
-              profile: existingProfile._id,
-              profileCid: existingProfile.cid
-            } : {})
-          },
-          $setOnInsert: {
-            uri: `at://${did}/so.sprk.actor.profile`,
-            followersCount: 0,
-            followingCount: 0,
-            postsCount: 0,
-            isLabeler: false,
-            priorityNotifications: false,
           }
         },
         { upsert: true }
       )
-
-      if (existingProfile) {
-        this.logger.info({ did, profileId: existingProfile._id }, 'Linked existing profile to actor during indexing')
-      }
+      
     } catch (error) {
       this.logger.error({ error, did }, 'Error indexing handle')
     }

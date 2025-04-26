@@ -22,6 +22,7 @@ export class IndexingService {
    * @param timestamp The timestamp of the operation
    * @param force Force reindexing even if recently indexed
    */
+  
   async indexHandle(did: string, timestamp: string, force = false): Promise<void> {
     try {
       // Find existing actor
@@ -54,35 +55,17 @@ export class IndexingService {
         }
       }
 
-      const existingProfile = await this.db.models.Profile.findOne({ authorDid: did })
-
       // Update or create actor
       await this.db.models.Actor.updateOne(
         { did },
         { 
           $set: { 
             handle,
-            indexedAt: timestamp,
-            ...(existingProfile && existingProfile._id ? {
-              profile: existingProfile._id,
-              profileCid: existingProfile.cid
-            } : {})
+            indexedAt: timestamp
           },
-          $setOnInsert: {
-            uri: `at://${did}/so.sprk.actor.profile`,
-            followersCount: 0,
-            followingCount: 0,
-            postsCount: 0,
-            isLabeler: false,
-            priorityNotifications: false,
-          }
         },
         { upsert: true }
       )
-
-      if (existingProfile) {
-        this.logger.info({ did, profileId: existingProfile._id }, 'Linked existing profile to actor during indexing')
-      }
     } catch (error) {
       this.logger.error({ error, did }, 'Error indexing handle')
     }

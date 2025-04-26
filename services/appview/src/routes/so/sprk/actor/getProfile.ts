@@ -44,11 +44,12 @@ export const createGetProfileRouter = (ctx: AppContext) => {
       let actorDoc = await ctx.db.models.Actor.findOne({
         did: actorDid,
       })
-      .populate('profile')
-      .lean()
 
-      // If no actor or no profile, try indexing
-      if (!actorDoc || !actorDoc.profile) {
+      let profile = await ctx.db.models.Profile.findOne({
+        authorDid: actorDid,
+      })
+
+      if (!actorDoc) {
         try {
           ctx.logger.info({ did: actorDid }, 'No profile found, attempting to index')
           await ctx.indexingService.indexHandle(actorDid, now, true)
@@ -57,14 +58,6 @@ export const createGetProfileRouter = (ctx: AppContext) => {
           actorDoc = await ctx.db.models.Actor.findOne({
             did: actorDid,
           })
-          .populate('profile')
-          .lean()
-          
-          ctx.logger.info({ 
-            did: actorDid, 
-            hasActor: !!actorDoc,
-            hasProfile: !!(actorDoc?.profile)
-          }, 'State after indexing')
         } catch (error) {
           ctx.logger.error({ error, did: actorDid }, 'Failed to index handle')
         }
@@ -74,23 +67,12 @@ export const createGetProfileRouter = (ctx: AppContext) => {
         return c.json({ error: 'Actor not found' }, 404)
       }
 
-      if (!actorDoc.profile) {
+      if (!profile) {
         return c.json({ error: 'Profile not found' }, 404)
       }
 
-      const profile = actorDoc.profile
-
-      // Get follower count
-      const followersCount = actorDoc.followersCount || 0
-
-      // Get follows count
-      const followsCount = actorDoc.followingCount || 0
-
-      // Get posts count
-      const postsCount = actorDoc.postsCount || 0
-
       // Use actor's handle if available, otherwise resolve from DID
-      const profileHandle = actorDoc.handle || await ctx.resolver.resolveDidToHandle(actorDid)
+      const handle = actorDoc.handle || await ctx.resolver.resolveDidToHandle(actorDid)
 
       // Build viewer state if a user is authenticated
       const viewer: SoSprkActorDefs.ViewerState = {}
@@ -131,54 +113,6 @@ export const createGetProfileRouter = (ctx: AppContext) => {
         if (blockedBy) {
           viewer.blockedBy = true
         }
-
-        // Get known followers (followers of the profile that the viewer also follows)
-        if (followersCount > 0) {
-          // Get the followers of this profile
-          const followers = await ctx.db.models.Follow.find({
-            subject: actorDid,
-          }).lean()
-
-          const followerDids = followers.map((f) => f.authorDid)
-
-          // Check which of these followers the viewer follows
-          const knownFollowsQuery = await ctx.db.models.Follow.find({
-            subject: { $in: followerDids },
-            authorDid: viewerDid,
-          }).lean()
-
-          if (knownFollowsQuery.length > 0) {
-            const knownFollowerDids = knownFollowsQuery.map((f) => f.subject)
-
-            // Get profiles for known followers
-            const knownFollowerProfiles = await ctx.db.models.Profile.find({
-              authorDid: { $in: knownFollowerDids },
-            })
-              .limit(3)
-              .lean()
-
-            const knownFollowersBasic = await Promise.all(
-              knownFollowerProfiles.map(async (p) => {
-                const handle = await ctx.resolver.resolveDidToHandle(
-                  p.authorDid,
-                )
-                return {
-                  did: p.authorDid,
-                  handle,
-                  displayName: p.displayName,
-                  avatar: p.avatar
-                    ? `https://media.sprk.so/avatar/tiny/${p.authorDid}/${p.avatar.ref.$link}/webp`
-                    : undefined,
-                } as SoSprkActorDefs.ProfileViewBasic
-              }),
-            )
-
-            viewer.knownFollowers = {
-              count: knownFollowsQuery.length,
-              followers: knownFollowersBasic,
-            }
-          }
-        }
       }
 
       // Check for associated services
@@ -208,16 +142,6 @@ export const createGetProfileRouter = (ctx: AppContext) => {
         ? `https://media.sprk.so/img/tiny/${actorDid}/${profile.banner.ref.$link}/webp`
         : undefined
 
-      // Convert joinedViaStarterPack to the correct type if it exists
-      let joinedViaStarterPack:
-        | SoSprkGraphDefs.StarterPackViewBasic
-        | undefined = undefined
-      if (profile.joinedViaStarterPack) {
-        // Type assertion assuming the structure fits the requirements
-        joinedViaStarterPack =
-          profile.joinedViaStarterPack as unknown as SoSprkGraphDefs.StarterPackViewBasic
-      }
-
       // Convert labels to the correct type if it exists
       let labels: Label[] | undefined = undefined
       if (profile.labels) {
@@ -233,10 +157,20 @@ export const createGetProfileRouter = (ctx: AppContext) => {
           profile.pinnedPost as unknown as ComAtprotoRepoStrongRef.Main
       }
 
+      const followersCount = await ctx.db.models.Follow.countDocuments({
+        subject: actorDid,
+      })
+      const followsCount = await ctx.db.models.Follow.countDocuments({
+        authorDid: actorDid,
+      })
+      const postsCount = await ctx.db.models.Post.countDocuments({
+        authorDid: actorDid,
+      })
+
       // Build the ProfileViewDetailed response
       const profileView: SoSprkActorDefs.ProfileViewDetailed = {
         did: actorDid,
-        handle: profileHandle,
+        handle: handle,
         displayName: profile.displayName,
         description: profile.description,
         avatar,
@@ -245,7 +179,6 @@ export const createGetProfileRouter = (ctx: AppContext) => {
         followsCount,
         postsCount,
         associated: Object.keys(associated).length > 0 ? associated : undefined,
-        joinedViaStarterPack,
         indexedAt: profile.indexedAt,
         createdAt: profile.createdAt,
         viewer: Object.keys(viewer).length > 0 ? viewer : undefined,
