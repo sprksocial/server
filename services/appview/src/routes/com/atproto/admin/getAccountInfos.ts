@@ -7,7 +7,6 @@ import { INVALID_HANDLE } from '@atproto/syntax'
 export const createGetAccountInfosRouter = (ctx: AppContext) => {
   const router = new Hono()
 
-  // XRPC endpoint for Ozone integration: com.atproto.admin.getAccountInfos
   router.get(
     '/xrpc/com.atproto.admin.getAccountInfos',
     (c, next) => authMiddleware(c, next, true),
