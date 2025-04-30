@@ -18,6 +18,7 @@ export class TakedownService {
       reason,
       takenDownBy: adminDid,
       takenDownAt: new Date().toISOString(),
+      applied: true,
     })
   }
 
@@ -37,6 +38,7 @@ export class TakedownService {
       takenDownBy: adminDid,
       takenDownAt: new Date().toISOString(),
       ref: ref || null,
+      applied: false,
     })
   }
 
@@ -58,6 +60,7 @@ export class TakedownService {
       takenDownBy: adminDid,
       takenDownAt: new Date().toISOString(),
       ref: ref || null,
+      applied: false,
     })
   }
 
@@ -77,6 +80,7 @@ export class TakedownService {
     reason: string
     takenDownBy: string
     takenDownAt: string
+    applied: boolean
   } | null> {
     const takedown = await this.db.models.Takedown.findOne({ targetUri: uri }).lean()
     return takedown
@@ -215,5 +219,51 @@ export class TakedownService {
       })),
       cursor: takedowns.length > limit ? takedowns[limit - 1].did : undefined
     }
+  }
+
+  async updateTakedownApplied(targetUri: string, applied: boolean): Promise<void> {
+    await this.db.models.Takedown.updateOne(
+      { targetUri },
+      { $set: { applied } }
+    )
+  }
+
+  async updateRepoTakedownApplied(did: string, applied: boolean): Promise<void> {
+    await this.db.models.RepoTakedown.updateOne(
+      { did },
+      { $set: { applied } }
+    )
+  }
+
+  async updateBlobTakedownApplied(did: string, cid: string, applied: boolean): Promise<void> {
+    await this.db.models.BlobTakedown.updateOne(
+      { did, cid },
+      { $set: { applied } }
+    )
+  }
+
+  async getRepoTakedown(did: string): Promise<{
+    did: string
+    reason: string
+    takenDownBy: string
+    takenDownAt: string
+    ref: string | null
+    applied: boolean
+  } | null> {
+    const takedown = await this.db.models.RepoTakedown.findOne({ did }).lean()
+    return takedown
+  }
+
+  async getBlobTakedown(did: string, cid: string): Promise<{
+    did: string
+    cid: string
+    reason: string
+    takenDownBy: string
+    takenDownAt: string
+    ref: string | null
+    applied: boolean
+  } | null> {
+    const takedown = await this.db.models.BlobTakedown.findOne({ did, cid }).lean()
+    return takedown
   }
 } 

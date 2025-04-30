@@ -36,8 +36,8 @@ export const takedownFilterMiddleware = async (c: Context, next: Next) => {
       body.profile?.did ||
       body.subject?.did
     if (targetDid) {
-      const isRepoTakenDown = await takedownService.isRepoTakenDown(targetDid)
-      if (isRepoTakenDown) {
+      const repoTakedown = await takedownService.getRepoTakedown(targetDid)
+      if (repoTakedown?.applied) {
         // For specific user/profile views, return minimal placeholder
         if (body.did && body.$type && body.$type.includes('profileView')) {
           const takenDownProfile = {
@@ -86,16 +86,14 @@ export const takedownFilterMiddleware = async (c: Context, next: Next) => {
       )
       body.feed = filteredFeed
     } else if (body.thread && body.thread.post) {
-      const isThreadTakenDown = await takedownService.isTakenDown(
-        body.thread.post.uri,
-      )
+      const takedown = await takedownService.getTakedown(body.thread.post.uri)
+      const isThreadTakenDown = takedown?.applied ?? false
 
       // Also check if the thread author repo is taken down
       let isAuthorTakenDown = false
       if (body.thread.post.author?.did) {
-        isAuthorTakenDown = await takedownService.isRepoTakenDown(
-          body.thread.post.author.did,
-        )
+        const repoTakedown = await takedownService.getRepoTakedown(body.thread.post.author.did)
+        isAuthorTakenDown = repoTakedown?.applied ?? false
       }
 
       if (isThreadTakenDown || isAuthorTakenDown) {
@@ -117,17 +115,15 @@ export const takedownFilterMiddleware = async (c: Context, next: Next) => {
       body.profiles = filteredProfiles
     } else if (body.profile) {
       if (body.profile.did) {
-        const isRepoTakenDown = await takedownService.isRepoTakenDown(
-          body.profile.did,
-        )
-        if (isRepoTakenDown) {
+        const repoTakedown = await takedownService.getRepoTakedown(body.profile.did)
+        if (repoTakedown?.applied) {
           body.profile = null
         }
       }
     } else if (body.did && body.$type && body.$type.includes('profileView')) {
       // For direct ProfileViewDetailed objects (so.sprk.actor.getProfile)
-      const isRepoTakenDown = await takedownService.isRepoTakenDown(body.did)
-      if (isRepoTakenDown) {
+      const repoTakedown = await takedownService.getRepoTakedown(body.did)
+      if (repoTakedown?.applied) {
         // Return a minimal placeholder object for taken-down profiles
         const takenDownProfile = {
           $type: body.$type,
@@ -150,10 +146,8 @@ export const takedownFilterMiddleware = async (c: Context, next: Next) => {
     } else if (body.subject) {
       // For followers/follows response that has a subject profile
       if (body.subject.did) {
-        const isRepoTakenDown = await takedownService.isRepoTakenDown(
-          body.subject.did,
-        )
-        if (isRepoTakenDown) {
+        const repoTakedown = await takedownService.getRepoTakedown(body.subject.did)
+        if (repoTakedown?.applied) {
           // Keep minimal info about the profile but mark it as taken down
           body.subject = {
             $type: body.subject.$type,
@@ -208,7 +202,8 @@ async function filterTakenDownItems(
     // Get URI for this specific content
     const uri = get(item, uriPath) as string | undefined
     if (uri) {
-      isTakenDown = await takedownService.isTakenDown(uri)
+      const takedown = await takedownService.getTakedown(uri)
+      isTakenDown = takedown?.applied ?? false
     }
 
     // Check if author's repo is taken down
@@ -221,17 +216,16 @@ async function filterTakenDownItems(
       get(item, 'actor.did')
 
     if (authorDid) {
-      isAuthorTakenDown = await takedownService.isRepoTakenDown(authorDid)
+      const repoTakedown = await takedownService.getRepoTakedown(authorDid)
+      isAuthorTakenDown = repoTakedown?.applied ?? false
     }
 
     // Keep the item only if neither the content nor the author is taken down
     if (!isTakenDown && !isAuthorTakenDown) {
       // Also check for any embedded items like quotes or replies
       if (item.embed && item.embed.record && item.embed.record.author?.did) {
-        const embedAuthorTakenDown = await takedownService.isRepoTakenDown(
-          item.embed.record.author.did,
-        )
-        if (embedAuthorTakenDown) {
+        const embedAuthorTakedown = await takedownService.getRepoTakedown(item.embed.record.author.did)
+        if (embedAuthorTakedown?.applied) {
           // Null out the embed if from a taken-down repo
           item.embed = {
             $type: item.embed.$type,
@@ -239,10 +233,8 @@ async function filterTakenDownItems(
           }
         } else if (item.embed.record.uri) {
           // Check if the specific embedded content is taken down
-          const embedContentTakenDown = await takedownService.isTakenDown(
-            item.embed.record.uri,
-          )
-          if (embedContentTakenDown) {
+          const embedContentTakedown = await takedownService.getTakedown(item.embed.record.uri)
+          if (embedContentTakedown?.applied) {
             item.embed = {
               $type: item.embed.$type,
               takenDown: true,
@@ -268,8 +260,8 @@ async function filterTakenDownRepos(
 
   for (const profile of profiles) {
     if (profile.did) {
-      const isRepoTakenDown = await takedownService.isRepoTakenDown(profile.did)
-      if (!isRepoTakenDown) {
+      const repoTakedown = await takedownService.getRepoTakedown(profile.did)
+      if (!repoTakedown?.applied) {
         filteredProfiles.push(profile)
       } else {
         // For UI consistency, push a minimal placeholder for taken-down profiles
@@ -304,11 +296,8 @@ async function filterTakenDownBlobs(
   for (const image of images) {
     // Check if the image is taken down based on blob CID
     if (image.cid && image.did) {
-      const isBlobTakenDown = await takedownService.isBlobTakenDown(
-        image.did,
-        image.cid,
-      )
-      if (!isBlobTakenDown) {
+      const blobTakedown = await takedownService.getBlobTakedown(image.did, image.cid)
+      if (!blobTakedown?.applied) {
         filteredImages.push(image)
       }
     } else {
@@ -331,14 +320,14 @@ async function filterReplies(
 
   for (const reply of replies) {
     if (reply.post && reply.post.uri) {
-      const isTakenDown = await takedownService.isTakenDown(reply.post.uri)
+      const takedown = await takedownService.getTakedown(reply.post.uri)
+      const isTakenDown = takedown?.applied ?? false
 
       // Check if author's repo is taken down
       let isAuthorTakenDown = false
       if (reply.post.author?.did) {
-        isAuthorTakenDown = await takedownService.isRepoTakenDown(
-          reply.post.author.did,
-        )
+        const repoTakedown = await takedownService.getRepoTakedown(reply.post.author.did)
+        isAuthorTakenDown = repoTakedown?.applied ?? false
       }
 
       if (!isTakenDown && !isAuthorTakenDown) {

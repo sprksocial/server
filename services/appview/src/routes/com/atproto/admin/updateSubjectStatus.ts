@@ -59,6 +59,7 @@ export const createUpdateSubjectStatusRouter = (
               adminDid,
               ref: takedown.ref,
             })
+            await takedownService.updateRepoTakedownApplied(subject.did, takedown.applied)
           } else {
             // Remove takedown
             await takedownService.removeRepoTakedown(subject.did)
@@ -79,6 +80,7 @@ export const createUpdateSubjectStatusRouter = (
               reason: 'Moderation via Ozone',
               adminDid,
             })
+            await takedownService.updateTakedownApplied(subject.uri, takedown.applied)
           } else {
             // Remove takedown
             await takedownService.removeTakedown(subject.uri)
@@ -100,6 +102,7 @@ export const createUpdateSubjectStatusRouter = (
               adminDid,
               ref: takedown.ref,
             })
+            await takedownService.updateBlobTakedownApplied(subject.did, subject.cid, takedown.applied)
           } else {
             // Remove takedown
             await takedownService.removeBlobTakedown(subject.did, subject.cid)

@@ -353,6 +353,8 @@ export interface TakedownDocument extends Document {
   reason: string
   takenDownBy: string
   takenDownAt: string
+  ref: string | null
+  applied: boolean
 }
 
 export const takedownSchema = new Schema<TakedownDocument>({
@@ -361,6 +363,8 @@ export const takedownSchema = new Schema<TakedownDocument>({
   reason: { type: String, required: true },
   takenDownBy: { type: String, required: true },
   takenDownAt: { type: String, required: true },
+  ref: { type: String, required: false },
+  applied: { type: Boolean, required: true, default: false },
 })
 
 // Repository takedown schema
@@ -370,6 +374,7 @@ export interface RepoTakedownDocument extends Document {
   takenDownBy: string
   takenDownAt: string
   ref: string | null
+  applied: boolean
 }
 
 export const repoTakedownSchema = new Schema<RepoTakedownDocument>({
@@ -378,6 +383,7 @@ export const repoTakedownSchema = new Schema<RepoTakedownDocument>({
   takenDownBy: { type: String, required: true },
   takenDownAt: { type: String, required: true },
   ref: { type: String, required: false, default: null },
+  applied: { type: Boolean, required: true, default: false },
 })
 
 // Blob takedown schema
@@ -388,6 +394,7 @@ export interface BlobTakedownDocument extends Document {
   takenDownBy: string
   takenDownAt: string
   ref: string | null
+  applied: boolean
 }
 
 export const blobTakedownSchema = new Schema<BlobTakedownDocument>({
@@ -397,6 +404,7 @@ export const blobTakedownSchema = new Schema<BlobTakedownDocument>({
   takenDownBy: { type: String, required: true },
   takenDownAt: { type: String, required: true },
   ref: { type: String, required: false, default: null },
+  applied: { type: Boolean, required: true, default: false },
 })
 
 // Ensure compound index on did + cid for blob takedowns
@@ -406,7 +414,7 @@ export interface ActorDocument extends Document {
   did: string
   handle: string | null
   indexedAt: string
-  takedownRef: string | null  
+  takedownRef: string | null
   upstreamStatus: string | null
 }
 

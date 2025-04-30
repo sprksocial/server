@@ -24,6 +24,8 @@ import { createGetFollowsRouter } from './routes/so/sprk/graph/getFollows.js'
 import { createTakedownRouter } from './routes/admin/takedowns.js'
 import { createUpdateSubjectStatusRouter } from './routes/com/atproto/admin/updateSubjectStatus.js'
 import { createGetRecordRouter } from './routes/com/atproto/repo/getRecord.js'
+import { createGetAccountInfosRouter } from './routes/com/atproto/admin/getAccountInfos.js'
+import { createGetSubjectStatusRouter } from './routes/com/atproto/admin/getSubjectStatus.js'
 import wellKnownRouter from './well-known.js'
 import { TakedownService } from './services/takedown.js'
 import { IndexingService } from './services/indexing.js'
@@ -110,6 +112,8 @@ export class Server {
     const updateSubjectStatusRouter = createUpdateSubjectStatusRouter(ctx)
     const takedownRouter = createTakedownRouter(ctx)
     const getRecordRouter = createGetRecordRouter(ctx)
+    const getAccountInfosRouter = createGetAccountInfosRouter(ctx)
+    const getSubjectStatusRouter = createGetSubjectStatusRouter(ctx)
 
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
@@ -121,7 +125,8 @@ export class Server {
     app.route('/', updateSubjectStatusRouter)
     app.route('/', takedownRouter)
     app.route('/', getRecordRouter)
-
+    app.route('/', getAccountInfosRouter)
+    app.route('/', getSubjectStatusRouter)
     app.route('/', wellKnownRouter())
 
     // Root route
