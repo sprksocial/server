@@ -26,6 +26,7 @@ import { createUpdateSubjectStatusRouter } from './routes/com/atproto/admin/upda
 import { createGetRecordRouter } from './routes/com/atproto/repo/getRecord.js'
 import { createGetAccountInfosRouter } from './routes/com/atproto/admin/getAccountInfos.js'
 import { createGetSubjectStatusRouter } from './routes/com/atproto/admin/getSubjectStatus.js'
+import { createResolveHandleRouter } from './routes/com/atproto/identity/resolveHandle.js'
 import wellKnownRouter from './well-known.js'
 import { TakedownService } from './services/takedown.js'
 import { IndexingService } from './services/indexing.js'
@@ -114,7 +115,8 @@ export class Server {
     const getRecordRouter = createGetRecordRouter(ctx)
     const getAccountInfosRouter = createGetAccountInfosRouter(ctx)
     const getSubjectStatusRouter = createGetSubjectStatusRouter(ctx)
-
+    const resolveHandleRouter = createResolveHandleRouter(ctx)
+    
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
     app.route('/', getProfileRouter)
@@ -127,6 +129,7 @@ export class Server {
     app.route('/', getRecordRouter)
     app.route('/', getAccountInfosRouter)
     app.route('/', getSubjectStatusRouter)
+    app.route('/', resolveHandleRouter)
     app.route('/', wellKnownRouter())
 
     // Root route

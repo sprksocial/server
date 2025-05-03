@@ -5,7 +5,7 @@ import { AppContext } from '../../../../index.js'
 export const createGetSubjectStatusRouter = (ctx: AppContext) => {
   const router = new Hono()
 
-  router.get('/xrpc/com.atproto.admin.getSubjectStatus', (c, next) => optionalAuthMiddleware(c, next), async (c) => {
+  router.get('/xrpc/com.atproto.admin.getSubjectStatus', (c, next) => authMiddleware(c, next, true), async (c) => {
     const did = c.req.query('did')
     const uri = c.req.query('uri')
     const blob = c.req.query('blob')
