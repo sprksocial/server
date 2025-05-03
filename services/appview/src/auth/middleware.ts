@@ -22,50 +22,70 @@ declare module 'hono' {
  * 
  * @param c - Hono context
  * @param next - Next middleware function
- * @param adminRequired - Whether admin privileges are required (checks agent DID against ADMIN_DIDS)
+ * @param adminRequired - Whether admin privileges are required (checks admin token)
  */
 export const authMiddleware = async (c: Context, next: Next, adminRequired = false) => {
   const authHeader = c.req.header('Authorization')
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader) {
     throw new HTTPException(401, {
-      message: 'Unauthorized: Invalid or missing Authorization header',
+      message: 'Unauthorized: Missing Authorization header',
     })
   }
 
-  const jwt = authHeader.replace('Bearer ', '').trim()
-
   try {
-    // The service DID and resolver should be passed from app context
-    const serviceDid = c.get('serviceDid')
-    const didResolver = c.get('didResolver') as DidResolver
+    if (authHeader.startsWith('Basic ')) {
+      const base64Credentials = authHeader.replace('Basic ', '').trim()
+      const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8')
+      const [username, password] = credentials.split(':')
 
-    const parsed = await verifyJwt(jwt, serviceDid, null, async (did: string) => {
-      return didResolver.resolveAtprotoKey(did)
-    })
+      console.log('Basic auth attempt:', { username, password, expected: env.ADMIN_PASSWORD })
 
-    // Set auth information in the context for route handlers to access
-    c.set('did', parsed.iss)
-    c.set('accessJwt', jwt)
-
-    // Check for admin status if required
-    if (adminRequired) {
-      const isAdmin = env.ADMIN_DIDS.includes(parsed.iss)
-      if (!isAdmin) {
-        throw new HTTPException(403, {
-          message: 'Forbidden: Admin privileges required',
+      if (username === 'admin' && password === env.ADMIN_PASSWORD) {
+        c.set('isAdmin', true)
+        await next()
+        return
+      } else {
+        throw new HTTPException(401, {
+          message: 'Unauthorized: Invalid admin credentials',
         })
       }
-      c.set('isAdmin', true)
-    }
+    } else if (authHeader.startsWith('Bearer ')) {
+      const jwt = authHeader.replace('Bearer ', '').trim()
 
-    await next()
+      // The service DID and resolver should be passed from app context
+      const serviceDid = c.get('serviceDid')
+      const didResolver = c.get('didResolver') as DidResolver
+
+      const parsed = await verifyJwt(jwt, serviceDid, null, async (did: string) => {
+        return didResolver.resolveAtprotoKey(did)
+      })
+
+      // Set auth information in the context for route handlers to access
+      c.set('did', parsed.iss)
+      c.set('accessJwt', jwt)
+
+      // Check for admin status if required
+      if (adminRequired) {
+        if (!c.get('isAdmin')) {
+          throw new HTTPException(403, {
+            message: 'Forbidden: Admin privileges required - use Basic auth with admin token',
+          })
+        }
+      }
+
+      await next()
+    } else {
+      throw new HTTPException(401, {
+        message: 'Unauthorized: Authorization header must start with "Basic " or "Bearer "',
+      })
+    }
   } catch (err) {
     if (err instanceof HTTPException) {
       throw err
     }
     throw new HTTPException(401, {
-      message: 'Unauthorized: Invalid JWT token',
+      message: 'Unauthorized: Invalid credentials',
     })
   }
 }
@@ -77,27 +97,36 @@ export const authMiddleware = async (c: Context, next: Next, adminRequired = fal
 export const optionalAuthMiddleware = async (c: Context, next: Next) => {
   const authHeader = c.req.header('Authorization')
 
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    const jwt = authHeader.replace('Bearer ', '').trim()
+  if (authHeader) {
+    if (authHeader.startsWith('Basic ')) {
+      try {
+        const base64Credentials = authHeader.replace('Basic ', '').trim()
+        const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8')
+        const [username, password] = credentials.split(':')
 
-    try {
-      const serviceDid = c.get('serviceDid')
-      const didResolver = c.get('didResolver') as DidResolver
-
-      const parsed = await verifyJwt(jwt, serviceDid, null, async (did: string) => {
-        return didResolver.resolveAtprotoKey(did)
-      })
-
-      // Set auth information if JWT is valid
-      c.set('did', parsed.iss)
-      c.set('accessJwt', jwt)
-      
-      // Check if user has admin privileges (but don't require it)
-      if (env.ADMIN_DIDS.includes(parsed.iss)) {
-        c.set('isAdmin', true)
+        if (username === 'admin' && password === env.ADMIN_PASSWORD) {
+          c.set('isAdmin', true)
+        }
+      } catch (err) {
+        // On auth failure, just continue without setting admin context
       }
-    } catch (err) {
-      // On auth failure, just continue without setting auth context
+    } else if (authHeader.startsWith('Bearer ')) {
+      const jwt = authHeader.replace('Bearer ', '').trim()
+
+      try {
+        const serviceDid = c.get('serviceDid')
+        const didResolver = c.get('didResolver') as DidResolver
+
+        const parsed = await verifyJwt(jwt, serviceDid, null, async (did: string) => {
+          return didResolver.resolveAtprotoKey(did)
+        })
+
+        // Set auth information if JWT is valid
+        c.set('did', parsed.iss)
+        c.set('accessJwt', jwt)
+      } catch (err) {
+        // On auth failure, just continue without setting auth context
+      }
     }
   }
 
