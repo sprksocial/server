@@ -22,6 +22,9 @@ export const likeSchema = new Schema<LikeDocument>({
   cid: { type: String, required: true },
 })
 
+// Add compound index to prevent duplicate likes
+likeSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
+
 export interface LookDocument extends Document {
   uri: string
   subject: string
