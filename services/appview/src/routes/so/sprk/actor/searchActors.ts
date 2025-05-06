@@ -18,6 +18,11 @@ export const createSearchActorRouter = (ctx: AppContext) => {
     optionalAuthMiddleware,
     async (c) => {
       const q = c.req.query('q')?.trim()
+
+      if (!q) {
+        return c.json({ error: 'Search query (q) is required' }, 400)
+      }
+
       let limit = parseInt(c.req.query('limit') ?? '25')
       if (isNaN(limit)) limit = 25
       if (limit < 1 || limit > 100) {
@@ -34,21 +39,15 @@ export const createSearchActorRouter = (ctx: AppContext) => {
       }
 
       const filter: any = {}
-      const sort: any = {}
+      const sort: any = { createdAt: -1 }
 
-      if (q) {
-        const escaped = escapeRegExp(q)
-        const regex = new RegExp(escaped, 'i')
-        filter.$or = [
-          { displayName: regex },
-          { description: regex },
-          { handle: regex },
-        ]
-        // fall back to sorting by createdAt
-        sort.createdAt = -1
-      } else {
-        sort.createdAt = -1
-      }
+      const escaped = escapeRegExp(q)
+      const regex = new RegExp(escaped, 'i')
+      filter.$or = [
+        { displayName: regex },
+        { description: regex },
+        { handle: regex },
+      ]
 
       const profiles = await ctx.db.models.Profile.find(filter)
         .sort(sort)

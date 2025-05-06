@@ -15,7 +15,7 @@ import {
 } from './id-resolver.js'
 import { takedownFilterMiddleware } from './middleware/takedown-filter.js'
 import { createGetProfileRouter } from './routes/so/sprk/actor/getProfile.js'
-import { createSearchActorRouter } from './routes/so/sprk/actor/searchActor.js'
+import { createSearchActorRouter } from './routes/so/sprk/actor/searchActors.js'
 import { createGetAuthorFeedRouter } from './routes/so/sprk/feed/getAuthorFeed.js'
 import { createGetPostsRouter } from './routes/so/sprk/feed/getPosts.js'
 import { createGetPostThreadRouter } from './routes/so/sprk/feed/getPostThread.js'
@@ -116,7 +116,7 @@ export class Server {
     const getAccountInfosRouter = createGetAccountInfosRouter(ctx)
     const getSubjectStatusRouter = createGetSubjectStatusRouter(ctx)
     const resolveHandleRouter = createResolveHandleRouter(ctx)
-    
+
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
     app.route('/', getProfileRouter)
