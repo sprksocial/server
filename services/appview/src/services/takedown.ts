@@ -1,4 +1,4 @@
-import { Database } from '../db.js'
+import { Database } from '../data-plane/server'
 
 export class TakedownService {
   constructor(private db: Database) {}

@@ -3,7 +3,7 @@ import { Hono } from 'hono'
 import { OutputSchema as GetPostsView } from '../../../../lexicon/types/so/sprk/feed/getPosts.js'
 import { AppContext } from '../../../../index.js'
 import { transformPostToPostView } from '../../../../utils/post-transformer.js'
-import { Database } from '../../../../db.js'
+import { Database } from '../../../../data-plane/server'
 import type * as SoSprkFeedDefs from '../../../../lexicon/types/so/sprk/feed/defs.js'
 import { optionalAuthMiddleware } from '../../../../auth/middleware.js'
 

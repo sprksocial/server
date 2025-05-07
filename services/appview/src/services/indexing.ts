@@ -2,7 +2,7 @@ import { AtUri } from '@atproto/syntax'
 import { CID } from 'multiformats/cid'
 import { Document } from 'mongoose'
 import { BidirectionalResolver } from '../id-resolver.js'
-import { Database } from '../db.js'
+import { Database } from '../data-plane/server'
 import { pino } from 'pino'
 import * as Post from './plugins/post.js'
 

@@ -1,6 +1,11 @@
 import mongoose, { Connection, Document, Model, Schema } from 'mongoose'
 import { pino } from 'pino'
-import { env } from './env.js'
+import { IdResolver, MemoryCache } from '@atproto/identity'
+import { env } from '../../env.js'
+import { DataPlaneClient, GetIdentityByDidResponse } from '../client'
+
+const HOUR = 60e3 * 60
+const DAY = HOUR * 24
 
 export interface LikeDocument extends Document {
   uri: string
@@ -447,41 +452,16 @@ export interface DatabaseModels {
   Actor: Model<ActorDocument>
 }
 
-export class Database {
-  private connection: Connection
-  public models: DatabaseModels
+export class Database implements DataPlaneClient {
+  private connection!: Connection
+  public models!: DatabaseModels
   private logger = pino({ name: 'database' })
+  public idResolver: IdResolver
 
   constructor() {
-    this.connection = mongoose.createConnection()
-    this.models = {
-      Like: this.connection.model<LikeDocument>('Like', likeSchema),
-      Post: this.connection.model<PostDocument>('Post', postSchema),
-      Follow: this.connection.model<FollowDocument>('Follow', followSchema),
-      Block: this.connection.model<BlockDocument>('Block', blockSchema),
-      Profile: this.connection.model<ProfileDocument>('Profile', profileSchema),
-      Audio: this.connection.model<AudioDocument>('Audio', audioSchema),
-      Repost: this.connection.model<RepostDocument>('Repost', repostSchema),
-      Music: this.connection.model<MusicDocument>('Music', musicSchema),
-      Look: this.connection.model<LookDocument>('Look', lookSchema),
-      Generator: this.connection.model<GeneratorDocument>(
-        'Generator',
-        generatorSchema,
-      ),
-      Takedown: this.connection.model<TakedownDocument>(
-        'Takedown',
-        takedownSchema,
-      ),
-      RepoTakedown: this.connection.model<RepoTakedownDocument>(
-        'RepoTakedown',
-        repoTakedownSchema,
-      ),
-      BlobTakedown: this.connection.model<BlobTakedownDocument>(
-        'BlobTakedown',
-        blobTakedownSchema,
-      ),
-      Actor: this.connection.model<ActorDocument>('Actor', actorSchema),
-    }
+    this.idResolver = new IdResolver({
+      didCache: new MemoryCache(HOUR, DAY),
+    })
   }
 
   async connect(): Promise<void> {
@@ -492,14 +472,33 @@ export class Database {
     )
 
     try {
-      await this.connection.openUri(uri, {
+      this.connection = await mongoose.createConnection(uri, {
         autoIndex: true,
         autoCreate: true,
         dbName: DB_NAME,
       })
+
+      // Initialize models
+      this.models = {
+        Like: this.connection.model<LikeDocument>('Like', likeSchema),
+        Post: this.connection.model<PostDocument>('Post', postSchema),
+        Follow: this.connection.model<FollowDocument>('Follow', followSchema),
+        Block: this.connection.model<BlockDocument>('Block', blockSchema),
+        Profile: this.connection.model<ProfileDocument>('Profile', profileSchema),
+        Audio: this.connection.model<AudioDocument>('Audio', audioSchema),
+        Repost: this.connection.model<RepostDocument>('Repost', repostSchema),
+        Music: this.connection.model<MusicDocument>('Music', musicSchema),
+        Look: this.connection.model<LookDocument>('Look', lookSchema),
+        Generator: this.connection.model<GeneratorDocument>('Generator', generatorSchema),
+        Takedown: this.connection.model<TakedownDocument>('Takedown', takedownSchema),
+        RepoTakedown: this.connection.model<RepoTakedownDocument>('RepoTakedown', repoTakedownSchema),
+        BlobTakedown: this.connection.model<BlobTakedownDocument>('BlobTakedown', blobTakedownSchema),
+        Actor: this.connection.model<ActorDocument>('Actor', actorSchema),
+      }
+
       this.logger.info('Connected to MongoDB')
     } catch (error) {
-      this.logger.error({ error }, 'MongoDB connection error')
+      this.logger.error(error, 'Failed to connect to MongoDB')
       throw error
     }
   }
@@ -508,6 +507,43 @@ export class Database {
     if (this.connection) {
       await this.connection.close()
       this.logger.info('Disconnected from MongoDB')
+    }
+  }
+
+  // Add methods for DID resolution
+  async resolveHandle(handle: string): Promise<string | undefined> {
+    try {
+      return await this.idResolver.handle.resolve(handle)
+    } catch (err) {
+      this.logger.error({ err, handle }, 'Failed to resolve handle')
+      return undefined
+    }
+  }
+
+  async resolveDid(did: string): Promise<{ did: string; handle?: string; } | undefined> {
+    try {
+      const data = await this.idResolver.did.resolveAtprotoData(did)
+      return {
+        did: data.did,
+        handle: data.handle,
+      }
+    } catch (err) {
+      this.logger.error({ err, did }, 'Failed to resolve DID')
+      return undefined
+    }
+  }
+
+  // Implement DataPlaneClient interface
+  async getIdentityByDid({ did }: { did: string }): Promise<GetIdentityByDidResponse> {
+    const actor = await this.models.Actor.findOne({ did }).exec()
+    if (!actor) {
+      throw new Error('Actor not found')
+    }
+    return {
+      did: actor.did,
+      handle: actor.handle || undefined,
+      keys: new Uint8Array(), // TODO: Implement key storage
+      services: new Uint8Array(), // TODO: Implement services storage
     }
   }
 }
