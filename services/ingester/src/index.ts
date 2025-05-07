@@ -30,7 +30,7 @@ async function main() {
   const bidirectionalResolver = createBidirectionalResolver(resolver)
 
   // Create and start Jetstream client
-  const jetstreamClient = createJetstreamClient(db, bidirectionalResolver)
+  const jetstreamClient = await createJetstreamClient(db, bidirectionalResolver)
   const connection = jetstreamClient.connect({
     filterCollections: ['so.sprk.*'],
   })

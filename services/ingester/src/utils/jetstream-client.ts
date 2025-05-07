@@ -13,19 +13,28 @@ export interface JetstreamClientOptions {
   initialCursor?: number | null
 }
 
-export function createJetstreamClient(
+export async function createJetstreamClient(
   db: Database,
   resolver: BidirectionalResolver,
 ) {
-  let cursorPosition: number | null = null
+  // Load initial cursor from DB
+  let cursorPosition: number | null = await db.getCursorState()
+  if (cursorPosition) {
+    logger.info({ initialCursor: cursorPosition }, 'Loaded initial cursor from DB')
+  } else {
+    logger.info('No initial cursor found in DB, will start from live feed.')
+  }
+
   let wsConnection: WebSocket | null = null
   let heartbeatInterval: Timer | null = null
 
   function connect(options: JetstreamClientOptions = {}): {
     close: () => void
   } {
-    const { filterCollections = ['so.sprk.*'], initialCursor = null } = options
+    // Use the loaded cursorPosition as default if no initialCursor is provided in options
+    const { filterCollections = ['so.sprk.*'], initialCursor = cursorPosition } = options
 
+    // Update cursorPosition if an initialCursor was explicitly passed in options or from DB
     if (initialCursor) {
       cursorPosition = initialCursor
     }
@@ -59,6 +68,11 @@ export function createJetstreamClient(
 
         // Process events
         await processEvent(event)
+
+        // Save cursor position after processing the event
+        if (cursorPosition) {
+          await db.saveCursorState(cursorPosition)
+        }
       } catch (error) {
         logger.error({ error }, 'Error parsing or processing message')
       }
@@ -137,8 +151,6 @@ export function createJetstreamClient(
       // Depending on desired behavior, you might want to return here or retry.
       // For now, we proceed but log the error.
     }
-
-    console.log('Processing event', event)
 
     const { did, time_us } = event
     const { operation, collection, rkey, record, cid } = event.commit // cid might still be needed by handleEvent

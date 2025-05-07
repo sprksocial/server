@@ -376,6 +376,18 @@ export const processedEventSchema = new Schema<ProcessedEventDocument>({
   processedAt: { type: Date, default: Date.now },
 })
 
+export interface CursorStateDocument extends Document {
+  identifier: string // To ensure a single document, e.g., 'last_processed_cursor'
+  cursorValue: number
+  updatedAt: Date
+}
+
+export const cursorStateSchema = new Schema<CursorStateDocument>({
+  identifier: { type: String, required: true, unique: true, index: true },
+  cursorValue: { type: Number, required: true },
+  updatedAt: { type: Date, default: Date.now },
+})
+
 export interface DatabaseModels {
   Like: Model<LikeDocument>
   Post: Model<PostDocument>
@@ -389,4 +401,5 @@ export interface DatabaseModels {
   Generator: Model<GeneratorDocument>
   Actor: Model<ActorDocument>
   ProcessedEvent: Model<ProcessedEventDocument>
+  CursorState: Model<CursorStateDocument>
 }

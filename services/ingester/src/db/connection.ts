@@ -13,6 +13,7 @@ import {
   generatorSchema,
   actorSchema,
   processedEventSchema,
+  cursorStateSchema,
 } from './models.js'
 import { env } from '../utils/env.js'
 import { pino } from 'pino'
@@ -40,6 +41,7 @@ export class Database {
         'ProcessedEvent',
         processedEventSchema,
       ),
+      CursorState: this.connection.model('CursorState', cursorStateSchema),
     }
   }
 
@@ -72,7 +74,9 @@ export class Database {
   }
 
   async hasProcessedEvent(rev: string): Promise<boolean> {
-    const count = await this.models.ProcessedEvent.countDocuments({ rev }).exec()
+    const count = await this.models.ProcessedEvent.countDocuments({
+      rev,
+    }).exec()
     return count > 0
   }
 
@@ -92,6 +96,45 @@ export class Database {
         // Re-throw other errors
         throw error
       }
+    }
+  }
+
+  private readonly CURSOR_IDENTIFIER = 'last_processed_cursor'
+
+  async getCursorState(): Promise<number | null> {
+    try {
+      const state = await this.models.CursorState.findOne({
+        identifier: this.CURSOR_IDENTIFIER,
+      }).exec()
+      if (state) {
+        this.logger.info(
+          { cursorValue: state.cursorValue },
+          'Loaded cursor state',
+        )
+        return state.cursorValue
+      }
+      this.logger.info('No cursor state found in database.')
+      return null
+    } catch (error) {
+      this.logger.error({ error }, 'Failed to get cursor state')
+      return null // Or rethrow, depending on desired error handling
+    }
+  }
+
+  async saveCursorState(cursorValue: number): Promise<void> {
+    try {
+      await this.models.CursorState.updateOne(
+        { identifier: this.CURSOR_IDENTIFIER },
+        {
+          $set: { cursorValue, updatedAt: new Date() },
+          $setOnInsert: { identifier: this.CURSOR_IDENTIFIER },
+        },
+        { upsert: true },
+      ).exec()
+      this.logger.debug({ cursorValue }, 'Saved cursor state')
+    } catch (error) {
+      this.logger.error({ cursorValue, error }, 'Failed to save cursor state')
+      // Depending on desired behavior, you might want to rethrow or handle more gracefully
     }
   }
 }
