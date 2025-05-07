@@ -2,7 +2,7 @@ import mongoose, { Connection, Document, Model, Schema } from 'mongoose'
 import { pino } from 'pino'
 import { IdResolver, MemoryCache } from '@atproto/identity'
 import { env } from '../../env.js'
-import { DataPlaneClient, GetIdentityByDidResponse } from '../client'
+import { DataPlaneClient, GetIdentityByDidResponse } from '../client/index.js'
 
 const HOUR = 60e3 * 60
 const DAY = HOUR * 24

@@ -1,11 +1,11 @@
 import assert from 'node:assert'
 import { randomInt } from 'node:crypto'
 import mongoose from 'mongoose'
-import { Code, ConnectError } from './util'
-import { HostList } from './hosts'
+import { Code, ConnectError } from './util.js'
+import { HostList } from './hosts.js'
 
-export * from './hosts'
-export * from './util'
+export * from './hosts.js'
+export * from './util.js'
 
 export interface DataPlaneClient {
   getIdentityByDid: (params: { did: string }) => Promise<GetIdentityByDidResponse>

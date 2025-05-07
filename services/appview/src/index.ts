@@ -5,12 +5,12 @@ import { cors } from 'hono/cors'
 import { HTTPException } from 'hono/http-exception'
 import { logger } from 'hono/logger'
 import { pino } from 'pino'
-import { Database } from './data-plane/server'
+import { Database } from './data-plane/server/index.js'
 import { env } from './env.js'
 import { createFeedRouter } from './feed/feed.js'
 import { AuthVerifier, createAuthVerifier } from './auth/auth-verifier.js'
-import API from './api'
-import { createServer } from './lexicon'
+import API from './api/index.js'
+import { createServer } from './lexicon/index.js'
 import {
   BidirectionalResolver,
   createBidirectionalResolver,
@@ -31,7 +31,6 @@ import wellKnownRouter from './well-known.js'
 import { TakedownService } from './services/takedown.js'
 import { IndexingService } from './services/indexing.js'
 import { expressToHono } from './utils/express-adapter.js'
-import { Context, Next } from 'hono'
 
 // Extend Hono's context variable map to include our services
 declare module 'hono' {

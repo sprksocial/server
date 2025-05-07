@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { HTTPException } from 'hono/http-exception'
 import { TakedownService } from '../../services/takedown.js'
 import { authMiddleware } from '../../auth/middleware.js'
-import { Database } from '../../data-plane/server'
+import { Database } from '../../data-plane/server/index.js'
 import { AtUri } from '@atproto/syntax'
 
 type TakedownContext = {

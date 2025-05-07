@@ -1,6 +1,5 @@
 import { KeyObject } from 'node:crypto'
 import { IncomingMessage, IncomingHttpHeaders } from 'node:http'
-import { HonoRequest } from 'hono'
 import * as ui8 from 'uint8arrays'
 import * as jose from 'jose'
 import { verify } from 'hono/jwt'
@@ -21,7 +20,7 @@ import {
   getKeyAsDidKey, 
   isDataplaneError, 
   unpackIdentityKeys 
-} from '../data-plane/client'
+} from '../data-plane/client/index.js'
 import { SignatureAlgorithm } from 'hono/utils/jwt/jwa'
 
 interface MinimalRequest {
