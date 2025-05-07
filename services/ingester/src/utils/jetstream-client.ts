@@ -118,8 +118,30 @@ export function createJetstreamClient(
       return
     }
 
+    // Extract REV for idempotency check
+    const { rev } = event.commit
+    if (!rev) {
+      logger.warn({ event }, 'Event commit is missing rev, cannot ensure idempotency. Skipping.')
+      return
+    }
+
+    // Check if event has already been processed
+    try {
+      const alreadyProcessed = await db.hasProcessedEvent(rev)
+      if (alreadyProcessed) {
+        logger.info({ rev }, 'Event already processed, skipping.')
+        return
+      }
+    } catch (error) {
+      logger.error({ rev, error }, 'Error checking for processed event. Proceeding with caution.')
+      // Depending on desired behavior, you might want to return here or retry.
+      // For now, we proceed but log the error.
+    }
+
+    console.log('Processing event', event)
+
     const { did, time_us } = event
-    const { operation, collection, rkey, record, cid } = event.commit
+    const { operation, collection, rkey, record, cid } = event.commit // cid might still be needed by handleEvent
 
     logger.debug(
       `Processing ${operation} operation for DID: ${did}, collection: ${collection}, rkey: ${rkey}`,
@@ -154,6 +176,15 @@ export function createJetstreamClient(
 
     // Process the normalized event
     await handleEvent(normalizedEvent, db)
+
+    // Record the event as processed
+    try {
+      await db.recordProcessedEvent(rev)
+    } catch (error) {
+      logger.error({ rev, error }, 'Error recording processed event after handling.')
+      // This is a critical error if the event was processed but not recorded,
+      // as it could lead to reprocessing. Consider further error handling or alerting.
+    }
   }
 
   return { connect }

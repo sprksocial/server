@@ -12,6 +12,7 @@ import {
   lookSchema,
   generatorSchema,
   actorSchema,
+  processedEventSchema,
 } from './models.js'
 import { env } from '../utils/env.js'
 import { pino } from 'pino'
@@ -35,6 +36,10 @@ export class Database {
       Look: this.connection.model('Look', lookSchema),
       Generator: this.connection.model('Generator', generatorSchema),
       Actor: this.connection.model('Actor', actorSchema),
+      ProcessedEvent: this.connection.model(
+        'ProcessedEvent',
+        processedEventSchema,
+      ),
     }
   }
 
@@ -42,7 +47,9 @@ export class Database {
     const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = env
     const uri = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/?appName=ingester`
 
-    this.logger.info(`Connecting to MongoDB at ${DB_HOST}:${DB_PORT}/?appName=ingester`)
+    this.logger.info(
+      `Connecting to MongoDB at ${DB_HOST}:${DB_PORT}/?appName=ingester`,
+    )
 
     try {
       await this.connection.openUri(uri, {
@@ -61,6 +68,30 @@ export class Database {
     if (this.connection) {
       await this.connection.close()
       this.logger.info('Disconnected from MongoDB')
+    }
+  }
+
+  async hasProcessedEvent(rev: string): Promise<boolean> {
+    const count = await this.models.ProcessedEvent.countDocuments({ rev }).exec()
+    return count > 0
+  }
+
+  async recordProcessedEvent(rev: string): Promise<void> {
+    try {
+      await this.models.ProcessedEvent.create({ rev })
+      this.logger.info({ rev }, 'Recorded processed event')
+    } catch (error) {
+      // Handle potential duplicate key error gracefully if two instances try to write at the exact same time
+      if (error instanceof Error && 'code' in error && error.code === 11000) {
+        this.logger.warn(
+          { rev, error },
+          'Attempted to record already processed event rev. Likely a race condition, ignoring.',
+        )
+      } else {
+        this.logger.error({ rev, error }, 'Failed to record processed event')
+        // Re-throw other errors
+        throw error
+      }
     }
   }
 }
