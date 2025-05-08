@@ -60,6 +60,9 @@ dependencies:
   iron-session:
     specifier: ^8.0.4
     version: 8.0.4
+  jose:
+    specifier: ^6.0.11
+    version: 6.0.11
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
@@ -1883,6 +1886,10 @@ packages:
 
   /jose@5.10.0:
     resolution: {integrity: sha512-s+3Al/p9g32Iq+oqXxkW//7jk2Vig6FF1CFqzVXoTUXt2qz89YWbL+OwS17NFYEvxC35n0FKeGO2LGYSxeM2Gg==}
+    dev: false
+
+  /jose@6.0.11:
+    resolution: {integrity: sha512-QxG7EaliDARm1O1S8BGakqncGT9s25bKL1WSf6/oa17Tkqwi8D2ZNglqCF+DsYF88/rV66Q/Q2mFAy697E1DUg==}
     dev: false
 
   /joycon@3.1.1:

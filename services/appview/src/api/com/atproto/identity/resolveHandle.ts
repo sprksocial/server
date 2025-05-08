@@ -1,7 +1,7 @@
 import * as ident from '@atproto/syntax'
 import { InvalidRequestError } from '@atproto/xrpc-server'
-import { Server } from '../../../../lexicon'
-import { AppContext } from '../../../..'
+import { Server } from '../../../../lexicon/index.js'
+import { AppContext } from '../../../../index.js'
 import { Hono } from 'hono'
 
 export const createResolveHandleRouter = (ctx: AppContext) => {

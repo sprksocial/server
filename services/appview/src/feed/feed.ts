@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { AppContext } from '..'
+import { AppContext } from '../index.js'
 import { Agent } from '@atproto/api'
 import { HTTPException } from 'hono/http-exception'
 import { CID } from 'multiformats/cid'

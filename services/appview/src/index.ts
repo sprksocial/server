@@ -5,31 +5,32 @@ import { cors } from 'hono/cors'
 import { HTTPException } from 'hono/http-exception'
 import { logger } from 'hono/logger'
 import { pino } from 'pino'
-import { Database } from './db.js'
+import { Database } from './data-plane/server/index.js'
 import { env } from './env.js'
 import { createFeedRouter } from './feed/feed.js'
+import { AuthVerifier, createAuthVerifier } from './auth/auth-verifier.js'
+import API from './api/index.js'
+import { createServer } from './lexicon/index.js'
 import {
   BidirectionalResolver,
   createBidirectionalResolver,
   createIdResolver,
 } from './id-resolver.js'
 import { takedownFilterMiddleware } from './middleware/takedown-filter.js'
-import { createGetProfileRouter } from './routes/so/sprk/actor/getProfile.js'
-import { createSearchActorRouter } from './routes/so/sprk/actor/searchActors.js'
-import { createGetAuthorFeedRouter } from './routes/so/sprk/feed/getAuthorFeed.js'
-import { createGetPostsRouter } from './routes/so/sprk/feed/getPosts.js'
-import { createGetPostThreadRouter } from './routes/so/sprk/feed/getPostThread.js'
-import { createGetFollowersRouter } from './routes/so/sprk/graph/getFollowers.js'
-import { createGetFollowsRouter } from './routes/so/sprk/graph/getFollows.js'
-import { createTakedownRouter } from './routes/admin/takedowns.js'
-import { createUpdateSubjectStatusRouter } from './routes/com/atproto/admin/updateSubjectStatus.js'
-import { createGetRecordRouter } from './routes/com/atproto/repo/getRecord.js'
-import { createGetAccountInfosRouter } from './routes/com/atproto/admin/getAccountInfos.js'
-import { createGetSubjectStatusRouter } from './routes/com/atproto/admin/getSubjectStatus.js'
-import { createResolveHandleRouter } from './routes/com/atproto/identity/resolveHandle.js'
+import { createGetProfileRouter } from './api/so/sprk/actor/getProfile.js'
+import { createSearchActorRouter } from './api/so/sprk/actor/searchActors.js'
+import { createGetAuthorFeedRouter } from './api/so/sprk/feed/getAuthorFeed.js'
+import { createGetPostsRouter } from './api/so/sprk/feed/getPosts.js'
+import { createGetPostThreadRouter } from './api/so/sprk/feed/getPostThread.js'
+import { createGetFollowersRouter } from './api/so/sprk/graph/getFollowers.js'
+import { createGetFollowsRouter } from './api/so/sprk/graph/getFollows.js'
+import { createTakedownRouter } from './api/admin/takedowns.js'
+import { createGetRecordRouter } from './api/com/atproto/repo/getRecord.js'
+import { createResolveHandleRouter } from './api/com/atproto/identity/resolveHandle.js'
 import wellKnownRouter from './well-known.js'
 import { TakedownService } from './services/takedown.js'
 import { IndexingService } from './services/indexing.js'
+import { expressToHono } from './utils/express-adapter.js'
 
 // Extend Hono's context variable map to include our services
 declare module 'hono' {
@@ -49,6 +50,7 @@ export type AppContext = {
   didResolver: DidResolver
   takedownService: TakedownService
   indexingService: IndexingService
+  authVerifier: AuthVerifier
 }
 
 export class Server {
@@ -72,6 +74,12 @@ export class Server {
     // Create services
     const takedownService = new TakedownService(db)
     const indexingService = new IndexingService(db, resolver)
+    const authVerifier = createAuthVerifier(db, {
+      ownDid: serviceDid,
+      alternateAudienceDids: [],
+      modServiceDid: env.MOD_SERVICE_DID,
+      adminPasses: [env.ADMIN_PASSWORD],
+    })
 
     const ctx = {
       db,
@@ -81,6 +89,7 @@ export class Server {
       didResolver: baseIdResolver.did,
       takedownService,
       indexingService,
+      authVerifier,
     }
 
     const app = new Hono()
@@ -101,7 +110,8 @@ export class Server {
 
     // TODO: Remove this after getAuthorFeedRouter is properly implemented on frontend
     const feedRouter = createFeedRouter(ctx)
-    app.route('/', feedRouter)
+    const lexServer = createServer()
+    const server = API(lexServer, ctx)
 
     const getPostsRouter = createGetPostsRouter(ctx)
     const getPostThreadRouter = createGetPostThreadRouter(ctx)
@@ -110,13 +120,11 @@ export class Server {
     const getFollowsRouter = createGetFollowsRouter(ctx)
     const getAuthorFeedRouter = createGetAuthorFeedRouter(ctx)
     const searchActorRouter = createSearchActorRouter(ctx)
-    const updateSubjectStatusRouter = createUpdateSubjectStatusRouter(ctx)
     const takedownRouter = createTakedownRouter(ctx)
     const getRecordRouter = createGetRecordRouter(ctx)
-    const getAccountInfosRouter = createGetAccountInfosRouter(ctx)
-    const getSubjectStatusRouter = createGetSubjectStatusRouter(ctx)
     const resolveHandleRouter = createResolveHandleRouter(ctx)
 
+    app.route('/', feedRouter)
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
     app.route('/', getProfileRouter)
@@ -124,11 +132,8 @@ export class Server {
     app.route('/', getFollowsRouter)
     app.route('/', getAuthorFeedRouter)
     app.route('/', searchActorRouter)
-    app.route('/', updateSubjectStatusRouter)
     app.route('/', takedownRouter)
     app.route('/', getRecordRouter)
-    app.route('/', getAccountInfosRouter)
-    app.route('/', getSubjectStatusRouter)
     app.route('/', resolveHandleRouter)
     app.route('/', wellKnownRouter())
 
@@ -138,6 +143,8 @@ export class Server {
         '✧･ﾟ: ✧･ﾟ:. ݁₊ ⊹ . ݁˖ . ݁ SPARK API . ݁₊ ⊹ . ݁˖ . ݁ :･ﾟ✧:･ﾟ✧',
       )
     })
+
+    app.use(expressToHono(lexServer.xrpc.router))
 
     app.onError((err, c) => {
       if (err instanceof HTTPException) {
@@ -197,3 +204,5 @@ const run = async () => {
 }
 
 run()
+
+

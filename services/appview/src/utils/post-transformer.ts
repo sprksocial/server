@@ -1,4 +1,4 @@
-import { Database, PostDocument } from '../db.js'
+import { Database, PostDocument } from '../data-plane/server/index.js'
 import type { Label } from '../lexicon/types/com/atproto/label/defs.js'
 import type { ProfileViewBasic } from '../lexicon/types/so/sprk/actor/defs.js'
 import type * as SoSprkEmbedImages from '../lexicon/types/so/sprk/embed/images.js'
