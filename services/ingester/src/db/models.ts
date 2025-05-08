@@ -345,17 +345,16 @@ export const generatorSchema = new Schema<GeneratorDocument>({
 generatorSchema.index({ authorDid: 1, createdAt: -1 })
 generatorSchema.index({ did: 1, createdAt: -1 })
 
-
 export interface ActorDocument extends Document {
   did: string
   handle: string | null
   indexedAt: string
-  takedownRef: string | null  
+  takedownRef: string | null
   upstreamStatus: string | null
 }
 
 export const actorSchema = new Schema<ActorDocument>({
-  did: { type: String, required: true, index: true },
+  did: { type: String, required: true },
   handle: { type: String, required: false, index: true },
   indexedAt: { type: String, required: true },
   takedownRef: { type: String, required: false },
@@ -365,6 +364,18 @@ export const actorSchema = new Schema<ActorDocument>({
 // Add compound indexes for Actor
 actorSchema.index({ handle: 'text' })
 actorSchema.index({ did: 1 }, { unique: true })
+
+export interface CursorStateDocument extends Document {
+  identifier: string // To ensure a single document, e.g., 'last_processed_cursor'
+  cursorValue: number
+  updatedAt: Date
+}
+
+export const cursorStateSchema = new Schema<CursorStateDocument>({
+  identifier: { type: String, required: true, unique: true, index: true },
+  cursorValue: { type: Number, required: true },
+  updatedAt: { type: Date, default: Date.now },
+})
 
 export interface DatabaseModels {
   Like: Model<LikeDocument>
@@ -378,4 +389,5 @@ export interface DatabaseModels {
   Look: Model<LookDocument>
   Generator: Model<GeneratorDocument>
   Actor: Model<ActorDocument>
+  CursorState: Model<CursorStateDocument>
 }

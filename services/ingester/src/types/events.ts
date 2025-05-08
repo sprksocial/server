@@ -8,6 +8,7 @@ export interface JetstreamEvent {
     rkey: string
     record: any
     cid: string
+    rev: string
   }
 }
 
@@ -20,6 +21,7 @@ export interface NormalizedEvent {
     rkey: string
     record: any
     cid: string
+    rev: string
   }
   time_us: number
   event: 'create' | 'update' | 'delete'

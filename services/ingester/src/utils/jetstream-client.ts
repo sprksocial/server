@@ -13,31 +13,47 @@ export interface JetstreamClientOptions {
   initialCursor?: number | null
 }
 
-export function createJetstreamClient(
+export async function createJetstreamClient(
   db: Database,
   resolver: BidirectionalResolver,
 ) {
-  let cursorPosition: number | null = null
+  // Load initial cursor from DB
+  let cursorPosition: number | null = await db.getCursorState()
+  if (cursorPosition) {
+    logger.info(
+      { initialCursor: cursorPosition },
+      'Loaded initial cursor from DB',
+    )
+  } else {
+    logger.info('No initial cursor found in DB, will start from live feed.')
+  }
+
   let wsConnection: WebSocket | null = null
   let heartbeatInterval: Timer | null = null
+  let saveCursorInterval: Timer | null = null // Added for periodic cursor saving
 
   function connect(options: JetstreamClientOptions = {}): {
     close: () => void
   } {
-    const { filterCollections = ['so.sprk.*'], initialCursor = null } = options
+    // Use the loaded cursorPosition as default if no initialCursor is provided in options
+    const {
+      filterCollections = ['so.sprk.*'],
+      initialCursor = cursorPosition,
+    } = options
 
+    // Update cursorPosition if an initialCursor was explicitly passed in options or from DB
     if (initialCursor) {
       cursorPosition = initialCursor
     }
 
     let url = filterCollections.reduce((acc, collection) => {
-      return `${acc}&wantedCollections=${collection}`
+      return `${acc}wantedCollections=${collection}&`
     }, `${env.JETSTREAM_URL}?`)
 
     if (cursorPosition) {
       // Subtract a few seconds (in microseconds) to ensure no gaps
       const rewindCursor = parseInt(cursorPosition.toString()) - 5000000 // 5 seconds in microseconds
-      url += `&cursor=${rewindCursor}`
+      url += `cursor=${rewindCursor}`
     }
 
     logger.info(`Connecting to Jetstream: ${url}`)
@@ -46,6 +62,8 @@ export function createJetstreamClient(
 
     wsConnection.on('open', () => {
       logger.info('Connected to Jetstream')
+      // Start periodic cursor saving only after successful connection
+      startPeriodicCursorSave()
     })
 
     wsConnection.on('message', async (data) => {
@@ -86,6 +104,7 @@ export function createJetstreamClient(
     return {
       close: () => {
         clearHeartbeatInterval()
+        clearSaveCursorInterval() // Clear cursor save interval on close/error
         if (wsConnection && wsConnection.readyState === WebSocket.OPEN) {
           wsConnection.close()
           wsConnection = null
@@ -101,8 +120,33 @@ export function createJetstreamClient(
     }
   }
 
+  function clearSaveCursorInterval() {
+    if (saveCursorInterval) {
+      clearInterval(saveCursorInterval)
+      saveCursorInterval = null
+    }
+  }
+
+  function startPeriodicCursorSave() {
+    clearSaveCursorInterval() // Clear any existing interval first
+    saveCursorInterval = setInterval(async () => {
+      if (cursorPosition !== null) {
+        try {
+          await db.saveCursorState(cursorPosition)
+          logger.debug({ cursorPosition }, 'Periodically saved cursor state')
+        } catch (error) {
+          logger.error(
+            { cursorPosition, error },
+            'Failed to periodically save cursor state',
+          )
+        }
+      }
+    }, 30000) // Save every 30 seconds
+  }
+
   function handleReconnect(options: JetstreamClientOptions) {
     clearHeartbeatInterval()
+    clearSaveCursorInterval() // Clear cursor save interval before reconnecting
 
     if (wsConnection) {
       wsConnection = null
@@ -119,7 +163,7 @@ export function createJetstreamClient(
     }
 
     const { did, time_us } = event
-    const { operation, collection, rkey, record, cid } = event.commit
+    const { operation, collection, rkey, record } = event.commit
 
     logger.debug(
       `Processing ${operation} operation for DID: ${did}, collection: ${collection}, rkey: ${rkey}`,

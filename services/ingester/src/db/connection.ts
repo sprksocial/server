@@ -12,6 +12,7 @@ import {
   lookSchema,
   generatorSchema,
   actorSchema,
+  cursorStateSchema,
 } from './models.js'
 import { env } from '../utils/env.js'
 import { pino } from 'pino'
@@ -35,6 +36,7 @@ export class Database {
       Look: this.connection.model('Look', lookSchema),
       Generator: this.connection.model('Generator', generatorSchema),
       Actor: this.connection.model('Actor', actorSchema),
+      CursorState: this.connection.model('CursorState', cursorStateSchema),
     }
   }
 
@@ -42,7 +44,9 @@ export class Database {
     const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = env
     const uri = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/?appName=ingester`
 
-    this.logger.info(`Connecting to MongoDB at ${DB_HOST}:${DB_PORT}/?appName=ingester`)
+    this.logger.info(
+      `Connecting to MongoDB at ${DB_HOST}:${DB_PORT}/?appName=ingester`,
+    )
 
     try {
       await this.connection.openUri(uri, {
@@ -61,6 +65,45 @@ export class Database {
     if (this.connection) {
       await this.connection.close()
       this.logger.info('Disconnected from MongoDB')
+    }
+  }
+
+  private readonly CURSOR_IDENTIFIER = 'last_processed_cursor'
+
+  async getCursorState(): Promise<number | null> {
+    try {
+      const state = await this.models.CursorState.findOne({
+        identifier: this.CURSOR_IDENTIFIER,
+      }).exec()
+      if (state) {
+        this.logger.info(
+          { cursorValue: state.cursorValue },
+          'Loaded cursor state',
+        )
+        return state.cursorValue
+      }
+      this.logger.info('No cursor state found in database.')
+      return null
+    } catch (error) {
+      this.logger.error({ error }, 'Failed to get cursor state')
+      return null // Or rethrow, depending on desired error handling
+    }
+  }
+
+  async saveCursorState(cursorValue: number): Promise<void> {
+    try {
+      await this.models.CursorState.updateOne(
+        { identifier: this.CURSOR_IDENTIFIER },
+        {
+          $set: { cursorValue, updatedAt: new Date() },
+          $setOnInsert: { identifier: this.CURSOR_IDENTIFIER },
+        },
+        { upsert: true },
+      ).exec()
+      this.logger.debug({ cursorValue }, 'Saved cursor state')
+    } catch (error) {
+      this.logger.error({ cursorValue, error }, 'Failed to save cursor state')
+      // Depending on desired behavior, you might want to rethrow or handle more gracefully
     }
   }
 }
