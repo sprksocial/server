@@ -20,7 +20,10 @@ export async function createJetstreamClient(
   // Load initial cursor from DB
   let cursorPosition: number | null = await db.getCursorState()
   if (cursorPosition) {
-    logger.info({ initialCursor: cursorPosition }, 'Loaded initial cursor from DB')
+    logger.info(
+      { initialCursor: cursorPosition },
+      'Loaded initial cursor from DB',
+    )
   } else {
     logger.info('No initial cursor found in DB, will start from live feed.')
   }
@@ -33,7 +36,10 @@ export async function createJetstreamClient(
     close: () => void
   } {
     // Use the loaded cursorPosition as default if no initialCursor is provided in options
-    const { filterCollections = ['so.sprk.*'], initialCursor = cursorPosition } = options
+    const {
+      filterCollections = ['so.sprk.*'],
+      initialCursor = cursorPosition,
+    } = options
 
     // Update cursorPosition if an initialCursor was explicitly passed in options or from DB
     if (initialCursor) {
@@ -71,7 +77,6 @@ export async function createJetstreamClient(
 
         // Process events
         await processEvent(event)
-
       } catch (error) {
         logger.error({ error }, 'Error parsing or processing message')
       }
@@ -130,7 +135,10 @@ export async function createJetstreamClient(
           await db.saveCursorState(cursorPosition)
           logger.debug({ cursorPosition }, 'Periodically saved cursor state')
         } catch (error) {
-          logger.error({ cursorPosition, error }, 'Failed to periodically save cursor state')
+          logger.error(
+            { cursorPosition, error },
+            'Failed to periodically save cursor state',
+          )
         }
       }
     }, 30000) // Save every 30 seconds
@@ -154,15 +162,8 @@ export async function createJetstreamClient(
       return
     }
 
-    // Extract REV for idempotency check
-    const { rev } = event.commit
-    if (!rev) {
-      logger.warn({ event }, 'Event commit is missing rev, cannot ensure idempotency. Skipping.')
-      return
-    }
-
     const { did, time_us } = event
-    const { operation, collection, rkey, record, cid } = event.commit // cid might still be needed by handleEvent
+    const { operation, collection, rkey, record } = event.commit
 
     logger.debug(
       `Processing ${operation} operation for DID: ${did}, collection: ${collection}, rkey: ${rkey}`,
