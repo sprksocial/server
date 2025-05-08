@@ -345,7 +345,6 @@ export const generatorSchema = new Schema<GeneratorDocument>({
 generatorSchema.index({ authorDid: 1, createdAt: -1 })
 generatorSchema.index({ did: 1, createdAt: -1 })
 
-
 export interface ActorDocument extends Document {
   did: string
   handle: string | null
@@ -365,16 +364,6 @@ export const actorSchema = new Schema<ActorDocument>({
 // Add compound indexes for Actor
 actorSchema.index({ handle: 'text' })
 actorSchema.index({ did: 1 }, { unique: true })
-
-export interface ProcessedEventDocument extends Document {
-  rev: string
-  processedAt: Date
-}
-
-export const processedEventSchema = new Schema<ProcessedEventDocument>({
-  rev: { type: String, required: true, unique: true, index: true },
-  processedAt: { type: Date, default: Date.now },
-})
 
 export interface CursorStateDocument extends Document {
   identifier: string // To ensure a single document, e.g., 'last_processed_cursor'
@@ -400,6 +389,5 @@ export interface DatabaseModels {
   Look: Model<LookDocument>
   Generator: Model<GeneratorDocument>
   Actor: Model<ActorDocument>
-  ProcessedEvent: Model<ProcessedEventDocument>
   CursorState: Model<CursorStateDocument>
 }

@@ -27,6 +27,7 @@ export async function createJetstreamClient(
 
   let wsConnection: WebSocket | null = null
   let heartbeatInterval: Timer | null = null
+  let saveCursorInterval: Timer | null = null // Added for periodic cursor saving
 
   function connect(options: JetstreamClientOptions = {}): {
     close: () => void
@@ -40,13 +41,13 @@ export async function createJetstreamClient(
     }
 
     let url = filterCollections.reduce((acc, collection) => {
-      return `${acc}&wantedCollections=${collection}`
+      return `${acc}wantedCollections=${collection}&`
     }, `${env.JETSTREAM_URL}?`)
 
     if (cursorPosition) {
       // Subtract a few seconds (in microseconds) to ensure no gaps
       const rewindCursor = parseInt(cursorPosition.toString()) - 5000000 // 5 seconds in microseconds
-      url += `&cursor=${rewindCursor}`
+      url += `cursor=${rewindCursor}`
     }
 
     logger.info(`Connecting to Jetstream: ${url}`)
@@ -55,6 +56,8 @@ export async function createJetstreamClient(
 
     wsConnection.on('open', () => {
       logger.info('Connected to Jetstream')
+      // Start periodic cursor saving only after successful connection
+      startPeriodicCursorSave()
     })
 
     wsConnection.on('message', async (data) => {
@@ -69,10 +72,6 @@ export async function createJetstreamClient(
         // Process events
         await processEvent(event)
 
-        // Save cursor position after processing the event
-        if (cursorPosition) {
-          await db.saveCursorState(cursorPosition)
-        }
       } catch (error) {
         logger.error({ error }, 'Error parsing or processing message')
       }
@@ -100,6 +99,7 @@ export async function createJetstreamClient(
     return {
       close: () => {
         clearHeartbeatInterval()
+        clearSaveCursorInterval() // Clear cursor save interval on close/error
         if (wsConnection && wsConnection.readyState === WebSocket.OPEN) {
           wsConnection.close()
           wsConnection = null
@@ -115,8 +115,30 @@ export async function createJetstreamClient(
     }
   }
 
+  function clearSaveCursorInterval() {
+    if (saveCursorInterval) {
+      clearInterval(saveCursorInterval)
+      saveCursorInterval = null
+    }
+  }
+
+  function startPeriodicCursorSave() {
+    clearSaveCursorInterval() // Clear any existing interval first
+    saveCursorInterval = setInterval(async () => {
+      if (cursorPosition !== null) {
+        try {
+          await db.saveCursorState(cursorPosition)
+          logger.debug({ cursorPosition }, 'Periodically saved cursor state')
+        } catch (error) {
+          logger.error({ cursorPosition, error }, 'Failed to periodically save cursor state')
+        }
+      }
+    }, 30000) // Save every 30 seconds
+  }
+
   function handleReconnect(options: JetstreamClientOptions) {
     clearHeartbeatInterval()
+    clearSaveCursorInterval() // Clear cursor save interval before reconnecting
 
     if (wsConnection) {
       wsConnection = null
@@ -137,19 +159,6 @@ export async function createJetstreamClient(
     if (!rev) {
       logger.warn({ event }, 'Event commit is missing rev, cannot ensure idempotency. Skipping.')
       return
-    }
-
-    // Check if event has already been processed
-    try {
-      const alreadyProcessed = await db.hasProcessedEvent(rev)
-      if (alreadyProcessed) {
-        logger.info({ rev }, 'Event already processed, skipping.')
-        return
-      }
-    } catch (error) {
-      logger.error({ rev, error }, 'Error checking for processed event. Proceeding with caution.')
-      // Depending on desired behavior, you might want to return here or retry.
-      // For now, we proceed but log the error.
     }
 
     const { did, time_us } = event
@@ -188,15 +197,6 @@ export async function createJetstreamClient(
 
     // Process the normalized event
     await handleEvent(normalizedEvent, db)
-
-    // Record the event as processed
-    try {
-      await db.recordProcessedEvent(rev)
-    } catch (error) {
-      logger.error({ rev, error }, 'Error recording processed event after handling.')
-      // This is a critical error if the event was processed but not recorded,
-      // as it could lead to reprocessing. Consider further error handling or alerting.
-    }
   }
 
   return { connect }
