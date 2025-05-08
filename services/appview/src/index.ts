@@ -137,14 +137,14 @@ export class Server {
     app.route('/', resolveHandleRouter)
     app.route('/', wellKnownRouter())
 
-    app.use(expressToHono(lexServer.xrpc.router))
-
     // Root route
     app.get('/', (c) => {
       return c.text(
         '✧･ﾟ: ✧･ﾟ:. ݁₊ ⊹ . ݁˖ . ݁ SPARK API . ݁₊ ⊹ . ݁˖ . ݁ :･ﾟ✧:･ﾟ✧',
       )
     })
+
+    app.use(expressToHono(lexServer.xrpc.router))
 
     app.onError((err, c) => {
       if (err instanceof HTTPException) {
