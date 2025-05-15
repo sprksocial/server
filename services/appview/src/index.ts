@@ -7,7 +7,6 @@ import { logger } from 'hono/logger'
 import { pino } from 'pino'
 import { Database } from './data-plane/server/index.js'
 import { env } from './env.js'
-import { createFeedRouter } from './feed/feed.js'
 import { AuthVerifier, createAuthVerifier } from './auth/auth-verifier.js'
 import API from './api/index.js'
 import { createServer } from './lexicon/index.js'
@@ -108,8 +107,6 @@ export class Server {
 
     app.use('*', takedownFilterMiddleware)
 
-    // TODO: Remove this after getAuthorFeedRouter is properly implemented on frontend
-    const feedRouter = createFeedRouter(ctx)
     const lexServer = createServer()
     const server = API(lexServer, ctx)
 
@@ -124,7 +121,6 @@ export class Server {
     const getRecordRouter = createGetRecordRouter(ctx)
     const resolveHandleRouter = createResolveHandleRouter(ctx)
 
-    app.route('/', feedRouter)
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
     app.route('/', getProfileRouter)
