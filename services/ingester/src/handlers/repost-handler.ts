@@ -1,8 +1,9 @@
 import { pino } from 'pino'
 import { Database } from '../db/connection.js'
 import type { NormalizedEvent } from '../types/events.js'
+import { customConfig } from '../utils/logger-config.js'
 
-const logger = pino({ name: 'repost-handler' })
+const logger = pino(customConfig('repost-handler'))
 
 export async function handleRepostEvent(evt: NormalizedEvent, db: Database): Promise<void> {
   if (evt.collection !== 'so.sprk.feed.repost') {

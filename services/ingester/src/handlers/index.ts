@@ -13,8 +13,9 @@ import { handleLookEvent } from './look-handler.js'
 import { handleGeneratorEvent } from './generator-handler.js'
 import { handleActorReferences } from './actor-handler.js'
 import { handleAppBskyFollowEvent } from './bsky/follow-handler.js'
+import { customConfig } from '../utils/logger-config.js'
 
-const logger = pino({ name: 'event-handler' })
+const logger = pino(customConfig('event-handler'))
 
 export async function handleEvent(evt: NormalizedEvent, db: Database): Promise<void> {
   try {

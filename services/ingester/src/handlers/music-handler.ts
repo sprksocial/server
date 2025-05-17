@@ -1,8 +1,9 @@
 import { pino } from 'pino'
+import { customConfig } from '../utils/logger-config.js'
 import { Database } from '../db/connection.js'
 import type { NormalizedEvent } from '../types/events.js'
 
-const logger = pino({ name: 'music-handler' })
+const logger = pino(customConfig('music-handler'))
 
 export async function handleMusicEvent(evt: NormalizedEvent, db: Database): Promise<void> {
   if (evt.collection !== 'so.sprk.feed.music') {

@@ -1,8 +1,9 @@
 import { pino } from 'pino'
+import { customConfig } from '../utils/logger-config.js'
 import { Database } from '../db/connection.js'
 import type { NormalizedEvent } from '../types/events.js'
 
-const logger = pino({ name: 'look-handler' })
+const logger = pino(customConfig('look-handler'))
 
 export async function handleLookEvent(evt: NormalizedEvent, db: Database): Promise<void> {
   if (evt.collection !== 'so.sprk.feed.look') {

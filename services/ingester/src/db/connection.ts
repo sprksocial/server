@@ -17,11 +17,12 @@ import {
 } from './models.js'
 import { env } from '../utils/env.js'
 import { pino } from 'pino'
+import { customConfig } from '../utils/logger-config.js'
 
 export class Database {
   private connection: Connection
   public models: DatabaseModels
-  private logger = pino({ name: 'database' })
+  private logger = pino(customConfig('database'))
 
   constructor() {
     this.connection = mongoose.createConnection()

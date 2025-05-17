@@ -1,10 +1,10 @@
 import * as dotenv from 'dotenv'
-import { envBool, envInt, envList, envStr } from '@atproto/common'
+import { envInt, envStr } from '@atproto/common'
 
 dotenv.config()
 
 export const env = {
-  NODE_ENV: envStr('NODE_ENV') ?? 'test',
+  NODE_ENV: envStr('NODE_ENV') ?? 'development',
 
   JETSTREAM_URL:
     envStr('JETSTREAM_URL') ??

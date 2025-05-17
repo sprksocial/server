@@ -1,6 +1,5 @@
 import { pino } from 'pino'
-
-const logger = pino({ name: 'id-resolver' })
+import { customConfig } from './utils/logger-config.js'
 
 export interface DidDocument {
   did: string
@@ -11,7 +10,7 @@ export interface DidDocument {
  * Service to handle resolving DIDs to handles and vice versa
  */
 export class BidirectionalResolver {
-  private logger = pino({ name: 'id-resolver' })
+  private logger = pino(customConfig('id-resolver'))
 
   /**
    * Resolve a DID to its DID document
@@ -58,4 +57,4 @@ export class BidirectionalResolver {
       throw error
     }
   }
-} 
+}

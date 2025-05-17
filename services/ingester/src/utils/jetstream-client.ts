@@ -5,8 +5,9 @@ import type { JetstreamEvent, NormalizedEvent } from '../types/events.js'
 import { Database } from '../db/connection.js'
 import type { BidirectionalResolver } from './id-resolver.js'
 import { handleEvent } from '../handlers/index.js'
+import { customConfig } from './logger-config.js'
 
-const logger = pino({ name: 'jetstream-client' })
+const logger = pino(customConfig('jetstream-client'))
 
 export interface JetstreamClientOptions {
   filterCollections?: string[]

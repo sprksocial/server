@@ -1,20 +1,21 @@
 import { pino } from 'pino'
 import { Database } from '../db/connection.js'
+import { customConfig } from './logger-config.js'
 
-const logger = pino({ name: 'actor-utils' })
+const logger = pino(customConfig('actor-utils'))
 
 /**
  * Ensures that an actor exists for the given DID.
  * If the actor doesn't exist, it creates a new one.
- * 
+ *
  * @param did The DID to ensure has an actor
  * @param handle Optional handle associated with the DID
  * @param db Database connection
  * @returns The actor document, either existing or newly created
  */
 export async function ensureActor(
-  did: string, 
-  handle?: string, 
+  did: string,
+  handle?: string,
   db?: Database
 ): Promise<any> {
   if (!db) {
@@ -25,7 +26,7 @@ export async function ensureActor(
   try {
     // Try to find existing actor
     const existingActor = await db.models.Actor.findOne({ did })
-    
+
     if (existingActor) {
       // If handle is provided and different from existing, update it
       if (handle && existingActor.handle !== handle) {
@@ -39,7 +40,7 @@ export async function ensureActor(
     // Create new actor if none exists
     const now = new Date()
     const uri = `at://${did}/so.sprk.actor.profile`
-    
+
     const newActor = await db.models.Actor.create({
       uri,
       did,
@@ -62,7 +63,7 @@ export async function ensureActor(
 
 /**
  * Links a profile to an actor
- * 
+ *
  * @param did The DID of the actor
  * @param profileId The MongoDB ID of the profile
  * @param profileCid The CID of the profile
@@ -77,15 +78,15 @@ export async function linkProfileToActor(
   try {
     await db.models.Actor.findOneAndUpdate(
       { did },
-      { 
+      {
         profile: profileId,
         profileCid
       },
       { new: true }
     )
-    
+
     logger.info({ did, profileId }, 'Linked profile to actor')
   } catch (error) {
     logger.error({ error, did, profileId }, 'Failed to link profile to actor')
   }
-} 
+}

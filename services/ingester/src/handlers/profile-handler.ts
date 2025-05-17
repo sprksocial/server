@@ -1,10 +1,11 @@
 import { pino } from 'pino'
+import { customConfig } from '../utils/logger-config.js'
 import { Database } from '../db/connection.js'
 import type { NormalizedEvent } from '../types/events.js'
 import { ensureActor, linkProfileToActor } from '../utils/actor-utils.js'
 import type { ProfileDocument } from '../db/models.js'
 
-const logger = pino({ name: 'profile-handler' })
+const logger = pino(customConfig('profile-handler'))
 
 export async function handleProfileEvent(evt: NormalizedEvent, db: Database): Promise<void> {
   if (evt.collection !== 'so.sprk.actor.profile') {

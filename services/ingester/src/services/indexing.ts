@@ -1,14 +1,15 @@
 import { pino } from 'pino'
 import { Database } from '../db/connection.js'
 import { BidirectionalResolver } from '../id-resolver.js'
+import { customConfig } from '../utils/logger-config.js'
 
-const logger = pino({ name: 'indexing-service' })
+const logger = pino(customConfig('indexing-service'))
 
 /**
  * Service to handle indexing of actors and their handles
  */
 export class IndexingService {
-  private logger = pino({ name: 'indexing-service' })
+  private logger = pino(customConfig('indexing-service'))
 
   constructor(
     private db: Database,
@@ -17,17 +18,17 @@ export class IndexingService {
 
   /**
    * Index or update actor handle information
-   * 
+   *
    * @param did The DID of the actor
    * @param timestamp The timestamp of the operation
    * @param force Force reindexing even if recently indexed
    */
-  
+
   async indexHandle(did: string, timestamp: string, force = false): Promise<void> {
     try {
       // Find existing actor
       const actor = await this.db.models.Actor.findOne({ did })
-      
+
       // Skip if recently indexed and not forced
       if (!force && actor && this.isHandleRecentlyIndexed(actor, timestamp)) {
         return
@@ -35,7 +36,7 @@ export class IndexingService {
 
       // Resolve DID to handle
       const didDoc = await this.resolver.resolveDidToDidDoc(did)
-      
+
       // Verify handle ownership
       let handle: string | undefined = undefined
       if (didDoc.handle) {
@@ -58,8 +59,8 @@ export class IndexingService {
       // Update or create actor
       await this.db.models.Actor.updateOne(
         { did },
-        { 
-          $set: { 
+        {
+          $set: {
             handle,
             indexedAt: timestamp
           },
@@ -76,17 +77,17 @@ export class IndexingService {
    */
   private isHandleRecentlyIndexed(actor: any, timestamp: string): boolean {
     if (!actor.indexedAt) return false
-    
+
     const timeDiff = new Date(timestamp).getTime() - new Date(actor.indexedAt).getTime()
     const ONE_DAY = 24 * 60 * 60 * 1000
     const ONE_HOUR = 60 * 60 * 1000
-    
+
     // Reindex daily for all actors
     if (timeDiff > ONE_DAY) return false
-    
+
     // Reindex more frequently for actors without handles
     if (actor.handle === null && timeDiff > ONE_HOUR) return false
-    
+
     return true
   }
-} 
+}
