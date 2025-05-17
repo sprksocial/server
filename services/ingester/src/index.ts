@@ -32,7 +32,7 @@ async function main() {
   // Create and start Jetstream client
   const jetstreamClient = await createJetstreamClient(db, bidirectionalResolver)
   const connection = jetstreamClient.connect({
-    filterCollections: ['so.sprk.*'],
+    filterCollections: ['so.sprk.*', 'app.bsky.graph.follow'],
   })
 
   // Handle shutdown gracefully

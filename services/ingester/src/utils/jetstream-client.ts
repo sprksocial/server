@@ -171,17 +171,17 @@ export async function createJetstreamClient(
 
     // Resolve DID to handle if needed
     let handle = null
-    try {
-      if (did) {
-        const didData = await resolver.resolveDidToDidDoc(did)
-        handle = didData.handle
-      }
-    } catch (error) {
-      logger.warn(
-        { did, error: (error as Error).message },
-        'Failed to resolve DID to handle',
-      )
-    }
+    // try {
+    //   if (did) {
+    //     const didData = await resolver.resolveDidToDidDoc(did)
+    //     handle = didData.handle
+    //   }
+    // } catch (error) {
+    //   logger.warn(
+    //     { did, error: (error as Error).message },
+    //     'Failed to resolve DID to handle',
+    //   )
+    // }
 
     // Construct a normalized event object
     const normalizedEvent: NormalizedEvent = {

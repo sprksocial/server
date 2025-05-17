@@ -67,6 +67,26 @@ export const followSchema = new Schema<FollowDocument>({
   cid: { type: String, required: true },
 })
 
+export interface BskyFollowDocument extends Document {
+  uri: string
+  subject: string
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+  cid: string
+}
+
+export const bskyFollowSchema = new Schema<BskyFollowDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  subject: { type: String, required: true, index: true },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
+})
+
 export interface BlockDocument extends Document {
   uri: string
   subject: string
@@ -381,6 +401,7 @@ export interface DatabaseModels {
   Like: Model<LikeDocument>
   Post: Model<PostDocument>
   Follow: Model<FollowDocument>
+  BskyFollow: Model<BskyFollowDocument>
   Block: Model<BlockDocument>
   Profile: Model<ProfileDocument>
   Audio: Model<AudioDocument>
