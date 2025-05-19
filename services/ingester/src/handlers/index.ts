@@ -21,7 +21,7 @@ export async function handleEvent(evt: NormalizedEvent, db: Database): Promise<v
   try {
     // Skip actor reference handling for any app.bsky.* events
     if (evt.collection.startsWith('app.bsky.')) {
-      logger.debug(
+      logger.trace(
         { did: evt.did, collection: evt.collection },
         'Skipping actor reference handling for app.bsky event.'
       );

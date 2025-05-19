@@ -166,7 +166,7 @@ export async function createJetstreamClient(
     const { did, time_us } = event
     const { operation, collection, rkey, record } = event.commit
 
-    logger.debug(
+    logger.trace(
       `Processing ${operation} operation for DID: ${did}, collection: ${collection}, rkey: ${rkey}`,
     )
 
