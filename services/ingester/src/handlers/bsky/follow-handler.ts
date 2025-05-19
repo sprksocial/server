@@ -2,6 +2,7 @@ import { pino } from 'pino'
 import { customConfig } from '../../utils/logger-config.js'
 import { Database } from '../../db/connection.js'
 import type { NormalizedEvent } from '../../types/events.js'
+import { isActorInDatabase } from '../../utils/actor-cache.js'
 
 const logger = pino(customConfig('bsky-follow-handler'))
 
@@ -12,7 +13,8 @@ export async function handleAppBskyFollowEvent(
   if (evt.collection !== 'app.bsky.graph.follow') {
     return
   }
-  const actorExists = await db.models.Actor.findOne({ did: evt.did }).lean()
+
+  const actorExists = await isActorInDatabase(evt.did, db)
   if (!actorExists) {
     logger.debug(
       { did: evt.did, uri: evt.uri, collection: evt.collection },
