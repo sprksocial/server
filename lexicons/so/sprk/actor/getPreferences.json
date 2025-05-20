@@ -13,11 +13,10 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["preferences"],
           "properties": {
-            "preferences": {
-              "type": "ref",
-              "ref": "so.sprk.actor.defs#preferences"
+            "followMode": {
+              "type": "string",
+              "knownValues": ["bsky", "sprk"]
             }
           }
         }

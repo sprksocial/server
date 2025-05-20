@@ -85,7 +85,6 @@ import * as ComAtprotoTempAddReservedHandle from './types/com/atproto/temp/addRe
 import * as ComAtprotoTempCheckSignupQueue from './types/com/atproto/temp/checkSignupQueue.js'
 import * as ComAtprotoTempFetchLabels from './types/com/atproto/temp/fetchLabels.js'
 import * as ComAtprotoTempRequestPhoneVerification from './types/com/atproto/temp/requestPhoneVerification.js'
-import * as SoSprkActorGetFollowMode from './types/so/sprk/actor/getFollowMode.js'
 import * as SoSprkActorGetPreferences from './types/so/sprk/actor/getPreferences.js'
 import * as SoSprkActorGetProfile from './types/so/sprk/actor/getProfile.js'
 import * as SoSprkActorGetProfiles from './types/so/sprk/actor/getProfiles.js'
@@ -93,7 +92,6 @@ import * as SoSprkActorGetSuggestions from './types/so/sprk/actor/getSuggestions
 import * as SoSprkActorPutPreferences from './types/so/sprk/actor/putPreferences.js'
 import * as SoSprkActorSearchActors from './types/so/sprk/actor/searchActors.js'
 import * as SoSprkActorSearchActorsTypeahead from './types/so/sprk/actor/searchActorsTypeahead.js'
-import * as SoSprkActorSetFollowMode from './types/so/sprk/actor/setFollowMode.js'
 import * as SoSprkFeedDescribeFeedGenerator from './types/so/sprk/feed/describeFeedGenerator.js'
 import * as SoSprkFeedGetActorFeeds from './types/so/sprk/feed/getActorFeeds.js'
 import * as SoSprkFeedGetActorLikes from './types/so/sprk/feed/getActorLikes.js'
@@ -1191,17 +1189,6 @@ export class SoSprkActorNS {
     this._server = server
   }
 
-  getFollowMode<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      SoSprkActorGetFollowMode.Handler<ExtractAuth<AV>>,
-      SoSprkActorGetFollowMode.HandlerReqCtx<ExtractAuth<AV>>
-    >,
-  ) {
-    const nsid = 'so.sprk.actor.getFollowMode' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
   getPreferences<AV extends AuthVerifier>(
     cfg: ConfigOf<
       AV,
@@ -1276,17 +1263,6 @@ export class SoSprkActorNS {
     >,
   ) {
     const nsid = 'so.sprk.actor.searchActorsTypeahead' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
-  setFollowMode<AV extends AuthVerifier>(
-    cfg: ConfigOf<
-      AV,
-      SoSprkActorSetFollowMode.Handler<ExtractAuth<AV>>,
-      SoSprkActorSetFollowMode.HandlerReqCtx<ExtractAuth<AV>>
-    >,
-  ) {
-    const nsid = 'so.sprk.actor.setFollowMode' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
   }
 }

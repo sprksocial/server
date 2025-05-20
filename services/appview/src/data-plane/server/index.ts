@@ -455,6 +455,20 @@ export const actorSchema = new Schema<ActorDocument>({
 actorSchema.index({ handle: 'text' })
 actorSchema.index({ did: 1 }, { unique: true })
 
+export interface UserPreferenceDocument extends Document {
+  userDid: string
+  followMode: string
+  createdAt: string
+  updatedAt: string
+}
+
+export const userPreferenceSchema = new Schema<UserPreferenceDocument>({
+  userDid: { type: String, required: true, unique: true, index: true },
+  followMode: { type: String, required: true, enum: ['bsky', 'sprk'], default: 'sprk' },
+  createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+})
+
 export interface DatabaseModels {
   Like: Model<LikeDocument>
   Post: Model<PostDocument>
@@ -471,6 +485,7 @@ export interface DatabaseModels {
   RepoTakedown: Model<RepoTakedownDocument>
   BlobTakedown: Model<BlobTakedownDocument>
   Actor: Model<ActorDocument>
+  UserPreference: Model<UserPreferenceDocument>
 }
 
 export class Database implements DataPlaneClient {
@@ -516,6 +531,7 @@ export class Database implements DataPlaneClient {
         RepoTakedown: this.connection.model<RepoTakedownDocument>('RepoTakedown', repoTakedownSchema),
         BlobTakedown: this.connection.model<BlobTakedownDocument>('BlobTakedown', blobTakedownSchema),
         Actor: this.connection.model<ActorDocument>('Actor', actorSchema),
+        UserPreference: this.connection.model<UserPreferenceDocument>('UserPreference', userPreferenceSchema),
       }
 
       this.logger.info('Connected to MongoDB')

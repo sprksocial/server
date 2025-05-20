@@ -4742,33 +4742,6 @@ export const schemaDict = {
       },
     },
   },
-  SoSprkActorGetFollowMode: {
-    lexicon: 1,
-    id: 'so.sprk.actor.getFollowMode',
-    defs: {
-      main: {
-        type: 'query',
-        description: 'Get the current follow mode for the authenticated user.',
-        parameters: {
-          type: 'params',
-          properties: {},
-        },
-        output: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            required: ['mode'],
-            properties: {
-              mode: {
-                type: 'string',
-                knownValues: ['bsky', 'sprk'],
-              },
-            },
-          },
-        },
-      },
-    },
-  },
   SoSprkActorGetPreferences: {
     lexicon: 1,
     id: 'so.sprk.actor.getPreferences',
@@ -4785,11 +4758,10 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['preferences'],
             properties: {
-              preferences: {
-                type: 'ref',
-                ref: 'lex:so.sprk.actor.defs#preferences',
+              followMode: {
+                type: 'string',
+                knownValues: ['bsky', 'sprk'],
               },
             },
           },
@@ -4985,11 +4957,10 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['preferences'],
             properties: {
-              preferences: {
-                type: 'ref',
-                ref: 'lex:so.sprk.actor.defs#preferences',
+              followMode: {
+                type: 'string',
+                knownValues: ['bsky', 'sprk'],
               },
             },
           },
@@ -5081,29 +5052,6 @@ export const schemaDict = {
                   type: 'ref',
                   ref: 'lex:so.sprk.actor.defs#profileViewBasic',
                 },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  SoSprkActorSetFollowMode: {
-    lexicon: 1,
-    id: 'so.sprk.actor.setFollowMode',
-    defs: {
-      main: {
-        type: 'procedure',
-        description: 'Set the follow mode for the account.',
-        input: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            required: ['mode'],
-            properties: {
-              mode: {
-                type: 'string',
-                knownValues: ['bsky', 'sprk'],
               },
             },
           },
@@ -10757,7 +10705,6 @@ export const ids = {
   ComAtprotoTempRequestPhoneVerification:
     'com.atproto.temp.requestPhoneVerification',
   SoSprkActorDefs: 'so.sprk.actor.defs',
-  SoSprkActorGetFollowMode: 'so.sprk.actor.getFollowMode',
   SoSprkActorGetPreferences: 'so.sprk.actor.getPreferences',
   SoSprkActorGetProfile: 'so.sprk.actor.getProfile',
   SoSprkActorGetProfiles: 'so.sprk.actor.getProfiles',
@@ -10766,7 +10713,6 @@ export const ids = {
   SoSprkActorPutPreferences: 'so.sprk.actor.putPreferences',
   SoSprkActorSearchActors: 'so.sprk.actor.searchActors',
   SoSprkActorSearchActorsTypeahead: 'so.sprk.actor.searchActorsTypeahead',
-  SoSprkActorSetFollowMode: 'so.sprk.actor.setFollowMode',
   SoSprkEmbedDefs: 'so.sprk.embed.defs',
   SoSprkEmbedImages: 'so.sprk.embed.images',
   SoSprkEmbedVideo: 'so.sprk.embed.video',

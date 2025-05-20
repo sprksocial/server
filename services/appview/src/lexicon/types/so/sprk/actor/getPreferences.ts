@@ -7,7 +7,6 @@ import { CID } from 'multiformats/cid'
 import { validate as _validate } from '../../../../lexicons'
 import { $Typed, is$typed as _is$typed, OmitKey } from '../../../../util'
 import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
-import type * as SoSprkActorDefs from './defs.js'
 
 const is$typed = _is$typed,
   validate = _validate
@@ -18,7 +17,7 @@ export interface QueryParams {}
 export type InputSchema = undefined
 
 export interface OutputSchema {
-  preferences: SoSprkActorDefs.Preferences
+  followMode?: 'bsky' | 'sprk' | (string & {})
 }
 
 export type HandlerInput = undefined
