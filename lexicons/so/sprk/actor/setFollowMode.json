@@ -1,0 +1,23 @@
+{
+  "lexicon": 1,
+  "id": "so.sprk.actor.setFollowMode",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Set the follow mode for the authenticated user.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["mode"],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "knownValues": ["bsky", "sprk"]
+            }
+          }
+        }
+      }
+    }
+  }
+}

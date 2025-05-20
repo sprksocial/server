@@ -1,0 +1,27 @@
+{
+  "lexicon": 1,
+  "id": "so.sprk.actor.getFollowMode",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the current follow mode for the authenticated user.",
+      "parameters": {
+        "type": "params",
+        "properties": {}
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["mode"],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "knownValues": ["bsky", "sprk"]
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -16,7 +16,7 @@ export async function handleAppBskyFollowEvent(
 
   const actorExists = await isActorInDatabase(evt.did, db)
   if (!actorExists) {
-    logger.debug(
+    logger.trace(
       { did: evt.did, uri: evt.uri, collection: evt.collection },
       'Author of follow not found in Actor table. Skipping follow ingestion for app.bsky.graph.follow event.',
     )

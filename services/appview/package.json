@@ -3,7 +3,7 @@
   "version": "1.0.50",
   "packageManager": "pnpm@8.6.11",
   "scripts": {
-    "codegen": "lex gen-server --yes ./src/lexicon ../../lexicons/com/atproto/*/* ../../lexicons/so/sprk/*/*",
+    "codegen": "lex gen-server --yes ./src/lexicon ../../lexicons/com/atproto/*/* ../../lexicons/so/sprk/*/* ../../lexicons/app/bsky/actor/defs.json",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
