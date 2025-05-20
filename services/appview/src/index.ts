@@ -23,8 +23,6 @@ import { createGetPostsRouter } from './api/so/sprk/feed/getPosts.js'
 import { createGetPostThreadRouter } from './api/so/sprk/feed/getPostThread.js'
 import { createGetFollowersRouter } from './api/so/sprk/graph/getFollowers.js'
 import { createGetFollowsRouter } from './api/so/sprk/graph/getFollows.js'
-import { createBskyGetFollowsRouter } from './api/app/bsky/graph/getFollows.js'
-import { createBskyGetFollowersRouter } from './api/app/bsky/graph/getFollowers.js'
 import { createTakedownRouter } from './api/admin/takedowns.js'
 import { createGetRecordRouter } from './api/com/atproto/repo/getRecord.js'
 import { createResolveHandleRouter } from './api/com/atproto/identity/resolveHandle.js'
@@ -127,10 +125,6 @@ export class Server {
     const putPreferencesRouter = createPutPreferencesRouter(ctx)
     const getPreferencesRouter = createGetPreferencesRouter(ctx)
 
-    // Bsky Routers
-    const bskyGetFollowsRouter = createBskyGetFollowsRouter(ctx)
-    const bskyGetFollowersRouter = createBskyGetFollowersRouter(ctx)
-
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
     app.route('/', getProfileRouter)
@@ -144,9 +138,6 @@ export class Server {
     app.route('/', putPreferencesRouter)
     app.route('/', getPreferencesRouter)
     app.route('/', wellKnownRouter())
-
-    app.route('/', bskyGetFollowsRouter)
-    app.route('/', bskyGetFollowersRouter)
 
     // Root route
     app.get('/', (c) => {
