@@ -444,7 +444,7 @@ export interface ActorDocument extends Document {
 }
 
 export const actorSchema = new Schema<ActorDocument>({
-  did: { type: String, required: true, index: true },
+  did: { type: String, required: true },
   handle: { type: String, required: false, index: true },
   indexedAt: { type: String, required: true },
   takedownRef: { type: String, required: false },
@@ -508,7 +508,7 @@ export class Database implements DataPlaneClient {
     )
 
     try {
-      this.connection = await mongoose.createConnection(uri, {
+      this.connection = mongoose.createConnection(uri, {
         autoIndex: true,
         autoCreate: true,
         dbName: DB_NAME,
