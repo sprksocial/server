@@ -39,7 +39,7 @@ export const createGetProfileRouter = (ctx: AppContext) => {
       const now = new Date().toISOString()
 
       await ctx.indexingService.indexHandle(actorDid, now)
-      
+
       // First check if actor exists and has profile
       let actorDoc = await ctx.db.models.Actor.findOne({
         did: actorDid,
@@ -51,9 +51,12 @@ export const createGetProfileRouter = (ctx: AppContext) => {
 
       if (!actorDoc) {
         try {
-          ctx.logger.info({ did: actorDid }, 'No profile found, attempting to index')
+          ctx.logger.info(
+            { did: actorDid },
+            'No profile found, attempting to index',
+          )
           await ctx.indexingService.indexHandle(actorDid, now, true)
-          
+
           // Refetch after indexing
           actorDoc = await ctx.db.models.Actor.findOne({
             did: actorDid,
@@ -72,47 +75,49 @@ export const createGetProfileRouter = (ctx: AppContext) => {
       }
 
       // Use actor's handle if available, otherwise resolve from DID
-      const handle = actorDoc.handle || await ctx.resolver.resolveDidToHandle(actorDid)
+      const handle =
+        actorDoc.handle || (await ctx.resolver.resolveDidToHandle(actorDid))
 
       // Build viewer state if a user is authenticated
       const viewer: SoSprkActorDefs.ViewerState = {}
 
       if (viewerDid) {
+        // Determine follow mode from user preference
+        const userPref = await ctx.db.models.UserPreference.findOne({
+          userDid: viewerDid,
+        })
+        const followMode = userPref?.followMode || 'sprk'
+        const FollowModel =
+          followMode === 'bsky'
+            ? ctx.db.models.BskyFollow
+            : ctx.db.models.Follow
+
         // Check if viewer follows this profile
-        const follow = await ctx.db.models.Follow.findOne({
+        const follow = await FollowModel.findOne({
           subject: actorDid,
           authorDid: viewerDid,
         })
-        if (follow) {
-          viewer.following = follow.uri
-        }
+        if (follow) viewer.following = follow.uri
 
         // Check if this profile follows the viewer
-        const followedBy = await ctx.db.models.Follow.findOne({
+        const followedBy = await FollowModel.findOne({
           subject: viewerDid,
           authorDid: actorDid,
         })
-        if (followedBy) {
-          viewer.followedBy = followedBy.uri
-        }
+        if (followedBy) viewer.followedBy = followedBy.uri
 
-        // Check if viewer has blocked this profile
+        // Check block relationships
         const block = await ctx.db.models.Block.findOne({
           subject: actorDid,
           authorDid: viewerDid,
         })
-        if (block) {
-          viewer.blocking = block.uri
-        }
+        if (block) viewer.blocking = block.uri
 
-        // Check if this profile has blocked the viewer
         const blockedBy = await ctx.db.models.Block.findOne({
           subject: viewerDid,
           authorDid: actorDid,
         })
-        if (blockedBy) {
-          viewer.blockedBy = true
-        }
+        if (blockedBy) viewer.blockedBy = true
       }
 
       // Check for associated services
@@ -157,10 +162,25 @@ export const createGetProfileRouter = (ctx: AppContext) => {
           profile.pinnedPost as unknown as ComAtprotoRepoStrongRef.Main
       }
 
-      const followersCount = await ctx.db.models.Follow.countDocuments({
-        subject: actorDid,
+      // Determine follow-mode-based counting for this actor
+      const actorPref = await ctx.db.models.UserPreference.findOne({
+        userDid: actorDid,
       })
-      const followsCount = await ctx.db.models.Follow.countDocuments({
+      const FollowCountModel =
+        actorPref?.followMode === 'bsky'
+          ? ctx.db.models.BskyFollow
+          : ctx.db.models.Follow
+
+      // Count unique followers across both Sprk and Bsky follow tables
+      const [sprkFollowerIds, bskyFollowerIds] = await Promise.all([
+        ctx.db.models.Follow.distinct('authorDid', { subject: actorDid }),
+        ctx.db.models.BskyFollow.distinct('authorDid', { subject: actorDid }),
+      ])
+      const followersCount = new Set([
+        ...sprkFollowerIds,
+        ...bskyFollowerIds,
+      ]).size
+      const followsCount = await FollowCountModel.countDocuments({
         authorDid: actorDid,
       })
       const postsCount = await ctx.db.models.Post.countDocuments({
