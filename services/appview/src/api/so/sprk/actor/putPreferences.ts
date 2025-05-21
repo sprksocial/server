@@ -23,6 +23,7 @@ export const createPutPreferencesRouter = (ctx: AppContext) => {
       try {
         const now = new Date().toISOString()
         let userPref = await ctx.db.models.UserPreference.findOne({ userDid })
+        const oldMode = userPref?.followMode
 
         if (!userPref) {
           userPref = await ctx.db.models.UserPreference.create({
@@ -37,6 +38,14 @@ export const createPutPreferencesRouter = (ctx: AppContext) => {
           }
           userPref.updatedAt = now
           await userPref.save()
+        }
+
+        // Queue indexing of Bsky follows if switched to bsky mode
+        const indexingService = c.get('indexingService')
+        if (body.followMode === 'bsky' && oldMode !== 'bsky') {
+          indexingService.indexBSkyFollows(userDid).catch(error =>
+            ctx.logger.error({ error, userDid }, 'Failed to index bsky follows'),
+          )
         }
 
         // Respond with all current preferences, including the updated followMode
