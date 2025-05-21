@@ -14,10 +14,11 @@ import { handleGeneratorEvent } from './generator-handler.js'
 import { handleActorReferences } from './actor-handler.js'
 import { handleAppBskyFollowEvent } from './bsky/follow-handler.js'
 import { customConfig } from '../utils/logger-config.js'
+import type { BidirectionalResolver } from '../utils/id-resolver.js'
 
 const logger = pino(customConfig('event-handler'))
 
-export async function handleEvent(evt: NormalizedEvent, db: Database): Promise<void> {
+export async function handleEvent(evt: NormalizedEvent, db: Database, resolver: BidirectionalResolver): Promise<void> {
   try {
     // Skip actor reference handling for any app.bsky.* events
     if (evt.collection.startsWith('app.bsky.')) {
@@ -26,7 +27,7 @@ export async function handleEvent(evt: NormalizedEvent, db: Database): Promise<v
         'Skipping actor reference handling for app.bsky event.'
       );
     } else {
-      await handleActorReferences(evt, db)
+      await handleActorReferences(evt, db, resolver)
     }
 
     // Then handle different events based on collection

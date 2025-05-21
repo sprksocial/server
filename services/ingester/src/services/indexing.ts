@@ -1,6 +1,6 @@
 import { pino } from 'pino'
 import { Database } from '../db/connection.js'
-import { BidirectionalResolver } from '../id-resolver.js'
+import type { BidirectionalResolver } from '../utils/id-resolver.js'
 import { customConfig } from '../utils/logger-config.js'
 
 const logger = pino(customConfig('indexing-service'))

@@ -2,7 +2,7 @@ import { pino } from 'pino'
 import { Database } from '../db/connection.js'
 import type { NormalizedEvent } from '../types/events.js'
 import { IndexingService } from '../services/indexing.js'
-import { BidirectionalResolver } from '../id-resolver.js'
+import type { BidirectionalResolver } from '../utils/id-resolver.js'
 import { ensureActor } from '../utils/actor-utils.js'
 import { customConfig } from '../utils/logger-config.js'
 
@@ -14,16 +14,28 @@ const logger = pino(customConfig('actor-handler'))
  *
  * @param evt The normalized event to process
  * @param db Database connection
+ * @param resolver Bidirectional resolver
  */
-export async function handleActorReferences(evt: NormalizedEvent, db: Database): Promise<void> {
+export async function handleActorReferences(evt: NormalizedEvent, db: Database, resolver: BidirectionalResolver): Promise<void> {
   try {
     const now = new Date().toISOString()
-    const resolver = new BidirectionalResolver()
     const indexingService = new IndexingService(db, resolver)
 
     // Always ensure the author DID has an actor
     if (evt.did) {
       await indexingService.indexHandle(evt.did, now)
+      // Resolve and update the handle on the event object
+      try {
+        const didData = await resolver.resolveDidToDidDoc(evt.did)
+        evt.handle = didData.handle ?? null
+      } catch (error) {
+        logger.warn(
+          { did: evt.did, error: (error as Error).message },
+          'Failed to resolve DID to handle after indexing for event update',
+        )
+        // Ensure evt.handle is null if resolution fails
+        evt.handle = null
+      }
     }
 
     // Handle subject DIDs for follow, block, like events
