@@ -183,39 +183,68 @@ export class IndexingService {
    * @param did The DID of the user to index follows for
    */
   async indexBSkyFollows(did: string): Promise<void> {
-    const timestamp = new Date().toISOString()
-    // Resolve the user's PDS endpoint from their DID document
-    const didData = await this.resolver.resolveDidToDidDoc(did)
-    const agent = new Agent(new URL(didData.pds))
-    // Debug: starting follow indexing
-    this.logger.debug({ did, pds: didData.pds }, 'Starting indexBSkyFollows')
-    const collection = 'app.bsky.graph.follow'
-    let cursor: string | undefined = undefined
-    do {
-      this.logger.debug({ cursor }, 'Listing bsky follow records')
-      const res = await agent.com.atproto.repo.listRecords({
-        repo: did,
-        collection,
-        limit: 100,
-        cursor,
-      })
-      const { records, cursor: nextCursor } = res.data
-      this.logger.debug(
-        { count: records.length, nextCursor },
-        'Fetched bsky follow records page',
-      )
-      for (const rec of records) {
-        this.logger.debug(
-          { uri: rec.uri, cid: rec.cid },
-          'Indexing bsky follow record',
-        )
+    try {
+      const timestamp = new Date().toISOString()
 
-        const uri = new AtUri(rec.uri)
-        const cid = CID.parse(rec.cid)
-        await this.indexRecord(uri, cid, rec.value, 'create', timestamp)
+      // Resolve the user's PDS endpoint from their DID document
+      const didData = await this.resolver.resolveDidToDidDoc(did)
+
+      // Validate that PDS endpoint exists and is a valid URL
+      if (!didData.pds) {
+        this.logger.warn({ did }, 'No PDS endpoint found in DID document')
+        return
       }
-      cursor = nextCursor
-    } while (cursor)
+
+      let pdsUrl: URL
+      try {
+        pdsUrl = new URL(didData.pds)
+      } catch (urlError) {
+        this.logger.error(
+          { did, pds: didData.pds, error: urlError },
+          'Invalid PDS URL in DID document'
+        )
+        return
+      }
+
+      const agent = new Agent(pdsUrl)
+
+      // Debug: starting follow indexing
+      this.logger.debug({ did, pds: didData.pds }, 'Starting indexBSkyFollows')
+
+      const collection = 'app.bsky.graph.follow'
+      let cursor: string | undefined = undefined
+
+      do {
+        this.logger.debug({ cursor }, 'Listing bsky follow records')
+        const res = await agent.com.atproto.repo.listRecords({
+          repo: did,
+          collection,
+          limit: 100,
+          cursor,
+        })
+        const { records, cursor: nextCursor } = res.data
+        this.logger.debug(
+          { count: records.length, nextCursor },
+          'Fetched bsky follow records page',
+        )
+        for (const rec of records) {
+          this.logger.debug(
+            { uri: rec.uri, cid: rec.cid },
+            'Indexing bsky follow record',
+          )
+
+          const uri = new AtUri(rec.uri)
+          const cid = CID.parse(rec.cid)
+          await this.indexRecord(uri, cid, rec.value, 'create', timestamp)
+        }
+        cursor = nextCursor
+      } while (cursor)
+    } catch (error) {
+      this.logger.error(
+        { error, did },
+        'Error indexing BSky follows'
+      )
+    }
   }
 
   /**

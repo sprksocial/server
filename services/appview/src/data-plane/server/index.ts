@@ -316,13 +316,15 @@ export const postSchema = new Schema<PostDocument>({
   cid: { type: String, required: true },
 })
 
-// Add compound indexes for more efficient queries
+// Compound indexes for more efficient queries
 postSchema.index({ authorDid: 1, createdAt: -1 })
 postSchema.index({ tags: 1, createdAt: -1 })
 
-// Add compound indexes for new schemas
 followSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
 followSchema.index({ subject: 1, createdAt: -1 })
+
+bskyFollowSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
+bskyFollowSchema.index({ subject: 1, createdAt: -1 })
 
 blockSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
 blockSchema.index({ subject: 1, createdAt: -1 })

@@ -12,6 +12,13 @@ let cacheRefreshInProgress = false
 let refreshPromise: Promise<Set<string>> | null = null
 
 /**
+ * Queries the database directly to check if an actor with the given DID exists
+ */
+async function queryActorDirectly(did: string, db: Database): Promise<boolean> {
+  return !!(await db.models.Actor.findOne({ did }).lean())
+}
+
+/**
  * Checks if an actor with the given DID exists in the database using cache for optimization
  */
 export async function isActorInDatabase(did: string, db: Database): Promise<boolean> {
@@ -28,7 +35,7 @@ export async function isActorInDatabase(did: string, db: Database): Promise<bool
       return refreshedActors.has(did)
     } catch (error) {
       logger.warn({ error, did }, 'Shared cache refresh failed, falling back to direct query')
-      return !!(await db.models.Actor.findOne({ did }).lean())
+      return queryActorDirectly(did, db)
     }
   }
 
@@ -41,7 +48,7 @@ export async function isActorInDatabase(did: string, db: Database): Promise<bool
     return refreshedActors.has(did)
   } catch (error) {
     logger.warn({ error, did }, 'Cache refresh failed, falling back to direct query')
-    return !!(await db.models.Actor.findOne({ did }).lean())
+    return queryActorDirectly(did, db)
   } finally {
     cacheRefreshInProgress = false
     refreshPromise = null
