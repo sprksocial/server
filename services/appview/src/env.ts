@@ -13,6 +13,7 @@ export const env = {
   MOD_SERVICE_DID: envStr('MOD_SERVICE_DID') ?? 'did:web:localhost',
   ADMIN_PASSWORD: envStr('ADMIN_PASSWORD') ?? 'admin-token',
 
+  DB_URI: envStr('DB_URI'),
   DB_NAME: envStr('DB_NAME') ?? 'dev',
   DB_HOST: envStr('DB_HOST') ?? 'localhost',
   DB_PORT: envInt('DB_PORT') ?? 27017,
