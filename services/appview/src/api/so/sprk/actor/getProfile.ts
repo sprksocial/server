@@ -6,7 +6,6 @@ import { AppContext } from '../../../../index.js'
 import type { Label } from '../../../../lexicon/types/com/atproto/label/defs.js'
 import type * as ComAtprotoRepoStrongRef from '../../../../lexicon/types/com/atproto/repo/strongRef.js'
 import type * as SoSprkActorDefs from '../../../../lexicon/types/so/sprk/actor/defs.js'
-import type * as SoSprkGraphDefs from '../../../../lexicon/types/so/sprk/graph/defs.js'
 
 export const createGetProfileRouter = (ctx: AppContext) => {
   const router = new Hono()
@@ -78,29 +77,41 @@ export const createGetProfileRouter = (ctx: AppContext) => {
       const handle =
         actorDoc.handle || (await ctx.resolver.resolveDidToHandle(actorDid))
 
+      // Get actor's preference for follow mode (used for both viewer state and counting)
+      const actorPref = await ctx.db.models.UserPreference.findOne({
+        userDid: actorDid,
+      })
+      const actorFollowMode = actorPref?.followMode || 'sprk'
+
       // Build viewer state if a user is authenticated
       const viewer: SoSprkActorDefs.ViewerState = {}
 
       if (viewerDid) {
-        // Determine follow mode from user preference
-        const userPref = await ctx.db.models.UserPreference.findOne({
+        // Determine follow mode from viewer's preference for checking if viewer follows profile
+        const viewerPref = await ctx.db.models.UserPreference.findOne({
           userDid: viewerDid,
         })
-        const followMode = userPref?.followMode || 'sprk'
-        const FollowModel =
-          followMode === 'bsky'
+        const viewerFollowMode = viewerPref?.followMode || 'sprk'
+        const ViewerFollowModel =
+          viewerFollowMode === 'bsky'
             ? ctx.db.models.BskyFollow
             : ctx.db.models.Follow
 
-        // Check if viewer follows this profile
-        const follow = await FollowModel.findOne({
+        // Use profile owner's follow mode for checking if profile follows viewer
+        const ActorFollowModel =
+          actorFollowMode === 'bsky'
+            ? ctx.db.models.BskyFollow
+            : ctx.db.models.Follow
+
+        // Check if viewer follows this profile (use viewer's follow mode)
+        const follow = await ViewerFollowModel.findOne({
           subject: actorDid,
           authorDid: viewerDid,
         })
         if (follow) viewer.following = follow.uri
 
-        // Check if this profile follows the viewer
-        const followedBy = await FollowModel.findOne({
+        // Check if this profile follows the viewer (use profile owner's follow mode)
+        const followedBy = await ActorFollowModel.findOne({
           subject: viewerDid,
           authorDid: actorDid,
         })
@@ -163,23 +174,23 @@ export const createGetProfileRouter = (ctx: AppContext) => {
       }
 
       // Determine follow-mode-based counting for this actor
-      const actorPref = await ctx.db.models.UserPreference.findOne({
-        userDid: actorDid,
-      })
       const FollowCountModel =
-        actorPref?.followMode === 'bsky'
+        actorFollowMode === 'bsky'
           ? ctx.db.models.BskyFollow
           : ctx.db.models.Follow
 
-      // Count unique followers across both Sprk and Bsky follow tables
-      const [sprkFollowerIds, bskyFollowerIds] = await Promise.all([
-        ctx.db.models.Follow.distinct('authorDid', { subject: actorDid }),
-        ctx.db.models.BskyFollow.distinct('authorDid', { subject: actorDid }),
-      ])
-      const followersCount = new Set([
-        ...sprkFollowerIds,
-        ...bskyFollowerIds,
-      ]).size
+      // Count unique followers across both Sprk and Bsky follow tables using aggregation
+      const followersCount = await ctx.db.models.Follow.aggregate([
+        { $match: { subject: actorDid } },
+        {
+          $unionWith: {
+            coll: 'bskyfollows',
+            pipeline: [{ $match: { subject: actorDid } }],
+          },
+        },
+        { $group: { _id: '$authorDid' } },
+        { $count: 'total' },
+      ]).then((result) => result[0]?.total || 0)
       const followsCount = await FollowCountModel.countDocuments({
         authorDid: actorDid,
       })
