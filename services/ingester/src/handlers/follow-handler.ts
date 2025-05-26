@@ -45,7 +45,8 @@ async function handleCreateOrUpdate(evt: NormalizedEvent, db: Database): Promise
       authorHandle: evt.handle || 'unknown',
       createdAt: record.createdAt,
       indexedAt: now.toISOString(),
-      cid: evt.commit.cid
+      cid: evt.commit.cid,
+      type: 'sprk' as const,
     }
 
     await db.models.Follow.findOneAndUpdate(

@@ -55,6 +55,7 @@ export interface FollowDocument extends Document {
   createdAt: string
   indexedAt: string
   cid: string
+  type: 'sprk' | 'bsky'
 }
 
 export const followSchema = new Schema<FollowDocument>({
@@ -65,26 +66,7 @@ export const followSchema = new Schema<FollowDocument>({
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
-})
-
-export interface BskyFollowDocument extends Document {
-  uri: string
-  subject: string
-  authorDid: string
-  authorHandle: string
-  createdAt: string
-  indexedAt: string
-  cid: string
-}
-
-export const bskyFollowSchema = new Schema<BskyFollowDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
-  subject: { type: String, required: true, index: true },
-  authorDid: { type: String, required: true, index: true },
-  authorHandle: { type: String, required: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-  cid: { type: String, required: true },
+  type: { type: String, required: true, enum: ['sprk', 'bsky'], index: true, default: 'sprk' },
 })
 
 export interface BlockDocument extends Document {
@@ -312,8 +294,9 @@ postSchema.index({ authorDid: 1, createdAt: -1 })
 postSchema.index({ tags: 1, createdAt: -1 })
 
 // Add compound indexes for new schemas
-followSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
+followSchema.index({ authorDid: 1, subject: 1, type: 1 }, { unique: true })
 followSchema.index({ subject: 1, createdAt: -1 })
+followSchema.index({ type: 1, createdAt: -1 })
 
 blockSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
 blockSchema.index({ subject: 1, createdAt: -1 })
@@ -401,7 +384,6 @@ export interface DatabaseModels {
   Like: Model<LikeDocument>
   Post: Model<PostDocument>
   Follow: Model<FollowDocument>
-  BskyFollow: Model<BskyFollowDocument>
   Block: Model<BlockDocument>
   Profile: Model<ProfileDocument>
   Audio: Model<AudioDocument>

@@ -65,9 +65,10 @@ async function handleCreateOrUpdate(
       createdAt: record.createdAt,
       indexedAt: now.toISOString(),
       cid: evt.commit.cid,
+      type: 'bsky' as const,
     }
 
-    await db.models.BskyFollow.findOneAndUpdate({ uri: evt.uri }, followData, {
+    await db.models.Follow.findOneAndUpdate({ uri: evt.uri }, followData, {
       upsert: true,
       new: true,
     })
@@ -80,7 +81,7 @@ async function handleCreateOrUpdate(
 
 async function handleDelete(evt: NormalizedEvent, db: Database): Promise<void> {
   try {
-    const result = await db.models.BskyFollow.deleteOne({ uri: evt.uri })
+    const result = await db.models.Follow.deleteOne({ uri: evt.uri })
 
     if (result.deletedCount > 0) {
       logger.info({ uri: evt.uri }, 'Successfully removed follow from database')

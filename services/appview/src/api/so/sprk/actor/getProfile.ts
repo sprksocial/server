@@ -92,28 +92,20 @@ export const createGetProfileRouter = (ctx: AppContext) => {
           userDid: viewerDid,
         })
         const viewerFollowMode = viewerPref?.followMode || 'sprk'
-        const ViewerFollowModel =
-          viewerFollowMode === 'bsky'
-            ? ctx.db.models.BskyFollow
-            : ctx.db.models.Follow
-
-        // Use profile owner's follow mode for checking if profile follows viewer
-        const ActorFollowModel =
-          actorFollowMode === 'bsky'
-            ? ctx.db.models.BskyFollow
-            : ctx.db.models.Follow
 
         // Check if viewer follows this profile (use viewer's follow mode)
-        const follow = await ViewerFollowModel.findOne({
+        const follow = await ctx.db.models.Follow.findOne({
           subject: actorDid,
           authorDid: viewerDid,
+          type: viewerFollowMode,
         })
         if (follow) viewer.following = follow.uri
 
         // Check if this profile follows the viewer (use profile owner's follow mode)
-        const followedBy = await ActorFollowModel.findOne({
+        const followedBy = await ctx.db.models.Follow.findOne({
           subject: viewerDid,
           authorDid: actorDid,
+          type: actorFollowMode,
         })
         if (followedBy) viewer.followedBy = followedBy.uri
 
@@ -173,26 +165,17 @@ export const createGetProfileRouter = (ctx: AppContext) => {
           profile.pinnedPost as unknown as ComAtprotoRepoStrongRef.Main
       }
 
-      // Determine follow-mode-based counting for this actor
-      const FollowCountModel =
-        actorFollowMode === 'bsky'
-          ? ctx.db.models.BskyFollow
-          : ctx.db.models.Follow
-
-      // Count unique followers across both Sprk and Bsky follow tables using aggregation
+      // Count unique followers across both Sprk and Bsky follow types
       const followersCount = await ctx.db.models.Follow.aggregate([
         { $match: { subject: actorDid } },
-        {
-          $unionWith: {
-            coll: 'bskyfollows',
-            pipeline: [{ $match: { subject: actorDid } }],
-          },
-        },
         { $group: { _id: '$authorDid' } },
         { $count: 'total' },
       ]).then((result) => result[0]?.total || 0)
-      const followsCount = await FollowCountModel.countDocuments({
+
+      // Count follows based on actor's follow mode preference
+      const followsCount = await ctx.db.models.Follow.countDocuments({
         authorDid: actorDid,
+        type: actorFollowMode,
       })
       const postsCount = await ctx.db.models.Post.countDocuments({
         authorDid: actorDid,

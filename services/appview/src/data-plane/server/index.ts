@@ -59,6 +59,7 @@ export interface FollowDocument extends Document {
   createdAt: string
   indexedAt: string
   cid: string
+  type: 'sprk' | 'bsky'
 }
 
 export const followSchema = new Schema<FollowDocument>({
@@ -69,26 +70,7 @@ export const followSchema = new Schema<FollowDocument>({
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
-})
-
-export interface BskyFollowDocument extends Document {
-  uri: string
-  subject: string
-  authorDid: string
-  authorHandle: string
-  createdAt: string
-  indexedAt: string
-  cid: string
-}
-
-export const bskyFollowSchema = new Schema<BskyFollowDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
-  subject: { type: String, required: true, index: true },
-  authorDid: { type: String, required: true, index: true },
-  authorHandle: { type: String, required: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-  cid: { type: String, required: true },
+  type: { type: String, required: true, enum: ['sprk', 'bsky'], index: true, default: 'sprk' },
 })
 
 export interface BlockDocument extends Document {
@@ -320,11 +302,9 @@ export const postSchema = new Schema<PostDocument>({
 postSchema.index({ authorDid: 1, createdAt: -1 })
 postSchema.index({ tags: 1, createdAt: -1 })
 
-followSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
+followSchema.index({ authorDid: 1, subject: 1, type: 1 }, { unique: true })
 followSchema.index({ subject: 1, createdAt: -1 })
-
-bskyFollowSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
-bskyFollowSchema.index({ subject: 1, createdAt: -1 })
+followSchema.index({ type: 1, createdAt: -1 })
 
 blockSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
 blockSchema.index({ subject: 1, createdAt: -1 })
@@ -475,7 +455,6 @@ export interface DatabaseModels {
   Like: Model<LikeDocument>
   Post: Model<PostDocument>
   Follow: Model<FollowDocument>
-  BskyFollow: Model<BskyFollowDocument>
   Block: Model<BlockDocument>
   Profile: Model<ProfileDocument>
   Audio: Model<AudioDocument>
@@ -525,7 +504,6 @@ export class Database implements DataPlaneClient {
         Like: this.connection.model<LikeDocument>('Like', likeSchema),
         Post: this.connection.model<PostDocument>('Post', postSchema),
         Follow: this.connection.model<FollowDocument>('Follow', followSchema),
-        BskyFollow: this.connection.model<BskyFollowDocument>('BskyFollow', bskyFollowSchema),
         Block: this.connection.model<BlockDocument>('Block', blockSchema),
         Profile: this.connection.model<ProfileDocument>('Profile', profileSchema),
         Audio: this.connection.model<AudioDocument>('Audio', audioSchema),

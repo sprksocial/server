@@ -21,8 +21,11 @@ export const createGetFollowsRouter = (ctx: AppContext) => {
       return c.json({ error: 'Limit must be between 1 and 100' }, 400)
     }
 
-    // Build query
-    const query: any = { authorDid: actor }
+    // Build query with follow type filter
+    const query: any = {
+      authorDid: actor,
+      type: 'sprk',
+    }
     if (cursor) {
       query._id = { $gt: cursor }
     }

@@ -1,7 +1,7 @@
 import { AtUri } from '@atproto/syntax'
 import { CID } from 'multiformats/cid'
 import { pino } from 'pino'
-import { Database, BskyFollowDocument } from '../../data-plane/server/index.js'
+import { Database, FollowDocument } from '../../data-plane/server/index.js'
 
 const logger = pino({ name: 'bsky-follow-processor' })
 
@@ -19,7 +19,7 @@ export function makePlugin(db: Database) {
       cid: CID,
       recordObj: unknown,
       timestamp: string,
-    ): Promise<BskyFollowDocument | null> {
+    ): Promise<FollowDocument | null> {
       const record = recordObj as BskyFollowRecord
       if (!record?.subject) return null
 
@@ -38,9 +38,10 @@ export function makePlugin(db: Database) {
           createdAt: record.createdAt,
           indexedAt: timestamp,
           cid: cid.toString(),
+          type: 'bsky' as const,
         }
 
-        const follow = await db.models.BskyFollow.findOneAndUpdate(
+        const follow = await db.models.Follow.findOneAndUpdate(
           { uri: uri.toString() },
           { $set: followData },
           { upsert: true, new: true },
@@ -61,7 +62,7 @@ export function makePlugin(db: Database) {
       cid: CID,
       recordObj: unknown,
       timestamp: string,
-    ): Promise<BskyFollowDocument | null> {
+    ): Promise<FollowDocument | null> {
       const record = recordObj as BskyFollowRecord
       if (!record?.subject) return null
 
@@ -77,7 +78,7 @@ export function makePlugin(db: Database) {
           indexedAt: timestamp,
         }
 
-        const follow = await db.models.BskyFollow.findOneAndUpdate(
+        const follow = await db.models.Follow.findOneAndUpdate(
           { uri: uri.toString() },
           { $set: updateData },
           { new: true },
@@ -93,15 +94,15 @@ export function makePlugin(db: Database) {
       }
     },
 
-    async deleteRecord(uri: AtUri, cascading = false): Promise<void> {
+    async deleteRecord(uri: AtUri): Promise<void> {
       try {
-        const follow = await db.models.BskyFollow.findOne({ uri: uri.toString() })
+        const follow = await db.models.Follow.findOne({ uri: uri.toString() })
         if (!follow) {
-          logger.warn({ uri: uri.toString() }, 'BskyFollow not found for deletion')
+          logger.warn({ uri: uri.toString() }, 'Follow not found for deletion')
           return
         }
 
-        await db.models.BskyFollow.deleteOne({ uri: uri.toString() })
+        await db.models.Follow.deleteOne({ uri: uri.toString() })
       } catch (error) {
         logger.error(
           { error, uri: uri.toString() },
