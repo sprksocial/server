@@ -59,6 +59,7 @@ export interface FollowDocument extends Document {
   createdAt: string
   indexedAt: string
   cid: string
+  type: 'sprk' | 'bsky'
 }
 
 export const followSchema = new Schema<FollowDocument>({
@@ -69,6 +70,7 @@ export const followSchema = new Schema<FollowDocument>({
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
+  type: { type: String, required: true, enum: ['sprk', 'bsky'], index: true, default: 'sprk' },
 })
 
 export interface BlockDocument extends Document {
@@ -296,13 +298,13 @@ export const postSchema = new Schema<PostDocument>({
   cid: { type: String, required: true },
 })
 
-// Add compound indexes for more efficient queries
+// Compound indexes for more efficient queries
 postSchema.index({ authorDid: 1, createdAt: -1 })
 postSchema.index({ tags: 1, createdAt: -1 })
 
-// Add compound indexes for new schemas
-followSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
+followSchema.index({ authorDid: 1, subject: 1, type: 1 }, { unique: true })
 followSchema.index({ subject: 1, createdAt: -1 })
+followSchema.index({ type: 1, createdAt: -1 })
 
 blockSchema.index({ authorDid: 1, subject: 1 }, { unique: true })
 blockSchema.index({ subject: 1, createdAt: -1 })
@@ -424,7 +426,7 @@ export interface ActorDocument extends Document {
 }
 
 export const actorSchema = new Schema<ActorDocument>({
-  did: { type: String, required: true, index: true },
+  did: { type: String, required: true },
   handle: { type: String, required: false, index: true },
   indexedAt: { type: String, required: true },
   takedownRef: { type: String, required: false },
@@ -434,6 +436,20 @@ export const actorSchema = new Schema<ActorDocument>({
 // Add compound indexes for Actor
 actorSchema.index({ handle: 'text' })
 actorSchema.index({ did: 1 }, { unique: true })
+
+export interface UserPreferenceDocument extends Document {
+  userDid: string
+  followMode: string
+  createdAt: string
+  updatedAt: string
+}
+
+export const userPreferenceSchema = new Schema<UserPreferenceDocument>({
+  userDid: { type: String, required: true, unique: true, index: true },
+  followMode: { type: String, required: true, enum: ['bsky', 'sprk'], default: 'sprk' },
+  createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+})
 
 export interface DatabaseModels {
   Like: Model<LikeDocument>
@@ -450,6 +466,7 @@ export interface DatabaseModels {
   RepoTakedown: Model<RepoTakedownDocument>
   BlobTakedown: Model<BlobTakedownDocument>
   Actor: Model<ActorDocument>
+  UserPreference: Model<UserPreferenceDocument>
 }
 
 export class Database implements DataPlaneClient {
@@ -465,14 +482,18 @@ export class Database implements DataPlaneClient {
   }
 
   async connect(): Promise<void> {
-    const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = env
-    const uri = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/?appName=appview`
+    const { DB_URI, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = env
+
+    const uri = DB_URI || `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/?appName=appview`
+
     this.logger.info(
-      `Connecting to MongoDB at ${DB_HOST}:${DB_PORT}/?appName=appview`,
+      DB_URI
+        ? `Connecting to MongoDB using provided URI`
+        : `Connecting to MongoDB at ${DB_HOST}:${DB_PORT}/?appName=appview`,
     )
 
     try {
-      this.connection = await mongoose.createConnection(uri, {
+      this.connection = mongoose.createConnection(uri, {
         autoIndex: true,
         autoCreate: true,
         dbName: DB_NAME,
@@ -494,6 +515,7 @@ export class Database implements DataPlaneClient {
         RepoTakedown: this.connection.model<RepoTakedownDocument>('RepoTakedown', repoTakedownSchema),
         BlobTakedown: this.connection.model<BlobTakedownDocument>('BlobTakedown', blobTakedownSchema),
         Actor: this.connection.model<ActorDocument>('Actor', actorSchema),
+        UserPreference: this.connection.model<UserPreferenceDocument>('UserPreference', userPreferenceSchema),
       }
 
       this.logger.info('Connected to MongoDB')

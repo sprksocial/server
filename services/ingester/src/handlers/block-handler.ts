@@ -1,8 +1,9 @@
 import { pino } from 'pino'
 import { Database } from '../db/connection.js'
 import type { NormalizedEvent } from '../types/events.js'
+import { customConfig } from '../utils/logger-config.js'
 
-const logger = pino({ name: 'block-handler' })
+const logger = pino(customConfig('block-handler'))
 
 export async function handleBlockEvent(evt: NormalizedEvent, db: Database): Promise<void> {
   if (evt.collection !== 'so.sprk.graph.block') {

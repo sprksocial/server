@@ -5,8 +5,9 @@ import type { JetstreamEvent, NormalizedEvent } from '../types/events.js'
 import { Database } from '../db/connection.js'
 import type { BidirectionalResolver } from './id-resolver.js'
 import { handleEvent } from '../handlers/index.js'
+import { customConfig } from './logger-config.js'
 
-const logger = pino({ name: 'jetstream-client' })
+const logger = pino(customConfig('jetstream-client'))
 
 export interface JetstreamClientOptions {
   filterCollections?: string[]
@@ -165,23 +166,11 @@ export async function createJetstreamClient(
     const { did, time_us } = event
     const { operation, collection, rkey, record } = event.commit
 
-    logger.debug(
+    logger.trace(
       `Processing ${operation} operation for DID: ${did}, collection: ${collection}, rkey: ${rkey}`,
     )
 
-    // Resolve DID to handle if needed
-    let handle = null
-    try {
-      if (did) {
-        const didData = await resolver.resolveDidToDidDoc(did)
-        handle = didData.handle
-      }
-    } catch (error) {
-      logger.warn(
-        { did, error: (error as Error).message },
-        'Failed to resolve DID to handle',
-      )
-    }
+    const handle = null
 
     // Construct a normalized event object
     const normalizedEvent: NormalizedEvent = {
@@ -197,7 +186,7 @@ export async function createJetstreamClient(
     }
 
     // Process the normalized event
-    await handleEvent(normalizedEvent, db)
+    await handleEvent(normalizedEvent, db, resolver)
   }
 
   return { connect }

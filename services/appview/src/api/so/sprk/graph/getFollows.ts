@@ -11,6 +11,7 @@ export const createGetFollowsRouter = (ctx: AppContext) => {
     const actor = c.req.query('actor')
     const limit = parseInt(c.req.query('limit') ?? '50')
     const cursor = c.req.query('cursor')
+    const viewerDid = c.get('did') as string | undefined
 
     if (!actor) {
       return c.json({ error: 'Actor is required' }, 400)
@@ -21,17 +22,57 @@ export const createGetFollowsRouter = (ctx: AppContext) => {
       return c.json({ error: 'Limit must be between 1 and 100' }, 400)
     }
 
-    // Build query
-    const query: any = { authorDid: actor }
-    if (cursor) {
-      query._id = { $gt: cursor }
+    let follows = []
+
+    // If user is authenticated, respect their follow preferences
+    if (viewerDid) {
+      const viewerPref = await ctx.db.models.UserPreference.findOne({
+        userDid: viewerDid
+      })
+      const followType = viewerPref?.followMode || 'sprk'
+
+      // Build query with the user's preferred follow type
+      const query: any = {
+        authorDid: actor,
+        type: followType
+      }
+
+      if (cursor) {
+        query._id = { $gt: cursor }
+      }
+
+      follows = await ctx.db.models.Follow.find(query)
+        .sort({ _id: 1 })
+        .limit(limit)
+        .lean()
+    } else {
+      // For unauthenticated users, get all follow types without duplicates
+      // We use aggregation to get distinct follows by subject
+      const pipelineStages: any[] = [
+        { $match: { authorDid: actor } }
+      ]
+
+      if (cursor) {
+        pipelineStages.push({ $match: { _id: { $gt: cursor } } })
+      }
+
+      // Group by subject to avoid duplicates
+      pipelineStages.push(
+        { $sort: { _id: 1 } },
+        { $group: {
+          _id: '$subject',
+          doc: { $first: '$$ROOT' }
+        }},
+        { $replaceRoot: { newRoot: '$doc' } },
+        { $sort: { _id: 1 } },
+        { $limit: limit }
+      )
+
+      follows = await ctx.db.models.Follow.aggregate(pipelineStages)
     }
 
-    // Get follows with pagination
-    const follows = await ctx.db.models.Follow.find(query)
-      .sort({ _id: 1 })
-      .limit(limit)
-      .lean()
+    // Get next cursor
+    const nextCursor = follows.length === limit ? follows[follows.length - 1]._id : undefined
 
     // Get profile views for each follow
     const profileViews = await Promise.all(
@@ -64,9 +105,6 @@ export const createGetFollowsRouter = (ctx: AppContext) => {
         return basicProfileView
       })
     )
-
-    // Get next cursor
-    const nextCursor = follows.length === limit ? follows[follows.length - 1]._id : undefined
 
     // Get subject profile if it exists
     const subjectProfile = await ctx.db.models.Profile.findOne({ authorDid: actor })

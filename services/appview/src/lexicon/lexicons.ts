@@ -4758,11 +4758,10 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['preferences'],
             properties: {
-              preferences: {
-                type: 'ref',
-                ref: 'lex:so.sprk.actor.defs#preferences',
+              followMode: {
+                type: 'string',
+                knownValues: ['bsky', 'sprk'],
               },
             },
           },
@@ -4958,11 +4957,10 @@ export const schemaDict = {
           encoding: 'application/json',
           schema: {
             type: 'object',
-            required: ['preferences'],
             properties: {
-              preferences: {
-                type: 'ref',
-                ref: 'lex:so.sprk.actor.defs#preferences',
+              followMode: {
+                type: 'string',
+                knownValues: ['bsky', 'sprk'],
               },
             },
           },
@@ -6886,7 +6884,8 @@ export const schemaDict = {
     defs: {
       main: {
         type: 'record',
-        description: "Record declaring a 'like' of a piece of subject content.",
+        description:
+          "Record declaring a 'like' of a piece of subject content. Duplicate likes from the same author to the same subject will be ignored by the AppView.",
         key: 'tid',
         record: {
           type: 'object',

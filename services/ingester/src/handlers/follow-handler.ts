@@ -1,8 +1,9 @@
 import { pino } from 'pino'
+import { customConfig } from '../utils/logger-config.js'
 import { Database } from '../db/connection.js'
 import type { NormalizedEvent } from '../types/events.js'
 
-const logger = pino({ name: 'follow-handler' })
+const logger = pino(customConfig('follow-handler'))
 
 export async function handleFollowEvent(evt: NormalizedEvent, db: Database): Promise<void> {
   if (evt.collection !== 'so.sprk.graph.follow') {
@@ -44,7 +45,8 @@ async function handleCreateOrUpdate(evt: NormalizedEvent, db: Database): Promise
       authorHandle: evt.handle || 'unknown',
       createdAt: record.createdAt,
       indexedAt: now.toISOString(),
-      cid: evt.commit.cid
+      cid: evt.commit.cid,
+      type: 'sprk' as const,
     }
 
     await db.models.Follow.findOneAndUpdate(

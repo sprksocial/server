@@ -30,6 +30,8 @@ import wellKnownRouter from './well-known.js'
 import { TakedownService } from './services/takedown.js'
 import { IndexingService } from './services/indexing.js'
 import { expressToHono } from './utils/express-adapter.js'
+import { createPutPreferencesRouter } from './api/so/sprk/actor/putPreferences.js'
+import { createGetPreferencesRouter } from './api/so/sprk/actor/getPreferences.js'
 
 // Extend Hono's context variable map to include our services
 declare module 'hono' {
@@ -120,6 +122,8 @@ export class Server {
     const takedownRouter = createTakedownRouter(ctx)
     const getRecordRouter = createGetRecordRouter(ctx)
     const resolveHandleRouter = createResolveHandleRouter(ctx)
+    const putPreferencesRouter = createPutPreferencesRouter(ctx)
+    const getPreferencesRouter = createGetPreferencesRouter(ctx)
 
     app.route('/', getPostsRouter)
     app.route('/', getPostThreadRouter)
@@ -131,6 +135,8 @@ export class Server {
     app.route('/', takedownRouter)
     app.route('/', getRecordRouter)
     app.route('/', resolveHandleRouter)
+    app.route('/', putPreferencesRouter)
+    app.route('/', getPreferencesRouter)
     app.route('/', wellKnownRouter())
 
     // Root route
@@ -200,5 +206,3 @@ const run = async () => {
 }
 
 run()
-
-

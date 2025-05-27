@@ -1,8 +1,9 @@
 import { pino } from 'pino'
 import { Database } from '../db/connection.js'
 import type { NormalizedEvent } from '../types/events.js'
+import { customConfig } from '../utils/logger-config.js'
 
-const logger = pino({ name: 'post-handler' })
+const logger = pino(customConfig('post-handler'))
 
 export async function handlePostEvent(evt: NormalizedEvent, db: Database): Promise<void> {
   // Skip if not a post event

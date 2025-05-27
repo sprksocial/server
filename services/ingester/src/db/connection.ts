@@ -16,11 +16,12 @@ import {
 } from './models.js'
 import { env } from '../utils/env.js'
 import { pino } from 'pino'
+import { customConfig } from '../utils/logger-config.js'
 
 export class Database {
   private connection: Connection
   public models: DatabaseModels
-  private logger = pino({ name: 'database' })
+  private logger = pino(customConfig('database'))
 
   constructor() {
     this.connection = mongoose.createConnection()
@@ -41,11 +42,14 @@ export class Database {
   }
 
   async connect(): Promise<void> {
-    const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = env
-    const uri = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/?appName=ingester`
+    const { DB_URI, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = env
+
+    const uri = DB_URI || `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/?appName=ingester`
 
     this.logger.info(
-      `Connecting to MongoDB at ${DB_HOST}:${DB_PORT}/?appName=ingester`,
+      DB_URI
+        ? `Connecting to MongoDB using provided URI`
+        : `Connecting to MongoDB at ${DB_HOST}:${DB_PORT}/?appName=ingester`,
     )
 
     try {

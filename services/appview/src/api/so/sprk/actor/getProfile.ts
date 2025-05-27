@@ -6,7 +6,6 @@ import { AppContext } from '../../../../index.js'
 import type { Label } from '../../../../lexicon/types/com/atproto/label/defs.js'
 import type * as ComAtprotoRepoStrongRef from '../../../../lexicon/types/com/atproto/repo/strongRef.js'
 import type * as SoSprkActorDefs from '../../../../lexicon/types/so/sprk/actor/defs.js'
-import type * as SoSprkGraphDefs from '../../../../lexicon/types/so/sprk/graph/defs.js'
 
 export const createGetProfileRouter = (ctx: AppContext) => {
   const router = new Hono()
@@ -39,7 +38,7 @@ export const createGetProfileRouter = (ctx: AppContext) => {
       const now = new Date().toISOString()
 
       await ctx.indexingService.indexHandle(actorDid, now)
-      
+
       // First check if actor exists and has profile
       let actorDoc = await ctx.db.models.Actor.findOne({
         did: actorDid,
@@ -51,9 +50,12 @@ export const createGetProfileRouter = (ctx: AppContext) => {
 
       if (!actorDoc) {
         try {
-          ctx.logger.info({ did: actorDid }, 'No profile found, attempting to index')
+          ctx.logger.info(
+            { did: actorDid },
+            'No profile found, attempting to index',
+          )
           await ctx.indexingService.indexHandle(actorDid, now, true)
-          
+
           // Refetch after indexing
           actorDoc = await ctx.db.models.Actor.findOne({
             did: actorDid,
@@ -72,47 +74,53 @@ export const createGetProfileRouter = (ctx: AppContext) => {
       }
 
       // Use actor's handle if available, otherwise resolve from DID
-      const handle = actorDoc.handle || await ctx.resolver.resolveDidToHandle(actorDid)
+      const handle =
+        actorDoc.handle || (await ctx.resolver.resolveDidToHandle(actorDid))
+
+      // Get actor's preference for follow mode (used for both viewer state and counting)
+      const actorPref = await ctx.db.models.UserPreference.findOne({
+        userDid: actorDid,
+      })
+      const actorFollowMode = actorPref?.followMode || 'sprk'
 
       // Build viewer state if a user is authenticated
       const viewer: SoSprkActorDefs.ViewerState = {}
 
       if (viewerDid) {
-        // Check if viewer follows this profile
+        // Determine follow mode from viewer's preference for checking if viewer follows profile
+        const viewerPref = await ctx.db.models.UserPreference.findOne({
+          userDid: viewerDid,
+        })
+        const viewerFollowMode = viewerPref?.followMode || 'sprk'
+
+        // Check if viewer follows this profile (use viewer's follow mode)
         const follow = await ctx.db.models.Follow.findOne({
           subject: actorDid,
           authorDid: viewerDid,
+          type: viewerFollowMode,
         })
-        if (follow) {
-          viewer.following = follow.uri
-        }
+        if (follow) viewer.following = follow.uri
 
-        // Check if this profile follows the viewer
+        // Check if this profile follows the viewer (use profile owner's follow mode)
         const followedBy = await ctx.db.models.Follow.findOne({
           subject: viewerDid,
           authorDid: actorDid,
+          type: actorFollowMode,
         })
-        if (followedBy) {
-          viewer.followedBy = followedBy.uri
-        }
+        if (followedBy) viewer.followedBy = followedBy.uri
 
-        // Check if viewer has blocked this profile
+        // Check block relationships
         const block = await ctx.db.models.Block.findOne({
           subject: actorDid,
           authorDid: viewerDid,
         })
-        if (block) {
-          viewer.blocking = block.uri
-        }
+        if (block) viewer.blocking = block.uri
 
-        // Check if this profile has blocked the viewer
         const blockedBy = await ctx.db.models.Block.findOne({
           subject: viewerDid,
           authorDid: actorDid,
         })
-        if (blockedBy) {
-          viewer.blockedBy = true
-        }
+        if (blockedBy) viewer.blockedBy = true
       }
 
       // Check for associated services
@@ -157,11 +165,17 @@ export const createGetProfileRouter = (ctx: AppContext) => {
           profile.pinnedPost as unknown as ComAtprotoRepoStrongRef.Main
       }
 
-      const followersCount = await ctx.db.models.Follow.countDocuments({
-        subject: actorDid,
-      })
+      // Count unique followers across both Sprk and Bsky follow types
+      const followersCount = await ctx.db.models.Follow.aggregate([
+        { $match: { subject: actorDid } },
+        { $group: { _id: '$authorDid' } },
+        { $count: 'total' },
+      ]).then((result) => result[0]?.total || 0)
+
+      // Count follows based on actor's follow mode preference
       const followsCount = await ctx.db.models.Follow.countDocuments({
         authorDid: actorDid,
+        type: actorFollowMode,
       })
       const postsCount = await ctx.db.models.Post.countDocuments({
         authorDid: actorDid,

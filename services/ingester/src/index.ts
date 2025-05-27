@@ -5,13 +5,9 @@ import {
   createBidirectionalResolver,
 } from './utils/id-resolver.js'
 import { createJetstreamClient } from './utils/jetstream-client.js'
+import { customConfig } from './utils/logger-config.js'
 
-const logger = pino({
-  name: 'ingester',
-  transport: {
-    target: 'pino-pretty',
-  },
-})
+const logger = pino(customConfig('ingester'))
 
 async function main() {
   logger.info('Starting Jetstream ingester service')
@@ -32,7 +28,7 @@ async function main() {
   // Create and start Jetstream client
   const jetstreamClient = await createJetstreamClient(db, bidirectionalResolver)
   const connection = jetstreamClient.connect({
-    filterCollections: ['so.sprk.*'],
+    filterCollections: ['so.sprk.*', 'app.bsky.graph.follow'],
   })
 
   // Handle shutdown gracefully
