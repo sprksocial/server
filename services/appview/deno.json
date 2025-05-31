@@ -1,0 +1,45 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-net --allow-env --allow-sys --allow-read --allow-ffi --watch main.ts",
+    "codegen": "lex gen-server --yes ./lexicon ../../lexicons/com/atproto/*/* ../../lexicons/so/sprk/*/*",
+    "start": "deno run --allow-net --allow-env --allow-sys --allow-read --allow-ffi main.ts",
+    "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
+  },
+  "imports": {
+    "hono": "jsr:@hono/hono@^4.7.10",
+    "@std/assert": "jsr:@std/assert@1",
+    "@std/encoding": "jsr:@std/encoding@1",
+    "@atproto/api": "npm:@atproto/api@^0.14.9",
+    "@atproto/common": "npm:@atproto/common@^0.4.8",
+    "@atproto/crypto": "npm:@atproto/crypto@^0.4.4",
+    "@atproto/identity": "npm:@atproto/identity@^0.4.6",
+    "@atproto/lexicon": "npm:@atproto/lexicon@^0.4.8",
+    "@atproto/oauth-client-node": "npm:@atproto/oauth-client-node@^0.2.12",
+    "@atproto/sync": "npm:@atproto/sync@^0.1.17",
+    "@atproto/syntax": "npm:@atproto/syntax@^0.3.4",
+    "@atproto/xrpc": "npm:@atproto/xrpc@^0.6.10",
+    "@atproto/xrpc-server": "npm:@atproto/xrpc-server@^0.7.12",
+    "@hono/zod-validator": "jsr:@hono/zod-validator@^0.4.3",
+    "dotenv": "npm:dotenv@^16.4.7",
+    "envalid": "npm:envalid@^8.0.0",
+    "express": "npm:express@^4.21.2",
+    "iron-session": "npm:iron-session@^8.0.4",
+    "jose": "npm:jose@^6.0.11",
+    "lodash": "npm:lodash@^4.17.21",
+    "mongoose": "npm:mongoose@^8.12.1",
+    "multiformats": "npm:multiformats@^9.9.0",
+    "pino": "npm:pino@^9.6.0",
+    "pino-pretty": "npm:pino-pretty@^13.0.0",
+    "uint8arrays": "npm:uint8arrays@^5.1.0",
+    "ws": "npm:ws@^8.18.1",
+    "zod": "npm:zod@^3.24.2"
+  },
+  "compilerOptions": {
+    "jsx": "precompile",
+    "jsxImportSource": "hono/jsx"
+  },
+  "lint": {
+    "exclude": ["lexicon/"]
+  },
+  "unstable": ["sloppy-imports"]
+}

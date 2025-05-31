@@ -33,17 +33,28 @@ services:
     ports:
       - "4000:3000"
     volumes:
-      - ./src:/app/src
-      - ./tsconfig.json:/app/tsconfig.json
+      - ./api:/app/api
+      - ./lexicon:/app/lexicon
+      - ./services:/app/services
+      - ./utils:/app/utils
     depends_on:
       db:
         condition: service_healthy
     develop:
       watch:
-        - path: ./src
+        - path: ./api
           action: sync+restart
-          target: /app/src
-        - path: ./package.json
+          target: /app/api
+        - path: ./lexicon
+          action: sync+restart
+          target: /app/lexicon
+        - path: ./services
+          action: sync+restart
+          target: /app/services
+        - path: ./utils
+          action: sync+restart
+          target: /app/utils
+        - path: ./deno.json
           action: rebuild
-          target: /app/package.json
+          target: /app/deno.json
     restart: unless-stopped

@@ -1,0 +1,34 @@
+/**
+ * GENERATED CODE - DO NOT MODIFY
+ */
+import { BlobRef, ValidationResult } from "@atproto/lexicon";
+import { CID } from "multiformats/cid";
+import { validate as _validate } from "../../../../lexicons";
+import { $Typed, is$typed as _is$typed, OmitKey } from "../../../../util";
+
+const is$typed = _is$typed,
+  validate = _validate;
+const id = "so.sprk.video.defs";
+
+export interface JobStatus {
+  $type?: "so.sprk.video.defs#jobStatus";
+  jobId: string;
+  did: string;
+  /** The state of the video processing job. All values not listed as a known value indicate that the job is in process. */
+  state: "JOB_STATE_COMPLETED" | "JOB_STATE_FAILED" | (string & {});
+  /** Progress within the current processing state. */
+  progress?: number;
+  blob?: BlobRef;
+  error?: string;
+  message?: string;
+}
+
+const hashJobStatus = "jobStatus";
+
+export function isJobStatus<V>(v: V) {
+  return is$typed(v, id, hashJobStatus);
+}
+
+export function validateJobStatus<V>(v: V) {
+  return validate<JobStatus & V>(v, id, hashJobStatus);
+}
