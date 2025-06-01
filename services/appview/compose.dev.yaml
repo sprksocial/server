@@ -37,6 +37,9 @@ services:
       - ./lexicon:/app/lexicon
       - ./services:/app/services
       - ./utils:/app/utils
+      - ./main.ts:/app/main.ts
+      - ./deno.json:/app/deno.json
+      - ./deno.lock:/app/deno.lock
     depends_on:
       db:
         condition: service_healthy
@@ -54,7 +57,7 @@ services:
         - path: ./utils
           action: sync+restart
           target: /app/utils
-        - path: ./deno.json
+        - path: ./main.ts
           action: rebuild
-          target: /app/deno.json
+          target: /app/main.ts
     restart: unless-stopped

@@ -112,19 +112,24 @@ export const blockSchema = new Schema<BlockDocument>({
   cid: { type: String, required: true },
 });
 
+interface PinnedPost {
+  uri: string
+  cid: string
+}
+
 export interface ProfileDocument extends Document {
-  uri: string;
-  displayName?: string;
-  description?: string;
-  avatar?: MediaRef;
-  banner?: MediaRef;
-  labels?: Label[];
-  pinnedPost?: Record<string, unknown>;
-  authorDid: string;
-  authorHandle: string;
-  createdAt: string;
-  indexedAt: string;
-  cid: string;
+  uri: string
+  displayName?: string
+  description?: string
+  avatar?: MediaRef
+  banner?: MediaRef
+  labels?: Label[]
+  pinnedPost?: PinnedPost
+  authorDid: string
+  authorHandle: string
+  createdAt: string
+  indexedAt: string
+  cid: string
 }
 
 export const profileSchema = new Schema<ProfileDocument>({
@@ -158,7 +163,7 @@ export interface AudioDocument extends Document {
   };
   title?: string;
   text?: string;
-  labels?: Record<string, any>;
+  labels?: PostLabel[];
   authorDid: string;
   authorHandle: string;
   createdAt: string;
@@ -220,8 +225,8 @@ export interface MusicDocument extends Document {
   cover?: string;
   text?: string;
   copyright?: string[];
-  facets?: Array<Record<string, any>>;
-  labels?: Record<string, any>;
+  facets?: Facet[];
+  labels?: PostLabel[];
   tags?: string[];
   authorDid: string;
   authorHandle: string;
@@ -251,10 +256,41 @@ export const musicSchema = new Schema<MusicDocument>({
   cid: { type: String, required: true },
 });
 
+export interface PostEmbed {
+  $type: string
+  record?: {
+    uri: string
+    cid: string
+  }
+  images?: Array<{
+    alt: string
+    image: MediaRef
+  }>
+  external?: {
+    uri: string
+    title: string
+    description: string
+    thumb?: MediaRef
+  }
+  recordWithMedia?: {
+    record: {
+      uri: string
+      cid: string
+    }
+    media: {
+      $type: string
+      images?: Array<{
+        alt: string
+        image: MediaRef
+      }>
+    }
+  }
+}
+
 export interface PostDocument extends Document {
   uri: string;
   text: string;
-  facets: Array<Record<string, any>>;
+  facets: Facet[];
   reply: {
     root: {
       uri: string;
@@ -265,13 +301,13 @@ export interface PostDocument extends Document {
       cid: string;
     };
   } | null;
-  embed: Record<string, any> | null;
+  embed: PostEmbed | null;
   sound: {
     uri: string;
     cid: string;
   } | null;
   langs: string[];
-  labels: Record<string, any> | null;
+  labels: PostLabel[] | null;
   tags: string[];
   authorDid: string;
   authorHandle: string;
@@ -335,15 +371,36 @@ repostSchema.index({ "subject.uri": 1, createdAt: -1 });
 musicSchema.index({ authorDid: 1, createdAt: -1 });
 musicSchema.index({ tags: 1, createdAt: -1 });
 
+interface Facet {
+  index: {
+    byteStart: number
+    byteEnd: number
+  }
+  features: Array<{
+    $type: string
+    uri?: string
+    did?: string
+    tag?: string
+  }>
+}
+
+interface PostLabel {
+  src: string
+  uri: string
+  cid: string
+  val: string
+  neg: boolean
+}
+
 export interface GeneratorDocument extends Document {
   uri: string;
   did: string;
   displayName: string;
   description?: string;
-  descriptionFacets?: Array<any>;
+  descriptionFacets?: Facet[];
   avatar?: string;
   acceptsInteractions?: boolean;
-  labels?: any;
+  labels?: PostLabel[];
   contentMode?: string;
   authorDid: string;
   authorHandle: string;
@@ -518,7 +575,7 @@ export class Database implements DataPlaneClient {
     );
 
     try {
-      this.connection = mongoose.createConnection(uri, {
+      this.connection = await mongoose.createConnection(uri, {
         autoIndex: true,
         autoCreate: true,
         dbName: DB_NAME,

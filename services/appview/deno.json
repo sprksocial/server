@@ -41,5 +41,8 @@
   "lint": {
     "exclude": ["lexicon/"]
   },
+  "fmt": {
+    "exclude": ["lexicon/"]
+  },
   "unstable": ["sloppy-imports"]
 }
