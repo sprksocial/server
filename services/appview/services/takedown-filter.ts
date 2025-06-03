@@ -26,7 +26,7 @@ export const takedownFilterMiddleware = async (c: Context, next: Next) => {
 
   try {
     // Get the takedown service from context
-    const takedownService = c.get("takedownService") as TakedownService;
+    const takedownService = c.env.takedownService as TakedownService;
 
     const body = await c.res.json();
 
