@@ -1,6 +1,0 @@
-{
-  "workspace": [
-    "services/appview"
-  ],
-  "unstable": ["sloppy-imports"]
-}

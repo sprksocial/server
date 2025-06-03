@@ -29,5 +29,6 @@
   },
   "fmt": {
     "exclude": ["lexicon/"]
-  }
+  },
+  "unstable": ["sloppy-imports"]
 }

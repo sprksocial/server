@@ -2,14 +2,9 @@
   "version": "5",
   "specifiers": {
     "jsr:@hono/hono@^4.7.10": "4.7.10",
-    "jsr:@std/assert@*": "1.0.13",
-    "jsr:@std/encoding@*": "1.0.10",
-    "jsr:@std/encoding@1": "1.0.10",
-    "jsr:@std/internal@^1.0.6": "1.0.8",
     "npm:@atproto/api@~0.14.9": "0.14.22",
     "npm:@atproto/common@~0.4.8": "0.4.11",
     "npm:@atproto/crypto@~0.4.4": "0.4.4",
-    "npm:@atproto/identity@*": "0.4.8",
     "npm:@atproto/identity@~0.4.6": "0.4.8",
     "npm:@atproto/lexicon@~0.4.8": "0.4.11",
     "npm:@atproto/syntax@~0.3.4": "0.3.4",
@@ -23,24 +18,11 @@
     "npm:mongoose@^8.12.1": "8.15.1",
     "npm:multiformats@^9.9.0": "9.9.0",
     "npm:pino@^9.6.0": "9.7.0",
-    "npm:uint8arrays@*": "5.1.0",
-    "npm:zod@^3.24.2": "3.25.39"
+    "npm:uint8arrays@*": "5.1.0"
   },
   "jsr": {
     "@hono/hono@4.7.10": {
       "integrity": "e59029e252af371abe43e8e4f9a115e38974c6bd5972022372bf89f763269cc7"
-    },
-    "@std/assert@1.0.13": {
-      "integrity": "ae0d31e41919b12c656c742b22522c32fb26ed0cba32975cb0de2a273cb68b29",
-      "dependencies": [
-        "jsr:@std/internal"
-      ]
-    },
-    "@std/encoding@1.0.10": {
-      "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
-    },
-    "@std/internal@1.0.8": {
-      "integrity": "fc66e846d8d38a47cffd274d80d2ca3f0de71040f855783724bb6b87f60891f5"
     }
   },
   "npm": {
@@ -910,24 +892,20 @@
     }
   },
   "workspace": {
-    "members": {
-      "services/appview": {
-        "dependencies": [
-          "jsr:@hono/hono@^4.7.10",
-          "jsr:@std/encoding@1",
-          "npm:@atproto/api@~0.14.9",
-          "npm:@atproto/common@~0.4.8",
-          "npm:@atproto/crypto@~0.4.4",
-          "npm:@atproto/identity@~0.4.6",
-          "npm:@atproto/lexicon@~0.4.8",
-          "npm:@atproto/syntax@~0.3.4",
-          "npm:@atproto/xrpc-server@~0.7.12",
-          "npm:express@^4.21.2",
-          "npm:mongoose@^8.12.1",
-          "npm:multiformats@^9.9.0",
-          "npm:pino@^9.6.0"
-        ]
-      }
-    }
+    "dependencies": [
+      "jsr:@hono/hono@^4.7.10",
+      "jsr:@std/encoding@1",
+      "npm:@atproto/api@~0.14.9",
+      "npm:@atproto/common@~0.4.8",
+      "npm:@atproto/crypto@~0.4.4",
+      "npm:@atproto/identity@~0.4.6",
+      "npm:@atproto/lexicon@~0.4.8",
+      "npm:@atproto/syntax@~0.3.4",
+      "npm:@atproto/xrpc-server@~0.7.12",
+      "npm:express@^4.21.2",
+      "npm:mongoose@^8.12.1",
+      "npm:multiformats@^9.9.0",
+      "npm:pino@^9.6.0"
+    ]
   }
 }
