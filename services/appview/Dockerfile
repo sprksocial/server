@@ -1,13 +1,19 @@
-FROM denoland/deno:latest AS production
+FROM denoland/deno:alpine-2.3.5 AS builder
 
 WORKDIR /app
 
+COPY . .
+
+RUN deno cache main.ts
+
+FROM denoland/deno:alpine-2.3.5 AS production
+
 ENV NODE_ENV=production
 
-COPY deno.json deno.lock ./
+WORKDIR /app
 
-RUN deno install
+COPY --from=builder /app .
 
 EXPOSE 3000
 
-CMD ["deno", "run", "main.ts"]
+CMD ["deno", "task", "start"]

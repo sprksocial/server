@@ -38,18 +38,18 @@ services:
     develop:
       watch:
         - path: ./api
-          action: sync+restart
+          action: sync
           target: /app/api
         - path: ./lexicon
-          action: sync+restart
+          action: sync
           target: /app/lexicon
         - path: ./services
-          action: sync+restart
+          action: sync
           target: /app/services
         - path: ./utils
-          action: sync+restart
+          action: sync
           target: /app/utils
         - path: ./main.ts
-          action: rebuild
+          action: sync
           target: /app/main.ts
     restart: unless-stopped

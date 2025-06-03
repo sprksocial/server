@@ -9,7 +9,7 @@ in Docker containers.
 For development without Docker, set up the .env file by following the
 instructions down below, then start the development server: `deno task dev`
 
-This will start the server in development mode with hot reloading enabled.
+Both methods will start the server in development mode with hot reloading enabled available at `http://localhost:4000`.
 
 ## Environment Variables
 
@@ -26,7 +26,7 @@ DB_PASSWORD=mongo
 # Server
 HOST=0.0.0.0
 NODE_ENV=development
-PORT=3000
+PORT=4000
 PUBLIC_URL=http://localhost:3000
 SERVICE_DID=did:web:localhost
 
