@@ -5,6 +5,8 @@ on:
   push:
     tags:
       - "ingester/v*"
+    branches:
+      - main
 
 jobs:
   build-and-push-ingester:
