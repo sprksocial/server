@@ -1,12 +1,12 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";
-import { AppContext } from "../../../../main.ts";
+import { AppContext, AppEnv } from "../../../../main.ts";
 import { transformPostToPostView } from "../../../../utils/post-transformer.ts";
 import { encodeBase64, decodeBase64 } from "jsr:@std/encoding"
 
 export const createGetAuthorFeedRouter = (ctx: AppContext) => {
-  const router = new Hono();
+  const router = new Hono<AppEnv>();
 
   router.get(
     "/xrpc/so.sprk.feed.getAuthorFeed",
@@ -18,7 +18,7 @@ export const createGetAuthorFeedRouter = (ctx: AppContext) => {
       const cursor = c.req.query("cursor");
       const filter = c.req.query("filter") || "posts_with_replies";
       const includePins = c.req.query("includePins") === "true";
-      const viewerDid = c.get("did") as string | undefined;
+      const viewerDid = c.var.did as string | undefined;
 
       // Validate required parameters
       if (!actor) {
@@ -85,9 +85,7 @@ export const createGetAuthorFeedRouter = (ctx: AppContext) => {
 
         if (cursor) {
           try {
-            const decodedCursor = Buffer.from(cursor, "base64").toString(
-              "utf-8",
-            );
+            const decodedCursor = new TextDecoder().decode(decodeBase64(cursor));
             const [timestamp, id] = decodedCursor.split("::");
             createdAtCursor = timestamp;
             idCursor = id;
@@ -117,7 +115,7 @@ export const createGetAuthorFeedRouter = (ctx: AppContext) => {
         }
 
         // Include pinned posts if requested
-        let pinnedPosts = [];
+        const pinnedPosts = [];
         if (includePins) {
           // Get profile to find pinned posts
           const profile = await ctx.db.models.Profile.findOne({
@@ -155,9 +153,9 @@ export const createGetAuthorFeedRouter = (ctx: AppContext) => {
         let nextCursor;
         if (hasMore && posts.length > 0) {
           const lastPost = posts[posts.length - 1];
-          nextCursor = Buffer.from(
-            `${lastPost.createdAt}::${lastPost._id}`,
-          ).toString("base64");
+          nextCursor = encodeBase64(
+            new TextEncoder().encode(`${lastPost.createdAt}::${lastPost._id}`)
+          );
         }
 
         return c.json({

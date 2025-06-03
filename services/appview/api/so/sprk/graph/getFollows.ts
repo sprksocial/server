@@ -1,11 +1,11 @@
 import { Hono } from "hono";
 
 import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";
-import { AppContext } from "../../../../main.ts";
+import { AppContext, AppEnv } from "../../../../main.ts";
 import type * as SoSprkActorDefs from "../../../../lexicon/types/so/sprk/actor/defs.ts";
 
 export const createGetFollowsRouter = (ctx: AppContext) => {
-  const router = new Hono();
+  const router = new Hono<AppEnv>();
 
   router.get(
     "/xrpc/so.sprk.graph.getFollows",
@@ -14,7 +14,7 @@ export const createGetFollowsRouter = (ctx: AppContext) => {
       const actor = c.req.query("actor");
       const limit = parseInt(c.req.query("limit") ?? "50");
       const cursor = c.req.query("cursor");
-      const viewerDid = c.get("did") as string | undefined;
+      const viewerDid = c.var.did as string | undefined;
 
       if (!actor) {
         return c.json({ error: "Actor is required" }, 400);
@@ -105,7 +105,7 @@ export const createGetFollowsRouter = (ctx: AppContext) => {
               handle: profile.authorHandle,
               displayName: profile.displayName,
               description: profile.description,
-              avatar: profile.avatar?.ref?.link,
+              avatar: profile.avatar?.ref?.$link,
               indexedAt: profile.indexedAt,
               createdAt: profile.createdAt,
             };
@@ -130,7 +130,7 @@ export const createGetFollowsRouter = (ctx: AppContext) => {
           handle: subjectProfile.authorHandle,
           displayName: subjectProfile.displayName,
           description: subjectProfile.description,
-          avatar: subjectProfile.avatar?.ref?.link,
+          avatar: subjectProfile.avatar?.ref?.$link,
           indexedAt: subjectProfile.indexedAt,
           createdAt: subjectProfile.createdAt,
         });

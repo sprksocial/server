@@ -1,4 +1,4 @@
-import * as ui8 from "uint8arrays";
+import * as ui8 from "npm:uint8arrays";
 import { getDidKeyFromMultibase } from "@atproto/identity";
 
 export enum Code {

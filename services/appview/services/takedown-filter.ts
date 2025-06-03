@@ -1,6 +1,6 @@
 import { Context, Next } from "hono";
 import { TakedownService } from "./takedown.ts";
-import lodash from "lodash";
+import lodash from "npm:lodash";
 import * as SoSprkFeedDefs from "../lexicon/types/so/sprk/feed/defs.ts";
 const { get } = lodash;
 

@@ -1,7 +1,7 @@
 import { KeyObject } from "node:crypto";
 import { IncomingHttpHeaders, IncomingMessage } from "node:http";
-import * as ui8 from "uint8arrays";
-import * as jose from "jose";
+import * as ui8 from "npm:uint8arrays";
+import * as jose from "npm:jose";
 import { verify } from "hono/jwt";
 import { parseDidKey, SECP256K1_JWT_ALG } from "@atproto/crypto";
 import {

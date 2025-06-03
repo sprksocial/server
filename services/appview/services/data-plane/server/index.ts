@@ -7,9 +7,26 @@ import { DataPlaneClient, GetIdentityByDidResponse } from "../client/index.ts";
 const HOUR = 60e3 * 60;
 const DAY = HOUR * 24;
 
-interface MediaRef {
+export interface MediaRef {
   $type: string;
   ref: { $link: string };
+}
+
+export interface EmbedImage {
+  alt: string
+  image: MediaRef
+  aspectRatio: {
+    width: number;
+    height: number;
+  }
+}
+
+export interface EmbedVideo extends MediaRef {
+  alt: string
+  aspectRatio: {
+    width: number;
+    height: number;
+  }
 }
 
 interface Label {
@@ -262,10 +279,9 @@ export interface PostEmbed {
     uri: string
     cid: string
   }
-  images?: Array<{
-    alt: string
-    image: MediaRef
-  }>
+  alt?: string
+  video?: EmbedVideo
+  images?: Array<EmbedImage>
   external?: {
     uri: string
     title: string

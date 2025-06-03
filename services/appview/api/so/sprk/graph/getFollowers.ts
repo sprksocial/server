@@ -60,7 +60,7 @@ export const createGetFollowersRouter = (ctx: AppContext) => {
               ...basicProfileView,
               displayName: profile.displayName,
               description: profile.description,
-              avatar: profile.avatar?.ref?.link,
+              avatar: profile.avatar?.ref?.$link,
               indexedAt: profile.indexedAt,
               createdAt: profile.createdAt,
             };
@@ -106,7 +106,7 @@ export const createGetFollowersRouter = (ctx: AppContext) => {
           handle: subjectProfile.authorHandle,
           displayName: subjectProfile.displayName,
           description: subjectProfile.description,
-          avatar: subjectProfile.avatar?.ref?.link,
+          avatar: subjectProfile.avatar?.ref?.$link,
           indexedAt: subjectProfile.indexedAt,
           createdAt: subjectProfile.createdAt,
         });

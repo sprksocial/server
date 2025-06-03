@@ -149,3 +149,5 @@ Deno.addSignalListener('SIGTERM', async () => {
   await db.disconnect()
   Deno.exit(0)
 })
+
+export default app;

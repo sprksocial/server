@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import express from "express";
+import express from "npm:express";
 import { BlobRef, ValidationResult } from "@atproto/lexicon";
 import { CID } from "multiformats/cid";
 import { validate as _validate } from "../../../../lexicons";
