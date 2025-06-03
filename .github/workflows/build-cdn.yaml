@@ -5,6 +5,8 @@ on:
   push:
     tags:
       - "cdn/v*"
+    branches:
+      - main
 
 jobs:
   build-and-push-cdn:
