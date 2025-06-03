@@ -2,21 +2,19 @@
 
 ## Running
 
-To run for development, first install dependencies. `pnpm install`
+To run with Docker Compose (includes database and appview):
+`deno task docker-dev`. This will start both the database and appview services
+in Docker containers.
 
-To run in Docker, first build the image: `docker build -t appview .`
-
-Then run the container: `pnpm docker-dev`
-
-For development without Docker, copy the .env.example file into a .env file and
-follow the instructions to generate a key, then start the development server:
-`pnpm dev`
+For development without Docker, set up the .env file by following the
+instructions down below, then start the development server: `deno task dev`
 
 This will start the server in development mode with hot reloading enabled.
 
 ## Environment Variables
 
 .env setup:
+
 ```
 # Database
 DB_HOST=localhost

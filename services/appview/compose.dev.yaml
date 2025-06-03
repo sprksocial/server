@@ -32,14 +32,6 @@ services:
       ADMIN_PASSWORD: "00000000000000000000000000000000"
     ports:
       - "4000:3000"
-    volumes:
-      - ./api:/app/api
-      - ./lexicon:/app/lexicon
-      - ./services:/app/services
-      - ./utils:/app/utils
-      - ./main.ts:/app/main.ts
-      - ./deno.json:/app/deno.json
-      - ./deno.lock:/app/deno.lock
     depends_on:
       db:
         condition: service_healthy
