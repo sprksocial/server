@@ -68,7 +68,14 @@ export const createGetAuthorFeedRouter = (ctx: AppContext) => {
         }
 
         // Build query based on filter
-        const query: any = { authorDid: actorDid, reply: null };
+        type MongoQuery = {
+          authorDid: string;
+          reply: null;
+          $or?: Array<{ [key: string]: unknown }>;
+          [key: string]: unknown;
+        };
+
+        const query: MongoQuery = { authorDid: actorDid, reply: null };
 
         if (filter === "posts_with_media") {
           query.$or = [

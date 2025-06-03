@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { PipelineStage } from "mongoose";
 
 import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";
 import { AppContext, AppEnv } from "../../../../main.ts";
@@ -35,7 +36,11 @@ export const createGetFollowsRouter = (ctx: AppContext) => {
         const followType = viewerPref?.followMode || "sprk";
 
         // Build query with the user's preferred follow type
-        const query: any = {
+        const query: {
+          authorDid: string;
+          type: string;
+          _id?: { $gt: string };
+        } = {
           authorDid: actor,
           type: followType,
         };
@@ -51,7 +56,7 @@ export const createGetFollowsRouter = (ctx: AppContext) => {
       } else {
         // For unauthenticated users, get all follow types without duplicates
         // We use aggregation to get distinct follows by subject
-        const pipelineStages: any[] = [
+        const pipelineStages: PipelineStage[] = [
           { $match: { authorDid: actor } },
         ];
 
