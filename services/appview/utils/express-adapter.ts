@@ -3,6 +3,7 @@ import {
   Request as ExpressRequest,
   Response as ExpressResponse,
   Router as ExpressRouter,
+  StatusCode,
 } from "express";
 
 /**
@@ -39,27 +40,27 @@ export const expressToHono = (expressRouter: ExpressRouter) => {
           c.header(name, value);
           return res;
         },
-        end: (chunk: any) => {
+        end: (chunk: string) => {
           console.log("end called with:", chunk);
           resolve(c.body(chunk));
         },
-        json: (body: any) => {
+        json: (body: Record<string, unknown>) => {
           console.log("json called with:", body);
           resolve(c.json(body));
         },
         status: (code: number) => {
           console.log("status called with:", code);
-          c.status(code as any);
+          c.status(code as StatusCode);
           return res;
         },
-        send: (body: any) => {
+        send: (body: string) => {
           console.log("send called with:", body);
           resolve(c.body(body));
         },
       } as unknown as ExpressResponse;
 
       console.log("Calling Express router");
-      expressRouter(req, res, (err: any) => {
+      expressRouter(req, res, (err: Error | null) => {
         console.log("Express router callback called", { err });
         if (err) {
           c.status(500);

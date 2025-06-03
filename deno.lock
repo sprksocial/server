@@ -23,7 +23,8 @@
     "npm:mongoose@^8.12.1": "8.15.1",
     "npm:multiformats@^9.9.0": "9.9.0",
     "npm:pino@^9.6.0": "9.7.0",
-    "npm:uint8arrays@*": "5.1.0"
+    "npm:uint8arrays@*": "5.1.0",
+    "npm:zod@^3.24.2": "3.25.39"
   },
   "jsr": {
     "@hono/hono@4.7.10": {
@@ -913,7 +914,6 @@
       "services/appview": {
         "dependencies": [
           "jsr:@hono/hono@^4.7.10",
-          "jsr:@hono/zod-validator@~0.4.3",
           "jsr:@std/encoding@1",
           "npm:@atproto/api@~0.14.9",
           "npm:@atproto/common@~0.4.8",
@@ -922,12 +922,10 @@
           "npm:@atproto/lexicon@~0.4.8",
           "npm:@atproto/syntax@~0.3.4",
           "npm:@atproto/xrpc-server@~0.7.12",
-          "npm:envalid@8",
           "npm:express@^4.21.2",
           "npm:mongoose@^8.12.1",
           "npm:multiformats@^9.9.0",
-          "npm:pino@^9.6.0",
-          "npm:zod@^3.24.2"
+          "npm:pino@^9.6.0"
         ]
       }
     }
