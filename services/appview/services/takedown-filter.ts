@@ -203,7 +203,8 @@ async function filterTakenDownItems(
     return items;
   }
 
-  const filteredItems: (SoSprkFeedDefs.PostView | SoSprkFeedDefs.FeedViewPost)[] = [];
+  const filteredItems:
+    (SoSprkFeedDefs.PostView | SoSprkFeedDefs.FeedViewPost)[] = [];
 
   for (const item of items) {
     let isTakenDown = false;
@@ -241,10 +242,22 @@ async function filterTakenDownItems(
 async function filterTakenDownRepos(
   profiles: { $type: string; did: string; handle?: string }[],
   takedownService: TakedownService,
-): Promise<{ $type: string; did: string; handle?: string; moderation?: { takenDown: boolean } }[]> {
+): Promise<
+  {
+    $type: string;
+    did: string;
+    handle?: string;
+    moderation?: { takenDown: boolean };
+  }[]
+> {
   if (!profiles || !Array.isArray(profiles)) return profiles;
 
-  const filteredProfiles: { $type: string; did: string; handle?: string; moderation?: { takenDown: boolean } }[] = [];
+  const filteredProfiles: {
+    $type: string;
+    did: string;
+    handle?: string;
+    moderation?: { takenDown: boolean };
+  }[] = [];
 
   for (const profile of profiles) {
     if (profile.did) {
@@ -301,7 +314,11 @@ async function filterTakenDownBlobs(
 }
 
 type ReplyType = {
-  post?: { uri: string; author?: { did: string }; embed?: { images?: { cid?: string; did?: string }[] } };
+  post?: {
+    uri: string;
+    author?: { did: string };
+    embed?: { images?: { cid?: string; did?: string }[] };
+  };
   replies?: ReplyType[];
 };
 

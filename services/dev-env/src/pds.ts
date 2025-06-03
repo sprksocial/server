@@ -4,7 +4,7 @@ import path from "node:path";
 import getPort from "get-port";
 import * as ui8 from "uint8arrays";
 import { AtpAgent } from "@atproto/api";
-import { Secp256k1Keypair, randomStr } from "@atproto/crypto";
+import { randomStr, Secp256k1Keypair } from "@atproto/crypto";
 import * as pds from "../../pds";
 import { createSecretKeyObject } from "@atproto/pds";
 import { ADMIN_PASSWORD, EXAMPLE_LABELER, JWT_SECRET } from "./const";
@@ -14,7 +14,7 @@ export class TestPds {
   constructor(
     public url: string,
     public port: number,
-    public server: pds.PDS
+    public server: pds.PDS,
   ) {}
 
   static async create(config: PdsConfig): Promise<TestPds> {
@@ -82,7 +82,7 @@ export class TestPds {
       "Basic " +
       ui8.toString(
         ui8.fromString(`admin:${ADMIN_PASSWORD}`, "utf8"),
-        "base64pad"
+        "base64pad",
       )
     );
   }

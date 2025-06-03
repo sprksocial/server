@@ -1,30 +1,36 @@
-import { pino } from 'pino'
-import { Database } from '../db/connection.js'
-import type { NormalizedEvent } from '../types/events.js'
-import { customConfig } from '../utils/logger-config.js'
+import { pino } from "pino";
+import { Database } from "../db/connection.js";
+import type { NormalizedEvent } from "../types/events.js";
+import { customConfig } from "../utils/logger-config.js";
 
-const logger = pino(customConfig('post-handler'))
+const logger = pino(customConfig("post-handler"));
 
-export async function handlePostEvent(evt: NormalizedEvent, db: Database): Promise<void> {
+export async function handlePostEvent(
+  evt: NormalizedEvent,
+  db: Database,
+): Promise<void> {
   // Skip if not a post event
-  if (evt.collection !== 'so.sprk.feed.post') {
-    return
+  if (evt.collection !== "so.sprk.feed.post") {
+    return;
   }
 
-  if (evt.event === 'create' || evt.event === 'update') {
-    await handleCreateOrUpdate(evt, db)
-  } else if (evt.event === 'delete') {
-    await handleDelete(evt, db)
+  if (evt.event === "create" || evt.event === "update") {
+    await handleCreateOrUpdate(evt, db);
+  } else if (evt.event === "delete") {
+    await handleDelete(evt, db);
   }
 }
 
-async function handleCreateOrUpdate(evt: NormalizedEvent, db: Database): Promise<void> {
-  const now = new Date()
-  const record = evt.record
+async function handleCreateOrUpdate(
+  evt: NormalizedEvent,
+  db: Database,
+): Promise<void> {
+  const now = new Date();
+  const record = evt.record;
 
   if (!record) {
-    logger.warn({ uri: evt.uri }, 'Post event missing record data')
-    return
+    logger.warn({ uri: evt.uri }, "Post event missing record data");
+    return;
   }
 
   logger.info({
@@ -32,7 +38,7 @@ async function handleCreateOrUpdate(evt: NormalizedEvent, db: Database): Promise
     handle: evt.handle,
     collection: evt.collection,
     uri: evt.uri,
-  }, 'Processing post event')
+  }, "Processing post event");
 
   try {
     // Extract post data from record
@@ -47,41 +53,44 @@ async function handleCreateOrUpdate(evt: NormalizedEvent, db: Database): Promise
       labels: record.labels || null,
       tags: record.tags || [],
       authorDid: evt.did,
-      authorHandle: evt.handle || 'unknown',
+      authorHandle: evt.handle || "unknown",
       createdAt: record.createdAt,
       indexedAt: now.toISOString(),
-      cid: evt.commit.cid
-    }
+      cid: evt.commit.cid,
+    };
 
     // Create or update the post record
     await db.models.Post.findOneAndUpdate(
       { uri: evt.uri },
       postData,
-      { upsert: true, new: true }
-    )
+      { upsert: true, new: true },
+    );
 
     logger.info(
       { uri: evt.uri },
-      'Successfully saved post to database'
-    )
+      "Successfully saved post to database",
+    );
   } catch (error) {
     logger.error(
       { error, uri: evt.uri },
-      'Failed to save post to database'
-    )
+      "Failed to save post to database",
+    );
   }
 }
 
 async function handleDelete(evt: NormalizedEvent, db: Database): Promise<void> {
   try {
-    const result = await db.models.Post.deleteOne({ uri: evt.uri })
+    const result = await db.models.Post.deleteOne({ uri: evt.uri });
 
     if (result.deletedCount > 0) {
-      logger.info({ uri: evt.uri }, 'Successfully removed post from database')
+      logger.info({ uri: evt.uri }, "Successfully removed post from database");
     } else {
-      logger.warn({ uri: evt.uri }, 'Post not found in database for deletion')
+      logger.warn({ uri: evt.uri }, "Post not found in database for deletion");
     }
   } catch (error) {
-    logger.error({ error, uri: evt.uri }, 'Failed to delete post from database')
+    logger.error(
+      { error, uri: evt.uri },
+      "Failed to delete post from database",
+    );
   }
 }

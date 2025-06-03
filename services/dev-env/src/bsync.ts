@@ -1,6 +1,6 @@
-import getPort from 'get-port'
-import * as bsync from '@atproto/bsync'
-import { BsyncConfig } from './types'
+import getPort from "get-port";
+import * as bsync from "@atproto/bsync";
+import { BsyncConfig } from "./types";
 
 export class TestBsync {
   constructor(
@@ -10,27 +10,27 @@ export class TestBsync {
   ) {}
 
   static async create(cfg: BsyncConfig): Promise<TestBsync> {
-    const port = cfg.port || (await getPort())
-    const url = `http://localhost:${port}`
+    const port = cfg.port || (await getPort());
+    const url = `http://localhost:${port}`;
 
     const config = bsync.envToCfg({
       port,
-      apiKeys: cfg.apiKeys ?? ['api-key'],
+      apiKeys: cfg.apiKeys ?? ["api-key"],
       ...cfg,
-    })
+    });
 
-    const service = await bsync.BsyncService.create(config)
-    await service.ctx.db.migrateToLatestOrThrow()
-    await service.start()
+    const service = await bsync.BsyncService.create(config);
+    await service.ctx.db.migrateToLatestOrThrow();
+    await service.start();
 
-    return new TestBsync(url, port, service)
+    return new TestBsync(url, port, service);
   }
 
   get ctx(): bsync.AppContext {
-    return this.service.ctx
+    return this.service.ctx;
   }
 
   async close() {
-    await this.service.destroy()
+    await this.service.destroy();
   }
 }

@@ -362,7 +362,9 @@ class AuthVerifierImpl {
     return { credentials: { type: "mod_service", aud, iss } };
   };
 
-  roleOrModService = (reqCtx: ReqCtx): Promise<ModServiceOutput> | RoleOutput => {
+  roleOrModService = (
+    reqCtx: ReqCtx,
+  ): Promise<ModServiceOutput> | RoleOutput => {
     if (isBearerToken(reqCtx.req)) {
       return this.modService(reqCtx);
     } else {

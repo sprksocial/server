@@ -25,7 +25,9 @@ export const createGetFollowersRouter = (ctx: AppContext) => {
       }
 
       // Build query
-      const query: { subject: string; _id?: { $gt: string } } = { subject: actor };
+      const query: { subject: string; _id?: { $gt: string } } = {
+        subject: actor,
+      };
       if (cursor) {
         query._id = { $gt: cursor };
       }

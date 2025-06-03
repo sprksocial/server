@@ -4,7 +4,7 @@ name: Build and Push AppView Image
 on:
   push:
     tags:
-      - 'appview/v*'
+      - "appview/v*"
 
 jobs:
   build-and-push-appview:

@@ -9,7 +9,8 @@ in Docker containers.
 For development without Docker, set up the .env file by following the
 instructions down below, then start the development server: `deno task dev`
 
-Both methods will start the server in development mode with hot reloading enabled available at `http://localhost:4000`.
+Both methods will start the server in development mode with hot reloading
+enabled available at `http://localhost:4000`.
 
 ## Environment Variables
 

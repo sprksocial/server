@@ -1,14 +1,14 @@
-import * as plc from '@did-plc/lib'
-import getPort from 'get-port'
-import * as ui8 from 'uint8arrays'
-import { AtpAgent } from '@atproto/api'
-import { Keypair, Secp256k1Keypair } from '@atproto/crypto'
-import * as ozone from '@atproto/ozone'
-import { createServiceJwt } from '@atproto/xrpc-server'
-import { ADMIN_PASSWORD, EXAMPLE_LABELER } from './const'
-import { ModeratorClient } from './moderator-client'
-import { DidAndKey, OzoneConfig } from './types'
-import { createDidAndKey } from './util'
+import * as plc from "@did-plc/lib";
+import getPort from "get-port";
+import * as ui8 from "uint8arrays";
+import { AtpAgent } from "@atproto/api";
+import { Keypair, Secp256k1Keypair } from "@atproto/crypto";
+import * as ozone from "@atproto/ozone";
+import { createServiceJwt } from "@atproto/xrpc-server";
+import { ADMIN_PASSWORD, EXAMPLE_LABELER } from "./const";
+import { ModeratorClient } from "./moderator-client";
+import { DidAndKey, OzoneConfig } from "./types";
+import { createDidAndKey } from "./util";
 
 export class TestOzone {
   constructor(
@@ -22,38 +22,38 @@ export class TestOzone {
   ) {}
 
   static async create(config: OzoneConfig): Promise<TestOzone> {
-    const serviceKeypair =
-      config.signingKey ?? (await Secp256k1Keypair.create({ exportable: true }))
-    const signingKeyHex = ui8.toString(await serviceKeypair.export(), 'hex')
-    let serverDid = config.serverDid
+    const serviceKeypair = config.signingKey ??
+      (await Secp256k1Keypair.create({ exportable: true }));
+    const signingKeyHex = ui8.toString(await serviceKeypair.export(), "hex");
+    let serverDid = config.serverDid;
     if (!serverDid) {
-      serverDid = await createOzoneDid(config.plcUrl, serviceKeypair)
+      serverDid = await createOzoneDid(config.plcUrl, serviceKeypair);
     }
 
     const admin = await createDidAndKey({
       plcUrl: config.plcUrl,
-      handle: 'admin.ozone',
-      pds: 'https://pds.invalid',
-    })
+      handle: "admin.ozone",
+      pds: "https://pds.invalid",
+    });
 
     const moderator = await createDidAndKey({
       plcUrl: config.plcUrl,
-      handle: 'moderator.ozone',
-      pds: 'https://pds.invalid',
-    })
+      handle: "moderator.ozone",
+      pds: "https://pds.invalid",
+    });
 
     const triage = await createDidAndKey({
       plcUrl: config.plcUrl,
-      handle: 'triage.ozone',
-      pds: 'https://pds.invalid',
-    })
+      handle: "triage.ozone",
+      pds: "https://pds.invalid",
+    });
 
-    const port = config.port || (await getPort())
-    const url = `http://localhost:${port}`
+    const port = config.port || (await getPort());
+    const url = `http://localhost:${port}`;
 
     const env: ozone.OzoneEnvironment = {
       devMode: true,
-      version: '0.0.0',
+      version: "0.0.0",
       port,
       didPlcUrl: config.plcUrl,
       publicUrl: url,
@@ -68,49 +68,49 @@ export class TestOzone {
         moderator.did,
       ],
       triageDids: [...(config.triageDids ?? []), triage.did],
-    }
+    };
 
     // Separate migration db in case migration changes some connection state that we need in the tests, e.g. "alter database ... set ..."
     const migrationDb = new ozone.Database({
       schema: config.dbPostgresSchema,
       url: config.dbPostgresUrl,
-    })
+    });
     if (config.migration) {
-      await migrationDb.migrateToOrThrow(config.migration)
+      await migrationDb.migrateToOrThrow(config.migration);
     } else {
-      await migrationDb.migrateToLatestOrThrow()
+      await migrationDb.migrateToLatestOrThrow();
     }
-    await migrationDb.close()
+    await migrationDb.close();
 
-    const cfg = ozone.envToCfg(env)
-    const secrets = ozone.envToSecrets(env)
+    const cfg = ozone.envToCfg(env);
+    const secrets = ozone.envToSecrets(env);
 
     // api server
     const server = await ozone.OzoneService.create(cfg, secrets, {
       imgInvalidator: config.imgInvalidator,
-    })
-    await server.start()
+    });
+    await server.start();
 
-    const daemon = await ozone.OzoneDaemon.create(cfg, secrets)
-    await daemon.start()
+    const daemon = await ozone.OzoneDaemon.create(cfg, secrets);
+    await daemon.start();
     // don't do event reversal in dev-env
-    await daemon.ctx.eventReverser.destroy()
+    await daemon.ctx.eventReverser.destroy();
 
-    return new TestOzone(url, port, server, daemon, admin, moderator, triage)
+    return new TestOzone(url, port, server, daemon, admin, moderator, triage);
   }
 
   get ctx(): ozone.AppContext {
-    return this.server.ctx
+    return this.server.ctx;
   }
 
   getClient(): AtpAgent {
-    const agent = new AtpAgent({ service: this.url })
-    agent.configureLabelers([EXAMPLE_LABELER])
-    return agent
+    const agent = new AtpAgent({ service: this.url });
+    agent.configureLabelers([EXAMPLE_LABELER]);
+    return agent;
   }
 
   getModClient() {
-    return new ModeratorClient(this)
+    return new ModeratorClient(this);
   }
 
   async addAdminDid(did: string) {
@@ -118,9 +118,9 @@ export class TestOzone {
       did,
       disabled: false,
       lastUpdatedBy: this.ctx.cfg.service.did,
-      role: 'tools.ozone.team.defs#roleAdmin',
-    })
-    this.ctx.cfg.access.admins.push(did)
+      role: "tools.ozone.team.defs#roleAdmin",
+    });
+    this.ctx.cfg.access.admins.push(did);
   }
 
   async addModeratorDid(did: string) {
@@ -128,9 +128,9 @@ export class TestOzone {
       did,
       disabled: false,
       lastUpdatedBy: this.ctx.cfg.service.did,
-      role: 'tools.ozone.team.defs#roleModerator',
-    })
-    this.ctx.cfg.access.moderators.push(did)
+      role: "tools.ozone.team.defs#roleModerator",
+    });
+    this.ctx.cfg.access.moderators.push(did);
   }
 
   async addTriageDid(did: string) {
@@ -138,38 +138,37 @@ export class TestOzone {
       did,
       disabled: false,
       lastUpdatedBy: this.ctx.cfg.service.did,
-      role: 'tools.ozone.team.defs#roleTriage',
-    })
-    this.ctx.cfg.access.triage.push(did)
+      role: "tools.ozone.team.defs#roleTriage",
+    });
+    this.ctx.cfg.access.triage.push(did);
   }
 
   async modHeaders(
     lxm: string,
-    role: 'admin' | 'moderator' | 'triage' = 'moderator',
+    role: "admin" | "moderator" | "triage" = "moderator",
   ) {
-    const account =
-      role === 'admin'
-        ? this.adminAccnt
-        : role === 'moderator'
-          ? this.moderatorAccnt
-          : this.triageAccnt
+    const account = role === "admin"
+      ? this.adminAccnt
+      : role === "moderator"
+      ? this.moderatorAccnt
+      : this.triageAccnt;
     const jwt = await createServiceJwt({
       iss: account.did,
       aud: this.ctx.cfg.service.did,
       lxm,
       keypair: account.key,
-    })
-    return { authorization: `Bearer ${jwt}` }
+    });
+    return { authorization: `Bearer ${jwt}` };
   }
 
   async processAll() {
-    await this.ctx.backgroundQueue.processAll()
-    await this.daemon.processAll()
+    await this.ctx.backgroundQueue.processAll();
+    await this.daemon.processAll();
   }
 
   async close() {
-    await this.daemon.destroy()
-    await this.server.destroy()
+    await this.daemon.destroy();
+    await this.server.destroy();
   }
 }
 
@@ -177,10 +176,10 @@ export const createOzoneDid = async (
   plcUrl: string,
   keypair: Keypair,
 ): Promise<string> => {
-  const plcClient = new plc.Client(plcUrl)
+  const plcClient = new plc.Client(plcUrl);
   const plcOp = await plc.signOperation(
     {
-      type: 'plc_operation',
+      type: "plc_operation",
       alsoKnownAs: [],
       rotationKeys: [keypair.did()],
       verificationMethods: {
@@ -188,15 +187,15 @@ export const createOzoneDid = async (
       },
       services: {
         atproto_labeler: {
-          type: 'AtprotoLabeler',
-          endpoint: 'https://ozone.public.url',
+          type: "AtprotoLabeler",
+          endpoint: "https://ozone.public.url",
         },
       },
       prev: null,
     },
     keypair,
-  )
-  const did = await plc.didForCreateOp(plcOp)
-  await plcClient.sendOperation(did, plcOp)
-  return did
-}
+  );
+  const did = await plc.didForCreateOp(plcOp);
+  await plcClient.sendOperation(did, plcOp);
+  return did;
+};

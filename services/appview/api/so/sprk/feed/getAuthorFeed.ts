@@ -3,7 +3,7 @@ import { HTTPException } from "hono/http-exception";
 import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";
 import { AppContext, AppEnv } from "../../../../main.ts";
 import { transformPostToPostView } from "../../../../utils/post-transformer.ts";
-import { encodeBase64, decodeBase64 } from "jsr:@std/encoding"
+import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
 
 export const createGetAuthorFeedRouter = (ctx: AppContext) => {
   const router = new Hono<AppEnv>();
@@ -92,7 +92,9 @@ export const createGetAuthorFeedRouter = (ctx: AppContext) => {
 
         if (cursor) {
           try {
-            const decodedCursor = new TextDecoder().decode(decodeBase64(cursor));
+            const decodedCursor = new TextDecoder().decode(
+              decodeBase64(cursor),
+            );
             const [timestamp, id] = decodedCursor.split("::");
             createdAtCursor = timestamp;
             idCursor = id;
@@ -161,7 +163,7 @@ export const createGetAuthorFeedRouter = (ctx: AppContext) => {
         if (hasMore && posts.length > 0) {
           const lastPost = posts[posts.length - 1];
           nextCursor = encodeBase64(
-            new TextEncoder().encode(`${lastPost.createdAt}::${lastPost._id}`)
+            new TextEncoder().encode(`${lastPost.createdAt}::${lastPost._id}`),
           );
         }
 

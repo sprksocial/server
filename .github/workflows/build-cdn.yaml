@@ -4,7 +4,7 @@ name: Build and Push CDN Image
 on:
   push:
     tags:
-      - 'cdn/v*'
+      - "cdn/v*"
 
 jobs:
   build-and-push-cdn:

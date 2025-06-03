@@ -1,7 +1,10 @@
 import { AtUri } from "@atproto/syntax";
 import { CID } from "multiformats/cid";
 import { pino } from "pino";
-import { Database, PostDocument } from "../../services/data-plane/server/index.ts";
+import {
+  Database,
+  PostDocument,
+} from "../../services/data-plane/server/index.ts";
 
 const logger = pino({ name: "post-processor" });
 

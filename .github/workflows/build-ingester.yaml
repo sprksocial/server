@@ -4,7 +4,7 @@ name: Build and Push Ingester Image
 on:
   push:
     tags:
-      - 'ingester/v*'
+      - "ingester/v*"
 
 jobs:
   build-and-push-ingester:

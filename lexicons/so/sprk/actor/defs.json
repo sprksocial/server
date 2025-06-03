@@ -307,7 +307,14 @@
         "sort": {
           "type": "string",
           "description": "Sorting mode for threads.",
-          "knownValues": ["oldest", "newest", "most-likes", "most-looks", "random", "hotness"]
+          "knownValues": [
+            "oldest",
+            "newest",
+            "most-likes",
+            "most-looks",
+            "random",
+            "hotness"
+          ]
         },
         "prioritizeFollowedUsers": {
           "type": "boolean",

@@ -13,20 +13,20 @@ export interface MediaRef {
 }
 
 export interface EmbedImage {
-  alt: string
-  image: MediaRef
+  alt: string;
+  image: MediaRef;
   aspectRatio: {
     width: number;
     height: number;
-  }
+  };
 }
 
 export interface EmbedVideo extends MediaRef {
-  alt: string
+  alt: string;
   aspectRatio: {
     width: number;
     height: number;
-  }
+  };
 }
 
 interface Label {
@@ -130,23 +130,23 @@ export const blockSchema = new Schema<BlockDocument>({
 });
 
 interface PinnedPost {
-  uri: string
-  cid: string
+  uri: string;
+  cid: string;
 }
 
 export interface ProfileDocument extends Document {
-  uri: string
-  displayName?: string
-  description?: string
-  avatar?: MediaRef
-  banner?: MediaRef
-  labels?: Label[]
-  pinnedPost?: PinnedPost
-  authorDid: string
-  authorHandle: string
-  createdAt: string
-  indexedAt: string
-  cid: string
+  uri: string;
+  displayName?: string;
+  description?: string;
+  avatar?: MediaRef;
+  banner?: MediaRef;
+  labels?: Label[];
+  pinnedPost?: PinnedPost;
+  authorDid: string;
+  authorHandle: string;
+  createdAt: string;
+  indexedAt: string;
+  cid: string;
 }
 
 export const profileSchema = new Schema<ProfileDocument>({
@@ -274,33 +274,33 @@ export const musicSchema = new Schema<MusicDocument>({
 });
 
 export interface PostEmbed {
-  $type: string
+  $type: string;
   record?: {
-    uri: string
-    cid: string
-  }
-  alt?: string
-  video?: EmbedVideo
-  images?: Array<EmbedImage>
+    uri: string;
+    cid: string;
+  };
+  alt?: string;
+  video?: EmbedVideo;
+  images?: Array<EmbedImage>;
   external?: {
-    uri: string
-    title: string
-    description: string
-    thumb?: MediaRef
-  }
+    uri: string;
+    title: string;
+    description: string;
+    thumb?: MediaRef;
+  };
   recordWithMedia?: {
     record: {
-      uri: string
-      cid: string
-    }
+      uri: string;
+      cid: string;
+    };
     media: {
-      $type: string
+      $type: string;
       images?: Array<{
-        alt: string
-        image: MediaRef
-      }>
-    }
-  }
+        alt: string;
+        image: MediaRef;
+      }>;
+    };
+  };
 }
 
 export interface PostDocument extends Document {
@@ -389,23 +389,23 @@ musicSchema.index({ tags: 1, createdAt: -1 });
 
 interface Facet {
   index: {
-    byteStart: number
-    byteEnd: number
-  }
+    byteStart: number;
+    byteEnd: number;
+  };
   features: Array<{
-    $type: string
-    uri?: string
-    did?: string
-    tag?: string
-  }>
+    $type: string;
+    uri?: string;
+    did?: string;
+    tag?: string;
+  }>;
 }
 
 interface PostLabel {
-  src: string
-  uri: string
-  cid: string
-  val: string
-  neg: boolean
+  src: string;
+  uri: string;
+  cid: string;
+  val: string;
+  neg: boolean;
 }
 
 export interface GeneratorDocument extends Document {

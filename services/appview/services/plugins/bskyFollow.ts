@@ -1,7 +1,10 @@
 import { AtUri } from "@atproto/syntax";
 import { CID } from "multiformats/cid";
 import { pino } from "pino";
-import { Database, FollowDocument } from "../../services/data-plane/server/index.ts";
+import {
+  Database,
+  FollowDocument,
+} from "../../services/data-plane/server/index.ts";
 
 const logger = pino({ name: "bsky-follow-processor" });
 

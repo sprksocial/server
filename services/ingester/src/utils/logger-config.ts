@@ -1,15 +1,15 @@
-import type { LoggerOptions } from 'pino'
-import { env } from './env'
+import type { LoggerOptions } from "pino";
+import { env } from "./env";
 
 export const customConfig = (name: string): LoggerOptions => {
   return {
     name,
-    level: env.NODE_ENV === 'development' ? 'debug' : 'info',
-    ...(env.NODE_ENV === 'development' && {
+    level: env.NODE_ENV === "development" ? "debug" : "info",
+    ...(env.NODE_ENV === "development" && {
       transport: {
-        target: 'pino-pretty',
+        target: "pino-pretty",
         options: { colorize: true },
       },
     }),
-  }
-}
+  };
+};

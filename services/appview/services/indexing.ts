@@ -273,7 +273,10 @@ export class IndexingService {
    * @param timestamp Current timestamp
    * @returns Whether the actor was recently indexed
    */
-  private isHandleRecentlyIndexed(actor: ActorDocument, timestamp: string): boolean {
+  private isHandleRecentlyIndexed(
+    actor: ActorDocument,
+    timestamp: string,
+  ): boolean {
     if (!actor.indexedAt) return false;
 
     const timeDiff = new Date(timestamp).getTime() -

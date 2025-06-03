@@ -103,7 +103,13 @@ export const createGetPostThreadRouter = (ctx: AppContext) => {
         // Add parent if it exists
         if (parentPosts.length > 0) {
           // Create a nested parent structure
-          let currentParent: { $type: string; post: SoSprkFeedDefs.PostView; parent?: unknown; replies: SoSprkFeedDefs.ThreadViewPost[]; threadContext: SoSprkFeedDefs.ThreadContext } | undefined = undefined;
+          let currentParent: {
+            $type: string;
+            post: SoSprkFeedDefs.PostView;
+            parent?: unknown;
+            replies: SoSprkFeedDefs.ThreadViewPost[];
+            threadContext: SoSprkFeedDefs.ThreadContext;
+          } | undefined = undefined;
 
           // Build parent thread structure from oldest to newest
           for (const parentPost of parentPosts) {
