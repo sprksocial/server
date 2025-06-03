@@ -134,8 +134,9 @@ app.onError((err, c) => {
 
 // Start server
 const { HOST, PORT } = env
-appLogger.info(`Server starting on http://${HOST}:${PORT}`)
-Deno.serve({ hostname: HOST, port: PORT }, app.fetch)
+Deno.serve({ hostname: HOST, port: PORT, onListen: (info) => {
+  appLogger.info(`Server listening on ${info.hostname}:${info.port}`)
+} }, app.fetch)
 
 // Handle shutdown
 Deno.addSignalListener('SIGINT', async () => {
