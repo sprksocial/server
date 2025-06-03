@@ -5,18 +5,18 @@ import {
   ToolsOzoneModerationQueryStatuses as QueryModerationStatuses,
   ToolsOzoneSettingRemoveOptions,
   ToolsOzoneSettingUpsertOption,
-} from '@atproto/api'
-import { TestOzone } from './ozone'
+} from "@atproto/api";
+import { TestOzone } from "./ozone";
 
-type TakeActionInput = EmitModerationEvent.InputSchema
-type QueryStatusesParams = QueryModerationStatuses.QueryParams
-type QueryEventsParams = QueryModerationEvents.QueryParams
-type ModLevel = 'admin' | 'moderator' | 'triage'
+type TakeActionInput = EmitModerationEvent.InputSchema;
+type QueryStatusesParams = QueryModerationStatuses.QueryParams;
+type QueryEventsParams = QueryModerationEvents.QueryParams;
+type ModLevel = "admin" | "moderator" | "triage";
 
 export class ModeratorClient {
-  agent: AtpAgent
+  agent: AtpAgent;
   constructor(public ozone: TestOzone) {
-    this.agent = ozone.getClient()
+    this.agent = ozone.getClient();
   }
 
   async getEvent(id: number, role?: ModLevel) {
@@ -24,12 +24,12 @@ export class ModeratorClient {
       { id },
       {
         headers: await this.ozone.modHeaders(
-          'tools.ozone.moderation.getEvent',
+          "tools.ozone.moderation.getEvent",
           role,
         ),
       },
-    )
-    return result.data
+    );
+    return result.data;
   }
 
   async queryStatuses(input: QueryStatusesParams, role?: ModLevel) {
@@ -37,12 +37,12 @@ export class ModeratorClient {
       input,
       {
         headers: await this.ozone.modHeaders(
-          'tools.ozone.moderation.queryStatuses',
+          "tools.ozone.moderation.queryStatuses",
           role,
         ),
       },
-    )
-    return result.data
+    );
+    return result.data;
   }
 
   async getReporterStats(dids: string[]) {
@@ -50,32 +50,32 @@ export class ModeratorClient {
       { dids },
       {
         headers: await this.ozone.modHeaders(
-          'tools.ozone.moderation.getReporterStats',
-          'admin',
+          "tools.ozone.moderation.getReporterStats",
+          "admin",
         ),
       },
-    )
-    return result.data
+    );
+    return result.data;
   }
 
   async queryEvents(input: QueryEventsParams, role?: ModLevel) {
     const result = await this.agent.tools.ozone.moderation.queryEvents(input, {
       headers: await this.ozone.modHeaders(
-        'tools.ozone.moderation.queryEvents',
+        "tools.ozone.moderation.queryEvents",
         role,
       ),
-    })
-    return result.data
+    });
+    return result.data;
   }
 
   async emitEvent(
     opts: {
-      event: TakeActionInput['event']
-      subject: TakeActionInput['subject']
-      subjectBlobCids?: TakeActionInput['subjectBlobCids']
-      reason?: string
-      createdBy?: string
-      meta?: unknown
+      event: TakeActionInput["event"];
+      subject: TakeActionInput["subject"];
+      subjectBlobCids?: TakeActionInput["subjectBlobCids"];
+      reason?: string;
+      createdBy?: string;
+      meta?: unknown;
     },
     role?: ModLevel,
   ) {
@@ -83,9 +83,9 @@ export class ModeratorClient {
       event,
       subject,
       subjectBlobCids,
-      reason = 'X',
-      createdBy = 'did:example:admin',
-    } = opts
+      reason = "X",
+      createdBy = "did:example:admin",
+    } = opts;
     const result = await this.agent.tools.ozone.moderation.emitEvent(
       {
         event,
@@ -96,63 +96,63 @@ export class ModeratorClient {
         reason,
       },
       {
-        encoding: 'application/json',
+        encoding: "application/json",
         headers: await this.ozone.modHeaders(
-          'tools.ozone.moderation.emitEvent',
+          "tools.ozone.moderation.emitEvent",
           role,
         ),
       },
-    )
-    return result.data
+    );
+    return result.data;
   }
 
   async reverseAction(
     opts: {
-      id: number
-      subject: TakeActionInput['subject']
-      reason?: string
-      createdBy?: string
+      id: number;
+      subject: TakeActionInput["subject"];
+      reason?: string;
+      createdBy?: string;
     },
     role?: ModLevel,
   ) {
-    const { subject, reason = 'X', createdBy = 'did:example:admin' } = opts
+    const { subject, reason = "X", createdBy = "did:example:admin" } = opts;
     const result = await this.agent.tools.ozone.moderation.emitEvent(
       {
         subject,
         event: {
-          $type: 'tools.ozone.moderation.defs#modEventReverseTakedown',
+          $type: "tools.ozone.moderation.defs#modEventReverseTakedown",
           comment: reason,
         },
         createdBy,
       },
       {
-        encoding: 'application/json',
+        encoding: "application/json",
         headers: await this.ozone.modHeaders(
-          'tools.ozone.moderation.emitEvent',
+          "tools.ozone.moderation.emitEvent",
           role,
         ),
       },
-    )
-    return result.data
+    );
+    return result.data;
   }
 
   async performTakedown(
     opts: {
-      subject: TakeActionInput['subject']
-      subjectBlobCids?: TakeActionInput['subjectBlobCids']
-      durationInHours?: number
-      acknowledgeAccountSubjects?: boolean
-      reason?: string
-      policies?: string[]
+      subject: TakeActionInput["subject"];
+      subjectBlobCids?: TakeActionInput["subjectBlobCids"];
+      durationInHours?: number;
+      acknowledgeAccountSubjects?: boolean;
+      reason?: string;
+      policies?: string[];
     },
     role?: ModLevel,
   ) {
     const { durationInHours, acknowledgeAccountSubjects, policies, ...rest } =
-      opts
+      opts;
     return this.emitEvent(
       {
         event: {
-          $type: 'tools.ozone.moderation.defs#modEventTakedown',
+          $type: "tools.ozone.moderation.defs#modEventTakedown",
           acknowledgeAccountSubjects,
           durationInHours,
           policies,
@@ -160,61 +160,61 @@ export class ModeratorClient {
         ...rest,
       },
       role,
-    )
+    );
   }
 
   async performReverseTakedown(
     opts: {
-      subject: TakeActionInput['subject']
-      subjectBlobCids?: TakeActionInput['subjectBlobCids']
-      reason?: string
+      subject: TakeActionInput["subject"];
+      subjectBlobCids?: TakeActionInput["subjectBlobCids"];
+      reason?: string;
     },
     role?: ModLevel,
   ) {
     return this.emitEvent(
       {
         event: {
-          $type: 'tools.ozone.moderation.defs#modEventReverseTakedown',
+          $type: "tools.ozone.moderation.defs#modEventReverseTakedown",
         },
         ...opts,
       },
       role,
-    )
+    );
   }
 
   async upsertSettingOption(
     setting: ToolsOzoneSettingUpsertOption.InputSchema,
-    callerRole: 'admin' | 'moderator' | 'triage' = 'admin',
+    callerRole: "admin" | "moderator" | "triage" = "admin",
   ) {
     const { data } = await this.agent.tools.ozone.setting.upsertOption(
       setting,
       {
-        encoding: 'application/json',
+        encoding: "application/json",
         headers: await this.ozone.modHeaders(
-          'tools.ozone.setting.upsertOption',
+          "tools.ozone.setting.upsertOption",
           callerRole,
         ),
       },
-    )
+    );
 
-    return data
+    return data;
   }
 
   async removeSettingOptions(
     params: ToolsOzoneSettingRemoveOptions.InputSchema,
-    callerRole: 'admin' | 'moderator' | 'triage' = 'admin',
+    callerRole: "admin" | "moderator" | "triage" = "admin",
   ) {
     const { data } = await this.agent.tools.ozone.setting.removeOptions(
       params,
       {
-        encoding: 'application/json',
+        encoding: "application/json",
         headers: await this.ozone.modHeaders(
-          'tools.ozone.setting.removeOptions',
+          "tools.ozone.setting.removeOptions",
           callerRole,
         ),
       },
-    )
+    );
 
-    return data
+    return data;
   }
 }

@@ -1,8 +1,8 @@
-import { pino } from 'pino'
-import { Database } from '../db/connection.js'
-import { customConfig } from './logger-config.js'
+import { pino } from "pino";
+import { Database } from "../db/connection.js";
+import { customConfig } from "./logger-config.js";
 
-const logger = pino(customConfig('actor-utils'))
+const logger = pino(customConfig("actor-utils"));
 
 /**
  * Ensures that an actor exists for the given DID.
@@ -16,30 +16,30 @@ const logger = pino(customConfig('actor-utils'))
 export async function ensureActor(
   did: string,
   handle?: string,
-  db?: Database
+  db?: Database,
 ): Promise<any> {
   if (!db) {
-    logger.warn({ did }, 'No database connection provided to ensureActor')
-    return null
+    logger.warn({ did }, "No database connection provided to ensureActor");
+    return null;
   }
 
   try {
     // Try to find existing actor
-    const existingActor = await db.models.Actor.findOne({ did })
+    const existingActor = await db.models.Actor.findOne({ did });
 
     if (existingActor) {
       // If handle is provided and different from existing, update it
       if (handle && existingActor.handle !== handle) {
-        existingActor.handle = handle
-        await existingActor.save()
-        logger.info({ did, handle }, 'Updated actor handle')
+        existingActor.handle = handle;
+        await existingActor.save();
+        logger.info({ did, handle }, "Updated actor handle");
       }
-      return existingActor
+      return existingActor;
     }
 
     // Create new actor if none exists
-    const now = new Date()
-    const uri = `at://${did}/so.sprk.actor.profile`
+    const now = new Date();
+    const uri = `at://${did}/so.sprk.actor.profile`;
 
     const newActor = await db.models.Actor.create({
       uri,
@@ -50,14 +50,14 @@ export async function ensureActor(
       postsCount: 0,
       indexedAt: now.toISOString(),
       isLabeler: false,
-      priorityNotifications: false
-    })
+      priorityNotifications: false,
+    });
 
-    logger.info({ did, handle }, 'Created new actor')
-    return newActor
+    logger.info({ did, handle }, "Created new actor");
+    return newActor;
   } catch (error) {
-    logger.error({ error, did, handle }, 'Failed to ensure actor exists')
-    return null
+    logger.error({ error, did, handle }, "Failed to ensure actor exists");
+    return null;
   }
 }
 
@@ -73,20 +73,20 @@ export async function linkProfileToActor(
   did: string,
   profileId: string,
   profileCid: string,
-  db: Database
+  db: Database,
 ): Promise<void> {
   try {
     await db.models.Actor.findOneAndUpdate(
       { did },
       {
         profile: profileId,
-        profileCid
+        profileCid,
       },
-      { new: true }
-    )
+      { new: true },
+    );
 
-    logger.info({ did, profileId }, 'Linked profile to actor')
+    logger.info({ did, profileId }, "Linked profile to actor");
   } catch (error) {
-    logger.error({ error, did, profileId }, 'Failed to link profile to actor')
+    logger.error({ error, did, profileId }, "Failed to link profile to actor");
   }
 }

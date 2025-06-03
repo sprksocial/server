@@ -1,6 +1,7 @@
 # Jetstream Ingester Service
 
-This service connects to the Bluesky Jetstream WebSocket service, processes events, and stores them in MongoDB.
+This service connects to the Bluesky Jetstream WebSocket service, processes
+events, and stores them in MongoDB.
 
 ## Features
 
@@ -49,4 +50,5 @@ To add support for new event types:
 1. Create a new handler file in `src/handlers/`
 2. Add the handler to the registry in `src/handlers/index.ts`
 
-This project was created using `bun init` in bun v1.2.2. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+This project was created using `bun init` in bun v1.2.2. [Bun](https://bun.sh)
+is a fast all-in-one JavaScript runtime.

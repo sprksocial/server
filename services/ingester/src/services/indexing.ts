@@ -1,15 +1,15 @@
-import { pino } from 'pino'
-import { Database } from '../db/connection.js'
-import type { BidirectionalResolver } from '../utils/id-resolver.js'
-import { customConfig } from '../utils/logger-config.js'
+import { pino } from "pino";
+import { Database } from "../db/connection.js";
+import type { BidirectionalResolver } from "../utils/id-resolver.js";
+import { customConfig } from "../utils/logger-config.js";
 
-const logger = pino(customConfig('indexing-service'))
+const logger = pino(customConfig("indexing-service"));
 
 /**
  * Service to handle indexing of actors and their handles
  */
 export class IndexingService {
-  private logger = pino(customConfig('indexing-service'))
+  private logger = pino(customConfig("indexing-service"));
 
   constructor(
     private db: Database,
@@ -24,35 +24,43 @@ export class IndexingService {
    * @param force Force reindexing even if recently indexed
    */
 
-  async indexHandle(did: string, timestamp: string, force = false): Promise<void> {
+  async indexHandle(
+    did: string,
+    timestamp: string,
+    force = false,
+  ): Promise<void> {
     try {
       // Find existing actor
-      const actor = await this.db.models.Actor.findOne({ did })
+      const actor = await this.db.models.Actor.findOne({ did });
 
       // Skip if recently indexed and not forced
       if (!force && actor && this.isHandleRecentlyIndexed(actor, timestamp)) {
-        return
+        return;
       }
 
       // Resolve DID to handle
-      const didDoc = await this.resolver.resolveDidToDidDoc(did)
+      const didDoc = await this.resolver.resolveDidToDidDoc(did);
 
       // Verify handle ownership
-      let handle: string | undefined = undefined
+      let handle: string | undefined = undefined;
       if (didDoc.handle) {
-        const handleDidDoc = await this.resolver.resolveHandleToDidDoc(didDoc.handle)
-        handle = did === handleDidDoc.did ? didDoc.handle.toLowerCase() : undefined
+        const handleDidDoc = await this.resolver.resolveHandleToDidDoc(
+          didDoc.handle,
+        );
+        handle = did === handleDidDoc.did
+          ? didDoc.handle.toLowerCase()
+          : undefined;
       }
 
       // Handle conflict resolution - if another actor has this handle
       if (handle) {
-        const actorWithHandle = await this.db.models.Actor.findOne({ handle })
+        const actorWithHandle = await this.db.models.Actor.findOne({ handle });
         if (actorWithHandle && actorWithHandle.did !== did) {
           // Clear handle from the other actor
           await this.db.models.Actor.updateOne(
             { did: actorWithHandle.did },
-            { $set: { handle: null } }
-          )
+            { $set: { handle: null } },
+          );
         }
       }
 
@@ -62,13 +70,13 @@ export class IndexingService {
         {
           $set: {
             handle,
-            indexedAt: timestamp
+            indexedAt: timestamp,
           },
         },
-        { upsert: true }
-      )
+        { upsert: true },
+      );
     } catch (error) {
-      this.logger.error({ error, did }, 'Error indexing handle')
+      this.logger.error({ error, did }, "Error indexing handle");
     }
   }
 
@@ -76,18 +84,19 @@ export class IndexingService {
    * Check if an actor's handle was recently indexed
    */
   private isHandleRecentlyIndexed(actor: any, timestamp: string): boolean {
-    if (!actor.indexedAt) return false
+    if (!actor.indexedAt) return false;
 
-    const timeDiff = new Date(timestamp).getTime() - new Date(actor.indexedAt).getTime()
-    const ONE_DAY = 24 * 60 * 60 * 1000
-    const ONE_HOUR = 60 * 60 * 1000
+    const timeDiff = new Date(timestamp).getTime() -
+      new Date(actor.indexedAt).getTime();
+    const ONE_DAY = 24 * 60 * 60 * 1000;
+    const ONE_HOUR = 60 * 60 * 1000;
 
     // Reindex daily for all actors
-    if (timeDiff > ONE_DAY) return false
+    if (timeDiff > ONE_DAY) return false;
 
     // Reindex more frequently for actors without handles
-    if (actor.handle === null && timeDiff > ONE_HOUR) return false
+    if (actor.handle === null && timeDiff > ONE_HOUR) return false;
 
-    return true
+    return true;
   }
 }

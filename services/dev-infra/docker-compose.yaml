@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   # An ephermerally-stored postgres database for single-use test runs
   db_test: &db_test
@@ -7,10 +7,10 @@ services:
       - POSTGRES_USER=pg
       - POSTGRES_PASSWORD=password
     ports:
-      - '5433:5432'
+      - "5433:5432"
     # Healthcheck ensures db is queryable when `docker-compose up --wait` completes
     healthcheck:
-      test: 'pg_isready -U pg'
+      test: "pg_isready -U pg"
       interval: 500ms
       timeout: 10s
       retries: 20
@@ -18,7 +18,7 @@ services:
   db:
     <<: *db_test
     ports:
-      - '5432:5432'
+      - "5432:5432"
     healthcheck:
       disable: true
     volumes:
@@ -27,10 +27,10 @@ services:
   redis_test: &redis_test
     image: redis:7.0-alpine
     ports:
-      - '6380:6379'
+      - "6380:6379"
     # Healthcheck ensures redis is queryable when `docker-compose up --wait` completes
     healthcheck:
-      test: ['CMD-SHELL', '[ "$$(redis-cli ping)" = "PONG" ]']
+      test: ["CMD-SHELL", '[ "$$(redis-cli ping)" = "PONG" ]']
       interval: 500ms
       timeout: 10s
       retries: 20
@@ -39,7 +39,7 @@ services:
     <<: *redis_test
     command: redis-server --save 60 1 --loglevel warning
     ports:
-      - '6379:6379'
+      - "6379:6379"
     healthcheck:
       disable: true
     volumes:

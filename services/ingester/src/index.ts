@@ -1,51 +1,54 @@
-import { pino } from 'pino'
-import { Database } from './db/connection.js'
+import { pino } from "pino";
+import { Database } from "./db/connection.js";
 import {
-  createIdResolver,
   createBidirectionalResolver,
-} from './utils/id-resolver.js'
-import { createJetstreamClient } from './utils/jetstream-client.js'
-import { customConfig } from './utils/logger-config.js'
+  createIdResolver,
+} from "./utils/id-resolver.js";
+import { createJetstreamClient } from "./utils/jetstream-client.js";
+import { customConfig } from "./utils/logger-config.js";
 
-const logger = pino(customConfig('ingester'))
+const logger = pino(customConfig("ingester"));
 
 async function main() {
-  logger.info('Starting Jetstream ingester service')
+  logger.info("Starting Jetstream ingester service");
 
   // Set up database connection
-  const db = new Database()
+  const db = new Database();
   try {
-    await db.connect()
+    await db.connect();
   } catch (err) {
-    logger.error({ err }, 'Failed to connect to database')
-    process.exit(1)
+    logger.error({ err }, "Failed to connect to database");
+    process.exit(1);
   }
 
   // Create ID resolver
-  const resolver = createIdResolver()
-  const bidirectionalResolver = createBidirectionalResolver(resolver)
+  const resolver = createIdResolver();
+  const bidirectionalResolver = createBidirectionalResolver(resolver);
 
   // Create and start Jetstream client
-  const jetstreamClient = await createJetstreamClient(db, bidirectionalResolver)
+  const jetstreamClient = await createJetstreamClient(
+    db,
+    bidirectionalResolver,
+  );
   const connection = jetstreamClient.connect({
-    filterCollections: ['so.sprk.*', 'app.bsky.graph.follow'],
-  })
+    filterCollections: ["so.sprk.*", "app.bsky.graph.follow"],
+  });
 
   // Handle shutdown gracefully
   const shutdown = async () => {
-    logger.info('Shutting down...')
-    connection.close()
-    await db.disconnect()
-    process.exit(0)
-  }
+    logger.info("Shutting down...");
+    connection.close();
+    await db.disconnect();
+    process.exit(0);
+  };
 
-  process.on('SIGINT', shutdown)
-  process.on('SIGTERM', shutdown)
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
 
-  logger.info('Ingester service is running')
+  logger.info("Ingester service is running");
 }
 
 main().catch((err) => {
-  logger.error({ err }, 'Fatal error in main process')
-  process.exit(1)
-})
+  logger.error({ err }, "Fatal error in main process");
+  process.exit(1);
+});

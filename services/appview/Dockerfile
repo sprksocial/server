@@ -1,30 +1,19 @@
-FROM node:20-alpine AS builder
+FROM denoland/deno:alpine-2.3.5 AS builder
 
 WORKDIR /app
-
-COPY package.json pnpm-lock.yaml ./
-RUN corepack enable && corepack prepare --activate
-
-RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN pnpm run build
+RUN deno cache main.ts
 
-FROM node:20-alpine AS production
-
-WORKDIR /app
+FROM denoland/deno:alpine-2.3.5 AS production
 
 ENV NODE_ENV=production
 
-COPY package.json pnpm-lock.yaml ./
+WORKDIR /app
 
-RUN corepack enable && corepack prepare --activate
-
-RUN pnpm install --frozen-lockfile --prod
-
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app .
 
 EXPOSE 3000
 
-CMD ["node", "dist/index.js"]
+CMD ["deno", "task", "start"]

@@ -29,18 +29,18 @@ Yes, yes, I remember, I had lasagna.`,
   `Jim never vomits at home.`,
   `The life of everyone on board depends upon just one thing: finding someone back there who can not only fly this plane, but who didn't have fish for dinner.`,
   `Shanna, they bought their tickets, they knew what they were getting into. I say, let 'em crash.`,
-]
+];
 
 export const replyTexts = [
-  'Wow, so true!',
-  'Haha ikr',
-  'lol',
-  'What does this mean for pet owners in the midterms?',
-  'is it cool if I DM?',
+  "Wow, so true!",
+  "Haha ikr",
+  "lol",
+  "What does this mean for pet owners in the midterms?",
+  "is it cool if I DM?",
   "This is sort of accurate, but honestly it misses a huge part of the issue at hand. There are just so many factors and I don't think a vibe is enough to cover it.",
-  'Wen token',
-  'fire',
-  'a/s/l?',
-  'finally! decentralization!',
-  'ugh when will hashtags get supported in this app',
-]
+  "Wen token",
+  "fire",
+  "a/s/l?",
+  "finally! decentralization!",
+  "ugh when will hashtags get supported in this app",
+];
