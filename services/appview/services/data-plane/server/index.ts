@@ -373,6 +373,45 @@ export const postSchema = new Schema<PostDocument>({
 postSchema.index({ authorDid: 1, createdAt: -1 });
 postSchema.index({ tags: 1, createdAt: -1 });
 
+export interface StoryDocument extends Document {
+  uri: string;
+  media: PostEmbed | null;
+  sound: {
+    uri: string;
+    cid: string;
+  } | null;
+  labels: PostLabel[] | null;
+  tags: string[];
+  authorDid: string;
+  authorHandle: string;
+  createdAt: string;
+  indexedAt: string;
+  cid: string;
+}
+
+export const storySchema = new Schema<StoryDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  media: { type: Object, required: false, default: null },
+  sound: {
+    type: {
+      uri: { type: String, required: true },
+      cid: { type: String, required: true },
+    },
+    required: false,
+    default: null,
+  },
+  labels: { type: Object, required: false, default: null },
+  tags: { type: [String], required: false, default: [] },
+  authorDid: { type: String, required: true, index: true },
+  authorHandle: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+  cid: { type: String, required: true },
+});
+
+storySchema.index({ authorDid: 1, createdAt: -1 });
+storySchema.index({ tags: 1, createdAt: -1 });
+
 followSchema.index({ authorDid: 1, subject: 1, type: 1 }, { unique: true });
 followSchema.index({ subject: 1, createdAt: -1 });
 followSchema.index({ type: 1, createdAt: -1 });
@@ -551,6 +590,7 @@ export const userPreferenceSchema = new Schema<UserPreferenceDocument>({
 export interface DatabaseModels {
   Like: Model<LikeDocument>;
   Post: Model<PostDocument>;
+  Story: Model<StoryDocument>;
   Follow: Model<FollowDocument>;
   Block: Model<BlockDocument>;
   Profile: Model<ProfileDocument>;
@@ -601,6 +641,7 @@ export class Database implements DataPlaneClient {
       this.models = {
         Like: this.connection.model<LikeDocument>("Like", likeSchema),
         Post: this.connection.model<PostDocument>("Post", postSchema),
+        Story: this.connection.model<StoryDocument>("Story", storySchema),
         Follow: this.connection.model<FollowDocument>("Follow", followSchema),
         Block: this.connection.model<BlockDocument>("Block", blockSchema),
         Profile: this.connection.model<ProfileDocument>(

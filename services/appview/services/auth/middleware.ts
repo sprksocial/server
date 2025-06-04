@@ -51,8 +51,8 @@ export const authMiddleware = async (
       const jwt = authHeader.replace("Bearer ", "").trim();
 
       // The service DID and resolver should be passed from app context
-      const serviceDid = c.get("serviceDid");
-      const didResolver = c.get("didResolver") as DidResolver;
+      const serviceDid = c.env.serviceDid as string;
+      const didResolver = c.env.didResolver as DidResolver;
 
       const parsed = await verifyJwt(
         jwt,

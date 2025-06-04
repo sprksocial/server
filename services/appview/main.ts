@@ -31,6 +31,8 @@ import { createGetPreferencesRouter } from "./api/so/sprk/actor/getPreferences.t
 import { BidirectionalResolver } from "./utils/id-resolver.ts";
 import { DidResolver } from "@atproto/identity";
 import { AuthVerifier } from "./services/auth/auth-verifier.ts";
+import { createGetStoriesTimelineRouter } from "./api/so/sprk/feed/getStoriesTimeline.ts";
+import { createGetStoriesRouter } from "./api/so/sprk/feed/getStories.ts";
 
 // Setup logger and database
 const appLogger = pino({ name: "server start" });
@@ -102,6 +104,8 @@ const lexServer = createServer();
 API(lexServer, ctx);
 
 app.route("/", createGetPostsRouter(ctx));
+app.route("/", createGetStoriesRouter(ctx));
+app.route("/", createGetStoriesTimelineRouter(ctx));
 app.route("/", createGetPostThreadRouter(ctx));
 app.route("/", createGetProfileRouter(ctx));
 app.route("/", createGetFollowersRouter(ctx));

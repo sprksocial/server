@@ -23,7 +23,15 @@
           "type": "array",
           "items": { "type": "ref", "ref": "com.atproto.label.defs#label" }
         },
-        "createdAt": { "type": "string", "format": "datetime" }
+        "createdAt": { "type": "string", "format": "datetime" },
+        "stories": {
+          "type": "array",
+          "description": "Recent stories from this profile author.",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
       }
     },
     "profileView": {
@@ -95,6 +103,14 @@
         "pinnedPost": {
           "type": "ref",
           "ref": "com.atproto.repo.strongRef"
+        },
+        "stories": {
+          "type": "array",
+          "description": "Recent stories from this profile author.",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
         }
       }
     },

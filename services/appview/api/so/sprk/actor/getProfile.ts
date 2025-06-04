@@ -1,11 +1,11 @@
 import { ensureValidDid, isValidHandle } from "@atproto/syntax";
 import { Hono } from "hono";
 
-import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";
-import { AppContext, AppEnv } from "../../../../main.ts";
 import type { Label } from "../../../../lexicon/types/com/atproto/label/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../../lexicon/types/com/atproto/repo/strongRef.ts";
 import type * as SoSprkActorDefs from "../../../../lexicon/types/so/sprk/actor/defs.ts";
+import { AppContext, AppEnv } from "../../../../main.ts";
+import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";
 
 export const createGetProfileRouter = (ctx: AppContext) => {
   const router = new Hono<AppEnv>();
@@ -28,7 +28,7 @@ export const createGetProfileRouter = (ctx: AppContext) => {
         try {
           ensureValidDid(actorParam);
           actorDidDoc = await ctx.resolver.resolveDidToDidDoc(actorParam);
-        } catch {
+        } catch (_err) {
           return c.json({ error: "Invalid actor" }, 400);
         }
       }
@@ -134,7 +134,7 @@ export const createGetProfileRouter = (ctx: AppContext) => {
             authorDid: actorDid,
           });
         }
-      } catch {
+      } catch (_error) {
         // Ignore if model doesn't exist
       }
 
@@ -165,21 +165,53 @@ export const createGetProfileRouter = (ctx: AppContext) => {
           .pinnedPost as unknown as ComAtprotoRepoStrongRef.Main;
       }
 
-      // Count unique followers across both Sprk and Bsky follow types
-      const followersCount = await ctx.db.models.Follow.aggregate([
-        { $match: { subject: actorDid } },
-        { $group: { _id: "$authorDid" } },
-        { $count: "total" },
-      ]).then((result) => result[0]?.total || 0);
+      const twentyFourHoursAgo = new Date();
+      twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
 
-      // Count follows based on actor's follow mode preference
-      const followsCount = await ctx.db.models.Follow.countDocuments({
-        authorDid: actorDid,
-        type: actorFollowMode,
-      });
-      const postsCount = await ctx.db.models.Post.countDocuments({
-        authorDid: actorDid,
-      });
+      const [recentStories, followersCount, followsCount, postsCount] =
+        await Promise.all([
+          // Fetch recent stories (within 24 hours)
+          ctx.db.models.Story.find({
+            authorDid: actorDid,
+            indexedAt: { $gte: twentyFourHoursAgo.toISOString() },
+          })
+            .sort({ indexedAt: -1 })
+            .limit(15)
+            .lean()
+            .catch((error) => {
+              ctx.logger.warn(
+                { error, actorDid },
+                "Failed to fetch stories for profile",
+              );
+              return [];
+            }),
+
+          // Count unique followers across both Sprk and Bsky follow types
+          ctx.db.models.Follow.aggregate([
+            { $match: { subject: actorDid } },
+            { $group: { _id: "$authorDid" } },
+            { $count: "total" },
+          ]).then((result) => result[0]?.total || 0),
+
+          // Count follows based on actor's follow mode preference
+          ctx.db.models.Follow.countDocuments({
+            authorDid: actorDid,
+            type: actorFollowMode,
+          }),
+
+          // Count posts
+          ctx.db.models.Post.countDocuments({
+            authorDid: actorDid,
+          }),
+        ]);
+
+      // Convert recent stories to strongRefs
+      const stories: ComAtprotoRepoStrongRef.Main[] = recentStories.map(
+        (story) => ({
+          uri: story.uri,
+          cid: story.cid,
+        }),
+      );
 
       // Build the ProfileViewDetailed response
       const profileView: SoSprkActorDefs.ProfileViewDetailed = {
@@ -198,6 +230,7 @@ export const createGetProfileRouter = (ctx: AppContext) => {
         viewer: Object.keys(viewer).length > 0 ? viewer : undefined,
         labels,
         pinnedPost,
+        stories: stories.length > 0 ? stories : undefined,
       };
 
       return c.json(profileView);

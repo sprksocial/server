@@ -13,6 +13,7 @@ import {
   postSchema,
   profileSchema,
   repostSchema,
+  storySchema,
 } from "./models.js";
 import { env } from "../utils/env.js";
 import { pino } from "pino";
@@ -28,6 +29,7 @@ export class Database {
     this.models = {
       Like: this.connection.model("Like", likeSchema),
       Post: this.connection.model("Post", postSchema),
+      Story: this.connection.model("Story", storySchema),
       Follow: this.connection.model("Follow", followSchema),
       Block: this.connection.model("Block", blockSchema),
       Profile: this.connection.model("Profile", profileSchema),
@@ -81,10 +83,6 @@ export class Database {
         identifier: this.CURSOR_IDENTIFIER,
       }).exec();
       if (state) {
-        this.logger.info(
-          { cursorValue: state.cursorValue },
-          "Loaded cursor state",
-        );
         return state.cursorValue;
       }
       this.logger.info("No cursor state found in database.");
@@ -105,7 +103,10 @@ export class Database {
         },
         { upsert: true },
       ).exec();
-      this.logger.debug({ cursorValue }, "Saved cursor state");
+      this.logger.debug({
+        cursorValue,
+        formattedDate: new Date(Math.floor(cursorValue / 1000)).toISOString(),
+      }, "Saved cursor state");
     } catch (error) {
       this.logger.error({ cursorValue, error }, "Failed to save cursor state");
       // Depending on desired behavior, you might want to rethrow or handle more gracefully

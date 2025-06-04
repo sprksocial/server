@@ -22,7 +22,11 @@ export async function createJetstreamClient(
   let cursorPosition: number | null = await db.getCursorState();
   if (cursorPosition) {
     logger.info(
-      { initialCursor: cursorPosition },
+      {
+        initialCursor: cursorPosition,
+        formattedDate: new Date(Math.floor(cursorPosition / 1000))
+          .toISOString(),
+      },
       "Loaded initial cursor from DB",
     );
   } else {
@@ -32,6 +36,7 @@ export async function createJetstreamClient(
   let wsConnection: WebSocket | null = null;
   let heartbeatInterval: Timer | null = null;
   let saveCursorInterval: Timer | null = null; // Added for periodic cursor saving
+  let lastSavedCursorPosition: number | null = cursorPosition;
 
   function connect(options: JetstreamClientOptions = {}): {
     close: () => void;
@@ -131,10 +136,12 @@ export async function createJetstreamClient(
   function startPeriodicCursorSave() {
     clearSaveCursorInterval(); // Clear any existing interval first
     saveCursorInterval = setInterval(async () => {
-      if (cursorPosition !== null) {
+      if (
+        cursorPosition !== null && cursorPosition !== lastSavedCursorPosition
+      ) {
         try {
           await db.saveCursorState(cursorPosition);
-          logger.debug({ cursorPosition }, "Periodically saved cursor state");
+          lastSavedCursorPosition = cursorPosition;
         } catch (error) {
           logger.error(
             { cursorPosition, error },

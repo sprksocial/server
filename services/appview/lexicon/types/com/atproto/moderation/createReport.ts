@@ -1,69 +1,73 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import express from "express";
-import { BlobRef, ValidationResult } from "@atproto/lexicon";
-import { CID } from "multiformats/cid";
-import { validate as _validate } from "../../../../lexicons";
-import { $Typed, is$typed as _is$typed, OmitKey } from "../../../../util";
-import { HandlerAuth, HandlerPipeThrough } from "@atproto/xrpc-server";
-import type * as ComAtprotoModerationDefs from "./defs.ts";
-import type * as ComAtprotoAdminDefs from "../admin/defs.ts";
-import type * as ComAtprotoRepoStrongRef from "../repo/strongRef.ts";
+import express from 'express'
+import { type ValidationResult, BlobRef } from '@atproto/lexicon'
+import { CID } from 'multiformats/cid'
+import { validate as _validate } from '../../../../lexicons'
+import {
+  type $Typed,
+  is$typed as _is$typed,
+  type OmitKey,
+} from '../../../../util'
+import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
+import type * as ComAtprotoModerationDefs from './defs.js'
+import type * as ComAtprotoAdminDefs from '../admin/defs.js'
+import type * as ComAtprotoRepoStrongRef from '../repo/strongRef.js'
 
 const is$typed = _is$typed,
-  validate = _validate;
-const id = "com.atproto.moderation.createReport";
+  validate = _validate
+const id = 'com.atproto.moderation.createReport'
 
 export interface QueryParams {}
 
 export interface InputSchema {
-  reasonType: ComAtprotoModerationDefs.ReasonType;
+  reasonType: ComAtprotoModerationDefs.ReasonType
   /** Additional context about the content and violation. */
-  reason?: string;
+  reason?: string
   subject:
     | $Typed<ComAtprotoAdminDefs.RepoRef>
     | $Typed<ComAtprotoRepoStrongRef.Main>
-    | { $type: string };
+    | { $type: string }
 }
 
 export interface OutputSchema {
-  id: number;
-  reasonType: ComAtprotoModerationDefs.ReasonType;
-  reason?: string;
+  id: number
+  reasonType: ComAtprotoModerationDefs.ReasonType
+  reason?: string
   subject:
     | $Typed<ComAtprotoAdminDefs.RepoRef>
     | $Typed<ComAtprotoRepoStrongRef.Main>
-    | { $type: string };
-  reportedBy: string;
-  createdAt: string;
+    | { $type: string }
+  reportedBy: string
+  createdAt: string
 }
 
 export interface HandlerInput {
-  encoding: "application/json";
-  body: InputSchema;
+  encoding: 'application/json'
+  body: InputSchema
 }
 
 export interface HandlerSuccess {
-  encoding: "application/json";
-  body: OutputSchema;
-  headers?: { [key: string]: string };
+  encoding: 'application/json'
+  body: OutputSchema
+  headers?: { [key: string]: string }
 }
 
 export interface HandlerError {
-  status: number;
-  message?: string;
+  status: number
+  message?: string
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough;
+export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough
 export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA;
-  params: QueryParams;
-  input: HandlerInput;
-  req: express.Request;
-  res: express.Response;
-  resetRouteRateLimits: () => Promise<void>;
-};
+  auth: HA
+  params: QueryParams
+  input: HandlerInput
+  req: express.Request
+  res: express.Response
+  resetRouteRateLimits: () => Promise<void>
+}
 export type Handler<HA extends HandlerAuth = never> = (
   ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput;
+) => Promise<HandlerOutput> | HandlerOutput
