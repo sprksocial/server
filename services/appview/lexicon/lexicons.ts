@@ -2,126 +2,126 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import {
-  LexiconDoc,
+  type LexiconDoc,
   Lexicons,
   ValidationError,
-  ValidationResult,
-} from "@atproto/lexicon";
-import { $Typed, is$typed, maybe$typed } from "./util.ts";
+  type ValidationResult,
+} from '@atproto/lexicon'
+import { type $Typed, is$typed, maybe$typed } from './util.js'
 
 export const schemaDict = {
   ComAtprotoAdminDefs: {
     lexicon: 1,
-    id: "com.atproto.admin.defs",
+    id: 'com.atproto.admin.defs',
     defs: {
       statusAttr: {
-        type: "object",
-        required: ["applied"],
+        type: 'object',
+        required: ['applied'],
         properties: {
           applied: {
-            type: "boolean",
+            type: 'boolean',
           },
           ref: {
-            type: "string",
+            type: 'string',
           },
         },
       },
       accountView: {
-        type: "object",
-        required: ["did", "handle", "indexedAt"],
+        type: 'object',
+        required: ['did', 'handle', 'indexedAt'],
         properties: {
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           handle: {
-            type: "string",
-            format: "handle",
+            type: 'string',
+            format: 'handle',
           },
           email: {
-            type: "string",
+            type: 'string',
           },
           relatedRecords: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "unknown",
+              type: 'unknown',
             },
           },
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           invitedBy: {
-            type: "ref",
-            ref: "lex:com.atproto.server.defs#inviteCode",
+            type: 'ref',
+            ref: 'lex:com.atproto.server.defs#inviteCode',
           },
           invites: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.server.defs#inviteCode",
+              type: 'ref',
+              ref: 'lex:com.atproto.server.defs#inviteCode',
             },
           },
           invitesDisabled: {
-            type: "boolean",
+            type: 'boolean',
           },
           emailConfirmedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           inviteNote: {
-            type: "string",
+            type: 'string',
           },
           deactivatedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           threatSignatures: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.admin.defs#threatSignature",
+              type: 'ref',
+              ref: 'lex:com.atproto.admin.defs#threatSignature',
             },
           },
         },
       },
       repoRef: {
-        type: "object",
-        required: ["did"],
+        type: 'object',
+        required: ['did'],
         properties: {
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
         },
       },
       repoBlobRef: {
-        type: "object",
-        required: ["did", "cid"],
+        type: 'object',
+        required: ['did', 'cid'],
         properties: {
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           recordUri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
         },
       },
       threatSignature: {
-        type: "object",
-        required: ["property", "value"],
+        type: 'object',
+        required: ['property', 'value'],
         properties: {
           property: {
-            type: "string",
+            type: 'string',
           },
           value: {
-            type: "string",
+            type: 'string',
           },
         },
       },
@@ -129,20 +129,20 @@ export const schemaDict = {
   },
   ComAtprotoAdminDeleteAccount: {
     lexicon: 1,
-    id: "com.atproto.admin.deleteAccount",
+    id: 'com.atproto.admin.deleteAccount',
     defs: {
       main: {
-        type: "procedure",
-        description: "Delete a user account as an administrator.",
+        type: 'procedure',
+        description: 'Delete a user account as an administrator.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["did"],
+            type: 'object',
+            required: ['did'],
             properties: {
               did: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
             },
           },
@@ -152,25 +152,25 @@ export const schemaDict = {
   },
   ComAtprotoAdminDisableAccountInvites: {
     lexicon: 1,
-    id: "com.atproto.admin.disableAccountInvites",
+    id: 'com.atproto.admin.disableAccountInvites',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Disable an account from receiving new invite codes, but does not invalidate existing codes.",
+          'Disable an account from receiving new invite codes, but does not invalidate existing codes.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["account"],
+            type: 'object',
+            required: ['account'],
             properties: {
               account: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               note: {
-                type: "string",
-                description: "Optional reason for disabled invites.",
+                type: 'string',
+                description: 'Optional reason for disabled invites.',
               },
             },
           },
@@ -180,27 +180,27 @@ export const schemaDict = {
   },
   ComAtprotoAdminDisableInviteCodes: {
     lexicon: 1,
-    id: "com.atproto.admin.disableInviteCodes",
+    id: 'com.atproto.admin.disableInviteCodes',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Disable some set of codes and/or all codes associated with a set of users.",
+          'Disable some set of codes and/or all codes associated with a set of users.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             properties: {
               codes: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "string",
+                  type: 'string',
                 },
               },
               accounts: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "string",
+                  type: 'string',
                 },
               },
             },
@@ -211,24 +211,24 @@ export const schemaDict = {
   },
   ComAtprotoAdminEnableAccountInvites: {
     lexicon: 1,
-    id: "com.atproto.admin.enableAccountInvites",
+    id: 'com.atproto.admin.enableAccountInvites',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description: "Re-enable an account's ability to receive invite codes.",
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["account"],
+            type: 'object',
+            required: ['account'],
             properties: {
               account: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               note: {
-                type: "string",
-                description: "Optional reason for enabled invites.",
+                type: 'string',
+                description: 'Optional reason for enabled invites.',
               },
             },
           },
@@ -238,26 +238,26 @@ export const schemaDict = {
   },
   ComAtprotoAdminGetAccountInfo: {
     lexicon: 1,
-    id: "com.atproto.admin.getAccountInfo",
+    id: 'com.atproto.admin.getAccountInfo',
     defs: {
       main: {
-        type: "query",
-        description: "Get details about an account.",
+        type: 'query',
+        description: 'Get details about an account.',
         parameters: {
-          type: "params",
-          required: ["did"],
+          type: 'params',
+          required: ['did'],
           properties: {
             did: {
-              type: "string",
-              format: "did",
+              type: 'string',
+              format: 'did',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "ref",
-            ref: "lex:com.atproto.admin.defs#accountView",
+            type: 'ref',
+            ref: 'lex:com.atproto.admin.defs#accountView',
           },
         },
       },
@@ -265,35 +265,35 @@ export const schemaDict = {
   },
   ComAtprotoAdminGetAccountInfos: {
     lexicon: 1,
-    id: "com.atproto.admin.getAccountInfos",
+    id: 'com.atproto.admin.getAccountInfos',
     defs: {
       main: {
-        type: "query",
-        description: "Get details about some accounts.",
+        type: 'query',
+        description: 'Get details about some accounts.',
         parameters: {
-          type: "params",
-          required: ["dids"],
+          type: 'params',
+          required: ['dids'],
           properties: {
             dids: {
-              type: "array",
+              type: 'array',
               items: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["infos"],
+            type: 'object',
+            required: ['infos'],
             properties: {
               infos: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:com.atproto.admin.defs#accountView",
+                  type: 'ref',
+                  ref: 'lex:com.atproto.admin.defs#accountView',
                 },
               },
             },
@@ -304,44 +304,44 @@ export const schemaDict = {
   },
   ComAtprotoAdminGetInviteCodes: {
     lexicon: 1,
-    id: "com.atproto.admin.getInviteCodes",
+    id: 'com.atproto.admin.getInviteCodes',
     defs: {
       main: {
-        type: "query",
-        description: "Get an admin view of invite codes.",
+        type: 'query',
+        description: 'Get an admin view of invite codes.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             sort: {
-              type: "string",
-              knownValues: ["recent", "usage"],
-              default: "recent",
+              type: 'string',
+              knownValues: ['recent', 'usage'],
+              default: 'recent',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 500,
               default: 100,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["codes"],
+            type: 'object',
+            required: ['codes'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               codes: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:com.atproto.server.defs#inviteCode",
+                  type: 'ref',
+                  ref: 'lex:com.atproto.server.defs#inviteCode',
                 },
               },
             },
@@ -352,50 +352,50 @@ export const schemaDict = {
   },
   ComAtprotoAdminGetSubjectStatus: {
     lexicon: 1,
-    id: "com.atproto.admin.getSubjectStatus",
+    id: 'com.atproto.admin.getSubjectStatus',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get the service-specific admin status of a subject (account, record, or blob).",
+          'Get the service-specific admin status of a subject (account, record, or blob).',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             did: {
-              type: "string",
-              format: "did",
+              type: 'string',
+              format: 'did',
             },
             uri: {
-              type: "string",
-              format: "at-uri",
+              type: 'string',
+              format: 'at-uri',
             },
             blob: {
-              type: "string",
-              format: "cid",
+              type: 'string',
+              format: 'cid',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["subject"],
+            type: 'object',
+            required: ['subject'],
             properties: {
               subject: {
-                type: "union",
+                type: 'union',
                 refs: [
-                  "lex:com.atproto.admin.defs#repoRef",
-                  "lex:com.atproto.repo.strongRef",
-                  "lex:com.atproto.admin.defs#repoBlobRef",
+                  'lex:com.atproto.admin.defs#repoRef',
+                  'lex:com.atproto.repo.strongRef',
+                  'lex:com.atproto.admin.defs#repoBlobRef',
                 ],
               },
               takedown: {
-                type: "ref",
-                ref: "lex:com.atproto.admin.defs#statusAttr",
+                type: 'ref',
+                ref: 'lex:com.atproto.admin.defs#statusAttr',
               },
               deactivated: {
-                type: "ref",
-                ref: "lex:com.atproto.admin.defs#statusAttr",
+                type: 'ref',
+                ref: 'lex:com.atproto.admin.defs#statusAttr',
               },
             },
           },
@@ -405,22 +405,22 @@ export const schemaDict = {
   },
   ComAtprotoAdminSearchAccounts: {
     lexicon: 1,
-    id: "com.atproto.admin.searchAccounts",
+    id: 'com.atproto.admin.searchAccounts',
     defs: {
       main: {
-        type: "query",
-        description: "Get list of accounts that matches your search query.",
+        type: 'query',
+        description: 'Get list of accounts that matches your search query.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             email: {
-              type: "string",
+              type: 'string',
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
@@ -428,19 +428,19 @@ export const schemaDict = {
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["accounts"],
+            type: 'object',
+            required: ['accounts'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               accounts: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:com.atproto.admin.defs#accountView",
+                  type: 'ref',
+                  ref: 'lex:com.atproto.admin.defs#accountView',
                 },
               },
             },
@@ -451,33 +451,33 @@ export const schemaDict = {
   },
   ComAtprotoAdminSendEmail: {
     lexicon: 1,
-    id: "com.atproto.admin.sendEmail",
+    id: 'com.atproto.admin.sendEmail',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description: "Send email to a user's account email address.",
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["recipientDid", "content", "senderDid"],
+            type: 'object',
+            required: ['recipientDid', 'content', 'senderDid'],
             properties: {
               recipientDid: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               content: {
-                type: "string",
+                type: 'string',
               },
               subject: {
-                type: "string",
+                type: 'string',
               },
               senderDid: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               comment: {
-                type: "string",
+                type: 'string',
                 description:
                   "Additional comment by the sender that won't be used in the email itself but helpful to provide more context for moderators/reviewers",
               },
@@ -485,13 +485,13 @@ export const schemaDict = {
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["sent"],
+            type: 'object',
+            required: ['sent'],
             properties: {
               sent: {
-                type: "boolean",
+                type: 'boolean',
               },
             },
           },
@@ -501,24 +501,24 @@ export const schemaDict = {
   },
   ComAtprotoAdminUpdateAccountEmail: {
     lexicon: 1,
-    id: "com.atproto.admin.updateAccountEmail",
+    id: 'com.atproto.admin.updateAccountEmail',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description: "Administrative action to update an account's email.",
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["account", "email"],
+            type: 'object',
+            required: ['account', 'email'],
             properties: {
               account: {
-                type: "string",
-                format: "at-identifier",
-                description: "The handle or DID of the repo.",
+                type: 'string',
+                format: 'at-identifier',
+                description: 'The handle or DID of the repo.',
               },
               email: {
-                type: "string",
+                type: 'string',
               },
             },
           },
@@ -528,24 +528,24 @@ export const schemaDict = {
   },
   ComAtprotoAdminUpdateAccountHandle: {
     lexicon: 1,
-    id: "com.atproto.admin.updateAccountHandle",
+    id: 'com.atproto.admin.updateAccountHandle',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description: "Administrative action to update an account's handle.",
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["did", "handle"],
+            type: 'object',
+            required: ['did', 'handle'],
             properties: {
               did: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               handle: {
-                type: "string",
-                format: "handle",
+                type: 'string',
+                format: 'handle',
               },
             },
           },
@@ -555,24 +555,24 @@ export const schemaDict = {
   },
   ComAtprotoAdminUpdateAccountPassword: {
     lexicon: 1,
-    id: "com.atproto.admin.updateAccountPassword",
+    id: 'com.atproto.admin.updateAccountPassword',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Update the password for a user account as an administrator.",
+          'Update the password for a user account as an administrator.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["did", "password"],
+            type: 'object',
+            required: ['did', 'password'],
             properties: {
               did: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               password: {
-                type: "string",
+                type: 'string',
               },
             },
           },
@@ -582,54 +582,54 @@ export const schemaDict = {
   },
   ComAtprotoAdminUpdateSubjectStatus: {
     lexicon: 1,
-    id: "com.atproto.admin.updateSubjectStatus",
+    id: 'com.atproto.admin.updateSubjectStatus',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Update the service-specific admin status of a subject (account, record, or blob).",
+          'Update the service-specific admin status of a subject (account, record, or blob).',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["subject"],
+            type: 'object',
+            required: ['subject'],
             properties: {
               subject: {
-                type: "union",
+                type: 'union',
                 refs: [
-                  "lex:com.atproto.admin.defs#repoRef",
-                  "lex:com.atproto.repo.strongRef",
-                  "lex:com.atproto.admin.defs#repoBlobRef",
+                  'lex:com.atproto.admin.defs#repoRef',
+                  'lex:com.atproto.repo.strongRef',
+                  'lex:com.atproto.admin.defs#repoBlobRef',
                 ],
               },
               takedown: {
-                type: "ref",
-                ref: "lex:com.atproto.admin.defs#statusAttr",
+                type: 'ref',
+                ref: 'lex:com.atproto.admin.defs#statusAttr',
               },
               deactivated: {
-                type: "ref",
-                ref: "lex:com.atproto.admin.defs#statusAttr",
+                type: 'ref',
+                ref: 'lex:com.atproto.admin.defs#statusAttr',
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["subject"],
+            type: 'object',
+            required: ['subject'],
             properties: {
               subject: {
-                type: "union",
+                type: 'union',
                 refs: [
-                  "lex:com.atproto.admin.defs#repoRef",
-                  "lex:com.atproto.repo.strongRef",
-                  "lex:com.atproto.admin.defs#repoBlobRef",
+                  'lex:com.atproto.admin.defs#repoRef',
+                  'lex:com.atproto.repo.strongRef',
+                  'lex:com.atproto.admin.defs#repoBlobRef',
                 ],
               },
               takedown: {
-                type: "ref",
-                ref: "lex:com.atproto.admin.defs#statusAttr",
+                type: 'ref',
+                ref: 'lex:com.atproto.admin.defs#statusAttr',
               },
             },
           },
@@ -639,36 +639,36 @@ export const schemaDict = {
   },
   ComAtprotoIdentityGetRecommendedDidCredentials: {
     lexicon: 1,
-    id: "com.atproto.identity.getRecommendedDidCredentials",
+    id: 'com.atproto.identity.getRecommendedDidCredentials',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Describe the credentials that should be included in the DID doc of an account that is migrating to this service.",
+          'Describe the credentials that should be included in the DID doc of an account that is migrating to this service.',
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             properties: {
               rotationKeys: {
                 description:
-                  "Recommended rotation keys for PLC dids. Should be undefined (or ignored) for did:webs.",
-                type: "array",
+                  'Recommended rotation keys for PLC dids. Should be undefined (or ignored) for did:webs.',
+                type: 'array',
                 items: {
-                  type: "string",
+                  type: 'string',
                 },
               },
               alsoKnownAs: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "string",
+                  type: 'string',
                 },
               },
               verificationMethods: {
-                type: "unknown",
+                type: 'unknown',
               },
               services: {
-                type: "unknown",
+                type: 'unknown',
               },
             },
           },
@@ -678,42 +678,42 @@ export const schemaDict = {
   },
   ComAtprotoIdentityRequestPlcOperationSignature: {
     lexicon: 1,
-    id: "com.atproto.identity.requestPlcOperationSignature",
+    id: 'com.atproto.identity.requestPlcOperationSignature',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Request an email with a code to in order to request a signed PLC operation. Requires Auth.",
+          'Request an email with a code to in order to request a signed PLC operation. Requires Auth.',
       },
     },
   },
   ComAtprotoIdentityResolveHandle: {
     lexicon: 1,
-    id: "com.atproto.identity.resolveHandle",
+    id: 'com.atproto.identity.resolveHandle',
     defs: {
       main: {
-        type: "query",
-        description: "Resolves a handle (domain name) to a DID.",
+        type: 'query',
+        description: 'Resolves a handle (domain name) to a DID.',
         parameters: {
-          type: "params",
-          required: ["handle"],
+          type: 'params',
+          required: ['handle'],
           properties: {
             handle: {
-              type: "string",
-              format: "handle",
-              description: "The handle to resolve.",
+              type: 'string',
+              format: 'handle',
+              description: 'The handle to resolve.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["did"],
+            type: 'object',
+            required: ['did'],
             properties: {
               did: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
             },
           },
@@ -723,52 +723,52 @@ export const schemaDict = {
   },
   ComAtprotoIdentitySignPlcOperation: {
     lexicon: 1,
-    id: "com.atproto.identity.signPlcOperation",
+    id: 'com.atproto.identity.signPlcOperation',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
           "Signs a PLC operation to update some value(s) in the requesting DID's document.",
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             properties: {
               token: {
                 description:
-                  "A token received through com.atproto.identity.requestPlcOperationSignature",
-                type: "string",
+                  'A token received through com.atproto.identity.requestPlcOperationSignature',
+                type: 'string',
               },
               rotationKeys: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "string",
+                  type: 'string',
                 },
               },
               alsoKnownAs: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "string",
+                  type: 'string',
                 },
               },
               verificationMethods: {
-                type: "unknown",
+                type: 'unknown',
               },
               services: {
-                type: "unknown",
+                type: 'unknown',
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["operation"],
+            type: 'object',
+            required: ['operation'],
             properties: {
               operation: {
-                type: "unknown",
-                description: "A signed DID PLC operation.",
+                type: 'unknown',
+                description: 'A signed DID PLC operation.',
               },
             },
           },
@@ -778,20 +778,20 @@ export const schemaDict = {
   },
   ComAtprotoIdentitySubmitPlcOperation: {
     lexicon: 1,
-    id: "com.atproto.identity.submitPlcOperation",
+    id: 'com.atproto.identity.submitPlcOperation',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
           "Validates a PLC operation to ensure that it doesn't violate a service's constraints or get the identity into a bad state, then submits it to the PLC registry",
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["operation"],
+            type: 'object',
+            required: ['operation'],
             properties: {
               operation: {
-                type: "unknown",
+                type: 'unknown',
               },
             },
           },
@@ -801,22 +801,22 @@ export const schemaDict = {
   },
   ComAtprotoIdentityUpdateHandle: {
     lexicon: 1,
-    id: "com.atproto.identity.updateHandle",
+    id: 'com.atproto.identity.updateHandle',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
           "Updates the current account's handle. Verifies handle validity, and updates did:plc document if necessary. Implemented by PDS, and requires auth.",
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["handle"],
+            type: 'object',
+            required: ['handle'],
             properties: {
               handle: {
-                type: "string",
-                format: "handle",
-                description: "The new handle.",
+                type: 'string',
+                format: 'handle',
+                description: 'The new handle.',
               },
             },
           },
@@ -826,237 +826,237 @@ export const schemaDict = {
   },
   ComAtprotoLabelDefs: {
     lexicon: 1,
-    id: "com.atproto.label.defs",
+    id: 'com.atproto.label.defs',
     defs: {
       label: {
-        type: "object",
+        type: 'object',
         description:
-          "Metadata tag on an atproto resource (eg, repo or record).",
-        required: ["src", "uri", "val", "cts"],
+          'Metadata tag on an atproto resource (eg, repo or record).',
+        required: ['src', 'uri', 'val', 'cts'],
         properties: {
           ver: {
-            type: "integer",
-            description: "The AT Protocol version of the label object.",
+            type: 'integer',
+            description: 'The AT Protocol version of the label object.',
           },
           src: {
-            type: "string",
-            format: "did",
-            description: "DID of the actor who created this label.",
+            type: 'string',
+            format: 'did',
+            description: 'DID of the actor who created this label.',
           },
           uri: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
             description:
-              "AT URI of the record, repository (account), or other resource that this label applies to.",
+              'AT URI of the record, repository (account), or other resource that this label applies to.',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
             description:
               "Optionally, CID specifying the specific version of 'uri' resource this label applies to.",
           },
           val: {
-            type: "string",
+            type: 'string',
             maxLength: 128,
             description:
-              "The short string name of the value or type of this label.",
+              'The short string name of the value or type of this label.',
           },
           neg: {
-            type: "boolean",
+            type: 'boolean',
             description:
-              "If true, this is a negation label, overwriting a previous label.",
+              'If true, this is a negation label, overwriting a previous label.',
           },
           cts: {
-            type: "string",
-            format: "datetime",
-            description: "Timestamp when this label was created.",
+            type: 'string',
+            format: 'datetime',
+            description: 'Timestamp when this label was created.',
           },
           exp: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
             description:
-              "Timestamp at which this label expires (no longer applies).",
+              'Timestamp at which this label expires (no longer applies).',
           },
           sig: {
-            type: "bytes",
-            description: "Signature of dag-cbor encoded label.",
+            type: 'bytes',
+            description: 'Signature of dag-cbor encoded label.',
           },
         },
       },
       selfLabels: {
-        type: "object",
+        type: 'object',
         description:
-          "Metadata tags on an atproto record, published by the author within the record.",
-        required: ["values"],
+          'Metadata tags on an atproto record, published by the author within the record.',
+        required: ['values'],
         properties: {
           values: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#selfLabel",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#selfLabel',
             },
             maxLength: 10,
           },
         },
       },
       selfLabel: {
-        type: "object",
+        type: 'object',
         description:
-          "Metadata tag on an atproto record, published by the author within the record. Note that schemas should use #selfLabels, not #selfLabel.",
-        required: ["val"],
+          'Metadata tag on an atproto record, published by the author within the record. Note that schemas should use #selfLabels, not #selfLabel.',
+        required: ['val'],
         properties: {
           val: {
-            type: "string",
+            type: 'string',
             maxLength: 128,
             description:
-              "The short string name of the value or type of this label.",
+              'The short string name of the value or type of this label.',
           },
         },
       },
       labelValueDefinition: {
-        type: "object",
+        type: 'object',
         description:
-          "Declares a label value and its expected interpretations and behaviors.",
-        required: ["identifier", "severity", "blurs", "locales"],
+          'Declares a label value and its expected interpretations and behaviors.',
+        required: ['identifier', 'severity', 'blurs', 'locales'],
         properties: {
           identifier: {
-            type: "string",
+            type: 'string',
             description:
               "The value of the label being defined. Must only include lowercase ascii and the '-' character ([a-z-]+).",
             maxLength: 100,
             maxGraphemes: 100,
           },
           severity: {
-            type: "string",
+            type: 'string',
             description:
               "How should a client visually convey this label? 'inform' means neutral and informational; 'alert' means negative and warning; 'none' means show nothing.",
-            knownValues: ["inform", "alert", "none"],
+            knownValues: ['inform', 'alert', 'none'],
           },
           blurs: {
-            type: "string",
+            type: 'string',
             description:
               "What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing.",
-            knownValues: ["content", "media", "none"],
+            knownValues: ['content', 'media', 'none'],
           },
           defaultSetting: {
-            type: "string",
-            description: "The default setting for this label.",
-            knownValues: ["ignore", "warn", "hide"],
-            default: "warn",
+            type: 'string',
+            description: 'The default setting for this label.',
+            knownValues: ['ignore', 'warn', 'hide'],
+            default: 'warn',
           },
           adultOnly: {
-            type: "boolean",
+            type: 'boolean',
             description:
-              "Does the user need to have adult content enabled in order to configure this label?",
+              'Does the user need to have adult content enabled in order to configure this label?',
           },
           locales: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#labelValueDefinitionStrings",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#labelValueDefinitionStrings',
             },
           },
         },
       },
       labelValueDefinitionStrings: {
-        type: "object",
+        type: 'object',
         description:
-          "Strings which describe the label in the UI, localized into a specific language.",
-        required: ["lang", "name", "description"],
+          'Strings which describe the label in the UI, localized into a specific language.',
+        required: ['lang', 'name', 'description'],
         properties: {
           lang: {
-            type: "string",
+            type: 'string',
             description:
-              "The code of the language these strings are written in.",
-            format: "language",
+              'The code of the language these strings are written in.',
+            format: 'language',
           },
           name: {
-            type: "string",
-            description: "A short human-readable name for the label.",
+            type: 'string',
+            description: 'A short human-readable name for the label.',
             maxGraphemes: 64,
             maxLength: 640,
           },
           description: {
-            type: "string",
+            type: 'string',
             description:
-              "A longer description of what the label means and why it might be applied.",
+              'A longer description of what the label means and why it might be applied.',
             maxGraphemes: 10000,
             maxLength: 100000,
           },
         },
       },
       labelValue: {
-        type: "string",
+        type: 'string',
         knownValues: [
-          "!hide",
-          "!no-promote",
-          "!warn",
-          "!no-unauthenticated",
-          "dmca-violation",
-          "doxxing",
-          "porn",
-          "sexual",
-          "nudity",
-          "nsfl",
-          "gore",
+          '!hide',
+          '!no-promote',
+          '!warn',
+          '!no-unauthenticated',
+          'dmca-violation',
+          'doxxing',
+          'porn',
+          'sexual',
+          'nudity',
+          'nsfl',
+          'gore',
         ],
       },
     },
   },
   ComAtprotoLabelQueryLabels: {
     lexicon: 1,
-    id: "com.atproto.label.queryLabels",
+    id: 'com.atproto.label.queryLabels',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Find labels relevant to the provided AT-URI patterns. Public endpoint for moderation services, though may return different or additional results with auth.",
+          'Find labels relevant to the provided AT-URI patterns. Public endpoint for moderation services, though may return different or additional results with auth.',
         parameters: {
-          type: "params",
-          required: ["uriPatterns"],
+          type: 'params',
+          required: ['uriPatterns'],
           properties: {
             uriPatterns: {
-              type: "array",
+              type: 'array',
               items: {
-                type: "string",
+                type: 'string',
               },
               description:
                 "List of AT URI patterns to match (boolean 'OR'). Each may be a prefix (ending with '*'; will match inclusive of the string leading to '*'), or a full URI.",
             },
             sources: {
-              type: "array",
+              type: 'array',
               items: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               description:
-                "Optional list of label sources (DIDs) to filter on.",
+                'Optional list of label sources (DIDs) to filter on.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 250,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["labels"],
+            type: 'object',
+            required: ['labels'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               labels: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:com.atproto.label.defs#label",
+                  type: 'ref',
+                  ref: 'lex:com.atproto.label.defs#label',
                 },
               },
             },
@@ -1067,62 +1067,62 @@ export const schemaDict = {
   },
   ComAtprotoLabelSubscribeLabels: {
     lexicon: 1,
-    id: "com.atproto.label.subscribeLabels",
+    id: 'com.atproto.label.subscribeLabels',
     defs: {
       main: {
-        type: "subscription",
+        type: 'subscription',
         description:
-          "Subscribe to stream of labels (and negations). Public endpoint implemented by mod services. Uses same sequencing scheme as repo event stream.",
+          'Subscribe to stream of labels (and negations). Public endpoint implemented by mod services. Uses same sequencing scheme as repo event stream.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             cursor: {
-              type: "integer",
-              description: "The last known event seq number to backfill from.",
+              type: 'integer',
+              description: 'The last known event seq number to backfill from.',
             },
           },
         },
         message: {
           schema: {
-            type: "union",
+            type: 'union',
             refs: [
-              "lex:com.atproto.label.subscribeLabels#labels",
-              "lex:com.atproto.label.subscribeLabels#info",
+              'lex:com.atproto.label.subscribeLabels#labels',
+              'lex:com.atproto.label.subscribeLabels#info',
             ],
           },
         },
         errors: [
           {
-            name: "FutureCursor",
+            name: 'FutureCursor',
           },
         ],
       },
       labels: {
-        type: "object",
-        required: ["seq", "labels"],
+        type: 'object',
+        required: ['seq', 'labels'],
         properties: {
           seq: {
-            type: "integer",
+            type: 'integer',
           },
           labels: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#label",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
             },
           },
         },
       },
       info: {
-        type: "object",
-        required: ["name"],
+        type: 'object',
+        required: ['name'],
         properties: {
           name: {
-            type: "string",
-            knownValues: ["OutdatedCursor"],
+            type: 'string',
+            knownValues: ['OutdatedCursor'],
           },
           message: {
-            type: "string",
+            type: 'string',
           },
         },
       },
@@ -1130,19 +1130,19 @@ export const schemaDict = {
   },
   ComAtprotoLexiconSchema: {
     lexicon: 1,
-    id: "com.atproto.lexicon.schema",
+    id: 'com.atproto.lexicon.schema',
     defs: {
       main: {
-        type: "record",
+        type: 'record',
         description:
           "Representation of Lexicon schemas themselves, when published as atproto records. Note that the schema language is not defined in Lexicon; this meta schema currently only includes a single version field ('lexicon'). See the atproto specifications for description of the other expected top-level fields ('id', 'defs', etc).",
-        key: "nsid",
+        key: 'nsid',
         record: {
-          type: "object",
-          required: ["lexicon"],
+          type: 'object',
+          required: ['lexicon'],
           properties: {
             lexicon: {
-              type: "integer",
+              type: 'integer',
               description:
                 "Indicates the 'version' of the Lexicon language. Must be '1' for the current atproto/Lexicon schema system.",
             },
@@ -1153,79 +1153,79 @@ export const schemaDict = {
   },
   ComAtprotoModerationCreateReport: {
     lexicon: 1,
-    id: "com.atproto.moderation.createReport",
+    id: 'com.atproto.moderation.createReport',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Submit a moderation report regarding an atproto account or record. Implemented by moderation services (with PDS proxying), and requires auth.",
+          'Submit a moderation report regarding an atproto account or record. Implemented by moderation services (with PDS proxying), and requires auth.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["reasonType", "subject"],
+            type: 'object',
+            required: ['reasonType', 'subject'],
             properties: {
               reasonType: {
-                type: "ref",
+                type: 'ref',
                 description:
-                  "Indicates the broad category of violation the report is for.",
-                ref: "lex:com.atproto.moderation.defs#reasonType",
+                  'Indicates the broad category of violation the report is for.',
+                ref: 'lex:com.atproto.moderation.defs#reasonType',
               },
               reason: {
-                type: "string",
+                type: 'string',
                 maxGraphemes: 2000,
                 maxLength: 20000,
                 description:
-                  "Additional context about the content and violation.",
+                  'Additional context about the content and violation.',
               },
               subject: {
-                type: "union",
+                type: 'union',
                 refs: [
-                  "lex:com.atproto.admin.defs#repoRef",
-                  "lex:com.atproto.repo.strongRef",
+                  'lex:com.atproto.admin.defs#repoRef',
+                  'lex:com.atproto.repo.strongRef',
                 ],
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             required: [
-              "id",
-              "reasonType",
-              "subject",
-              "reportedBy",
-              "createdAt",
+              'id',
+              'reasonType',
+              'subject',
+              'reportedBy',
+              'createdAt',
             ],
             properties: {
               id: {
-                type: "integer",
+                type: 'integer',
               },
               reasonType: {
-                type: "ref",
-                ref: "lex:com.atproto.moderation.defs#reasonType",
+                type: 'ref',
+                ref: 'lex:com.atproto.moderation.defs#reasonType',
               },
               reason: {
-                type: "string",
+                type: 'string',
                 maxGraphemes: 2000,
                 maxLength: 20000,
               },
               subject: {
-                type: "union",
+                type: 'union',
                 refs: [
-                  "lex:com.atproto.admin.defs#repoRef",
-                  "lex:com.atproto.repo.strongRef",
+                  'lex:com.atproto.admin.defs#repoRef',
+                  'lex:com.atproto.repo.strongRef',
                 ],
               },
               reportedBy: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               createdAt: {
-                type: "string",
-                format: "datetime",
+                type: 'string',
+                format: 'datetime',
               },
             },
           },
@@ -1235,115 +1235,115 @@ export const schemaDict = {
   },
   ComAtprotoModerationDefs: {
     lexicon: 1,
-    id: "com.atproto.moderation.defs",
+    id: 'com.atproto.moderation.defs',
     defs: {
       reasonType: {
-        type: "string",
+        type: 'string',
         knownValues: [
-          "com.atproto.moderation.defs#reasonSpam",
-          "com.atproto.moderation.defs#reasonViolation",
-          "com.atproto.moderation.defs#reasonMisleading",
-          "com.atproto.moderation.defs#reasonSexual",
-          "com.atproto.moderation.defs#reasonRude",
-          "com.atproto.moderation.defs#reasonOther",
-          "com.atproto.moderation.defs#reasonAppeal",
+          'com.atproto.moderation.defs#reasonSpam',
+          'com.atproto.moderation.defs#reasonViolation',
+          'com.atproto.moderation.defs#reasonMisleading',
+          'com.atproto.moderation.defs#reasonSexual',
+          'com.atproto.moderation.defs#reasonRude',
+          'com.atproto.moderation.defs#reasonOther',
+          'com.atproto.moderation.defs#reasonAppeal',
         ],
       },
       reasonSpam: {
-        type: "token",
-        description: "Spam: frequent unwanted promotion, replies, mentions",
+        type: 'token',
+        description: 'Spam: frequent unwanted promotion, replies, mentions',
       },
       reasonViolation: {
-        type: "token",
-        description: "Direct violation of server rules, laws, terms of service",
+        type: 'token',
+        description: 'Direct violation of server rules, laws, terms of service',
       },
       reasonMisleading: {
-        type: "token",
-        description: "Misleading identity, affiliation, or content",
+        type: 'token',
+        description: 'Misleading identity, affiliation, or content',
       },
       reasonSexual: {
-        type: "token",
-        description: "Unwanted or mislabeled sexual content",
+        type: 'token',
+        description: 'Unwanted or mislabeled sexual content',
       },
       reasonRude: {
-        type: "token",
+        type: 'token',
         description:
-          "Rude, harassing, explicit, or otherwise unwelcoming behavior",
+          'Rude, harassing, explicit, or otherwise unwelcoming behavior',
       },
       reasonOther: {
-        type: "token",
-        description: "Other: reports not falling under another report category",
+        type: 'token',
+        description: 'Other: reports not falling under another report category',
       },
       reasonAppeal: {
-        type: "token",
-        description: "Appeal: appeal a previously taken moderation action",
+        type: 'token',
+        description: 'Appeal: appeal a previously taken moderation action',
       },
     },
   },
   ComAtprotoRepoApplyWrites: {
     lexicon: 1,
-    id: "com.atproto.repo.applyWrites",
+    id: 'com.atproto.repo.applyWrites',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Apply a batch transaction of repository creates, updates, and deletes. Requires auth, implemented by PDS.",
+          'Apply a batch transaction of repository creates, updates, and deletes. Requires auth, implemented by PDS.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["repo", "writes"],
+            type: 'object',
+            required: ['repo', 'writes'],
             properties: {
               repo: {
-                type: "string",
-                format: "at-identifier",
+                type: 'string',
+                format: 'at-identifier',
                 description:
-                  "The handle or DID of the repo (aka, current account).",
+                  'The handle or DID of the repo (aka, current account).',
               },
               validate: {
-                type: "boolean",
+                type: 'boolean',
                 description:
                   "Can be set to 'false' to skip Lexicon schema validation of record data across all operations, 'true' to require it, or leave unset to validate only for known Lexicons.",
               },
               writes: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "union",
+                  type: 'union',
                   refs: [
-                    "lex:com.atproto.repo.applyWrites#create",
-                    "lex:com.atproto.repo.applyWrites#update",
-                    "lex:com.atproto.repo.applyWrites#delete",
+                    'lex:com.atproto.repo.applyWrites#create',
+                    'lex:com.atproto.repo.applyWrites#update',
+                    'lex:com.atproto.repo.applyWrites#delete',
                   ],
                   closed: true,
                 },
               },
               swapCommit: {
-                type: "string",
+                type: 'string',
                 description:
-                  "If provided, the entire operation will fail if the current repo commit CID does not match this value. Used to prevent conflicting repo mutations.",
-                format: "cid",
+                  'If provided, the entire operation will fail if the current repo commit CID does not match this value. Used to prevent conflicting repo mutations.',
+                format: 'cid',
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             required: [],
             properties: {
               commit: {
-                type: "ref",
-                ref: "lex:com.atproto.repo.defs#commitMeta",
+                type: 'ref',
+                ref: 'lex:com.atproto.repo.defs#commitMeta',
               },
               results: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "union",
+                  type: 'union',
                   refs: [
-                    "lex:com.atproto.repo.applyWrites#createResult",
-                    "lex:com.atproto.repo.applyWrites#updateResult",
-                    "lex:com.atproto.repo.applyWrites#deleteResult",
+                    'lex:com.atproto.repo.applyWrites#createResult',
+                    'lex:com.atproto.repo.applyWrites#updateResult',
+                    'lex:com.atproto.repo.applyWrites#deleteResult',
                   ],
                   closed: true,
                 },
@@ -1353,99 +1353,99 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "InvalidSwap",
+            name: 'InvalidSwap',
             description:
               "Indicates that the 'swapCommit' parameter did not match current commit.",
           },
         ],
       },
       create: {
-        type: "object",
-        description: "Operation which creates a new record.",
-        required: ["collection", "value"],
+        type: 'object',
+        description: 'Operation which creates a new record.',
+        required: ['collection', 'value'],
         properties: {
           collection: {
-            type: "string",
-            format: "nsid",
+            type: 'string',
+            format: 'nsid',
           },
           rkey: {
-            type: "string",
+            type: 'string',
             maxLength: 512,
           },
           value: {
-            type: "unknown",
+            type: 'unknown',
           },
         },
       },
       update: {
-        type: "object",
-        description: "Operation which updates an existing record.",
-        required: ["collection", "rkey", "value"],
+        type: 'object',
+        description: 'Operation which updates an existing record.',
+        required: ['collection', 'rkey', 'value'],
         properties: {
           collection: {
-            type: "string",
-            format: "nsid",
+            type: 'string',
+            format: 'nsid',
           },
           rkey: {
-            type: "string",
+            type: 'string',
           },
           value: {
-            type: "unknown",
+            type: 'unknown',
           },
         },
       },
       delete: {
-        type: "object",
-        description: "Operation which deletes an existing record.",
-        required: ["collection", "rkey"],
+        type: 'object',
+        description: 'Operation which deletes an existing record.',
+        required: ['collection', 'rkey'],
         properties: {
           collection: {
-            type: "string",
-            format: "nsid",
+            type: 'string',
+            format: 'nsid',
           },
           rkey: {
-            type: "string",
+            type: 'string',
           },
         },
       },
       createResult: {
-        type: "object",
-        required: ["uri", "cid"],
+        type: 'object',
+        required: ['uri', 'cid'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           validationStatus: {
-            type: "string",
-            knownValues: ["valid", "unknown"],
+            type: 'string',
+            knownValues: ['valid', 'unknown'],
           },
         },
       },
       updateResult: {
-        type: "object",
-        required: ["uri", "cid"],
+        type: 'object',
+        required: ['uri', 'cid'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           validationStatus: {
-            type: "string",
-            knownValues: ["valid", "unknown"],
+            type: 'string',
+            knownValues: ['valid', 'unknown'],
           },
         },
       },
       deleteResult: {
-        type: "object",
+        type: 'object',
         required: [],
         properties: {},
       },
@@ -1453,80 +1453,80 @@ export const schemaDict = {
   },
   ComAtprotoRepoCreateRecord: {
     lexicon: 1,
-    id: "com.atproto.repo.createRecord",
+    id: 'com.atproto.repo.createRecord',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Create a single new repository record. Requires auth, implemented by PDS.",
+          'Create a single new repository record. Requires auth, implemented by PDS.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["repo", "collection", "record"],
+            type: 'object',
+            required: ['repo', 'collection', 'record'],
             properties: {
               repo: {
-                type: "string",
-                format: "at-identifier",
+                type: 'string',
+                format: 'at-identifier',
                 description:
-                  "The handle or DID of the repo (aka, current account).",
+                  'The handle or DID of the repo (aka, current account).',
               },
               collection: {
-                type: "string",
-                format: "nsid",
-                description: "The NSID of the record collection.",
+                type: 'string',
+                format: 'nsid',
+                description: 'The NSID of the record collection.',
               },
               rkey: {
-                type: "string",
-                description: "The Record Key.",
+                type: 'string',
+                description: 'The Record Key.',
                 maxLength: 512,
               },
               validate: {
-                type: "boolean",
+                type: 'boolean',
                 description:
                   "Can be set to 'false' to skip Lexicon schema validation of record data, 'true' to require it, or leave unset to validate only for known Lexicons.",
               },
               record: {
-                type: "unknown",
-                description: "The record itself. Must contain a $type field.",
+                type: 'unknown',
+                description: 'The record itself. Must contain a $type field.',
               },
               swapCommit: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
                 description:
-                  "Compare and swap with the previous commit by CID.",
+                  'Compare and swap with the previous commit by CID.',
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["uri", "cid"],
+            type: 'object',
+            required: ['uri', 'cid'],
             properties: {
               uri: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
               cid: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
               },
               commit: {
-                type: "ref",
-                ref: "lex:com.atproto.repo.defs#commitMeta",
+                type: 'ref',
+                ref: 'lex:com.atproto.repo.defs#commitMeta',
               },
               validationStatus: {
-                type: "string",
-                knownValues: ["valid", "unknown"],
+                type: 'string',
+                knownValues: ['valid', 'unknown'],
               },
             },
           },
         },
         errors: [
           {
-            name: "InvalidSwap",
+            name: 'InvalidSwap',
             description:
               "Indicates that 'swapCommit' didn't match current repo commit.",
           },
@@ -1536,18 +1536,18 @@ export const schemaDict = {
   },
   ComAtprotoRepoDefs: {
     lexicon: 1,
-    id: "com.atproto.repo.defs",
+    id: 'com.atproto.repo.defs',
     defs: {
       commitMeta: {
-        type: "object",
-        required: ["cid", "rev"],
+        type: 'object',
+        required: ['cid', 'rev'],
         properties: {
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           rev: {
-            type: "string",
+            type: 'string',
           },
         },
       },
@@ -1555,63 +1555,63 @@ export const schemaDict = {
   },
   ComAtprotoRepoDeleteRecord: {
     lexicon: 1,
-    id: "com.atproto.repo.deleteRecord",
+    id: 'com.atproto.repo.deleteRecord',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
           "Delete a repository record, or ensure it doesn't exist. Requires auth, implemented by PDS.",
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["repo", "collection", "rkey"],
+            type: 'object',
+            required: ['repo', 'collection', 'rkey'],
             properties: {
               repo: {
-                type: "string",
-                format: "at-identifier",
+                type: 'string',
+                format: 'at-identifier',
                 description:
-                  "The handle or DID of the repo (aka, current account).",
+                  'The handle or DID of the repo (aka, current account).',
               },
               collection: {
-                type: "string",
-                format: "nsid",
-                description: "The NSID of the record collection.",
+                type: 'string',
+                format: 'nsid',
+                description: 'The NSID of the record collection.',
               },
               rkey: {
-                type: "string",
-                description: "The Record Key.",
+                type: 'string',
+                description: 'The Record Key.',
               },
               swapRecord: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
                 description:
-                  "Compare and swap with the previous record by CID.",
+                  'Compare and swap with the previous record by CID.',
               },
               swapCommit: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
                 description:
-                  "Compare and swap with the previous commit by CID.",
+                  'Compare and swap with the previous commit by CID.',
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             properties: {
               commit: {
-                type: "ref",
-                ref: "lex:com.atproto.repo.defs#commitMeta",
+                type: 'ref',
+                ref: 'lex:com.atproto.repo.defs#commitMeta',
               },
             },
           },
         },
         errors: [
           {
-            name: "InvalidSwap",
+            name: 'InvalidSwap',
           },
         ],
       },
@@ -1619,60 +1619,60 @@ export const schemaDict = {
   },
   ComAtprotoRepoDescribeRepo: {
     lexicon: 1,
-    id: "com.atproto.repo.describeRepo",
+    id: 'com.atproto.repo.describeRepo',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get information about an account and repository, including the list of collections. Does not require auth.",
+          'Get information about an account and repository, including the list of collections. Does not require auth.',
         parameters: {
-          type: "params",
-          required: ["repo"],
+          type: 'params',
+          required: ['repo'],
           properties: {
             repo: {
-              type: "string",
-              format: "at-identifier",
-              description: "The handle or DID of the repo.",
+              type: 'string',
+              format: 'at-identifier',
+              description: 'The handle or DID of the repo.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             required: [
-              "handle",
-              "did",
-              "didDoc",
-              "collections",
-              "handleIsCorrect",
+              'handle',
+              'did',
+              'didDoc',
+              'collections',
+              'handleIsCorrect',
             ],
             properties: {
               handle: {
-                type: "string",
-                format: "handle",
+                type: 'string',
+                format: 'handle',
               },
               did: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               didDoc: {
-                type: "unknown",
-                description: "The complete DID document for this account.",
+                type: 'unknown',
+                description: 'The complete DID document for this account.',
               },
               collections: {
-                type: "array",
+                type: 'array',
                 description:
-                  "List of all the collections (NSIDs) for which this repo contains at least one record.",
+                  'List of all the collections (NSIDs) for which this repo contains at least one record.',
                 items: {
-                  type: "string",
-                  format: "nsid",
+                  type: 'string',
+                  format: 'nsid',
                 },
               },
               handleIsCorrect: {
-                type: "boolean",
+                type: 'boolean',
                 description:
-                  "Indicates if handle is currently valid (resolves bi-directionally)",
+                  'Indicates if handle is currently valid (resolves bi-directionally)',
               },
             },
           },
@@ -1682,61 +1682,61 @@ export const schemaDict = {
   },
   ComAtprotoRepoGetRecord: {
     lexicon: 1,
-    id: "com.atproto.repo.getRecord",
+    id: 'com.atproto.repo.getRecord',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get a single record from a repository. Does not require auth.",
+          'Get a single record from a repository. Does not require auth.',
         parameters: {
-          type: "params",
-          required: ["repo", "collection", "rkey"],
+          type: 'params',
+          required: ['repo', 'collection', 'rkey'],
           properties: {
             repo: {
-              type: "string",
-              format: "at-identifier",
-              description: "The handle or DID of the repo.",
+              type: 'string',
+              format: 'at-identifier',
+              description: 'The handle or DID of the repo.',
             },
             collection: {
-              type: "string",
-              format: "nsid",
-              description: "The NSID of the record collection.",
+              type: 'string',
+              format: 'nsid',
+              description: 'The NSID of the record collection.',
             },
             rkey: {
-              type: "string",
-              description: "The Record Key.",
+              type: 'string',
+              description: 'The Record Key.',
             },
             cid: {
-              type: "string",
-              format: "cid",
+              type: 'string',
+              format: 'cid',
               description:
-                "The CID of the version of the record. If not specified, then return the most recent version.",
+                'The CID of the version of the record. If not specified, then return the most recent version.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["uri", "value"],
+            type: 'object',
+            required: ['uri', 'value'],
             properties: {
               uri: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
               cid: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
               },
               value: {
-                type: "unknown",
+                type: 'unknown',
               },
             },
           },
         },
         errors: [
           {
-            name: "RecordNotFound",
+            name: 'RecordNotFound',
           },
         ],
       },
@@ -1744,54 +1744,54 @@ export const schemaDict = {
   },
   ComAtprotoRepoImportRepo: {
     lexicon: 1,
-    id: "com.atproto.repo.importRepo",
+    id: 'com.atproto.repo.importRepo',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Import a repo in the form of a CAR file. Requires Content-Length HTTP header to be set.",
+          'Import a repo in the form of a CAR file. Requires Content-Length HTTP header to be set.',
         input: {
-          encoding: "application/vnd.ipld.car",
+          encoding: 'application/vnd.ipld.car',
         },
       },
     },
   },
   ComAtprotoRepoListMissingBlobs: {
     lexicon: 1,
-    id: "com.atproto.repo.listMissingBlobs",
+    id: 'com.atproto.repo.listMissingBlobs',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Returns a list of missing blobs for the requesting account. Intended to be used in the account migration flow.",
+          'Returns a list of missing blobs for the requesting account. Intended to be used in the account migration flow.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 1000,
               default: 500,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["blobs"],
+            type: 'object',
+            required: ['blobs'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               blobs: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:com.atproto.repo.listMissingBlobs#recordBlob",
+                  type: 'ref',
+                  ref: 'lex:com.atproto.repo.listMissingBlobs#recordBlob',
                 },
               },
             },
@@ -1799,16 +1799,16 @@ export const schemaDict = {
         },
       },
       recordBlob: {
-        type: "object",
-        required: ["cid", "recordUri"],
+        type: 'object',
+        required: ['cid', 'recordUri'],
         properties: {
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           recordUri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
         },
       },
@@ -1816,66 +1816,66 @@ export const schemaDict = {
   },
   ComAtprotoRepoListRecords: {
     lexicon: 1,
-    id: "com.atproto.repo.listRecords",
+    id: 'com.atproto.repo.listRecords',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "List a range of records in a repository, matching a specific collection. Does not require auth.",
+          'List a range of records in a repository, matching a specific collection. Does not require auth.',
         parameters: {
-          type: "params",
-          required: ["repo", "collection"],
+          type: 'params',
+          required: ['repo', 'collection'],
           properties: {
             repo: {
-              type: "string",
-              format: "at-identifier",
-              description: "The handle or DID of the repo.",
+              type: 'string',
+              format: 'at-identifier',
+              description: 'The handle or DID of the repo.',
             },
             collection: {
-              type: "string",
-              format: "nsid",
-              description: "The NSID of the record type.",
+              type: 'string',
+              format: 'nsid',
+              description: 'The NSID of the record type.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
-              description: "The number of records to return.",
+              description: 'The number of records to return.',
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
             rkeyStart: {
-              type: "string",
+              type: 'string',
               description:
-                "DEPRECATED: The lowest sort-ordered rkey to start from (exclusive)",
+                'DEPRECATED: The lowest sort-ordered rkey to start from (exclusive)',
             },
             rkeyEnd: {
-              type: "string",
+              type: 'string',
               description:
-                "DEPRECATED: The highest sort-ordered rkey to stop at (exclusive)",
+                'DEPRECATED: The highest sort-ordered rkey to stop at (exclusive)',
             },
             reverse: {
-              type: "boolean",
-              description: "Flag to reverse the order of the returned records.",
+              type: 'boolean',
+              description: 'Flag to reverse the order of the returned records.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["records"],
+            type: 'object',
+            required: ['records'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               records: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:com.atproto.repo.listRecords#record",
+                  type: 'ref',
+                  ref: 'lex:com.atproto.repo.listRecords#record',
                 },
               },
             },
@@ -1883,19 +1883,19 @@ export const schemaDict = {
         },
       },
       record: {
-        type: "object",
-        required: ["uri", "cid", "value"],
+        type: 'object',
+        required: ['uri', 'cid', 'value'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           value: {
-            type: "unknown",
+            type: 'unknown',
           },
         },
       },
@@ -1903,87 +1903,87 @@ export const schemaDict = {
   },
   ComAtprotoRepoPutRecord: {
     lexicon: 1,
-    id: "com.atproto.repo.putRecord",
+    id: 'com.atproto.repo.putRecord',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Write a repository record, creating or updating it as needed. Requires auth, implemented by PDS.",
+          'Write a repository record, creating or updating it as needed. Requires auth, implemented by PDS.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["repo", "collection", "rkey", "record"],
-            nullable: ["swapRecord"],
+            type: 'object',
+            required: ['repo', 'collection', 'rkey', 'record'],
+            nullable: ['swapRecord'],
             properties: {
               repo: {
-                type: "string",
-                format: "at-identifier",
+                type: 'string',
+                format: 'at-identifier',
                 description:
-                  "The handle or DID of the repo (aka, current account).",
+                  'The handle or DID of the repo (aka, current account).',
               },
               collection: {
-                type: "string",
-                format: "nsid",
-                description: "The NSID of the record collection.",
+                type: 'string',
+                format: 'nsid',
+                description: 'The NSID of the record collection.',
               },
               rkey: {
-                type: "string",
-                description: "The Record Key.",
+                type: 'string',
+                description: 'The Record Key.',
                 maxLength: 512,
               },
               validate: {
-                type: "boolean",
+                type: 'boolean',
                 description:
                   "Can be set to 'false' to skip Lexicon schema validation of record data, 'true' to require it, or leave unset to validate only for known Lexicons.",
               },
               record: {
-                type: "unknown",
-                description: "The record to write.",
+                type: 'unknown',
+                description: 'The record to write.',
               },
               swapRecord: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
                 description:
-                  "Compare and swap with the previous record by CID. WARNING: nullable and optional field; may cause problems with golang implementation",
+                  'Compare and swap with the previous record by CID. WARNING: nullable and optional field; may cause problems with golang implementation',
               },
               swapCommit: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
                 description:
-                  "Compare and swap with the previous commit by CID.",
+                  'Compare and swap with the previous commit by CID.',
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["uri", "cid"],
+            type: 'object',
+            required: ['uri', 'cid'],
             properties: {
               uri: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
               cid: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
               },
               commit: {
-                type: "ref",
-                ref: "lex:com.atproto.repo.defs#commitMeta",
+                type: 'ref',
+                ref: 'lex:com.atproto.repo.defs#commitMeta',
               },
               validationStatus: {
-                type: "string",
-                knownValues: ["valid", "unknown"],
+                type: 'string',
+                knownValues: ['valid', 'unknown'],
               },
             },
           },
         },
         errors: [
           {
-            name: "InvalidSwap",
+            name: 'InvalidSwap',
           },
         ],
       },
@@ -1991,20 +1991,20 @@ export const schemaDict = {
   },
   ComAtprotoRepoStrongRef: {
     lexicon: 1,
-    id: "com.atproto.repo.strongRef",
-    description: "A URI with a content-hash fingerprint.",
+    id: 'com.atproto.repo.strongRef',
+    description: 'A URI with a content-hash fingerprint.',
     defs: {
       main: {
-        type: "object",
-        required: ["uri", "cid"],
+        type: 'object',
+        required: ['uri', 'cid'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
         },
       },
@@ -2012,23 +2012,23 @@ export const schemaDict = {
   },
   ComAtprotoRepoUploadBlob: {
     lexicon: 1,
-    id: "com.atproto.repo.uploadBlob",
+    id: 'com.atproto.repo.uploadBlob',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Upload a new blob, to be referenced from a repository record. The blob will be deleted if it is not referenced within a time window (eg, minutes). Blob restrictions (mimetype, size, etc) are enforced when the reference is created. Requires auth, implemented by PDS.",
+          'Upload a new blob, to be referenced from a repository record. The blob will be deleted if it is not referenced within a time window (eg, minutes). Blob restrictions (mimetype, size, etc) are enforced when the reference is created. Requires auth, implemented by PDS.',
         input: {
-          encoding: "*/*",
+          encoding: '*/*',
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["blob"],
+            type: 'object',
+            required: ['blob'],
             properties: {
               blob: {
-                type: "blob",
+                type: 'blob',
               },
             },
           },
@@ -2038,10 +2038,10 @@ export const schemaDict = {
   },
   ComAtprotoServerActivateAccount: {
     lexicon: 1,
-    id: "com.atproto.server.activateAccount",
+    id: 'com.atproto.server.activateAccount',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
           "Activates a currently deactivated account. Used to finalize account migration after the account's repo is imported and identity is setup.",
       },
@@ -2049,55 +2049,55 @@ export const schemaDict = {
   },
   ComAtprotoServerCheckAccountStatus: {
     lexicon: 1,
-    id: "com.atproto.server.checkAccountStatus",
+    id: 'com.atproto.server.checkAccountStatus',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Returns the status of an account, especially as pertaining to import or recovery. Can be called many times over the course of an account migration. Requires auth and can only be called pertaining to oneself.",
+          'Returns the status of an account, especially as pertaining to import or recovery. Can be called many times over the course of an account migration. Requires auth and can only be called pertaining to oneself.',
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             required: [
-              "activated",
-              "validDid",
-              "repoCommit",
-              "repoRev",
-              "repoBlocks",
-              "indexedRecords",
-              "privateStateValues",
-              "expectedBlobs",
-              "importedBlobs",
+              'activated',
+              'validDid',
+              'repoCommit',
+              'repoRev',
+              'repoBlocks',
+              'indexedRecords',
+              'privateStateValues',
+              'expectedBlobs',
+              'importedBlobs',
             ],
             properties: {
               activated: {
-                type: "boolean",
+                type: 'boolean',
               },
               validDid: {
-                type: "boolean",
+                type: 'boolean',
               },
               repoCommit: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
               },
               repoRev: {
-                type: "string",
+                type: 'string',
               },
               repoBlocks: {
-                type: "integer",
+                type: 'integer',
               },
               indexedRecords: {
-                type: "integer",
+                type: 'integer',
               },
               privateStateValues: {
-                type: "integer",
+                type: 'integer',
               },
               expectedBlobs: {
-                type: "integer",
+                type: 'integer',
               },
               importedBlobs: {
-                type: "integer",
+                type: 'integer',
               },
             },
           },
@@ -2107,39 +2107,39 @@ export const schemaDict = {
   },
   ComAtprotoServerConfirmEmail: {
     lexicon: 1,
-    id: "com.atproto.server.confirmEmail",
+    id: 'com.atproto.server.confirmEmail',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Confirm an email using a token from com.atproto.server.requestEmailConfirmation.",
+          'Confirm an email using a token from com.atproto.server.requestEmailConfirmation.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["email", "token"],
+            type: 'object',
+            required: ['email', 'token'],
             properties: {
               email: {
-                type: "string",
+                type: 'string',
               },
               token: {
-                type: "string",
+                type: 'string',
               },
             },
           },
         },
         errors: [
           {
-            name: "AccountNotFound",
+            name: 'AccountNotFound',
           },
           {
-            name: "ExpiredToken",
+            name: 'ExpiredToken',
           },
           {
-            name: "InvalidToken",
+            name: 'InvalidToken',
           },
           {
-            name: "InvalidEmail",
+            name: 'InvalidEmail',
           },
         ],
       },
@@ -2147,109 +2147,109 @@ export const schemaDict = {
   },
   ComAtprotoServerCreateAccount: {
     lexicon: 1,
-    id: "com.atproto.server.createAccount",
+    id: 'com.atproto.server.createAccount',
     defs: {
       main: {
-        type: "procedure",
-        description: "Create an account. Implemented by PDS.",
+        type: 'procedure',
+        description: 'Create an account. Implemented by PDS.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["handle"],
+            type: 'object',
+            required: ['handle'],
             properties: {
               email: {
-                type: "string",
+                type: 'string',
               },
               handle: {
-                type: "string",
-                format: "handle",
-                description: "Requested handle for the account.",
+                type: 'string',
+                format: 'handle',
+                description: 'Requested handle for the account.',
               },
               did: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
                 description:
-                  "Pre-existing atproto DID, being imported to a new account.",
+                  'Pre-existing atproto DID, being imported to a new account.',
               },
               inviteCode: {
-                type: "string",
+                type: 'string',
               },
               verificationCode: {
-                type: "string",
+                type: 'string',
               },
               verificationPhone: {
-                type: "string",
+                type: 'string',
               },
               password: {
-                type: "string",
+                type: 'string',
                 description:
-                  "Initial account password. May need to meet instance-specific password strength requirements.",
+                  'Initial account password. May need to meet instance-specific password strength requirements.',
               },
               recoveryKey: {
-                type: "string",
+                type: 'string',
                 description:
-                  "DID PLC rotation key (aka, recovery key) to be included in PLC creation operation.",
+                  'DID PLC rotation key (aka, recovery key) to be included in PLC creation operation.',
               },
               plcOp: {
-                type: "unknown",
+                type: 'unknown',
                 description:
-                  "A signed DID PLC operation to be submitted as part of importing an existing account to this instance. NOTE: this optional field may be updated when full account migration is implemented.",
+                  'A signed DID PLC operation to be submitted as part of importing an existing account to this instance. NOTE: this optional field may be updated when full account migration is implemented.',
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             description:
-              "Account login session returned on successful account creation.",
-            required: ["accessJwt", "refreshJwt", "handle", "did"],
+              'Account login session returned on successful account creation.',
+            required: ['accessJwt', 'refreshJwt', 'handle', 'did'],
             properties: {
               accessJwt: {
-                type: "string",
+                type: 'string',
               },
               refreshJwt: {
-                type: "string",
+                type: 'string',
               },
               handle: {
-                type: "string",
-                format: "handle",
+                type: 'string',
+                format: 'handle',
               },
               did: {
-                type: "string",
-                format: "did",
-                description: "The DID of the new account.",
+                type: 'string',
+                format: 'did',
+                description: 'The DID of the new account.',
               },
               didDoc: {
-                type: "unknown",
-                description: "Complete DID document.",
+                type: 'unknown',
+                description: 'Complete DID document.',
               },
             },
           },
         },
         errors: [
           {
-            name: "InvalidHandle",
+            name: 'InvalidHandle',
           },
           {
-            name: "InvalidPassword",
+            name: 'InvalidPassword',
           },
           {
-            name: "InvalidInviteCode",
+            name: 'InvalidInviteCode',
           },
           {
-            name: "HandleNotAvailable",
+            name: 'HandleNotAvailable',
           },
           {
-            name: "UnsupportedDomain",
+            name: 'UnsupportedDomain',
           },
           {
-            name: "UnresolvableDid",
+            name: 'UnresolvableDid',
           },
           {
-            name: "IncompatibleDidDoc",
+            name: 'IncompatibleDidDoc',
           },
         ],
       },
@@ -2257,24 +2257,24 @@ export const schemaDict = {
   },
   ComAtprotoServerCreateAppPassword: {
     lexicon: 1,
-    id: "com.atproto.server.createAppPassword",
+    id: 'com.atproto.server.createAppPassword',
     defs: {
       main: {
-        type: "procedure",
-        description: "Create an App Password.",
+        type: 'procedure',
+        description: 'Create an App Password.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["name"],
+            type: 'object',
+            required: ['name'],
             properties: {
               name: {
-                type: "string",
+                type: 'string',
                 description:
-                  "A short name for the App Password, to help distinguish them.",
+                  'A short name for the App Password, to help distinguish them.',
               },
               privileged: {
-                type: "boolean",
+                type: 'boolean',
                 description:
                   "If an app password has 'privileged' access to possibly sensitive account state. Meant for use with trusted clients.",
               },
@@ -2282,34 +2282,34 @@ export const schemaDict = {
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "ref",
-            ref: "lex:com.atproto.server.createAppPassword#appPassword",
+            type: 'ref',
+            ref: 'lex:com.atproto.server.createAppPassword#appPassword',
           },
         },
         errors: [
           {
-            name: "AccountTakedown",
+            name: 'AccountTakedown',
           },
         ],
       },
       appPassword: {
-        type: "object",
-        required: ["name", "password", "createdAt"],
+        type: 'object',
+        required: ['name', 'password', 'createdAt'],
         properties: {
           name: {
-            type: "string",
+            type: 'string',
           },
           password: {
-            type: "string",
+            type: 'string',
           },
           createdAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           privileged: {
-            type: "boolean",
+            type: 'boolean',
           },
         },
       },
@@ -2317,35 +2317,35 @@ export const schemaDict = {
   },
   ComAtprotoServerCreateInviteCode: {
     lexicon: 1,
-    id: "com.atproto.server.createInviteCode",
+    id: 'com.atproto.server.createInviteCode',
     defs: {
       main: {
-        type: "procedure",
-        description: "Create an invite code.",
+        type: 'procedure',
+        description: 'Create an invite code.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["useCount"],
+            type: 'object',
+            required: ['useCount'],
             properties: {
               useCount: {
-                type: "integer",
+                type: 'integer',
               },
               forAccount: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["code"],
+            type: 'object',
+            required: ['code'],
             properties: {
               code: {
-                type: "string",
+                type: 'string',
               },
             },
           },
@@ -2355,45 +2355,45 @@ export const schemaDict = {
   },
   ComAtprotoServerCreateInviteCodes: {
     lexicon: 1,
-    id: "com.atproto.server.createInviteCodes",
+    id: 'com.atproto.server.createInviteCodes',
     defs: {
       main: {
-        type: "procedure",
-        description: "Create invite codes.",
+        type: 'procedure',
+        description: 'Create invite codes.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["codeCount", "useCount"],
+            type: 'object',
+            required: ['codeCount', 'useCount'],
             properties: {
               codeCount: {
-                type: "integer",
+                type: 'integer',
                 default: 1,
               },
               useCount: {
-                type: "integer",
+                type: 'integer',
               },
               forAccounts: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "string",
-                  format: "did",
+                  type: 'string',
+                  format: 'did',
                 },
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["codes"],
+            type: 'object',
+            required: ['codes'],
             properties: {
               codes: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:com.atproto.server.createInviteCodes#accountCodes",
+                  type: 'ref',
+                  ref: 'lex:com.atproto.server.createInviteCodes#accountCodes',
                 },
               },
             },
@@ -2401,16 +2401,16 @@ export const schemaDict = {
         },
       },
       accountCodes: {
-        type: "object",
-        required: ["account", "codes"],
+        type: 'object',
+        required: ['account', 'codes'],
         properties: {
           account: {
-            type: "string",
+            type: 'string',
           },
           codes: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "string",
+              type: 'string',
             },
           },
         },
@@ -2419,86 +2419,86 @@ export const schemaDict = {
   },
   ComAtprotoServerCreateSession: {
     lexicon: 1,
-    id: "com.atproto.server.createSession",
+    id: 'com.atproto.server.createSession',
     defs: {
       main: {
-        type: "procedure",
-        description: "Create an authentication session.",
+        type: 'procedure',
+        description: 'Create an authentication session.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["identifier", "password"],
+            type: 'object',
+            required: ['identifier', 'password'],
             properties: {
               identifier: {
-                type: "string",
+                type: 'string',
                 description:
-                  "Handle or other identifier supported by the server for the authenticating user.",
+                  'Handle or other identifier supported by the server for the authenticating user.',
               },
               password: {
-                type: "string",
+                type: 'string',
               },
               authFactorToken: {
-                type: "string",
+                type: 'string',
               },
               allowTakendown: {
-                type: "boolean",
+                type: 'boolean',
                 description:
-                  "When true, instead of throwing error for takendown accounts, a valid response with a narrow scoped token will be returned",
+                  'When true, instead of throwing error for takendown accounts, a valid response with a narrow scoped token will be returned',
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["accessJwt", "refreshJwt", "handle", "did"],
+            type: 'object',
+            required: ['accessJwt', 'refreshJwt', 'handle', 'did'],
             properties: {
               accessJwt: {
-                type: "string",
+                type: 'string',
               },
               refreshJwt: {
-                type: "string",
+                type: 'string',
               },
               handle: {
-                type: "string",
-                format: "handle",
+                type: 'string',
+                format: 'handle',
               },
               did: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               didDoc: {
-                type: "unknown",
+                type: 'unknown',
               },
               email: {
-                type: "string",
+                type: 'string',
               },
               emailConfirmed: {
-                type: "boolean",
+                type: 'boolean',
               },
               emailAuthFactor: {
-                type: "boolean",
+                type: 'boolean',
               },
               active: {
-                type: "boolean",
+                type: 'boolean',
               },
               status: {
-                type: "string",
+                type: 'string',
                 description:
-                  "If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.",
-                knownValues: ["takendown", "suspended", "deactivated"],
+                  'If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.',
+                knownValues: ['takendown', 'suspended', 'deactivated'],
               },
             },
           },
         },
         errors: [
           {
-            name: "AccountTakedown",
+            name: 'AccountTakedown',
           },
           {
-            name: "AuthFactorTokenRequired",
+            name: 'AuthFactorTokenRequired',
           },
         ],
       },
@@ -2506,22 +2506,22 @@ export const schemaDict = {
   },
   ComAtprotoServerDeactivateAccount: {
     lexicon: 1,
-    id: "com.atproto.server.deactivateAccount",
+    id: 'com.atproto.server.deactivateAccount',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Deactivates a currently active account. Stops serving of repo, and future writes to repo until reactivated. Used to finalize account migration with the old host after the account has been activated on the new host.",
+          'Deactivates a currently active account. Stops serving of repo, and future writes to repo until reactivated. Used to finalize account migration with the old host after the account has been activated on the new host.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             properties: {
               deleteAfter: {
-                type: "string",
-                format: "datetime",
+                type: 'string',
+                format: 'datetime',
                 description:
-                  "A recommendation to server as to how long they should hold onto the deactivated account before deleting.",
+                  'A recommendation to server as to how long they should hold onto the deactivated account before deleting.',
               },
             },
           },
@@ -2531,59 +2531,59 @@ export const schemaDict = {
   },
   ComAtprotoServerDefs: {
     lexicon: 1,
-    id: "com.atproto.server.defs",
+    id: 'com.atproto.server.defs',
     defs: {
       inviteCode: {
-        type: "object",
+        type: 'object',
         required: [
-          "code",
-          "available",
-          "disabled",
-          "forAccount",
-          "createdBy",
-          "createdAt",
-          "uses",
+          'code',
+          'available',
+          'disabled',
+          'forAccount',
+          'createdBy',
+          'createdAt',
+          'uses',
         ],
         properties: {
           code: {
-            type: "string",
+            type: 'string',
           },
           available: {
-            type: "integer",
+            type: 'integer',
           },
           disabled: {
-            type: "boolean",
+            type: 'boolean',
           },
           forAccount: {
-            type: "string",
+            type: 'string',
           },
           createdBy: {
-            type: "string",
+            type: 'string',
           },
           createdAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           uses: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.server.defs#inviteCodeUse",
+              type: 'ref',
+              ref: 'lex:com.atproto.server.defs#inviteCodeUse',
             },
           },
         },
       },
       inviteCodeUse: {
-        type: "object",
-        required: ["usedBy", "usedAt"],
+        type: 'object',
+        required: ['usedBy', 'usedAt'],
         properties: {
           usedBy: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           usedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
         },
       },
@@ -2591,37 +2591,37 @@ export const schemaDict = {
   },
   ComAtprotoServerDeleteAccount: {
     lexicon: 1,
-    id: "com.atproto.server.deleteAccount",
+    id: 'com.atproto.server.deleteAccount',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
           "Delete an actor's account with a token and password. Can only be called after requesting a deletion token. Requires auth.",
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["did", "password", "token"],
+            type: 'object',
+            required: ['did', 'password', 'token'],
             properties: {
               did: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               password: {
-                type: "string",
+                type: 'string',
               },
               token: {
-                type: "string",
+                type: 'string',
               },
             },
           },
         },
         errors: [
           {
-            name: "ExpiredToken",
+            name: 'ExpiredToken',
           },
           {
-            name: "InvalidToken",
+            name: 'InvalidToken',
           },
         ],
       },
@@ -2629,82 +2629,82 @@ export const schemaDict = {
   },
   ComAtprotoServerDeleteSession: {
     lexicon: 1,
-    id: "com.atproto.server.deleteSession",
+    id: 'com.atproto.server.deleteSession',
     defs: {
       main: {
-        type: "procedure",
-        description: "Delete the current session. Requires auth.",
+        type: 'procedure',
+        description: 'Delete the current session. Requires auth.',
       },
     },
   },
   ComAtprotoServerDescribeServer: {
     lexicon: 1,
-    id: "com.atproto.server.describeServer",
+    id: 'com.atproto.server.describeServer',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
           "Describes the server's account creation requirements and capabilities. Implemented by PDS.",
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["did", "availableUserDomains"],
+            type: 'object',
+            required: ['did', 'availableUserDomains'],
             properties: {
               inviteCodeRequired: {
-                type: "boolean",
+                type: 'boolean',
                 description:
-                  "If true, an invite code must be supplied to create an account on this instance.",
+                  'If true, an invite code must be supplied to create an account on this instance.',
               },
               phoneVerificationRequired: {
-                type: "boolean",
+                type: 'boolean',
                 description:
-                  "If true, a phone verification token must be supplied to create an account on this instance.",
+                  'If true, a phone verification token must be supplied to create an account on this instance.',
               },
               availableUserDomains: {
-                type: "array",
+                type: 'array',
                 description:
-                  "List of domain suffixes that can be used in account handles.",
+                  'List of domain suffixes that can be used in account handles.',
                 items: {
-                  type: "string",
+                  type: 'string',
                 },
               },
               links: {
-                type: "ref",
-                description: "URLs of service policy documents.",
-                ref: "lex:com.atproto.server.describeServer#links",
+                type: 'ref',
+                description: 'URLs of service policy documents.',
+                ref: 'lex:com.atproto.server.describeServer#links',
               },
               contact: {
-                type: "ref",
-                description: "Contact information",
-                ref: "lex:com.atproto.server.describeServer#contact",
+                type: 'ref',
+                description: 'Contact information',
+                ref: 'lex:com.atproto.server.describeServer#contact',
               },
               did: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
             },
           },
         },
       },
       links: {
-        type: "object",
+        type: 'object',
         properties: {
           privacyPolicy: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
           },
           termsOfService: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
           },
         },
       },
       contact: {
-        type: "object",
+        type: 'object',
         properties: {
           email: {
-            type: "string",
+            type: 'string',
           },
         },
       },
@@ -2712,21 +2712,21 @@ export const schemaDict = {
   },
   ComAtprotoServerGetAccountInviteCodes: {
     lexicon: 1,
-    id: "com.atproto.server.getAccountInviteCodes",
+    id: 'com.atproto.server.getAccountInviteCodes',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get all invite codes for the current account. Requires auth.",
+          'Get all invite codes for the current account. Requires auth.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             includeUsed: {
-              type: "boolean",
+              type: 'boolean',
               default: true,
             },
             createAvailable: {
-              type: "boolean",
+              type: 'boolean',
               default: true,
               description:
                 "Controls whether any new 'earned' but not 'created' invites should be created.",
@@ -2734,16 +2734,16 @@ export const schemaDict = {
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["codes"],
+            type: 'object',
+            required: ['codes'],
             properties: {
               codes: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:com.atproto.server.defs#inviteCode",
+                  type: 'ref',
+                  ref: 'lex:com.atproto.server.defs#inviteCode',
                 },
               },
             },
@@ -2751,7 +2751,7 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "DuplicateCreate",
+            name: 'DuplicateCreate',
           },
         ],
       },
@@ -2759,52 +2759,52 @@ export const schemaDict = {
   },
   ComAtprotoServerGetServiceAuth: {
     lexicon: 1,
-    id: "com.atproto.server.getServiceAuth",
+    id: 'com.atproto.server.getServiceAuth',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get a signed token on behalf of the requesting DID for the requested service.",
+          'Get a signed token on behalf of the requesting DID for the requested service.',
         parameters: {
-          type: "params",
-          required: ["aud"],
+          type: 'params',
+          required: ['aud'],
           properties: {
             aud: {
-              type: "string",
-              format: "did",
+              type: 'string',
+              format: 'did',
               description:
-                "The DID of the service that the token will be used to authenticate with",
+                'The DID of the service that the token will be used to authenticate with',
             },
             exp: {
-              type: "integer",
+              type: 'integer',
               description:
-                "The time in Unix Epoch seconds that the JWT expires. Defaults to 60 seconds in the future. The service may enforce certain time bounds on tokens depending on the requested scope.",
+                'The time in Unix Epoch seconds that the JWT expires. Defaults to 60 seconds in the future. The service may enforce certain time bounds on tokens depending on the requested scope.',
             },
             lxm: {
-              type: "string",
-              format: "nsid",
+              type: 'string',
+              format: 'nsid',
               description:
-                "Lexicon (XRPC) method to bind the requested token to",
+                'Lexicon (XRPC) method to bind the requested token to',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["token"],
+            type: 'object',
+            required: ['token'],
             properties: {
               token: {
-                type: "string",
+                type: 'string',
               },
             },
           },
         },
         errors: [
           {
-            name: "BadExpiration",
+            name: 'BadExpiration',
             description:
-              "Indicates that the requested expiration date is not a valid. May be in the past or may be reliant on the requested scopes.",
+              'Indicates that the requested expiration date is not a valid. May be in the past or may be reliant on the requested scopes.',
           },
         ],
       },
@@ -2812,46 +2812,46 @@ export const schemaDict = {
   },
   ComAtprotoServerGetSession: {
     lexicon: 1,
-    id: "com.atproto.server.getSession",
+    id: 'com.atproto.server.getSession',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get information about the current auth session. Requires auth.",
+          'Get information about the current auth session. Requires auth.',
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["handle", "did"],
+            type: 'object',
+            required: ['handle', 'did'],
             properties: {
               handle: {
-                type: "string",
-                format: "handle",
+                type: 'string',
+                format: 'handle',
               },
               did: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               email: {
-                type: "string",
+                type: 'string',
               },
               emailConfirmed: {
-                type: "boolean",
+                type: 'boolean',
               },
               emailAuthFactor: {
-                type: "boolean",
+                type: 'boolean',
               },
               didDoc: {
-                type: "unknown",
+                type: 'unknown',
               },
               active: {
-                type: "boolean",
+                type: 'boolean',
               },
               status: {
-                type: "string",
+                type: 'string',
                 description:
-                  "If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.",
-                knownValues: ["takendown", "suspended", "deactivated"],
+                  'If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.',
+                knownValues: ['takendown', 'suspended', 'deactivated'],
               },
             },
           },
@@ -2861,22 +2861,22 @@ export const schemaDict = {
   },
   ComAtprotoServerListAppPasswords: {
     lexicon: 1,
-    id: "com.atproto.server.listAppPasswords",
+    id: 'com.atproto.server.listAppPasswords',
     defs: {
       main: {
-        type: "query",
-        description: "List all App Passwords.",
+        type: 'query',
+        description: 'List all App Passwords.',
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["passwords"],
+            type: 'object',
+            required: ['passwords'],
             properties: {
               passwords: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:com.atproto.server.listAppPasswords#appPassword",
+                  type: 'ref',
+                  ref: 'lex:com.atproto.server.listAppPasswords#appPassword',
                 },
               },
             },
@@ -2884,23 +2884,23 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "AccountTakedown",
+            name: 'AccountTakedown',
           },
         ],
       },
       appPassword: {
-        type: "object",
-        required: ["name", "createdAt"],
+        type: 'object',
+        required: ['name', 'createdAt'],
         properties: {
           name: {
-            type: "string",
+            type: 'string',
           },
           createdAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           privileged: {
-            type: "boolean",
+            type: 'boolean',
           },
         },
       },
@@ -2908,50 +2908,50 @@ export const schemaDict = {
   },
   ComAtprotoServerRefreshSession: {
     lexicon: 1,
-    id: "com.atproto.server.refreshSession",
+    id: 'com.atproto.server.refreshSession',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
           "Refresh an authentication session. Requires auth using the 'refreshJwt' (not the 'accessJwt').",
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["accessJwt", "refreshJwt", "handle", "did"],
+            type: 'object',
+            required: ['accessJwt', 'refreshJwt', 'handle', 'did'],
             properties: {
               accessJwt: {
-                type: "string",
+                type: 'string',
               },
               refreshJwt: {
-                type: "string",
+                type: 'string',
               },
               handle: {
-                type: "string",
-                format: "handle",
+                type: 'string',
+                format: 'handle',
               },
               did: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               didDoc: {
-                type: "unknown",
+                type: 'unknown',
               },
               active: {
-                type: "boolean",
+                type: 'boolean',
               },
               status: {
-                type: "string",
+                type: 'string',
                 description:
                   "Hosting status of the account. If not specified, then assume 'active'.",
-                knownValues: ["takendown", "suspended", "deactivated"],
+                knownValues: ['takendown', 'suspended', 'deactivated'],
               },
             },
           },
         },
         errors: [
           {
-            name: "AccountTakedown",
+            name: 'AccountTakedown',
           },
         ],
       },
@@ -2959,40 +2959,40 @@ export const schemaDict = {
   },
   ComAtprotoServerRequestAccountDelete: {
     lexicon: 1,
-    id: "com.atproto.server.requestAccountDelete",
+    id: 'com.atproto.server.requestAccountDelete',
     defs: {
       main: {
-        type: "procedure",
-        description: "Initiate a user account deletion via email.",
+        type: 'procedure',
+        description: 'Initiate a user account deletion via email.',
       },
     },
   },
   ComAtprotoServerRequestEmailConfirmation: {
     lexicon: 1,
-    id: "com.atproto.server.requestEmailConfirmation",
+    id: 'com.atproto.server.requestEmailConfirmation',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Request an email with a code to confirm ownership of email.",
+          'Request an email with a code to confirm ownership of email.',
       },
     },
   },
   ComAtprotoServerRequestEmailUpdate: {
     lexicon: 1,
-    id: "com.atproto.server.requestEmailUpdate",
+    id: 'com.atproto.server.requestEmailUpdate',
     defs: {
       main: {
-        type: "procedure",
-        description: "Request a token in order to update email.",
+        type: 'procedure',
+        description: 'Request a token in order to update email.',
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["tokenRequired"],
+            type: 'object',
+            required: ['tokenRequired'],
             properties: {
               tokenRequired: {
-                type: "boolean",
+                type: 'boolean',
               },
             },
           },
@@ -3002,19 +3002,19 @@ export const schemaDict = {
   },
   ComAtprotoServerRequestPasswordReset: {
     lexicon: 1,
-    id: "com.atproto.server.requestPasswordReset",
+    id: 'com.atproto.server.requestPasswordReset',
     defs: {
       main: {
-        type: "procedure",
-        description: "Initiate a user account password reset via email.",
+        type: 'procedure',
+        description: 'Initiate a user account password reset via email.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["email"],
+            type: 'object',
+            required: ['email'],
             properties: {
               email: {
-                type: "string",
+                type: 'string',
               },
             },
           },
@@ -3024,35 +3024,35 @@ export const schemaDict = {
   },
   ComAtprotoServerReserveSigningKey: {
     lexicon: 1,
-    id: "com.atproto.server.reserveSigningKey",
+    id: 'com.atproto.server.reserveSigningKey',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Reserve a repo signing key, for use with account creation. Necessary so that a DID PLC update operation can be constructed during an account migraiton. Public and does not require auth; implemented by PDS. NOTE: this endpoint may change when full account migration is implemented.",
+          'Reserve a repo signing key, for use with account creation. Necessary so that a DID PLC update operation can be constructed during an account migraiton. Public and does not require auth; implemented by PDS. NOTE: this endpoint may change when full account migration is implemented.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             properties: {
               did: {
-                type: "string",
-                format: "did",
-                description: "The DID to reserve a key for.",
+                type: 'string',
+                format: 'did',
+                description: 'The DID to reserve a key for.',
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["signingKey"],
+            type: 'object',
+            required: ['signingKey'],
             properties: {
               signingKey: {
-                type: "string",
+                type: 'string',
                 description:
-                  "The public key for the reserved signing key, in did:key serialization.",
+                  'The public key for the reserved signing key, in did:key serialization.',
               },
             },
           },
@@ -3062,32 +3062,32 @@ export const schemaDict = {
   },
   ComAtprotoServerResetPassword: {
     lexicon: 1,
-    id: "com.atproto.server.resetPassword",
+    id: 'com.atproto.server.resetPassword',
     defs: {
       main: {
-        type: "procedure",
-        description: "Reset a user account password using a token.",
+        type: 'procedure',
+        description: 'Reset a user account password using a token.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["token", "password"],
+            type: 'object',
+            required: ['token', 'password'],
             properties: {
               token: {
-                type: "string",
+                type: 'string',
               },
               password: {
-                type: "string",
+                type: 'string',
               },
             },
           },
         },
         errors: [
           {
-            name: "ExpiredToken",
+            name: 'ExpiredToken',
           },
           {
-            name: "InvalidToken",
+            name: 'InvalidToken',
           },
         ],
       },
@@ -3095,19 +3095,19 @@ export const schemaDict = {
   },
   ComAtprotoServerRevokeAppPassword: {
     lexicon: 1,
-    id: "com.atproto.server.revokeAppPassword",
+    id: 'com.atproto.server.revokeAppPassword',
     defs: {
       main: {
-        type: "procedure",
-        description: "Revoke an App Password by name.",
+        type: 'procedure',
+        description: 'Revoke an App Password by name.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["name"],
+            type: 'object',
+            required: ['name'],
             properties: {
               name: {
-                type: "string",
+                type: 'string',
               },
             },
           },
@@ -3117,25 +3117,25 @@ export const schemaDict = {
   },
   ComAtprotoServerUpdateEmail: {
     lexicon: 1,
-    id: "com.atproto.server.updateEmail",
+    id: 'com.atproto.server.updateEmail',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description: "Update an account's email.",
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["email"],
+            type: 'object',
+            required: ['email'],
             properties: {
               email: {
-                type: "string",
+                type: 'string',
               },
               emailAuthFactor: {
-                type: "boolean",
+                type: 'boolean',
               },
               token: {
-                type: "string",
+                type: 'string',
                 description:
                   "Requires a token from com.atproto.sever.requestEmailUpdate if the account's email has been confirmed.",
               },
@@ -3144,13 +3144,13 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "ExpiredToken",
+            name: 'ExpiredToken',
           },
           {
-            name: "InvalidToken",
+            name: 'InvalidToken',
           },
           {
-            name: "TokenRequired",
+            name: 'TokenRequired',
           },
         ],
       },
@@ -3158,46 +3158,46 @@ export const schemaDict = {
   },
   ComAtprotoSyncGetBlob: {
     lexicon: 1,
-    id: "com.atproto.sync.getBlob",
+    id: 'com.atproto.sync.getBlob',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get a blob associated with a given account. Returns the full blob as originally uploaded. Does not require auth; implemented by PDS.",
+          'Get a blob associated with a given account. Returns the full blob as originally uploaded. Does not require auth; implemented by PDS.',
         parameters: {
-          type: "params",
-          required: ["did", "cid"],
+          type: 'params',
+          required: ['did', 'cid'],
           properties: {
             did: {
-              type: "string",
-              format: "did",
-              description: "The DID of the account.",
+              type: 'string',
+              format: 'did',
+              description: 'The DID of the account.',
             },
             cid: {
-              type: "string",
-              format: "cid",
-              description: "The CID of the blob to fetch",
+              type: 'string',
+              format: 'cid',
+              description: 'The CID of the blob to fetch',
             },
           },
         },
         output: {
-          encoding: "*/*",
+          encoding: '*/*',
         },
         errors: [
           {
-            name: "BlobNotFound",
+            name: 'BlobNotFound',
           },
           {
-            name: "RepoNotFound",
+            name: 'RepoNotFound',
           },
           {
-            name: "RepoTakendown",
+            name: 'RepoTakendown',
           },
           {
-            name: "RepoSuspended",
+            name: 'RepoSuspended',
           },
           {
-            name: "RepoDeactivated",
+            name: 'RepoDeactivated',
           },
         ],
       },
@@ -3205,48 +3205,48 @@ export const schemaDict = {
   },
   ComAtprotoSyncGetBlocks: {
     lexicon: 1,
-    id: "com.atproto.sync.getBlocks",
+    id: 'com.atproto.sync.getBlocks',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get data blocks from a given repo, by CID. For example, intermediate MST nodes, or records. Does not require auth; implemented by PDS.",
+          'Get data blocks from a given repo, by CID. For example, intermediate MST nodes, or records. Does not require auth; implemented by PDS.',
         parameters: {
-          type: "params",
-          required: ["did", "cids"],
+          type: 'params',
+          required: ['did', 'cids'],
           properties: {
             did: {
-              type: "string",
-              format: "did",
-              description: "The DID of the repo.",
+              type: 'string',
+              format: 'did',
+              description: 'The DID of the repo.',
             },
             cids: {
-              type: "array",
+              type: 'array',
               items: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
               },
             },
           },
         },
         output: {
-          encoding: "application/vnd.ipld.car",
+          encoding: 'application/vnd.ipld.car',
         },
         errors: [
           {
-            name: "BlockNotFound",
+            name: 'BlockNotFound',
           },
           {
-            name: "RepoNotFound",
+            name: 'RepoNotFound',
           },
           {
-            name: "RepoTakendown",
+            name: 'RepoTakendown',
           },
           {
-            name: "RepoSuspended",
+            name: 'RepoSuspended',
           },
           {
-            name: "RepoDeactivated",
+            name: 'RepoDeactivated',
           },
         ],
       },
@@ -3254,63 +3254,63 @@ export const schemaDict = {
   },
   ComAtprotoSyncGetCheckout: {
     lexicon: 1,
-    id: "com.atproto.sync.getCheckout",
+    id: 'com.atproto.sync.getCheckout',
     defs: {
       main: {
-        type: "query",
-        description: "DEPRECATED - please use com.atproto.sync.getRepo instead",
+        type: 'query',
+        description: 'DEPRECATED - please use com.atproto.sync.getRepo instead',
         parameters: {
-          type: "params",
-          required: ["did"],
+          type: 'params',
+          required: ['did'],
           properties: {
             did: {
-              type: "string",
-              format: "did",
-              description: "The DID of the repo.",
+              type: 'string',
+              format: 'did',
+              description: 'The DID of the repo.',
             },
           },
         },
         output: {
-          encoding: "application/vnd.ipld.car",
+          encoding: 'application/vnd.ipld.car',
         },
       },
     },
   },
   ComAtprotoSyncGetHead: {
     lexicon: 1,
-    id: "com.atproto.sync.getHead",
+    id: 'com.atproto.sync.getHead',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "DEPRECATED - please use com.atproto.sync.getLatestCommit instead",
+          'DEPRECATED - please use com.atproto.sync.getLatestCommit instead',
         parameters: {
-          type: "params",
-          required: ["did"],
+          type: 'params',
+          required: ['did'],
           properties: {
             did: {
-              type: "string",
-              format: "did",
-              description: "The DID of the repo.",
+              type: 'string',
+              format: 'did',
+              description: 'The DID of the repo.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["root"],
+            type: 'object',
+            required: ['root'],
             properties: {
               root: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
               },
             },
           },
         },
         errors: [
           {
-            name: "HeadNotFound",
+            name: 'HeadNotFound',
           },
         ],
       },
@@ -3318,51 +3318,51 @@ export const schemaDict = {
   },
   ComAtprotoSyncGetLatestCommit: {
     lexicon: 1,
-    id: "com.atproto.sync.getLatestCommit",
+    id: 'com.atproto.sync.getLatestCommit',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get the current commit CID & revision of the specified repo. Does not require auth.",
+          'Get the current commit CID & revision of the specified repo. Does not require auth.',
         parameters: {
-          type: "params",
-          required: ["did"],
+          type: 'params',
+          required: ['did'],
           properties: {
             did: {
-              type: "string",
-              format: "did",
-              description: "The DID of the repo.",
+              type: 'string',
+              format: 'did',
+              description: 'The DID of the repo.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["cid", "rev"],
+            type: 'object',
+            required: ['cid', 'rev'],
             properties: {
               cid: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
               },
               rev: {
-                type: "string",
+                type: 'string',
               },
             },
           },
         },
         errors: [
           {
-            name: "RepoNotFound",
+            name: 'RepoNotFound',
           },
           {
-            name: "RepoTakendown",
+            name: 'RepoTakendown',
           },
           {
-            name: "RepoSuspended",
+            name: 'RepoSuspended',
           },
           {
-            name: "RepoDeactivated",
+            name: 'RepoDeactivated',
           },
         ],
       },
@@ -3370,55 +3370,55 @@ export const schemaDict = {
   },
   ComAtprotoSyncGetRecord: {
     lexicon: 1,
-    id: "com.atproto.sync.getRecord",
+    id: 'com.atproto.sync.getRecord',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get data blocks needed to prove the existence or non-existence of record in the current version of repo. Does not require auth.",
+          'Get data blocks needed to prove the existence or non-existence of record in the current version of repo. Does not require auth.',
         parameters: {
-          type: "params",
-          required: ["did", "collection", "rkey"],
+          type: 'params',
+          required: ['did', 'collection', 'rkey'],
           properties: {
             did: {
-              type: "string",
-              format: "did",
-              description: "The DID of the repo.",
+              type: 'string',
+              format: 'did',
+              description: 'The DID of the repo.',
             },
             collection: {
-              type: "string",
-              format: "nsid",
+              type: 'string',
+              format: 'nsid',
             },
             rkey: {
-              type: "string",
-              description: "Record Key",
+              type: 'string',
+              description: 'Record Key',
             },
             commit: {
-              type: "string",
-              format: "cid",
+              type: 'string',
+              format: 'cid',
               description:
-                "DEPRECATED: referenced a repo commit by CID, and retrieved record as of that commit",
+                'DEPRECATED: referenced a repo commit by CID, and retrieved record as of that commit',
             },
           },
         },
         output: {
-          encoding: "application/vnd.ipld.car",
+          encoding: 'application/vnd.ipld.car',
         },
         errors: [
           {
-            name: "RecordNotFound",
+            name: 'RecordNotFound',
           },
           {
-            name: "RepoNotFound",
+            name: 'RepoNotFound',
           },
           {
-            name: "RepoTakendown",
+            name: 'RepoTakendown',
           },
           {
-            name: "RepoSuspended",
+            name: 'RepoSuspended',
           },
           {
-            name: "RepoDeactivated",
+            name: 'RepoDeactivated',
           },
         ],
       },
@@ -3426,43 +3426,43 @@ export const schemaDict = {
   },
   ComAtprotoSyncGetRepo: {
     lexicon: 1,
-    id: "com.atproto.sync.getRepo",
+    id: 'com.atproto.sync.getRepo',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
           "Download a repository export as CAR file. Optionally only a 'diff' since a previous revision. Does not require auth; implemented by PDS.",
         parameters: {
-          type: "params",
-          required: ["did"],
+          type: 'params',
+          required: ['did'],
           properties: {
             did: {
-              type: "string",
-              format: "did",
-              description: "The DID of the repo.",
+              type: 'string',
+              format: 'did',
+              description: 'The DID of the repo.',
             },
             since: {
-              type: "string",
+              type: 'string',
               description:
                 "The revision ('rev') of the repo to create a diff from.",
             },
           },
         },
         output: {
-          encoding: "application/vnd.ipld.car",
+          encoding: 'application/vnd.ipld.car',
         },
         errors: [
           {
-            name: "RepoNotFound",
+            name: 'RepoNotFound',
           },
           {
-            name: "RepoTakendown",
+            name: 'RepoTakendown',
           },
           {
-            name: "RepoSuspended",
+            name: 'RepoSuspended',
           },
           {
-            name: "RepoDeactivated",
+            name: 'RepoDeactivated',
           },
         ],
       },
@@ -3470,53 +3470,53 @@ export const schemaDict = {
   },
   ComAtprotoSyncGetRepoStatus: {
     lexicon: 1,
-    id: "com.atproto.sync.getRepoStatus",
+    id: 'com.atproto.sync.getRepoStatus',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get the hosting status for a repository, on this server. Expected to be implemented by PDS and Relay.",
+          'Get the hosting status for a repository, on this server. Expected to be implemented by PDS and Relay.',
         parameters: {
-          type: "params",
-          required: ["did"],
+          type: 'params',
+          required: ['did'],
           properties: {
             did: {
-              type: "string",
-              format: "did",
-              description: "The DID of the repo.",
+              type: 'string',
+              format: 'did',
+              description: 'The DID of the repo.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["did", "active"],
+            type: 'object',
+            required: ['did', 'active'],
             properties: {
               did: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               active: {
-                type: "boolean",
+                type: 'boolean',
               },
               status: {
-                type: "string",
+                type: 'string',
                 description:
-                  "If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.",
-                knownValues: ["takendown", "suspended", "deactivated"],
+                  'If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.',
+                knownValues: ['takendown', 'suspended', 'deactivated'],
               },
               rev: {
-                type: "string",
+                type: 'string',
                 description:
-                  "Optional field, the current rev of the repo, if active=true",
+                  'Optional field, the current rev of the repo, if active=true',
               },
             },
           },
         },
         errors: [
           {
-            name: "RepoNotFound",
+            name: 'RepoNotFound',
           },
         ],
       },
@@ -3524,50 +3524,50 @@ export const schemaDict = {
   },
   ComAtprotoSyncListBlobs: {
     lexicon: 1,
-    id: "com.atproto.sync.listBlobs",
+    id: 'com.atproto.sync.listBlobs',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "List blob CIDs for an account, since some repo revision. Does not require auth; implemented by PDS.",
+          'List blob CIDs for an account, since some repo revision. Does not require auth; implemented by PDS.',
         parameters: {
-          type: "params",
-          required: ["did"],
+          type: 'params',
+          required: ['did'],
           properties: {
             did: {
-              type: "string",
-              format: "did",
-              description: "The DID of the repo.",
+              type: 'string',
+              format: 'did',
+              description: 'The DID of the repo.',
             },
             since: {
-              type: "string",
-              description: "Optional revision of the repo to list blobs since.",
+              type: 'string',
+              description: 'Optional revision of the repo to list blobs since.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 1000,
               default: 500,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["cids"],
+            type: 'object',
+            required: ['cids'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               cids: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "string",
-                  format: "cid",
+                  type: 'string',
+                  format: 'cid',
                 },
               },
             },
@@ -3575,118 +3575,57 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "RepoNotFound",
+            name: 'RepoNotFound',
           },
           {
-            name: "RepoTakendown",
+            name: 'RepoTakendown',
           },
           {
-            name: "RepoSuspended",
+            name: 'RepoSuspended',
           },
           {
-            name: "RepoDeactivated",
+            name: 'RepoDeactivated',
           },
         ],
       },
     },
   },
-  ComAtprotoSyncListReposByCollection: {
-    lexicon: 1,
-    id: "com.atproto.sync.listReposByCollection",
-    defs: {
-      main: {
-        type: "query",
-        description:
-          "Enumerates all the DIDs which have records with the given collection NSID.",
-        parameters: {
-          type: "params",
-          required: ["collection"],
-          properties: {
-            collection: {
-              type: "string",
-              format: "nsid",
-            },
-            limit: {
-              type: "integer",
-              description:
-                "Maximum size of response set. Recommend setting a large maximum (1000+) when enumerating large DID lists.",
-              minimum: 1,
-              maximum: 2000,
-              default: 500,
-            },
-            cursor: {
-              type: "string",
-            },
-          },
-        },
-        output: {
-          encoding: "application/json",
-          schema: {
-            type: "object",
-            required: ["repos"],
-            properties: {
-              cursor: {
-                type: "string",
-              },
-              repos: {
-                type: "array",
-                items: {
-                  type: "ref",
-                  ref: "lex:com.atproto.sync.listReposByCollection#repo",
-                },
-              },
-            },
-          },
-        },
-      },
-      repo: {
-        type: "object",
-        required: ["did"],
-        properties: {
-          did: {
-            type: "string",
-            format: "did",
-          },
-        },
-      },
-    },
-  },
   ComAtprotoSyncListRepos: {
     lexicon: 1,
-    id: "com.atproto.sync.listRepos",
+    id: 'com.atproto.sync.listRepos',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Enumerates all the DID, rev, and commit CID for all repos hosted by this service. Does not require auth; implemented by PDS and Relay.",
+          'Enumerates all the DID, rev, and commit CID for all repos hosted by this service. Does not require auth; implemented by PDS and Relay.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 1000,
               default: 500,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["repos"],
+            type: 'object',
+            required: ['repos'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               repos: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:com.atproto.sync.listRepos#repo",
+                  type: 'ref',
+                  ref: 'lex:com.atproto.sync.listRepos#repo',
                 },
               },
             },
@@ -3694,29 +3633,90 @@ export const schemaDict = {
         },
       },
       repo: {
-        type: "object",
-        required: ["did", "head", "rev"],
+        type: 'object',
+        required: ['did', 'head', 'rev'],
         properties: {
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           head: {
-            type: "string",
-            format: "cid",
-            description: "Current repo commit CID",
+            type: 'string',
+            format: 'cid',
+            description: 'Current repo commit CID',
           },
           rev: {
-            type: "string",
+            type: 'string',
           },
           active: {
-            type: "boolean",
+            type: 'boolean',
           },
           status: {
-            type: "string",
+            type: 'string',
             description:
-              "If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.",
-            knownValues: ["takendown", "suspended", "deactivated"],
+              'If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.',
+            knownValues: ['takendown', 'suspended', 'deactivated'],
+          },
+        },
+      },
+    },
+  },
+  ComAtprotoSyncListReposByCollection: {
+    lexicon: 1,
+    id: 'com.atproto.sync.listReposByCollection',
+    defs: {
+      main: {
+        type: 'query',
+        description:
+          'Enumerates all the DIDs which have records with the given collection NSID.',
+        parameters: {
+          type: 'params',
+          required: ['collection'],
+          properties: {
+            collection: {
+              type: 'string',
+              format: 'nsid',
+            },
+            limit: {
+              type: 'integer',
+              description:
+                'Maximum size of response set. Recommend setting a large maximum (1000+) when enumerating large DID lists.',
+              minimum: 1,
+              maximum: 2000,
+              default: 500,
+            },
+            cursor: {
+              type: 'string',
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['repos'],
+            properties: {
+              cursor: {
+                type: 'string',
+              },
+              repos: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:com.atproto.sync.listReposByCollection#repo',
+                },
+              },
+            },
+          },
+        },
+      },
+      repo: {
+        type: 'object',
+        required: ['did'],
+        properties: {
+          did: {
+            type: 'string',
+            format: 'did',
           },
         },
       },
@@ -3724,22 +3724,22 @@ export const schemaDict = {
   },
   ComAtprotoSyncNotifyOfUpdate: {
     lexicon: 1,
-    id: "com.atproto.sync.notifyOfUpdate",
+    id: 'com.atproto.sync.notifyOfUpdate',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Notify a crawling service of a recent update, and that crawling should resume. Intended use is after a gap between repo stream events caused the crawling service to disconnect. Does not require auth; implemented by Relay.",
+          'Notify a crawling service of a recent update, and that crawling should resume. Intended use is after a gap between repo stream events caused the crawling service to disconnect. Does not require auth; implemented by Relay.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["hostname"],
+            type: 'object',
+            required: ['hostname'],
             properties: {
               hostname: {
-                type: "string",
+                type: 'string',
                 description:
-                  "Hostname of the current service (usually a PDS) that is notifying of update.",
+                  'Hostname of the current service (usually a PDS) that is notifying of update.',
               },
             },
           },
@@ -3749,22 +3749,22 @@ export const schemaDict = {
   },
   ComAtprotoSyncRequestCrawl: {
     lexicon: 1,
-    id: "com.atproto.sync.requestCrawl",
+    id: 'com.atproto.sync.requestCrawl',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Request a service to persistently crawl hosted repos. Expected use is new PDS instances declaring their existence to Relays. Does not require auth.",
+          'Request a service to persistently crawl hosted repos. Expected use is new PDS instances declaring their existence to Relays. Does not require auth.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["hostname"],
+            type: 'object',
+            required: ['hostname'],
             properties: {
               hostname: {
-                type: "string",
+                type: 'string',
                 description:
-                  "Hostname of the current service (eg, PDS) that is requesting to be crawled.",
+                  'Hostname of the current service (eg, PDS) that is requesting to be crawled.',
               },
             },
           },
@@ -3774,281 +3774,281 @@ export const schemaDict = {
   },
   ComAtprotoSyncSubscribeRepos: {
     lexicon: 1,
-    id: "com.atproto.sync.subscribeRepos",
+    id: 'com.atproto.sync.subscribeRepos',
     defs: {
       main: {
-        type: "subscription",
+        type: 'subscription',
         description:
-          "Repository event stream, aka Firehose endpoint. Outputs repo commits with diff data, and identity update events, for all repositories on the current server. See the atproto specifications for details around stream sequencing, repo versioning, CAR diff format, and more. Public and does not require auth; implemented by PDS and Relay.",
+          'Repository event stream, aka Firehose endpoint. Outputs repo commits with diff data, and identity update events, for all repositories on the current server. See the atproto specifications for details around stream sequencing, repo versioning, CAR diff format, and more. Public and does not require auth; implemented by PDS and Relay.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             cursor: {
-              type: "integer",
-              description: "The last known event seq number to backfill from.",
+              type: 'integer',
+              description: 'The last known event seq number to backfill from.',
             },
           },
         },
         message: {
           schema: {
-            type: "union",
+            type: 'union',
             refs: [
-              "lex:com.atproto.sync.subscribeRepos#commit",
-              "lex:com.atproto.sync.subscribeRepos#identity",
-              "lex:com.atproto.sync.subscribeRepos#account",
-              "lex:com.atproto.sync.subscribeRepos#handle",
-              "lex:com.atproto.sync.subscribeRepos#migrate",
-              "lex:com.atproto.sync.subscribeRepos#tombstone",
-              "lex:com.atproto.sync.subscribeRepos#info",
+              'lex:com.atproto.sync.subscribeRepos#commit',
+              'lex:com.atproto.sync.subscribeRepos#identity',
+              'lex:com.atproto.sync.subscribeRepos#account',
+              'lex:com.atproto.sync.subscribeRepos#handle',
+              'lex:com.atproto.sync.subscribeRepos#migrate',
+              'lex:com.atproto.sync.subscribeRepos#tombstone',
+              'lex:com.atproto.sync.subscribeRepos#info',
             ],
           },
         },
         errors: [
           {
-            name: "FutureCursor",
+            name: 'FutureCursor',
           },
           {
-            name: "ConsumerTooSlow",
+            name: 'ConsumerTooSlow',
             description:
-              "If the consumer of the stream can not keep up with events, and a backlog gets too large, the server will drop the connection.",
+              'If the consumer of the stream can not keep up with events, and a backlog gets too large, the server will drop the connection.',
           },
         ],
       },
       commit: {
-        type: "object",
+        type: 'object',
         description:
-          "Represents an update of repository state. Note that empty commits are allowed, which include no repo data changes, but an update to rev and signature.",
+          'Represents an update of repository state. Note that empty commits are allowed, which include no repo data changes, but an update to rev and signature.',
         required: [
-          "seq",
-          "rebase",
-          "tooBig",
-          "repo",
-          "commit",
-          "rev",
-          "since",
-          "blocks",
-          "ops",
-          "blobs",
-          "time",
+          'seq',
+          'rebase',
+          'tooBig',
+          'repo',
+          'commit',
+          'rev',
+          'since',
+          'blocks',
+          'ops',
+          'blobs',
+          'time',
         ],
-        nullable: ["prev", "since"],
+        nullable: ['prev', 'since'],
         properties: {
           seq: {
-            type: "integer",
-            description: "The stream sequence number of this message.",
+            type: 'integer',
+            description: 'The stream sequence number of this message.',
           },
           rebase: {
-            type: "boolean",
-            description: "DEPRECATED -- unused",
+            type: 'boolean',
+            description: 'DEPRECATED -- unused',
           },
           tooBig: {
-            type: "boolean",
+            type: 'boolean',
             description:
-              "Indicates that this commit contained too many ops, or data size was too large. Consumers will need to make a separate request to get missing data.",
+              'Indicates that this commit contained too many ops, or data size was too large. Consumers will need to make a separate request to get missing data.',
           },
           repo: {
-            type: "string",
-            format: "did",
-            description: "The repo this event comes from.",
+            type: 'string',
+            format: 'did',
+            description: 'The repo this event comes from.',
           },
           commit: {
-            type: "cid-link",
-            description: "Repo commit object CID.",
+            type: 'cid-link',
+            description: 'Repo commit object CID.',
           },
           prev: {
-            type: "cid-link",
+            type: 'cid-link',
             description:
-              "DEPRECATED -- unused. WARNING -- nullable and optional; stick with optional to ensure golang interoperability.",
+              'DEPRECATED -- unused. WARNING -- nullable and optional; stick with optional to ensure golang interoperability.',
           },
           rev: {
-            type: "string",
+            type: 'string',
             description:
-              "The rev of the emitted commit. Note that this information is also in the commit object included in blocks, unless this is a tooBig event.",
+              'The rev of the emitted commit. Note that this information is also in the commit object included in blocks, unless this is a tooBig event.',
           },
           since: {
-            type: "string",
+            type: 'string',
             description:
-              "The rev of the last emitted commit from this repo (if any).",
+              'The rev of the last emitted commit from this repo (if any).',
           },
           blocks: {
-            type: "bytes",
+            type: 'bytes',
             description:
-              "CAR file containing relevant blocks, as a diff since the previous repo state.",
+              'CAR file containing relevant blocks, as a diff since the previous repo state.',
             maxLength: 1000000,
           },
           ops: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.sync.subscribeRepos#repoOp",
+              type: 'ref',
+              ref: 'lex:com.atproto.sync.subscribeRepos#repoOp',
               description:
-                "List of repo mutation operations in this commit (eg, records created, updated, or deleted).",
+                'List of repo mutation operations in this commit (eg, records created, updated, or deleted).',
             },
             maxLength: 200,
           },
           blobs: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "cid-link",
+              type: 'cid-link',
               description:
-                "List of new blobs (by CID) referenced by records in this commit.",
+                'List of new blobs (by CID) referenced by records in this commit.',
             },
           },
           time: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
             description:
-              "Timestamp of when this message was originally broadcast.",
+              'Timestamp of when this message was originally broadcast.',
           },
         },
       },
       identity: {
-        type: "object",
+        type: 'object',
         description:
           "Represents a change to an account's identity. Could be an updated handle, signing key, or pds hosting endpoint. Serves as a prod to all downstream services to refresh their identity cache.",
-        required: ["seq", "did", "time"],
+        required: ['seq', 'did', 'time'],
         properties: {
           seq: {
-            type: "integer",
+            type: 'integer',
           },
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           time: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           handle: {
-            type: "string",
-            format: "handle",
+            type: 'string',
+            format: 'handle',
             description:
               "The current handle for the account, or 'handle.invalid' if validation fails. This field is optional, might have been validated or passed-through from an upstream source. Semantics and behaviors for PDS vs Relay may evolve in the future; see atproto specs for more details.",
           },
         },
       },
       account: {
-        type: "object",
+        type: 'object',
         description:
           "Represents a change to an account's status on a host (eg, PDS or Relay). The semantics of this event are that the status is at the host which emitted the event, not necessarily that at the currently active PDS. Eg, a Relay takedown would emit a takedown with active=false, even if the PDS is still active.",
-        required: ["seq", "did", "time", "active"],
+        required: ['seq', 'did', 'time', 'active'],
         properties: {
           seq: {
-            type: "integer",
+            type: 'integer',
           },
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           time: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           active: {
-            type: "boolean",
+            type: 'boolean',
             description:
-              "Indicates that the account has a repository which can be fetched from the host that emitted this event.",
+              'Indicates that the account has a repository which can be fetched from the host that emitted this event.',
           },
           status: {
-            type: "string",
+            type: 'string',
             description:
-              "If active=false, this optional field indicates a reason for why the account is not active.",
-            knownValues: ["takendown", "suspended", "deleted", "deactivated"],
+              'If active=false, this optional field indicates a reason for why the account is not active.',
+            knownValues: ['takendown', 'suspended', 'deleted', 'deactivated'],
           },
         },
       },
       handle: {
-        type: "object",
-        description: "DEPRECATED -- Use #identity event instead",
-        required: ["seq", "did", "handle", "time"],
+        type: 'object',
+        description: 'DEPRECATED -- Use #identity event instead',
+        required: ['seq', 'did', 'handle', 'time'],
         properties: {
           seq: {
-            type: "integer",
+            type: 'integer',
           },
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           handle: {
-            type: "string",
-            format: "handle",
+            type: 'string',
+            format: 'handle',
           },
           time: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
         },
       },
       migrate: {
-        type: "object",
-        description: "DEPRECATED -- Use #account event instead",
-        required: ["seq", "did", "migrateTo", "time"],
-        nullable: ["migrateTo"],
+        type: 'object',
+        description: 'DEPRECATED -- Use #account event instead',
+        required: ['seq', 'did', 'migrateTo', 'time'],
+        nullable: ['migrateTo'],
         properties: {
           seq: {
-            type: "integer",
+            type: 'integer',
           },
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           migrateTo: {
-            type: "string",
+            type: 'string',
           },
           time: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
         },
       },
       tombstone: {
-        type: "object",
-        description: "DEPRECATED -- Use #account event instead",
-        required: ["seq", "did", "time"],
+        type: 'object',
+        description: 'DEPRECATED -- Use #account event instead',
+        required: ['seq', 'did', 'time'],
         properties: {
           seq: {
-            type: "integer",
+            type: 'integer',
           },
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           time: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
         },
       },
       info: {
-        type: "object",
-        required: ["name"],
+        type: 'object',
+        required: ['name'],
         properties: {
           name: {
-            type: "string",
-            knownValues: ["OutdatedCursor"],
+            type: 'string',
+            knownValues: ['OutdatedCursor'],
           },
           message: {
-            type: "string",
+            type: 'string',
           },
         },
       },
       repoOp: {
-        type: "object",
-        description: "A repo operation, ie a mutation of a single record.",
-        required: ["action", "path", "cid"],
-        nullable: ["cid"],
+        type: 'object',
+        description: 'A repo operation, ie a mutation of a single record.',
+        required: ['action', 'path', 'cid'],
+        nullable: ['cid'],
         properties: {
           action: {
-            type: "string",
-            knownValues: ["create", "update", "delete"],
+            type: 'string',
+            knownValues: ['create', 'update', 'delete'],
           },
           path: {
-            type: "string",
+            type: 'string',
           },
           cid: {
-            type: "cid-link",
+            type: 'cid-link',
             description:
-              "For creates and updates, the new record CID. For deletions, null.",
+              'For creates and updates, the new record CID. For deletions, null.',
           },
         },
       },
@@ -4056,27 +4056,27 @@ export const schemaDict = {
   },
   ComAtprotoTempAddReservedHandle: {
     lexicon: 1,
-    id: "com.atproto.temp.addReservedHandle",
+    id: 'com.atproto.temp.addReservedHandle',
     defs: {
       main: {
-        type: "procedure",
-        description: "Add a handle to the set of reserved handles.",
+        type: 'procedure',
+        description: 'Add a handle to the set of reserved handles.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["handle"],
+            type: 'object',
+            required: ['handle'],
             properties: {
               handle: {
-                type: "string",
+                type: 'string',
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             properties: {},
           },
         },
@@ -4085,25 +4085,25 @@ export const schemaDict = {
   },
   ComAtprotoTempCheckSignupQueue: {
     lexicon: 1,
-    id: "com.atproto.temp.checkSignupQueue",
+    id: 'com.atproto.temp.checkSignupQueue',
     defs: {
       main: {
-        type: "query",
-        description: "Check accounts location in signup queue.",
+        type: 'query',
+        description: 'Check accounts location in signup queue.',
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["activated"],
+            type: 'object',
+            required: ['activated'],
             properties: {
               activated: {
-                type: "boolean",
+                type: 'boolean',
               },
               placeInQueue: {
-                type: "integer",
+                type: 'integer',
               },
               estimatedTimeMs: {
-                type: "integer",
+                type: 'integer',
               },
             },
           },
@@ -4113,20 +4113,20 @@ export const schemaDict = {
   },
   ComAtprotoTempFetchLabels: {
     lexicon: 1,
-    id: "com.atproto.temp.fetchLabels",
+    id: 'com.atproto.temp.fetchLabels',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "DEPRECATED: use queryLabels or subscribeLabels instead -- Fetch all labels from a labeler created after a certain date.",
+          'DEPRECATED: use queryLabels or subscribeLabels instead -- Fetch all labels from a labeler created after a certain date.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             since: {
-              type: "integer",
+              type: 'integer',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 250,
               default: 50,
@@ -4134,16 +4134,16 @@ export const schemaDict = {
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["labels"],
+            type: 'object',
+            required: ['labels'],
             properties: {
               labels: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:com.atproto.label.defs#label",
+                  type: 'ref',
+                  ref: 'lex:com.atproto.label.defs#label',
                 },
               },
             },
@@ -4154,20 +4154,20 @@ export const schemaDict = {
   },
   ComAtprotoTempRequestPhoneVerification: {
     lexicon: 1,
-    id: "com.atproto.temp.requestPhoneVerification",
+    id: 'com.atproto.temp.requestPhoneVerification',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Request a verification code to be sent to the supplied phone number",
+          'Request a verification code to be sent to the supplied phone number',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["phoneNumber"],
+            type: 'object',
+            required: ['phoneNumber'],
             properties: {
               phoneNumber: {
-                type: "string",
+                type: 'string',
               },
             },
           },
@@ -4177,443 +4177,459 @@ export const schemaDict = {
   },
   SoSprkActorDefs: {
     lexicon: 1,
-    id: "so.sprk.actor.defs",
+    id: 'so.sprk.actor.defs',
     defs: {
       profileViewBasic: {
-        type: "object",
-        required: ["did", "handle"],
+        type: 'object',
+        required: ['did', 'handle'],
         properties: {
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           handle: {
-            type: "string",
-            format: "handle",
+            type: 'string',
+            format: 'handle',
           },
           displayName: {
-            type: "string",
+            type: 'string',
             maxGraphemes: 64,
             maxLength: 640,
           },
           avatar: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
           },
           associated: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileAssociated",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileAssociated',
           },
           viewer: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#viewerState",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#viewerState',
           },
           labels: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#label",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
             },
           },
           createdAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
+          },
+          stories: {
+            type: 'array',
+            description: 'Recent stories from this profile author.',
+            items: {
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
+            },
           },
         },
       },
       profileView: {
-        type: "object",
-        required: ["did", "handle"],
+        type: 'object',
+        required: ['did', 'handle'],
         properties: {
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           handle: {
-            type: "string",
-            format: "handle",
+            type: 'string',
+            format: 'handle',
           },
           displayName: {
-            type: "string",
+            type: 'string',
             maxGraphemes: 64,
             maxLength: 640,
           },
           description: {
-            type: "string",
+            type: 'string',
             maxGraphemes: 256,
             maxLength: 2560,
           },
           avatar: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
           },
           associated: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileAssociated",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileAssociated',
           },
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           createdAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           viewer: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#viewerState",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#viewerState',
           },
           labels: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#label",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
             },
           },
         },
       },
       profileViewDetailed: {
-        type: "object",
-        required: ["did", "handle"],
+        type: 'object',
+        required: ['did', 'handle'],
         properties: {
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           handle: {
-            type: "string",
-            format: "handle",
+            type: 'string',
+            format: 'handle',
           },
           displayName: {
-            type: "string",
+            type: 'string',
             maxGraphemes: 64,
             maxLength: 640,
           },
           description: {
-            type: "string",
+            type: 'string',
             maxGraphemes: 256,
             maxLength: 2560,
           },
           avatar: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
           },
           banner: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
           },
           followersCount: {
-            type: "integer",
+            type: 'integer',
           },
           followsCount: {
-            type: "integer",
+            type: 'integer',
           },
           postsCount: {
-            type: "integer",
+            type: 'integer',
           },
           associated: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileAssociated",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileAssociated',
           },
           joinedViaStarterPack: {
-            type: "ref",
-            ref: "lex:so.sprk.graph.defs#starterPackViewBasic",
+            type: 'ref',
+            ref: 'lex:so.sprk.graph.defs#starterPackViewBasic',
           },
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           createdAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           viewer: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#viewerState",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#viewerState',
           },
           labels: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#label",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
             },
           },
           pinnedPost: {
-            type: "ref",
-            ref: "lex:com.atproto.repo.strongRef",
+            type: 'ref',
+            ref: 'lex:com.atproto.repo.strongRef',
+          },
+          stories: {
+            type: 'array',
+            description: 'Recent stories from this profile author.',
+            items: {
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
+            },
           },
         },
       },
       profileAssociated: {
-        type: "object",
+        type: 'object',
         properties: {
           lists: {
-            type: "integer",
+            type: 'integer',
           },
           feedgens: {
-            type: "integer",
+            type: 'integer',
           },
           starterPacks: {
-            type: "integer",
+            type: 'integer',
           },
           labeler: {
-            type: "boolean",
+            type: 'boolean',
           },
           chat: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileAssociatedChat",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileAssociatedChat',
           },
         },
       },
       profileAssociatedChat: {
-        type: "object",
-        required: ["allowIncoming"],
+        type: 'object',
+        required: ['allowIncoming'],
         properties: {
           allowIncoming: {
-            type: "string",
-            knownValues: ["all", "none", "following"],
+            type: 'string',
+            knownValues: ['all', 'none', 'following'],
           },
         },
       },
       viewerState: {
-        type: "object",
+        type: 'object',
         description:
           "Metadata about the requesting account's relationship with the subject account. Only has meaningful content for authed requests.",
         properties: {
           muted: {
-            type: "boolean",
+            type: 'boolean',
           },
           mutedByList: {
-            type: "ref",
-            ref: "lex:so.sprk.graph.defs#listViewBasic",
+            type: 'ref',
+            ref: 'lex:so.sprk.graph.defs#listViewBasic',
           },
           blockedBy: {
-            type: "boolean",
+            type: 'boolean',
           },
           blocking: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           blockingByList: {
-            type: "ref",
-            ref: "lex:so.sprk.graph.defs#listViewBasic",
+            type: 'ref',
+            ref: 'lex:so.sprk.graph.defs#listViewBasic',
           },
           following: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           followedBy: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           knownFollowers: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#knownFollowers",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#knownFollowers',
           },
         },
       },
       knownFollowers: {
-        type: "object",
+        type: 'object',
         description: "The subject's followers whom you also follow",
-        required: ["count", "followers"],
+        required: ['count', 'followers'],
         properties: {
           count: {
-            type: "integer",
+            type: 'integer',
           },
           followers: {
-            type: "array",
+            type: 'array',
             minLength: 0,
             maxLength: 5,
             items: {
-              type: "ref",
-              ref: "lex:so.sprk.actor.defs#profileViewBasic",
+              type: 'ref',
+              ref: 'lex:so.sprk.actor.defs#profileViewBasic',
             },
           },
         },
       },
       preferences: {
-        type: "array",
+        type: 'array',
         items: {
-          type: "union",
+          type: 'union',
           refs: [
-            "lex:so.sprk.actor.defs#adultContentPref",
-            "lex:so.sprk.actor.defs#contentLabelPref",
-            "lex:so.sprk.actor.defs#savedFeedsPref",
-            "lex:so.sprk.actor.defs#savedFeedsPrefV2",
-            "lex:so.sprk.actor.defs#personalDetailsPref",
-            "lex:so.sprk.actor.defs#feedViewPref",
-            "lex:so.sprk.actor.defs#threadViewPref",
-            "lex:so.sprk.actor.defs#interestsPref",
-            "lex:so.sprk.actor.defs#mutedWordsPref",
-            "lex:so.sprk.actor.defs#hiddenPostsPref",
-            "lex:so.sprk.actor.defs#labelersPref",
-            "lex:so.sprk.actor.defs#postInteractionSettingsPref",
+            'lex:so.sprk.actor.defs#adultContentPref',
+            'lex:so.sprk.actor.defs#contentLabelPref',
+            'lex:so.sprk.actor.defs#savedFeedsPref',
+            'lex:so.sprk.actor.defs#savedFeedsPrefV2',
+            'lex:so.sprk.actor.defs#personalDetailsPref',
+            'lex:so.sprk.actor.defs#feedViewPref',
+            'lex:so.sprk.actor.defs#threadViewPref',
+            'lex:so.sprk.actor.defs#interestsPref',
+            'lex:so.sprk.actor.defs#mutedWordsPref',
+            'lex:so.sprk.actor.defs#hiddenPostsPref',
+            'lex:so.sprk.actor.defs#labelersPref',
+            'lex:so.sprk.actor.defs#postInteractionSettingsPref',
           ],
         },
       },
       adultContentPref: {
-        type: "object",
-        required: ["enabled"],
+        type: 'object',
+        required: ['enabled'],
         properties: {
           enabled: {
-            type: "boolean",
+            type: 'boolean',
             default: false,
           },
         },
       },
       contentLabelPref: {
-        type: "object",
-        required: ["label", "visibility"],
+        type: 'object',
+        required: ['label', 'visibility'],
         properties: {
           labelerDid: {
-            type: "string",
+            type: 'string',
             description:
-              "Which labeler does this preference apply to? If undefined, applies globally.",
-            format: "did",
+              'Which labeler does this preference apply to? If undefined, applies globally.',
+            format: 'did',
           },
           label: {
-            type: "string",
+            type: 'string',
           },
           visibility: {
-            type: "string",
-            knownValues: ["ignore", "show", "warn", "hide"],
+            type: 'string',
+            knownValues: ['ignore', 'show', 'warn', 'hide'],
           },
         },
       },
       savedFeed: {
-        type: "object",
-        required: ["id", "type", "value", "pinned"],
+        type: 'object',
+        required: ['id', 'type', 'value', 'pinned'],
         properties: {
           id: {
-            type: "string",
+            type: 'string',
           },
           type: {
-            type: "string",
-            knownValues: ["feed", "list", "timeline"],
+            type: 'string',
+            knownValues: ['feed', 'list', 'timeline'],
           },
           value: {
-            type: "string",
+            type: 'string',
           },
           pinned: {
-            type: "boolean",
+            type: 'boolean',
           },
         },
       },
       savedFeedsPrefV2: {
-        type: "object",
-        required: ["items"],
+        type: 'object',
+        required: ['items'],
         properties: {
           items: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:so.sprk.actor.defs#savedFeed",
+              type: 'ref',
+              ref: 'lex:so.sprk.actor.defs#savedFeed',
             },
           },
         },
       },
       savedFeedsPref: {
-        type: "object",
-        required: ["pinned", "saved"],
+        type: 'object',
+        required: ['pinned', 'saved'],
         properties: {
           pinned: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "string",
-              format: "at-uri",
+              type: 'string',
+              format: 'at-uri',
             },
           },
           saved: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "string",
-              format: "at-uri",
+              type: 'string',
+              format: 'at-uri',
             },
           },
           timelineIndex: {
-            type: "integer",
+            type: 'integer',
           },
         },
       },
       personalDetailsPref: {
-        type: "object",
+        type: 'object',
         properties: {
           birthDate: {
-            type: "string",
-            format: "datetime",
-            description: "The birth date of account owner.",
+            type: 'string',
+            format: 'datetime',
+            description: 'The birth date of account owner.',
           },
         },
       },
       feedViewPref: {
-        type: "object",
-        required: ["feed"],
+        type: 'object',
+        required: ['feed'],
         properties: {
           feed: {
-            type: "string",
+            type: 'string',
             description:
-              "The URI of the feed, or an identifier which describes the feed.",
+              'The URI of the feed, or an identifier which describes the feed.',
           },
           hideReplies: {
-            type: "boolean",
-            description: "Hide replies in the feed.",
+            type: 'boolean',
+            description: 'Hide replies in the feed.',
           },
           hideRepliesByUnfollowed: {
-            type: "boolean",
+            type: 'boolean',
             description:
-              "Hide replies in the feed if they are not by followed users.",
+              'Hide replies in the feed if they are not by followed users.',
             default: true,
           },
           hideRepliesByLikeCount: {
-            type: "integer",
+            type: 'integer',
             description:
-              "Hide replies in the feed if they do not have this number of likes.",
+              'Hide replies in the feed if they do not have this number of likes.',
           },
           hideRepliesByLookCount: {
-            type: "integer",
+            type: 'integer',
             description:
-              "Hide replies in the feed if they do not have this number of looks.",
+              'Hide replies in the feed if they do not have this number of looks.',
           },
           hideReposts: {
-            type: "boolean",
-            description: "Hide reposts in the feed.",
+            type: 'boolean',
+            description: 'Hide reposts in the feed.',
           },
           hideQuotePosts: {
-            type: "boolean",
-            description: "Hide quote posts in the feed.",
+            type: 'boolean',
+            description: 'Hide quote posts in the feed.',
           },
         },
       },
       threadViewPref: {
-        type: "object",
+        type: 'object',
         properties: {
           sort: {
-            type: "string",
-            description: "Sorting mode for threads.",
+            type: 'string',
+            description: 'Sorting mode for threads.',
             knownValues: [
-              "oldest",
-              "newest",
-              "most-likes",
-              "most-looks",
-              "random",
-              "hotness",
+              'oldest',
+              'newest',
+              'most-likes',
+              'most-looks',
+              'random',
+              'hotness',
             ],
           },
           prioritizeFollowedUsers: {
-            type: "boolean",
-            description: "Show followed users at the top of all replies.",
+            type: 'boolean',
+            description: 'Show followed users at the top of all replies.',
           },
         },
       },
       interestsPref: {
-        type: "object",
-        required: ["tags"],
+        type: 'object',
+        required: ['tags'],
         properties: {
           tags: {
-            type: "array",
+            type: 'array',
             maxLength: 100,
             items: {
-              type: "string",
+              type: 'string',
               maxLength: 640,
               maxGraphemes: 64,
             },
@@ -4623,118 +4639,118 @@ export const schemaDict = {
         },
       },
       mutedWordTarget: {
-        type: "string",
-        knownValues: ["content", "tag"],
+        type: 'string',
+        knownValues: ['content', 'tag'],
         maxLength: 640,
         maxGraphemes: 64,
       },
       mutedWord: {
-        type: "object",
-        description: "A word that the account owner has muted.",
-        required: ["value", "targets"],
+        type: 'object',
+        description: 'A word that the account owner has muted.',
+        required: ['value', 'targets'],
         properties: {
           id: {
-            type: "string",
+            type: 'string',
           },
           value: {
-            type: "string",
-            description: "The muted word itself.",
+            type: 'string',
+            description: 'The muted word itself.',
             maxLength: 10000,
             maxGraphemes: 1000,
           },
           targets: {
-            type: "array",
-            description: "The intended targets of the muted word.",
+            type: 'array',
+            description: 'The intended targets of the muted word.',
             items: {
-              type: "ref",
-              ref: "lex:so.sprk.actor.defs#mutedWordTarget",
+              type: 'ref',
+              ref: 'lex:so.sprk.actor.defs#mutedWordTarget',
             },
           },
           actorTarget: {
-            type: "string",
+            type: 'string',
             description:
-              "Groups of users to apply the muted word to. If undefined, applies to all users.",
-            knownValues: ["all", "exclude-following"],
-            default: "all",
+              'Groups of users to apply the muted word to. If undefined, applies to all users.',
+            knownValues: ['all', 'exclude-following'],
+            default: 'all',
           },
           expiresAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
             description:
-              "The date and time at which the muted word will expire and no longer be applied.",
+              'The date and time at which the muted word will expire and no longer be applied.',
           },
         },
       },
       mutedWordsPref: {
-        type: "object",
-        required: ["items"],
+        type: 'object',
+        required: ['items'],
         properties: {
           items: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:so.sprk.actor.defs#mutedWord",
+              type: 'ref',
+              ref: 'lex:so.sprk.actor.defs#mutedWord',
             },
-            description: "A list of words the account owner has muted.",
+            description: 'A list of words the account owner has muted.',
           },
         },
       },
       hiddenPostsPref: {
-        type: "object",
-        required: ["items"],
+        type: 'object',
+        required: ['items'],
         properties: {
           items: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "string",
-              format: "at-uri",
+              type: 'string',
+              format: 'at-uri',
             },
             description:
-              "A list of URIs of posts the account owner has hidden.",
+              'A list of URIs of posts the account owner has hidden.',
           },
         },
       },
       labelersPref: {
-        type: "object",
-        required: ["labelers"],
+        type: 'object',
+        required: ['labelers'],
         properties: {
           labelers: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:so.sprk.actor.defs#labelerPrefItem",
+              type: 'ref',
+              ref: 'lex:so.sprk.actor.defs#labelerPrefItem',
             },
           },
         },
       },
       labelerPrefItem: {
-        type: "object",
-        required: ["did"],
+        type: 'object',
+        required: ['did'],
         properties: {
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
         },
       },
       postInteractionSettingsPref: {
-        type: "object",
+        type: 'object',
         description:
-          "Default post interaction settings for the account. These values should be applied as default values when creating new posts. These refs should mirror the threadgate and postgate records exactly.",
+          'Default post interaction settings for the account. These values should be applied as default values when creating new posts. These refs should mirror the threadgate and postgate records exactly.',
         required: [],
         properties: {
           threadgateAllowRules: {
             description:
-              "Matches threadgate record. List of rules defining who can reply to this users posts. If value is an empty array, no one can reply. If value is undefined, anyone can reply.",
-            type: "array",
+              'Matches threadgate record. List of rules defining who can reply to this users posts. If value is an empty array, no one can reply. If value is undefined, anyone can reply.',
+            type: 'array',
             maxLength: 5,
             items: {
-              type: "union",
+              type: 'union',
               refs: [
-                "lex:so.sprk.feed.threadgate#mentionRule",
-                "lex:so.sprk.feed.threadgate#followerRule",
-                "lex:so.sprk.feed.threadgate#followingRule",
-                "lex:so.sprk.feed.threadgate#listRule",
+                'lex:so.sprk.feed.threadgate#mentionRule',
+                'lex:so.sprk.feed.threadgate#followerRule',
+                'lex:so.sprk.feed.threadgate#followingRule',
+                'lex:so.sprk.feed.threadgate#listRule',
               ],
             },
           },
@@ -4744,24 +4760,24 @@ export const schemaDict = {
   },
   SoSprkActorGetPreferences: {
     lexicon: 1,
-    id: "so.sprk.actor.getPreferences",
+    id: 'so.sprk.actor.getPreferences',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get private preferences attached to the current account. Expected use is synchronization between multiple devices, and import/export during account migration. Requires auth.",
+          'Get private preferences attached to the current account. Expected use is synchronization between multiple devices, and import/export during account migration. Requires auth.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {},
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             properties: {
               followMode: {
-                type: "string",
-                knownValues: ["bsky", "sprk"],
+                type: 'string',
+                knownValues: ['bsky', 'sprk'],
               },
             },
           },
@@ -4771,28 +4787,28 @@ export const schemaDict = {
   },
   SoSprkActorGetProfile: {
     lexicon: 1,
-    id: "so.sprk.actor.getProfile",
+    id: 'so.sprk.actor.getProfile',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get detailed profile view of an actor. Does not require auth, but contains relevant metadata with auth.",
+          'Get detailed profile view of an actor. Does not require auth, but contains relevant metadata with auth.',
         parameters: {
-          type: "params",
-          required: ["actor"],
+          type: 'params',
+          required: ['actor'],
           properties: {
             actor: {
-              type: "string",
-              format: "at-identifier",
-              description: "Handle or DID of account to fetch profile of.",
+              type: 'string',
+              format: 'at-identifier',
+              description: 'Handle or DID of account to fetch profile of.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileViewDetailed",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileViewDetailed',
           },
         },
       },
@@ -4800,36 +4816,36 @@ export const schemaDict = {
   },
   SoSprkActorGetProfiles: {
     lexicon: 1,
-    id: "so.sprk.actor.getProfiles",
+    id: 'so.sprk.actor.getProfiles',
     defs: {
       main: {
-        type: "query",
-        description: "Get detailed profile views of multiple actors.",
+        type: 'query',
+        description: 'Get detailed profile views of multiple actors.',
         parameters: {
-          type: "params",
-          required: ["actors"],
+          type: 'params',
+          required: ['actors'],
           properties: {
             actors: {
-              type: "array",
+              type: 'array',
               items: {
-                type: "string",
-                format: "at-identifier",
+                type: 'string',
+                format: 'at-identifier',
               },
               maxLength: 25,
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["profiles"],
+            type: 'object',
+            required: ['profiles'],
             properties: {
               profiles: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.actor.defs#profileViewDetailed",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.actor.defs#profileViewDetailed',
                 },
               },
             },
@@ -4840,46 +4856,46 @@ export const schemaDict = {
   },
   SoSprkActorGetSuggestions: {
     lexicon: 1,
-    id: "so.sprk.actor.getSuggestions",
+    id: 'so.sprk.actor.getSuggestions',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get a list of suggested actors. Expected use is discovery of accounts to follow during new account onboarding.",
+          'Get a list of suggested actors. Expected use is discovery of accounts to follow during new account onboarding.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["actors"],
+            type: 'object',
+            required: ['actors'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               actors: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.actor.defs#profileView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.actor.defs#profileView',
                 },
               },
               recId: {
-                type: "integer",
+                type: 'integer',
                 description:
-                  "Snowflake for this recommendation, use when submitting recommendation events.",
+                  'Snowflake for this recommendation, use when submitting recommendation events.',
               },
             },
           },
@@ -4889,57 +4905,57 @@ export const schemaDict = {
   },
   SoSprkActorProfile: {
     lexicon: 1,
-    id: "so.sprk.actor.profile",
+    id: 'so.sprk.actor.profile',
     defs: {
       main: {
-        type: "record",
-        description: "A declaration of a Spark account profile.",
-        key: "literal:self",
+        type: 'record',
+        description: 'A declaration of a Spark account profile.',
+        key: 'literal:self',
         record: {
-          type: "object",
+          type: 'object',
           properties: {
             displayName: {
-              type: "string",
+              type: 'string',
               maxGraphemes: 64,
               maxLength: 640,
             },
             description: {
-              type: "string",
-              description: "Free-form profile description text.",
+              type: 'string',
+              description: 'Free-form profile description text.',
               maxGraphemes: 256,
               maxLength: 2560,
             },
             avatar: {
-              type: "blob",
+              type: 'blob',
               description:
                 "Small image to be displayed next to posts from account. AKA, 'profile picture'",
-              accept: ["image/png", "image/jpeg"],
+              accept: ['image/png', 'image/jpeg'],
               maxSize: 5242880,
             },
             banner: {
-              type: "blob",
+              type: 'blob',
               description:
-                "Larger horizontal image to display behind profile view.",
-              accept: ["image/png", "image/jpeg"],
+                'Larger horizontal image to display behind profile view.',
+              accept: ['image/png', 'image/jpeg'],
               maxSize: 5242880,
             },
             labels: {
-              type: "union",
+              type: 'union',
               description:
-                "Self-label values, specific to the Spark applications, on the overall account.",
-              refs: ["lex:com.atproto.label.defs#selfLabels"],
+                'Self-label values, specific to the Spark applications, on the overall account.',
+              refs: ['lex:com.atproto.label.defs#selfLabels'],
             },
             joinedViaStarterPack: {
-              type: "ref",
-              ref: "lex:com.atproto.repo.strongRef",
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
             },
             pinnedPost: {
-              type: "ref",
-              ref: "lex:com.atproto.repo.strongRef",
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
             },
             createdAt: {
-              type: "string",
-              format: "datetime",
+              type: 'string',
+              format: 'datetime',
             },
           },
         },
@@ -4948,19 +4964,19 @@ export const schemaDict = {
   },
   SoSprkActorPutPreferences: {
     lexicon: 1,
-    id: "so.sprk.actor.putPreferences",
+    id: 'so.sprk.actor.putPreferences',
     defs: {
       main: {
-        type: "procedure",
-        description: "Set the private preferences attached to the account.",
+        type: 'procedure',
+        description: 'Set the private preferences attached to the account.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             properties: {
               followMode: {
-                type: "string",
-                knownValues: ["bsky", "sprk"],
+                type: 'string',
+                knownValues: ['bsky', 'sprk'],
               },
             },
           },
@@ -4970,45 +4986,45 @@ export const schemaDict = {
   },
   SoSprkActorSearchActors: {
     lexicon: 1,
-    id: "so.sprk.actor.searchActors",
+    id: 'so.sprk.actor.searchActors',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Find actors (profiles) matching search criteria. Does not require auth.",
+          'Find actors (profiles) matching search criteria. Does not require auth.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             q: {
-              type: "string",
+              type: 'string',
               description:
-                "Search query string. Syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended.",
+                'Search query string. Syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 25,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["actors"],
+            type: 'object',
+            required: ['actors'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               actors: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.actor.defs#profileView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.actor.defs#profileView',
                 },
               },
             },
@@ -5019,21 +5035,21 @@ export const schemaDict = {
   },
   SoSprkActorSearchActorsTypeahead: {
     lexicon: 1,
-    id: "so.sprk.actor.searchActorsTypeahead",
+    id: 'so.sprk.actor.searchActorsTypeahead',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Find actor suggestions for a prefix search term. Expected use is for auto-completion during text field entry. Does not require auth.",
+          'Find actor suggestions for a prefix search term. Expected use is for auto-completion during text field entry. Does not require auth.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             q: {
-              type: "string",
-              description: "Search query prefix; not a full query string.",
+              type: 'string',
+              description: 'Search query prefix; not a full query string.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 10,
@@ -5041,16 +5057,16 @@ export const schemaDict = {
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["actors"],
+            type: 'object',
+            required: ['actors'],
             properties: {
               actors: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.actor.defs#profileViewBasic",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.actor.defs#profileViewBasic',
                 },
               },
             },
@@ -5061,20 +5077,20 @@ export const schemaDict = {
   },
   SoSprkEmbedDefs: {
     lexicon: 1,
-    id: "so.sprk.embed.defs",
+    id: 'so.sprk.embed.defs',
     defs: {
       aspectRatio: {
-        type: "object",
+        type: 'object',
         description:
-          "width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.",
-        required: ["width", "height"],
+          'width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.',
+        required: ['width', 'height'],
         properties: {
           width: {
-            type: "integer",
+            type: 'integer',
             minimum: 1,
           },
           height: {
-            type: "integer",
+            type: 'integer',
             minimum: 1,
           },
         },
@@ -5083,81 +5099,81 @@ export const schemaDict = {
   },
   SoSprkEmbedImages: {
     lexicon: 1,
-    id: "so.sprk.embed.images",
-    description: "A set of images embedded in a Spark record (eg, a post).",
+    id: 'so.sprk.embed.images',
+    description: 'A set of images embedded in a Spark record (eg, a post).',
     defs: {
       main: {
-        type: "object",
-        required: ["images"],
+        type: 'object',
+        required: ['images'],
         properties: {
           images: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:so.sprk.embed.images#image",
+              type: 'ref',
+              ref: 'lex:so.sprk.embed.images#image',
             },
             maxLength: 12,
           },
         },
       },
       image: {
-        type: "object",
-        required: ["image", "alt"],
+        type: 'object',
+        required: ['image', 'alt'],
         properties: {
           image: {
-            type: "blob",
-            accept: ["image/*"],
+            type: 'blob',
+            accept: ['image/*'],
             maxSize: 5242880,
           },
           alt: {
-            type: "string",
+            type: 'string',
             description:
-              "Alt text description of the image, for accessibility.",
+              'Alt text description of the image, for accessibility.',
           },
           aspectRatio: {
-            type: "ref",
-            ref: "lex:so.sprk.embed.defs#aspectRatio",
+            type: 'ref',
+            ref: 'lex:so.sprk.embed.defs#aspectRatio',
           },
         },
       },
       view: {
-        type: "object",
-        required: ["images"],
+        type: 'object',
+        required: ['images'],
         properties: {
           images: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:so.sprk.embed.images#viewImage",
+              type: 'ref',
+              ref: 'lex:so.sprk.embed.images#viewImage',
             },
             maxLength: 4,
           },
         },
       },
       viewImage: {
-        type: "object",
-        required: ["thumb", "fullsize", "alt"],
+        type: 'object',
+        required: ['thumb', 'fullsize', 'alt'],
         properties: {
           thumb: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
             description:
-              "Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.",
+              'Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.',
           },
           fullsize: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
             description:
-              "Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.",
+              'Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.',
           },
           alt: {
-            type: "string",
+            type: 'string',
             description:
-              "Alt text description of the image, for accessibility.",
+              'Alt text description of the image, for accessibility.',
           },
           aspectRatio: {
-            type: "ref",
-            ref: "lex:so.sprk.embed.defs#aspectRatio",
+            type: 'ref',
+            ref: 'lex:so.sprk.embed.defs#aspectRatio',
           },
         },
       },
@@ -5165,78 +5181,78 @@ export const schemaDict = {
   },
   SoSprkEmbedVideo: {
     lexicon: 1,
-    id: "so.sprk.embed.video",
-    description: "A video embedded in a Spark record (eg, a post).",
+    id: 'so.sprk.embed.video',
+    description: 'A video embedded in a Spark record (eg, a post).',
     defs: {
       main: {
-        type: "object",
-        required: ["video"],
+        type: 'object',
+        required: ['video'],
         properties: {
           video: {
-            type: "blob",
-            accept: ["video/mp4"],
+            type: 'blob',
+            accept: ['video/mp4'],
             maxSize: 314572800,
           },
           captions: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:so.sprk.embed.video#caption",
+              type: 'ref',
+              ref: 'lex:so.sprk.embed.video#caption',
             },
             maxLength: 20,
           },
           alt: {
-            type: "string",
+            type: 'string',
             description:
-              "Alt text description of the video, for accessibility.",
+              'Alt text description of the video, for accessibility.',
             maxGraphemes: 1000,
             maxLength: 10000,
           },
           aspectRatio: {
-            type: "ref",
-            ref: "lex:so.sprk.embed.defs#aspectRatio",
+            type: 'ref',
+            ref: 'lex:so.sprk.embed.defs#aspectRatio',
           },
         },
       },
       caption: {
-        type: "object",
-        required: ["lang", "file"],
+        type: 'object',
+        required: ['lang', 'file'],
         properties: {
           lang: {
-            type: "string",
-            format: "language",
+            type: 'string',
+            format: 'language',
           },
           file: {
-            type: "blob",
-            accept: ["text/vtt"],
+            type: 'blob',
+            accept: ['text/vtt'],
             maxSize: 20000,
           },
         },
       },
       view: {
-        type: "object",
-        required: ["cid", "playlist"],
+        type: 'object',
+        required: ['cid', 'playlist'],
         properties: {
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           playlist: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
           },
           thumbnail: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
           },
           alt: {
-            type: "string",
+            type: 'string',
             maxGraphemes: 1000,
             maxLength: 10000,
           },
           aspectRatio: {
-            type: "ref",
-            ref: "lex:so.sprk.embed.defs#aspectRatio",
+            type: 'ref',
+            ref: 'lex:so.sprk.embed.defs#aspectRatio',
           },
         },
       },
@@ -5244,595 +5260,654 @@ export const schemaDict = {
   },
   SoSprkFeedDefs: {
     lexicon: 1,
-    id: "so.sprk.feed.defs",
+    id: 'so.sprk.feed.defs',
     defs: {
-      postView: {
-        type: "object",
-        required: ["uri", "cid", "author", "record", "indexedAt"],
+      storyView: {
+        type: 'object',
+        required: ['uri', 'cid', 'author', 'record', 'indexedAt'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           author: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileViewBasic",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileViewBasic',
           },
           record: {
-            type: "unknown",
+            type: 'unknown',
+          },
+          media: {
+            type: 'union',
+            refs: [
+              'lex:so.sprk.embed.images#view',
+              'lex:so.sprk.embed.video#view',
+            ],
+          },
+          indexedAt: {
+            type: 'string',
+            format: 'datetime',
+          },
+        },
+      },
+      postView: {
+        type: 'object',
+        required: ['uri', 'cid', 'author', 'record', 'indexedAt'],
+        properties: {
+          uri: {
+            type: 'string',
+            format: 'at-uri',
+          },
+          cid: {
+            type: 'string',
+            format: 'cid',
+          },
+          author: {
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileViewBasic',
+          },
+          record: {
+            type: 'unknown',
           },
           embed: {
-            type: "union",
+            type: 'union',
             refs: [
-              "lex:so.sprk.embed.images#view",
-              "lex:so.sprk.embed.video#view",
+              'lex:so.sprk.embed.images#view',
+              'lex:so.sprk.embed.video#view',
             ],
           },
           sound: {
-            type: "ref",
-            ref: "lex:so.sprk.feed.defs#soundView",
+            type: 'ref',
+            ref: 'lex:so.sprk.feed.defs#soundView',
           },
           replyCount: {
-            type: "integer",
+            type: 'integer',
           },
           repostCount: {
-            type: "integer",
+            type: 'integer',
           },
           likeCount: {
-            type: "integer",
+            type: 'integer',
           },
           lookCount: {
-            type: "integer",
+            type: 'integer',
           },
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           viewer: {
-            type: "ref",
-            ref: "lex:so.sprk.feed.defs#viewerState",
+            type: 'ref',
+            ref: 'lex:so.sprk.feed.defs#viewerState',
           },
           labels: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#label",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
             },
           },
           threadgate: {
-            type: "ref",
-            ref: "lex:so.sprk.feed.defs#threadgateView",
+            type: 'ref',
+            ref: 'lex:so.sprk.feed.defs#threadgateView',
           },
         },
       },
       soundView: {
-        type: "object",
-        required: ["uri", "cid", "author", "record", "indexedAt"],
+        type: 'object',
+        required: ['uri', 'cid', 'author', 'record', 'indexedAt'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           author: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileViewBasic",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileViewBasic',
           },
           record: {
-            type: "unknown",
+            type: 'unknown',
           },
           useCount: {
-            type: "integer",
+            type: 'integer',
           },
           likeCount: {
-            type: "integer",
+            type: 'integer',
           },
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           labels: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#label",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
             },
           },
         },
       },
       viewerState: {
-        type: "object",
+        type: 'object',
         description:
           "Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests.",
         properties: {
           repost: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           like: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           look: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           threadMuted: {
-            type: "boolean",
+            type: 'boolean',
           },
           replyDisabled: {
-            type: "boolean",
+            type: 'boolean',
           },
           embeddingDisabled: {
-            type: "boolean",
+            type: 'boolean',
           },
           pinned: {
-            type: "boolean",
+            type: 'boolean',
           },
         },
       },
       threadContext: {
-        type: "object",
+        type: 'object',
         description:
-          "Metadata about this post within the context of the thread it is in.",
+          'Metadata about this post within the context of the thread it is in.',
         properties: {
           rootAuthorLike: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
         },
       },
       feedViewPost: {
-        type: "object",
-        required: ["post"],
+        type: 'object',
+        required: ['post'],
         properties: {
           post: {
-            type: "ref",
-            ref: "lex:so.sprk.feed.defs#postView",
+            type: 'ref',
+            ref: 'lex:so.sprk.feed.defs#postView',
           },
           reply: {
-            type: "ref",
-            ref: "lex:so.sprk.feed.defs#replyRef",
+            type: 'ref',
+            ref: 'lex:so.sprk.feed.defs#replyRef',
           },
           reason: {
-            type: "union",
+            type: 'union',
             refs: [
-              "lex:so.sprk.feed.defs#reasonRepost",
-              "lex:so.sprk.feed.defs#reasonPin",
+              'lex:so.sprk.feed.defs#reasonRepost',
+              'lex:so.sprk.feed.defs#reasonPin',
             ],
           },
           feedContext: {
-            type: "string",
+            type: 'string',
             description:
-              "Context provided by feed generator that may be passed back alongside interactions.",
+              'Context provided by feed generator that may be passed back alongside interactions.',
             maxLength: 2000,
           },
         },
       },
+      feedViewStory: {
+        type: 'object',
+        required: ['story'],
+        properties: {
+          story: {
+            type: 'ref',
+            ref: 'lex:so.sprk.feed.defs#storyView',
+          },
+        },
+      },
+      storiesByAuthor: {
+        type: 'object',
+        required: ['author', 'stories'],
+        properties: {
+          author: {
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileViewBasic',
+          },
+          stories: {
+            type: 'array',
+            items: {
+              type: 'ref',
+              ref: 'lex:so.sprk.feed.defs#storyView',
+            },
+          },
+        },
+      },
       replyRef: {
-        type: "object",
-        required: ["root", "parent"],
+        type: 'object',
+        required: ['root', 'parent'],
         properties: {
           root: {
-            type: "union",
+            type: 'union',
             refs: [
-              "lex:so.sprk.feed.defs#postView",
-              "lex:so.sprk.feed.defs#notFoundPost",
-              "lex:so.sprk.feed.defs#blockedPost",
+              'lex:so.sprk.feed.defs#postView',
+              'lex:so.sprk.feed.defs#notFoundPost',
+              'lex:so.sprk.feed.defs#blockedPost',
             ],
           },
           parent: {
-            type: "union",
+            type: 'union',
             refs: [
-              "lex:so.sprk.feed.defs#postView",
-              "lex:so.sprk.feed.defs#notFoundPost",
-              "lex:so.sprk.feed.defs#blockedPost",
+              'lex:so.sprk.feed.defs#postView',
+              'lex:so.sprk.feed.defs#notFoundPost',
+              'lex:so.sprk.feed.defs#blockedPost',
             ],
           },
           grandparentAuthor: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileViewBasic",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileViewBasic',
             description:
-              "When parent is a reply to another post, this is the author of that post.",
+              'When parent is a reply to another post, this is the author of that post.',
           },
         },
       },
       reasonRepost: {
-        type: "object",
-        required: ["by", "indexedAt"],
+        type: 'object',
+        required: ['by', 'indexedAt'],
         properties: {
           by: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileViewBasic",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileViewBasic',
           },
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
         },
       },
       reasonPin: {
-        type: "object",
+        type: 'object',
         properties: {},
       },
       threadViewPost: {
-        type: "object",
-        required: ["post"],
+        type: 'object',
+        required: ['post'],
         properties: {
           post: {
-            type: "ref",
-            ref: "lex:so.sprk.feed.defs#postView",
+            type: 'ref',
+            ref: 'lex:so.sprk.feed.defs#postView',
           },
           parent: {
-            type: "union",
+            type: 'union',
             refs: [
-              "lex:so.sprk.feed.defs#threadViewPost",
-              "lex:so.sprk.feed.defs#notFoundPost",
-              "lex:so.sprk.feed.defs#blockedPost",
+              'lex:so.sprk.feed.defs#threadViewPost',
+              'lex:so.sprk.feed.defs#notFoundPost',
+              'lex:so.sprk.feed.defs#blockedPost',
             ],
           },
           replies: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "union",
+              type: 'union',
               refs: [
-                "lex:so.sprk.feed.defs#threadViewPost",
-                "lex:so.sprk.feed.defs#notFoundPost",
-                "lex:so.sprk.feed.defs#blockedPost",
+                'lex:so.sprk.feed.defs#threadViewPost',
+                'lex:so.sprk.feed.defs#notFoundPost',
+                'lex:so.sprk.feed.defs#blockedPost',
               ],
             },
           },
           threadContext: {
-            type: "ref",
-            ref: "lex:so.sprk.feed.defs#threadContext",
+            type: 'ref',
+            ref: 'lex:so.sprk.feed.defs#threadContext',
           },
         },
       },
       notFoundPost: {
-        type: "object",
-        required: ["uri", "notFound"],
+        type: 'object',
+        required: ['uri', 'notFound'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           notFound: {
-            type: "boolean",
+            type: 'boolean',
             const: true,
           },
         },
       },
       blockedPost: {
-        type: "object",
-        required: ["uri", "blocked", "author"],
+        type: 'object',
+        required: ['uri', 'blocked', 'author'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           blocked: {
-            type: "boolean",
+            type: 'boolean',
             const: true,
           },
           author: {
-            type: "ref",
-            ref: "lex:so.sprk.feed.defs#blockedAuthor",
+            type: 'ref',
+            ref: 'lex:so.sprk.feed.defs#blockedAuthor',
           },
         },
       },
       blockedAuthor: {
-        type: "object",
-        required: ["did"],
+        type: 'object',
+        required: ['did'],
         properties: {
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           viewer: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#viewerState",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#viewerState',
           },
         },
       },
       generatorView: {
-        type: "object",
-        required: ["uri", "cid", "did", "creator", "displayName", "indexedAt"],
+        type: 'object',
+        required: ['uri', 'cid', 'did', 'creator', 'displayName', 'indexedAt'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           creator: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileView",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileView',
           },
           displayName: {
-            type: "string",
+            type: 'string',
           },
           description: {
-            type: "string",
+            type: 'string',
             maxGraphemes: 300,
             maxLength: 3000,
           },
           descriptionFacets: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:so.sprk.richtext.facet",
+              type: 'ref',
+              ref: 'lex:so.sprk.richtext.facet',
             },
           },
           avatar: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
           },
           likeCount: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
           lookCount: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
           acceptsInteractions: {
-            type: "boolean",
+            type: 'boolean',
           },
           labels: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#label",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
             },
           },
           viewer: {
-            type: "ref",
-            ref: "lex:so.sprk.feed.defs#generatorViewerState",
+            type: 'ref',
+            ref: 'lex:so.sprk.feed.defs#generatorViewerState',
           },
           contentMode: {
-            type: "string",
+            type: 'string',
             knownValues: [
-              "so.sprk.feed.defs#contentModeUnspecified",
-              "so.sprk.feed.defs#contentModeVideo",
+              'so.sprk.feed.defs#contentModeUnspecified',
+              'so.sprk.feed.defs#contentModeVideo',
             ],
           },
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
         },
       },
       generatorViewerState: {
-        type: "object",
+        type: 'object',
         properties: {
           like: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           look: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
         },
       },
       skeletonFeedPost: {
-        type: "object",
-        required: ["post"],
+        type: 'object',
+        required: ['post'],
         properties: {
           post: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           reason: {
-            type: "union",
+            type: 'union',
             refs: [
-              "lex:so.sprk.feed.defs#skeletonReasonRepost",
-              "lex:so.sprk.feed.defs#skeletonReasonPin",
+              'lex:so.sprk.feed.defs#skeletonReasonRepost',
+              'lex:so.sprk.feed.defs#skeletonReasonPin',
             ],
           },
           feedContext: {
-            type: "string",
+            type: 'string',
             description:
-              "Context that will be passed through to client and may be passed to feed generator back alongside interactions.",
+              'Context that will be passed through to client and may be passed to feed generator back alongside interactions.',
             maxLength: 2000,
           },
         },
       },
       skeletonReasonRepost: {
-        type: "object",
-        required: ["repost"],
+        type: 'object',
+        required: ['repost'],
         properties: {
           repost: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
         },
       },
       skeletonReasonPin: {
-        type: "object",
+        type: 'object',
         properties: {},
       },
       threadgateView: {
-        type: "object",
+        type: 'object',
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           record: {
-            type: "unknown",
+            type: 'unknown',
           },
           lists: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:so.sprk.graph.defs#listViewBasic",
+              type: 'ref',
+              ref: 'lex:so.sprk.graph.defs#listViewBasic',
             },
           },
         },
       },
       interaction: {
-        type: "object",
+        type: 'object',
         properties: {
           item: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           event: {
-            type: "string",
+            type: 'string',
             knownValues: [
-              "so.sprk.feed.defs#requestLess",
-              "so.sprk.feed.defs#requestMore",
-              "so.sprk.feed.defs#clickthroughItem",
-              "so.sprk.feed.defs#clickthroughAuthor",
-              "so.sprk.feed.defs#clickthroughReposter",
-              "so.sprk.feed.defs#clickthroughEmbed",
-              "so.sprk.feed.defs#interactionSeen",
-              "so.sprk.feed.defs#interactionLike",
-              "so.sprk.feed.defs#interactionRepost",
-              "so.sprk.feed.defs#interactionReply",
-              "so.sprk.feed.defs#interactionQuote",
-              "so.sprk.feed.defs#interactionShare",
+              'so.sprk.feed.defs#requestLess',
+              'so.sprk.feed.defs#requestMore',
+              'so.sprk.feed.defs#clickthroughItem',
+              'so.sprk.feed.defs#clickthroughAuthor',
+              'so.sprk.feed.defs#clickthroughReposter',
+              'so.sprk.feed.defs#clickthroughEmbed',
+              'so.sprk.feed.defs#interactionSeen',
+              'so.sprk.feed.defs#interactionLike',
+              'so.sprk.feed.defs#interactionRepost',
+              'so.sprk.feed.defs#interactionReply',
+              'so.sprk.feed.defs#interactionQuote',
+              'so.sprk.feed.defs#interactionShare',
             ],
           },
           feedContext: {
-            type: "string",
+            type: 'string',
             description:
-              "Context on a feed item that was originally supplied by the feed generator on getFeedSkeleton.",
+              'Context on a feed item that was originally supplied by the feed generator on getFeedSkeleton.',
             maxLength: 2000,
           },
         },
       },
       requestLess: {
-        type: "token",
+        type: 'token',
         description:
-          "Request that less content like the given feed item be shown in the feed",
+          'Request that less content like the given feed item be shown in the feed',
       },
       requestMore: {
-        type: "token",
+        type: 'token',
         description:
-          "Request that more content like the given feed item be shown in the feed",
+          'Request that more content like the given feed item be shown in the feed',
       },
       clickthroughItem: {
-        type: "token",
-        description: "User clicked through to the feed item",
+        type: 'token',
+        description: 'User clicked through to the feed item',
       },
       clickthroughAuthor: {
-        type: "token",
-        description: "User clicked through to the author of the feed item",
+        type: 'token',
+        description: 'User clicked through to the author of the feed item',
       },
       clickthroughReposter: {
-        type: "token",
-        description: "User clicked through to the reposter of the feed item",
+        type: 'token',
+        description: 'User clicked through to the reposter of the feed item',
       },
       clickthroughEmbed: {
-        type: "token",
+        type: 'token',
         description:
-          "User clicked through to the embedded content of the feed item",
+          'User clicked through to the embedded content of the feed item',
       },
       contentModeUnspecified: {
-        type: "token",
-        description: "Declares the feed generator returns any types of posts.",
+        type: 'token',
+        description: 'Declares the feed generator returns any types of posts.',
       },
       contentModeVideo: {
-        type: "token",
+        type: 'token',
         description:
-          "Declares the feed generator returns posts containing so.sprk.embed.video embeds.",
+          'Declares the feed generator returns posts containing so.sprk.embed.video embeds.',
       },
       interactionSeen: {
-        type: "token",
-        description: "Feed item was seen by user",
+        type: 'token',
+        description: 'Feed item was seen by user',
       },
       interactionLike: {
-        type: "token",
-        description: "User liked the feed item",
+        type: 'token',
+        description: 'User liked the feed item',
       },
       interactionRepost: {
-        type: "token",
-        description: "User reposted the feed item",
+        type: 'token',
+        description: 'User reposted the feed item',
       },
       interactionReply: {
-        type: "token",
-        description: "User replied to the feed item",
+        type: 'token',
+        description: 'User replied to the feed item',
       },
       interactionQuote: {
-        type: "token",
-        description: "User quoted the feed item",
+        type: 'token',
+        description: 'User quoted the feed item',
       },
       interactionShare: {
-        type: "token",
-        description: "User shared the feed item",
+        type: 'token',
+        description: 'User shared the feed item',
       },
     },
   },
   SoSprkFeedDescribeFeedGenerator: {
     lexicon: 1,
-    id: "so.sprk.feed.describeFeedGenerator",
+    id: 'so.sprk.feed.describeFeedGenerator',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get information about a feed generator, including policies and offered feed URIs. Does not require auth; implemented by Feed Generator services (not App View).",
+          'Get information about a feed generator, including policies and offered feed URIs. Does not require auth; implemented by Feed Generator services (not App View).',
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["did", "feeds"],
+            type: 'object',
+            required: ['did', 'feeds'],
             properties: {
               did: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               feeds: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.describeFeedGenerator#feed",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.describeFeedGenerator#feed',
                 },
               },
               links: {
-                type: "ref",
-                ref: "lex:so.sprk.feed.describeFeedGenerator#links",
+                type: 'ref',
+                ref: 'lex:so.sprk.feed.describeFeedGenerator#links',
               },
             },
           },
         },
       },
       feed: {
-        type: "object",
-        required: ["uri"],
+        type: 'object',
+        required: ['uri'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
         },
       },
       links: {
-        type: "object",
+        type: 'object',
         properties: {
           privacyPolicy: {
-            type: "string",
+            type: 'string',
           },
           termsOfService: {
-            type: "string",
+            type: 'string',
           },
         },
       },
@@ -5840,63 +5915,63 @@ export const schemaDict = {
   },
   SoSprkFeedGenerator: {
     lexicon: 1,
-    id: "so.sprk.feed.generator",
+    id: 'so.sprk.feed.generator',
     defs: {
       main: {
-        type: "record",
+        type: 'record',
         description:
-          "Record declaring of the existence of a feed generator, and containing metadata about it. The record can exist in any repository.",
-        key: "any",
+          'Record declaring of the existence of a feed generator, and containing metadata about it. The record can exist in any repository.',
+        key: 'any',
         record: {
-          type: "object",
-          required: ["did", "displayName", "createdAt"],
+          type: 'object',
+          required: ['did', 'displayName', 'createdAt'],
           properties: {
             did: {
-              type: "string",
-              format: "did",
+              type: 'string',
+              format: 'did',
             },
             displayName: {
-              type: "string",
+              type: 'string',
               maxGraphemes: 24,
               maxLength: 240,
             },
             description: {
-              type: "string",
+              type: 'string',
               maxGraphemes: 300,
               maxLength: 3000,
             },
             descriptionFacets: {
-              type: "array",
+              type: 'array',
               items: {
-                type: "ref",
-                ref: "lex:so.sprk.richtext.facet",
+                type: 'ref',
+                ref: 'lex:so.sprk.richtext.facet',
               },
             },
             avatar: {
-              type: "blob",
-              accept: ["image/png", "image/jpeg"],
+              type: 'blob',
+              accept: ['image/png', 'image/jpeg'],
               maxSize: 1000000,
             },
             acceptsInteractions: {
-              type: "boolean",
+              type: 'boolean',
               description:
-                "Declaration that a feed accepts feedback interactions from a client through so.sprk.feed.sendInteractions",
+                'Declaration that a feed accepts feedback interactions from a client through so.sprk.feed.sendInteractions',
             },
             labels: {
-              type: "union",
-              description: "Self-label values",
-              refs: ["lex:com.atproto.label.defs#selfLabels"],
+              type: 'union',
+              description: 'Self-label values',
+              refs: ['lex:com.atproto.label.defs#selfLabels'],
             },
             contentMode: {
-              type: "string",
+              type: 'string',
               knownValues: [
-                "so.sprk.feed.defs#contentModeUnspecified",
-                "so.sprk.feed.defs#contentModeVideo",
+                'so.sprk.feed.defs#contentModeUnspecified',
+                'so.sprk.feed.defs#contentModeVideo',
               ],
             },
             createdAt: {
-              type: "string",
-              format: "datetime",
+              type: 'string',
+              format: 'datetime',
             },
           },
         },
@@ -5905,45 +5980,45 @@ export const schemaDict = {
   },
   SoSprkFeedGetActorFeeds: {
     lexicon: 1,
-    id: "so.sprk.feed.getActorFeeds",
+    id: 'so.sprk.feed.getActorFeeds',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
           "Get a list of feeds (feed generator records) created by the actor (in the actor's repo).",
         parameters: {
-          type: "params",
-          required: ["actor"],
+          type: 'params',
+          required: ['actor'],
           properties: {
             actor: {
-              type: "string",
-              format: "at-identifier",
+              type: 'string',
+              format: 'at-identifier',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["feeds"],
+            type: 'object',
+            required: ['feeds'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               feeds: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#generatorView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#generatorView',
                 },
               },
             },
@@ -5954,45 +6029,45 @@ export const schemaDict = {
   },
   SoSprkFeedGetActorLikes: {
     lexicon: 1,
-    id: "so.sprk.feed.getActorLikes",
+    id: 'so.sprk.feed.getActorLikes',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get a list of posts liked by an actor. Requires auth, actor must be the requesting account.",
+          'Get a list of posts liked by an actor. Requires auth, actor must be the requesting account.',
         parameters: {
-          type: "params",
-          required: ["actor"],
+          type: 'params',
+          required: ['actor'],
           properties: {
             actor: {
-              type: "string",
-              format: "at-identifier",
+              type: 'string',
+              format: 'at-identifier',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["feed"],
+            type: 'object',
+            required: ['feed'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               feed: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#feedViewPost",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#feedViewPost',
                 },
               },
             },
@@ -6000,10 +6075,10 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "BlockedActor",
+            name: 'BlockedActor',
           },
           {
-            name: "BlockedByActor",
+            name: 'BlockedByActor',
           },
         ],
       },
@@ -6011,45 +6086,45 @@ export const schemaDict = {
   },
   SoSprkFeedGetActorLooks: {
     lexicon: 1,
-    id: "so.sprk.feed.getActorLooks",
+    id: 'so.sprk.feed.getActorLooks',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get a list of posts looked by an actor. Requires auth, actor must be the requesting account.",
+          'Get a list of posts looked by an actor. Requires auth, actor must be the requesting account.',
         parameters: {
-          type: "params",
-          required: ["actor"],
+          type: 'params',
+          required: ['actor'],
           properties: {
             actor: {
-              type: "string",
-              format: "at-identifier",
+              type: 'string',
+              format: 'at-identifier',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["feed"],
+            type: 'object',
+            required: ['feed'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               feed: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#feedViewPost",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#feedViewPost',
                 },
               },
             },
@@ -6057,10 +6132,10 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "BlockedActor",
+            name: 'BlockedActor',
           },
           {
-            name: "BlockedByActor",
+            name: 'BlockedByActor',
           },
         ],
       },
@@ -6068,62 +6143,62 @@ export const schemaDict = {
   },
   SoSprkFeedGetAuthorFeed: {
     lexicon: 1,
-    id: "so.sprk.feed.getAuthorFeed",
+    id: 'so.sprk.feed.getAuthorFeed',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
           "Get a view of an actor's 'author feed' (post and reposts by the author). Does not require auth.",
         parameters: {
-          type: "params",
-          required: ["actor"],
+          type: 'params',
+          required: ['actor'],
           properties: {
             actor: {
-              type: "string",
-              format: "at-identifier",
+              type: 'string',
+              format: 'at-identifier',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
             filter: {
-              type: "string",
+              type: 'string',
               description:
-                "Combinations of post/repost types to include in response.",
+                'Combinations of post/repost types to include in response.',
               knownValues: [
-                "posts_with_replies",
-                "posts_no_replies",
-                "posts_with_media",
-                "posts_and_author_threads",
-                "posts_with_video",
+                'posts_with_replies',
+                'posts_no_replies',
+                'posts_with_media',
+                'posts_and_author_threads',
+                'posts_with_video',
               ],
-              default: "posts_with_replies",
+              default: 'posts_with_replies',
             },
             includePins: {
-              type: "boolean",
+              type: 'boolean',
               default: false,
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["feed"],
+            type: 'object',
+            required: ['feed'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               feed: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#feedViewPost",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#feedViewPost',
                 },
               },
             },
@@ -6131,10 +6206,64 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "BlockedActor",
+            name: 'BlockedActor',
           },
           {
-            name: "BlockedByActor",
+            name: 'BlockedByActor',
+          },
+        ],
+      },
+    },
+  },
+  SoSprkFeedGetFeed: {
+    lexicon: 1,
+    id: 'so.sprk.feed.getFeed',
+    defs: {
+      main: {
+        type: 'query',
+        description:
+          "Get a hydrated feed from an actor's selected feed generator. Implemented by App View.",
+        parameters: {
+          type: 'params',
+          required: ['feed'],
+          properties: {
+            feed: {
+              type: 'string',
+              format: 'at-uri',
+            },
+            limit: {
+              type: 'integer',
+              minimum: 1,
+              maximum: 100,
+              default: 50,
+            },
+            cursor: {
+              type: 'string',
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['feed'],
+            properties: {
+              cursor: {
+                type: 'string',
+              },
+              feed: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#feedViewPost',
+                },
+              },
+            },
+          },
+        },
+        errors: [
+          {
+            name: 'UnknownFeed',
           },
         ],
       },
@@ -6142,42 +6271,42 @@ export const schemaDict = {
   },
   SoSprkFeedGetFeedGenerator: {
     lexicon: 1,
-    id: "so.sprk.feed.getFeedGenerator",
+    id: 'so.sprk.feed.getFeedGenerator',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get information about a feed generator. Implemented by AppView.",
+          'Get information about a feed generator. Implemented by AppView.',
         parameters: {
-          type: "params",
-          required: ["feed"],
+          type: 'params',
+          required: ['feed'],
           properties: {
             feed: {
-              type: "string",
-              format: "at-uri",
-              description: "AT-URI of the feed generator record.",
+              type: 'string',
+              format: 'at-uri',
+              description: 'AT-URI of the feed generator record.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["view", "isOnline", "isValid"],
+            type: 'object',
+            required: ['view', 'isOnline', 'isValid'],
             properties: {
               view: {
-                type: "ref",
-                ref: "lex:so.sprk.feed.defs#generatorView",
+                type: 'ref',
+                ref: 'lex:so.sprk.feed.defs#generatorView',
               },
               isOnline: {
-                type: "boolean",
+                type: 'boolean',
                 description:
-                  "Indicates whether the feed generator service has been online recently, or else seems to be inactive.",
+                  'Indicates whether the feed generator service has been online recently, or else seems to be inactive.',
               },
               isValid: {
-                type: "boolean",
+                type: 'boolean',
                 description:
-                  "Indicates whether the feed generator service is compatible with the record declaration.",
+                  'Indicates whether the feed generator service is compatible with the record declaration.',
               },
             },
           },
@@ -6187,140 +6316,86 @@ export const schemaDict = {
   },
   SoSprkFeedGetFeedGenerators: {
     lexicon: 1,
-    id: "so.sprk.feed.getFeedGenerators",
+    id: 'so.sprk.feed.getFeedGenerators',
     defs: {
       main: {
-        type: "query",
-        description: "Get information about a list of feed generators.",
+        type: 'query',
+        description: 'Get information about a list of feed generators.',
         parameters: {
-          type: "params",
-          required: ["feeds"],
+          type: 'params',
+          required: ['feeds'],
           properties: {
             feeds: {
-              type: "array",
+              type: 'array',
               items: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["feeds"],
+            type: 'object',
+            required: ['feeds'],
             properties: {
               feeds: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#generatorView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#generatorView',
                 },
               },
             },
           },
         },
-      },
-    },
-  },
-  SoSprkFeedGetFeed: {
-    lexicon: 1,
-    id: "so.sprk.feed.getFeed",
-    defs: {
-      main: {
-        type: "query",
-        description:
-          "Get a hydrated feed from an actor's selected feed generator. Implemented by App View.",
-        parameters: {
-          type: "params",
-          required: ["feed"],
-          properties: {
-            feed: {
-              type: "string",
-              format: "at-uri",
-            },
-            limit: {
-              type: "integer",
-              minimum: 1,
-              maximum: 100,
-              default: 50,
-            },
-            cursor: {
-              type: "string",
-            },
-          },
-        },
-        output: {
-          encoding: "application/json",
-          schema: {
-            type: "object",
-            required: ["feed"],
-            properties: {
-              cursor: {
-                type: "string",
-              },
-              feed: {
-                type: "array",
-                items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#feedViewPost",
-                },
-              },
-            },
-          },
-        },
-        errors: [
-          {
-            name: "UnknownFeed",
-          },
-        ],
       },
     },
   },
   SoSprkFeedGetFeedSkeleton: {
     lexicon: 1,
-    id: "so.sprk.feed.getFeedSkeleton",
+    id: 'so.sprk.feed.getFeedSkeleton',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get a skeleton of a feed provided by a feed generator. Auth is optional, depending on provider requirements, and provides the DID of the requester. Implemented by Feed Generator Service.",
+          'Get a skeleton of a feed provided by a feed generator. Auth is optional, depending on provider requirements, and provides the DID of the requester. Implemented by Feed Generator Service.',
         parameters: {
-          type: "params",
-          required: ["feed"],
+          type: 'params',
+          required: ['feed'],
           properties: {
             feed: {
-              type: "string",
-              format: "at-uri",
+              type: 'string',
+              format: 'at-uri',
               description:
-                "Reference to feed generator record describing the specific feed being requested.",
+                'Reference to feed generator record describing the specific feed being requested.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["feed"],
+            type: 'object',
+            required: ['feed'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               feed: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#skeletonFeedPost",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#skeletonFeedPost',
                 },
               },
             },
@@ -6328,7 +6403,7 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "UnknownFeed",
+            name: 'UnknownFeed',
           },
         ],
       },
@@ -6336,60 +6411,60 @@ export const schemaDict = {
   },
   SoSprkFeedGetLikes: {
     lexicon: 1,
-    id: "so.sprk.feed.getLikes",
+    id: 'so.sprk.feed.getLikes',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get like records which reference a subject (by AT-URI and CID).",
+          'Get like records which reference a subject (by AT-URI and CID).',
         parameters: {
-          type: "params",
-          required: ["uri"],
+          type: 'params',
+          required: ['uri'],
           properties: {
             uri: {
-              type: "string",
-              format: "at-uri",
-              description: "AT-URI of the subject (eg, a post record).",
+              type: 'string',
+              format: 'at-uri',
+              description: 'AT-URI of the subject (eg, a post record).',
             },
             cid: {
-              type: "string",
-              format: "cid",
+              type: 'string',
+              format: 'cid',
               description:
-                "CID of the subject record (aka, specific version of record), to filter likes.",
+                'CID of the subject record (aka, specific version of record), to filter likes.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["uri", "likes"],
+            type: 'object',
+            required: ['uri', 'likes'],
             properties: {
               uri: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
               cid: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
               },
               cursor: {
-                type: "string",
+                type: 'string',
               },
               likes: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.getLikes#like",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.getLikes#like',
                 },
               },
             },
@@ -6397,20 +6472,20 @@ export const schemaDict = {
         },
       },
       like: {
-        type: "object",
-        required: ["indexedAt", "createdAt", "actor"],
+        type: 'object',
+        required: ['indexedAt', 'createdAt', 'actor'],
         properties: {
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           createdAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           actor: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileView",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileView',
           },
         },
       },
@@ -6418,46 +6493,46 @@ export const schemaDict = {
   },
   SoSprkFeedGetListFeed: {
     lexicon: 1,
-    id: "so.sprk.feed.getListFeed",
+    id: 'so.sprk.feed.getListFeed',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get a feed of recent posts from a list (posts and reposts from any actors on the list). Does not require auth.",
+          'Get a feed of recent posts from a list (posts and reposts from any actors on the list). Does not require auth.',
         parameters: {
-          type: "params",
-          required: ["list"],
+          type: 'params',
+          required: ['list'],
           properties: {
             list: {
-              type: "string",
-              format: "at-uri",
-              description: "Reference (AT-URI) to the list record.",
+              type: 'string',
+              format: 'at-uri',
+              description: 'Reference (AT-URI) to the list record.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["feed"],
+            type: 'object',
+            required: ['feed'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               feed: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#feedViewPost",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#feedViewPost',
                 },
               },
             },
@@ -6465,7 +6540,7 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "UnknownList",
+            name: 'UnknownList',
           },
         ],
       },
@@ -6473,60 +6548,60 @@ export const schemaDict = {
   },
   SoSprkFeedGetLooks: {
     lexicon: 1,
-    id: "so.sprk.feed.getLooks",
+    id: 'so.sprk.feed.getLooks',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get look records which reference a subject (by AT-URI and CID).",
+          'Get look records which reference a subject (by AT-URI and CID).',
         parameters: {
-          type: "params",
-          required: ["uri"],
+          type: 'params',
+          required: ['uri'],
           properties: {
             uri: {
-              type: "string",
-              format: "at-uri",
-              description: "AT-URI of the subject (eg, a post record).",
+              type: 'string',
+              format: 'at-uri',
+              description: 'AT-URI of the subject (eg, a post record).',
             },
             cid: {
-              type: "string",
-              format: "cid",
+              type: 'string',
+              format: 'cid',
               description:
-                "CID of the subject record (aka, specific version of record), to filter looks.",
+                'CID of the subject record (aka, specific version of record), to filter looks.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["uri", "looks"],
+            type: 'object',
+            required: ['uri', 'looks'],
             properties: {
               uri: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
               cid: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
               },
               cursor: {
-                type: "string",
+                type: 'string',
               },
               looks: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.getLooks#look",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.getLooks#look',
                 },
               },
             },
@@ -6534,59 +6609,123 @@ export const schemaDict = {
         },
       },
       look: {
-        type: "object",
-        required: ["indexedAt", "createdAt", "actor"],
+        type: 'object',
+        required: ['indexedAt', 'createdAt', 'actor'],
         properties: {
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           createdAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           actor: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileView",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileView',
           },
         },
       },
     },
   },
-  SoSprkFeedGetPosts: {
+  SoSprkFeedGetPostThread: {
     lexicon: 1,
-    id: "so.sprk.feed.getPosts",
+    id: 'so.sprk.feed.getPostThread',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
+        description:
+          'Get posts in a thread. Does not require auth, but additional metadata and filtering will be applied for authed requests.',
+        parameters: {
+          type: 'params',
+          required: ['uri'],
+          properties: {
+            uri: {
+              type: 'string',
+              format: 'at-uri',
+              description: 'Reference (AT-URI) to post record.',
+            },
+            depth: {
+              type: 'integer',
+              description:
+                'How many levels of reply depth should be included in response.',
+              default: 6,
+              minimum: 0,
+              maximum: 1000,
+            },
+            parentHeight: {
+              type: 'integer',
+              description:
+                'How many levels of parent (and grandparent, etc) post to include.',
+              default: 80,
+              minimum: 0,
+              maximum: 1000,
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['thread'],
+            properties: {
+              thread: {
+                type: 'union',
+                refs: [
+                  'lex:so.sprk.feed.defs#threadViewPost',
+                  'lex:so.sprk.feed.defs#notFoundPost',
+                  'lex:so.sprk.feed.defs#blockedPost',
+                ],
+              },
+              threadgate: {
+                type: 'ref',
+                ref: 'lex:so.sprk.feed.defs#threadgateView',
+              },
+            },
+          },
+        },
+        errors: [
+          {
+            name: 'NotFound',
+          },
+        ],
+      },
+    },
+  },
+  SoSprkFeedGetPosts: {
+    lexicon: 1,
+    id: 'so.sprk.feed.getPosts',
+    defs: {
+      main: {
+        type: 'query',
         description:
           "Gets post views for a specified list of posts (by AT-URI). This is sometimes referred to as 'hydrating' a 'feed skeleton'.",
         parameters: {
-          type: "params",
-          required: ["uris"],
+          type: 'params',
+          required: ['uris'],
           properties: {
             uris: {
-              type: "array",
-              description: "List of post AT-URIs to return hydrated views for.",
+              type: 'array',
+              description: 'List of post AT-URIs to return hydrated views for.',
               items: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
               maxLength: 25,
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["posts"],
+            type: 'object',
+            required: ['posts'],
             properties: {
               posts: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#postView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#postView',
                 },
               },
             },
@@ -6595,125 +6734,61 @@ export const schemaDict = {
       },
     },
   },
-  SoSprkFeedGetPostThread: {
-    lexicon: 1,
-    id: "so.sprk.feed.getPostThread",
-    defs: {
-      main: {
-        type: "query",
-        description:
-          "Get posts in a thread. Does not require auth, but additional metadata and filtering will be applied for authed requests.",
-        parameters: {
-          type: "params",
-          required: ["uri"],
-          properties: {
-            uri: {
-              type: "string",
-              format: "at-uri",
-              description: "Reference (AT-URI) to post record.",
-            },
-            depth: {
-              type: "integer",
-              description:
-                "How many levels of reply depth should be included in response.",
-              default: 6,
-              minimum: 0,
-              maximum: 1000,
-            },
-            parentHeight: {
-              type: "integer",
-              description:
-                "How many levels of parent (and grandparent, etc) post to include.",
-              default: 80,
-              minimum: 0,
-              maximum: 1000,
-            },
-          },
-        },
-        output: {
-          encoding: "application/json",
-          schema: {
-            type: "object",
-            required: ["thread"],
-            properties: {
-              thread: {
-                type: "union",
-                refs: [
-                  "lex:so.sprk.feed.defs#threadViewPost",
-                  "lex:so.sprk.feed.defs#notFoundPost",
-                  "lex:so.sprk.feed.defs#blockedPost",
-                ],
-              },
-              threadgate: {
-                type: "ref",
-                ref: "lex:so.sprk.feed.defs#threadgateView",
-              },
-            },
-          },
-        },
-        errors: [
-          {
-            name: "NotFound",
-          },
-        ],
-      },
-    },
-  },
   SoSprkFeedGetQuotes: {
     lexicon: 1,
-    id: "so.sprk.feed.getQuotes",
+    id: 'so.sprk.feed.getQuotes',
     defs: {
       main: {
-        type: "query",
-        description: "Get a list of quotes for a given post.",
+        type: 'query',
+        description: 'Get a list of quotes for a given post.',
         parameters: {
-          type: "params",
-          required: ["uri"],
+          type: 'params',
+          required: ['uri'],
           properties: {
             uri: {
-              type: "string",
-              format: "at-uri",
-              description: "Reference (AT-URI) of post record",
+              type: 'string',
+              format: 'at-uri',
+              description: 'Reference (AT-URI) of post record',
             },
             cid: {
-              type: "string",
-              format: "cid",
+              type: 'string',
+              format: 'cid',
               description:
-                "If supplied, filters to quotes of specific version (by CID) of the post record.",
+                'If supplied, filters to quotes of specific version (by CID) of the post record.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["uri", "posts"],
+            type: 'object',
+            required: ['uri', 'posts'],
             properties: {
               uri: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
               cid: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
               },
               cursor: {
-                type: "string",
+                type: 'string',
               },
               posts: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#postView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#postView',
                 },
               },
             },
@@ -6724,59 +6799,145 @@ export const schemaDict = {
   },
   SoSprkFeedGetRepostedBy: {
     lexicon: 1,
-    id: "so.sprk.feed.getRepostedBy",
+    id: 'so.sprk.feed.getRepostedBy',
     defs: {
       main: {
-        type: "query",
-        description: "Get a list of reposts for a given post.",
+        type: 'query',
+        description: 'Get a list of reposts for a given post.',
         parameters: {
-          type: "params",
-          required: ["uri"],
+          type: 'params',
+          required: ['uri'],
           properties: {
             uri: {
-              type: "string",
-              format: "at-uri",
-              description: "Reference (AT-URI) of post record",
+              type: 'string',
+              format: 'at-uri',
+              description: 'Reference (AT-URI) of post record',
             },
             cid: {
-              type: "string",
-              format: "cid",
+              type: 'string',
+              format: 'cid',
               description:
-                "If supplied, filters to reposts of specific version (by CID) of the post record.",
+                'If supplied, filters to reposts of specific version (by CID) of the post record.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["uri", "repostedBy"],
+            type: 'object',
+            required: ['uri', 'repostedBy'],
             properties: {
               uri: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
               cid: {
-                type: "string",
-                format: "cid",
+                type: 'string',
+                format: 'cid',
               },
               cursor: {
-                type: "string",
+                type: 'string',
               },
               repostedBy: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.actor.defs#profileView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.actor.defs#profileView',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  SoSprkFeedGetStories: {
+    lexicon: 1,
+    id: 'so.sprk.feed.getStories',
+    defs: {
+      main: {
+        type: 'query',
+        description:
+          "Gets story views for a specified list of stories (by AT-URI). This is sometimes referred to as 'hydrating' a story reference list.",
+        parameters: {
+          type: 'params',
+          required: ['uris'],
+          properties: {
+            uris: {
+              type: 'array',
+              description:
+                'List of story AT-URIs to return hydrated views for.',
+              items: {
+                type: 'string',
+                format: 'at-uri',
+              },
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['stories'],
+            properties: {
+              stories: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#storyView',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  SoSprkFeedGetStoriesTimeline: {
+    lexicon: 1,
+    id: 'so.sprk.feed.getStoriesTimeline',
+    defs: {
+      main: {
+        type: 'query',
+        description:
+          "Get a view of the requesting account's stories timeline grouped by author.",
+        parameters: {
+          type: 'params',
+          properties: {
+            limit: {
+              type: 'integer',
+              minimum: 1,
+              maximum: 100,
+              default: 50,
+            },
+            cursor: {
+              type: 'string',
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['storiesByAuthor'],
+            properties: {
+              cursor: {
+                type: 'string',
+              },
+              storiesByAuthor: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#storiesByAuthor',
                 },
               },
             },
@@ -6787,40 +6948,40 @@ export const schemaDict = {
   },
   SoSprkFeedGetSuggestedFeeds: {
     lexicon: 1,
-    id: "so.sprk.feed.getSuggestedFeeds",
+    id: 'so.sprk.feed.getSuggestedFeeds',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get a list of suggested feeds (feed generators) for the requesting account.",
+          'Get a list of suggested feeds (feed generators) for the requesting account.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["feeds"],
+            type: 'object',
+            required: ['feeds'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               feeds: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#generatorView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#generatorView',
                 },
               },
             },
@@ -6831,45 +6992,45 @@ export const schemaDict = {
   },
   SoSprkFeedGetTimeline: {
     lexicon: 1,
-    id: "so.sprk.feed.getTimeline",
+    id: 'so.sprk.feed.getTimeline',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
           "Get a view of the requesting account's home timeline. This is expected to be some form of reverse-chronological feed.",
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             algorithm: {
-              type: "string",
+              type: 'string',
               description:
                 "Variant 'algorithm' for timeline. Implementation-specific. NOTE: most feed flexibility has been moved to feed generator mechanism.",
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["feed"],
+            type: 'object',
+            required: ['feed'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               feed: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#feedViewPost",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#feedViewPost',
                 },
               },
             },
@@ -6880,24 +7041,24 @@ export const schemaDict = {
   },
   SoSprkFeedLike: {
     lexicon: 1,
-    id: "so.sprk.feed.like",
+    id: 'so.sprk.feed.like',
     defs: {
       main: {
-        type: "record",
+        type: 'record',
         description:
           "Record declaring a 'like' of a piece of subject content. Duplicate likes from the same author to the same subject will be ignored by the AppView.",
-        key: "tid",
+        key: 'tid',
         record: {
-          type: "object",
-          required: ["subject", "createdAt"],
+          type: 'object',
+          required: ['subject', 'createdAt'],
           properties: {
             subject: {
-              type: "ref",
-              ref: "lex:com.atproto.repo.strongRef",
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
             },
             createdAt: {
-              type: "string",
-              format: "datetime",
+              type: 'string',
+              format: 'datetime',
             },
           },
         },
@@ -6906,25 +7067,116 @@ export const schemaDict = {
   },
   SoSprkFeedLook: {
     lexicon: 1,
-    id: "so.sprk.feed.look",
+    id: 'so.sprk.feed.look',
     defs: {
       main: {
-        type: "record",
+        type: 'record',
         description:
           "Record declaring a 'look' of a piece of subject content. Equivalent to a 'view'",
-        key: "tid",
+        key: 'tid',
         record: {
-          type: "object",
-          required: ["subject", "createdAt"],
+          type: 'object',
+          required: ['subject', 'createdAt'],
           properties: {
             subject: {
-              type: "ref",
-              ref: "lex:com.atproto.repo.strongRef",
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
             },
             createdAt: {
-              type: "string",
-              format: "datetime",
+              type: 'string',
+              format: 'datetime',
             },
+          },
+        },
+      },
+    },
+  },
+  SoSprkFeedPost: {
+    lexicon: 1,
+    id: 'so.sprk.feed.post',
+    defs: {
+      main: {
+        type: 'record',
+        description: 'Record containing a Spark post.',
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['createdAt'],
+          properties: {
+            text: {
+              type: 'string',
+              maxLength: 3000,
+              maxGraphemes: 300,
+              description: 'The post description.',
+            },
+            facets: {
+              type: 'array',
+              description:
+                'Annotations of text (mentions, URLs, hashtags, etc)',
+              items: {
+                type: 'ref',
+                ref: 'lex:so.sprk.richtext.facet',
+              },
+            },
+            reply: {
+              type: 'ref',
+              ref: 'lex:so.sprk.feed.post#replyRef',
+            },
+            embed: {
+              type: 'union',
+              refs: ['lex:so.sprk.embed.images', 'lex:so.sprk.embed.video'],
+            },
+            sound: {
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
+            },
+            langs: {
+              type: 'array',
+              description:
+                'Indicates human language of post primary text content.',
+              maxLength: 3,
+              items: {
+                type: 'string',
+                format: 'language',
+              },
+            },
+            labels: {
+              type: 'union',
+              description:
+                'Self-label values for this post. Effectively content warnings.',
+              refs: ['lex:com.atproto.label.defs#selfLabels'],
+            },
+            tags: {
+              type: 'array',
+              description:
+                'Additional hashtags, in addition to any included in post text and facets.',
+              maxLength: 8,
+              items: {
+                type: 'string',
+                maxLength: 640,
+                maxGraphemes: 64,
+              },
+            },
+            createdAt: {
+              type: 'string',
+              format: 'datetime',
+              description:
+                'Client-declared timestamp when this post was originally created.',
+            },
+          },
+        },
+      },
+      replyRef: {
+        type: 'object',
+        required: ['root', 'parent'],
+        properties: {
+          root: {
+            type: 'ref',
+            ref: 'lex:com.atproto.repo.strongRef',
+          },
+          parent: {
+            type: 'ref',
+            ref: 'lex:com.atproto.repo.strongRef',
           },
         },
       },
@@ -6932,167 +7184,76 @@ export const schemaDict = {
   },
   SoSprkFeedPostgate: {
     lexicon: 1,
-    id: "so.sprk.feed.postgate",
+    id: 'so.sprk.feed.postgate',
     defs: {
       main: {
-        type: "record",
-        key: "tid",
+        type: 'record',
+        key: 'tid',
         description:
-          "Record defining interaction rules for a post. The record key (rkey) of the postgate record must match the record key of the post, and that record must be in the same repository.",
+          'Record defining interaction rules for a post. The record key (rkey) of the postgate record must match the record key of the post, and that record must be in the same repository.',
         record: {
-          type: "object",
-          required: ["post", "createdAt"],
+          type: 'object',
+          required: ['post', 'createdAt'],
           properties: {
             createdAt: {
-              type: "string",
-              format: "datetime",
+              type: 'string',
+              format: 'datetime',
             },
             post: {
-              type: "string",
-              format: "at-uri",
-              description: "Reference (AT-URI) to the post record.",
+              type: 'string',
+              format: 'at-uri',
+              description: 'Reference (AT-URI) to the post record.',
             },
             detachedEmbeddingUris: {
-              type: "array",
+              type: 'array',
               maxLength: 50,
               items: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
               description:
-                "List of AT-URIs embedding this post that the author has detached from.",
+                'List of AT-URIs embedding this post that the author has detached from.',
             },
             embeddingRules: {
               description:
-                "List of rules defining who can embed this post. If value is an empty array or is undefined, no particular rules apply and anyone can embed.",
-              type: "array",
+                'List of rules defining who can embed this post. If value is an empty array or is undefined, no particular rules apply and anyone can embed.',
+              type: 'array',
               maxLength: 5,
               items: {
-                type: "union",
-                refs: ["lex:so.sprk.feed.postgate#disableRule"],
+                type: 'union',
+                refs: ['lex:so.sprk.feed.postgate#disableRule'],
               },
             },
           },
         },
       },
       disableRule: {
-        type: "object",
-        description: "Disables embedding of this post.",
+        type: 'object',
+        description: 'Disables embedding of this post.',
         properties: {},
-      },
-    },
-  },
-  SoSprkFeedPost: {
-    lexicon: 1,
-    id: "so.sprk.feed.post",
-    defs: {
-      main: {
-        type: "record",
-        description: "Record containing a Spark post.",
-        key: "tid",
-        record: {
-          type: "object",
-          required: ["createdAt"],
-          properties: {
-            text: {
-              type: "string",
-              maxLength: 3000,
-              maxGraphemes: 300,
-              description: "The post description.",
-            },
-            facets: {
-              type: "array",
-              description:
-                "Annotations of text (mentions, URLs, hashtags, etc)",
-              items: {
-                type: "ref",
-                ref: "lex:so.sprk.richtext.facet",
-              },
-            },
-            reply: {
-              type: "ref",
-              ref: "lex:so.sprk.feed.post#replyRef",
-            },
-            embed: {
-              type: "union",
-              refs: ["lex:so.sprk.embed.images", "lex:so.sprk.embed.video"],
-            },
-            sound: {
-              type: "ref",
-              ref: "lex:com.atproto.repo.strongRef",
-            },
-            langs: {
-              type: "array",
-              description:
-                "Indicates human language of post primary text content.",
-              maxLength: 3,
-              items: {
-                type: "string",
-                format: "language",
-              },
-            },
-            labels: {
-              type: "union",
-              description:
-                "Self-label values for this post. Effectively content warnings.",
-              refs: ["lex:com.atproto.label.defs#selfLabels"],
-            },
-            tags: {
-              type: "array",
-              description:
-                "Additional hashtags, in addition to any included in post text and facets.",
-              maxLength: 8,
-              items: {
-                type: "string",
-                maxLength: 640,
-                maxGraphemes: 64,
-              },
-            },
-            createdAt: {
-              type: "string",
-              format: "datetime",
-              description:
-                "Client-declared timestamp when this post was originally created.",
-            },
-          },
-        },
-      },
-      replyRef: {
-        type: "object",
-        required: ["root", "parent"],
-        properties: {
-          root: {
-            type: "ref",
-            ref: "lex:com.atproto.repo.strongRef",
-          },
-          parent: {
-            type: "ref",
-            ref: "lex:com.atproto.repo.strongRef",
-          },
-        },
       },
     },
   },
   SoSprkFeedRepost: {
     lexicon: 1,
-    id: "so.sprk.feed.repost",
+    id: 'so.sprk.feed.repost',
     defs: {
       main: {
         description:
           "Record representing a 'repost' of an existing Spark post.",
-        type: "record",
-        key: "tid",
+        type: 'record',
+        key: 'tid',
         record: {
-          type: "object",
-          required: ["subject", "createdAt"],
+          type: 'object',
+          required: ['subject', 'createdAt'],
           properties: {
             subject: {
-              type: "ref",
-              ref: "lex:com.atproto.repo.strongRef",
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
             },
             createdAt: {
-              type: "string",
-              format: "datetime",
+              type: 'string',
+              format: 'datetime',
             },
           },
         },
@@ -7101,70 +7262,70 @@ export const schemaDict = {
   },
   SoSprkFeedSearchPosts: {
     lexicon: 1,
-    id: "so.sprk.feed.searchPosts",
+    id: 'so.sprk.feed.searchPosts',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Find posts matching search criteria, returning views of those posts.",
+          'Find posts matching search criteria, returning views of those posts.',
         parameters: {
-          type: "params",
-          required: ["q"],
+          type: 'params',
+          required: ['q'],
           properties: {
             q: {
-              type: "string",
+              type: 'string',
               description:
-                "Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended.",
+                'Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended.',
             },
             sort: {
-              type: "string",
-              knownValues: ["top", "latest"],
-              default: "latest",
-              description: "Specifies the ranking order of results.",
+              type: 'string',
+              knownValues: ['top', 'latest'],
+              default: 'latest',
+              description: 'Specifies the ranking order of results.',
             },
             since: {
-              type: "string",
+              type: 'string',
               description:
                 "Filter results for posts after the indicated datetime (inclusive). Expected to use 'sortAt' timestamp, which may not match 'createdAt'. Can be a datetime, or just an ISO date (YYYY-MM-DD).",
             },
             until: {
-              type: "string",
+              type: 'string',
               description:
                 "Filter results for posts before the indicated datetime (not inclusive). Expected to use 'sortAt' timestamp, which may not match 'createdAt'. Can be a datetime, or just an ISO date (YYY-MM-DD).",
             },
             mentions: {
-              type: "string",
-              format: "at-identifier",
+              type: 'string',
+              format: 'at-identifier',
               description:
-                "Filter to posts which mention the given account. Handles are resolved to DID before query-time. Only matches rich-text facet mentions.",
+                'Filter to posts which mention the given account. Handles are resolved to DID before query-time. Only matches rich-text facet mentions.',
             },
             author: {
-              type: "string",
-              format: "at-identifier",
+              type: 'string',
+              format: 'at-identifier',
               description:
-                "Filter to posts by the given account. Handles are resolved to DID before query-time.",
+                'Filter to posts by the given account. Handles are resolved to DID before query-time.',
             },
             lang: {
-              type: "string",
-              format: "language",
+              type: 'string',
+              format: 'language',
               description:
-                "Filter to posts in the given language. Expected to be based on post language field, though server may override language detection.",
+                'Filter to posts in the given language. Expected to be based on post language field, though server may override language detection.',
             },
             domain: {
-              type: "string",
+              type: 'string',
               description:
-                "Filter to posts with URLs (facet links or embeds) linking to the given domain (hostname). Server may apply hostname normalization.",
+                'Filter to posts with URLs (facet links or embeds) linking to the given domain (hostname). Server may apply hostname normalization.',
             },
             url: {
-              type: "string",
-              format: "uri",
+              type: 'string',
+              format: 'uri',
               description:
-                "Filter to posts with links (facet links or embeds) pointing to this URL. Server may apply URL normalization or fuzzy matching.",
+                'Filter to posts with links (facet links or embeds) pointing to this URL. Server may apply URL normalization or fuzzy matching.',
             },
             tag: {
-              type: "array",
+              type: 'array',
               items: {
-                type: "string",
+                type: 'string',
                 maxLength: 640,
                 maxGraphemes: 64,
               },
@@ -7172,37 +7333,37 @@ export const schemaDict = {
                 "Filter to posts with the given tag (hashtag), based on rich-text facet or tag field. Do not include the hash (#) prefix. Multiple tags can be specified, with 'AND' matching.",
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 25,
             },
             cursor: {
-              type: "string",
+              type: 'string',
               description:
-                "Optional pagination mechanism; may not necessarily allow scrolling through entire result set.",
+                'Optional pagination mechanism; may not necessarily allow scrolling through entire result set.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["posts"],
+            type: 'object',
+            required: ['posts'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               hitsTotal: {
-                type: "integer",
+                type: 'integer',
                 description:
-                  "Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.",
+                  'Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.',
               },
               posts: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#postView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#postView',
                 },
               },
             },
@@ -7210,7 +7371,7 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "BadQueryString",
+            name: 'BadQueryString',
           },
         ],
       },
@@ -7218,33 +7379,81 @@ export const schemaDict = {
   },
   SoSprkFeedSendInteractions: {
     lexicon: 1,
-    id: "so.sprk.feed.sendInteractions",
+    id: 'so.sprk.feed.sendInteractions',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Send information about interactions with feed items back to the feed generator that served them.",
+          'Send information about interactions with feed items back to the feed generator that served them.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["interactions"],
+            type: 'object',
+            required: ['interactions'],
             properties: {
               interactions: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#interaction",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#interaction',
                 },
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             properties: {},
+          },
+        },
+      },
+    },
+  },
+  SoSprkFeedStory: {
+    lexicon: 1,
+    id: 'so.sprk.feed.story',
+    defs: {
+      main: {
+        type: 'record',
+        description: 'Record containing a Spark story.',
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['createdAt', 'media'],
+          properties: {
+            media: {
+              type: 'union',
+              refs: ['lex:so.sprk.embed.images', 'lex:so.sprk.embed.video'],
+            },
+            sound: {
+              type: 'ref',
+              ref: 'lex:com.atproto.repo.strongRef',
+            },
+            labels: {
+              type: 'union',
+              description:
+                'Self-label values for this story. Effectively content warnings.',
+              refs: ['lex:com.atproto.label.defs#selfLabels'],
+            },
+            tags: {
+              type: 'array',
+              description:
+                'Additional hashtags, in addition to any included in story text and facets.',
+              maxLength: 8,
+              items: {
+                type: 'string',
+                maxLength: 640,
+                maxGraphemes: 64,
+              },
+            },
+            createdAt: {
+              type: 'string',
+              format: 'datetime',
+              description:
+                'Client-declared timestamp when this story was originally created.',
+            },
           },
         },
       },
@@ -7252,76 +7461,76 @@ export const schemaDict = {
   },
   SoSprkFeedThreadgate: {
     lexicon: 1,
-    id: "so.sprk.feed.threadgate",
+    id: 'so.sprk.feed.threadgate',
     defs: {
       main: {
-        type: "record",
-        key: "tid",
+        type: 'record',
+        key: 'tid',
         description:
           "Record defining interaction gating rules for a thread (aka, reply controls). The record key (rkey) of the threadgate record must match the record key of the thread's root post, and that record must be in the same repository.",
         record: {
-          type: "object",
-          required: ["post", "createdAt"],
+          type: 'object',
+          required: ['post', 'createdAt'],
           properties: {
             post: {
-              type: "string",
-              format: "at-uri",
-              description: "Reference (AT-URI) to the post record.",
+              type: 'string',
+              format: 'at-uri',
+              description: 'Reference (AT-URI) to the post record.',
             },
             allow: {
               description:
-                "List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.",
-              type: "array",
+                'List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.',
+              type: 'array',
               maxLength: 5,
               items: {
-                type: "union",
+                type: 'union',
                 refs: [
-                  "lex:so.sprk.feed.threadgate#mentionRule",
-                  "lex:so.sprk.feed.threadgate#followerRule",
-                  "lex:so.sprk.feed.threadgate#followingRule",
-                  "lex:so.sprk.feed.threadgate#listRule",
+                  'lex:so.sprk.feed.threadgate#mentionRule',
+                  'lex:so.sprk.feed.threadgate#followerRule',
+                  'lex:so.sprk.feed.threadgate#followingRule',
+                  'lex:so.sprk.feed.threadgate#listRule',
                 ],
               },
             },
             createdAt: {
-              type: "string",
-              format: "datetime",
+              type: 'string',
+              format: 'datetime',
             },
             hiddenReplies: {
-              type: "array",
+              type: 'array',
               maxLength: 50,
               items: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
-              description: "List of hidden reply URIs.",
+              description: 'List of hidden reply URIs.',
             },
           },
         },
       },
       mentionRule: {
-        type: "object",
-        description: "Allow replies from actors mentioned in your post.",
+        type: 'object',
+        description: 'Allow replies from actors mentioned in your post.',
         properties: {},
       },
       followerRule: {
-        type: "object",
-        description: "Allow replies from actors who follow you.",
+        type: 'object',
+        description: 'Allow replies from actors who follow you.',
         properties: {},
       },
       followingRule: {
-        type: "object",
-        description: "Allow replies from actors you follow.",
+        type: 'object',
+        description: 'Allow replies from actors you follow.',
         properties: {},
       },
       listRule: {
-        type: "object",
-        description: "Allow replies from actors on a list.",
-        required: ["list"],
+        type: 'object',
+        description: 'Allow replies from actors on a list.',
+        required: ['list'],
         properties: {
           list: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
         },
       },
@@ -7329,25 +7538,25 @@ export const schemaDict = {
   },
   SoSprkGraphBlock: {
     lexicon: 1,
-    id: "so.sprk.graph.block",
+    id: 'so.sprk.graph.block',
     defs: {
       main: {
-        type: "record",
+        type: 'record',
         description:
           "Record declaring a 'block' relationship against another account. NOTE: blocks are public in Spark; see blog posts for details.",
-        key: "tid",
+        key: 'tid',
         record: {
-          type: "object",
-          required: ["subject", "createdAt"],
+          type: 'object',
+          required: ['subject', 'createdAt'],
           properties: {
             subject: {
-              type: "string",
-              format: "did",
-              description: "DID of the account to be blocked.",
+              type: 'string',
+              format: 'did',
+              description: 'DID of the account to be blocked.',
             },
             createdAt: {
-              type: "string",
-              format: "datetime",
+              type: 'string',
+              format: 'datetime',
             },
           },
         },
@@ -7356,305 +7565,305 @@ export const schemaDict = {
   },
   SoSprkGraphDefs: {
     lexicon: 1,
-    id: "so.sprk.graph.defs",
+    id: 'so.sprk.graph.defs',
     defs: {
       listViewBasic: {
-        type: "object",
-        required: ["uri", "cid", "name", "purpose"],
+        type: 'object',
+        required: ['uri', 'cid', 'name', 'purpose'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           name: {
-            type: "string",
+            type: 'string',
             maxLength: 64,
             minLength: 1,
           },
           purpose: {
-            type: "ref",
-            ref: "lex:so.sprk.graph.defs#listPurpose",
+            type: 'ref',
+            ref: 'lex:so.sprk.graph.defs#listPurpose',
           },
           avatar: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
           },
           listItemCount: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
           labels: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#label",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
             },
           },
           viewer: {
-            type: "ref",
-            ref: "lex:so.sprk.graph.defs#listViewerState",
+            type: 'ref',
+            ref: 'lex:so.sprk.graph.defs#listViewerState',
           },
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
         },
       },
       listView: {
-        type: "object",
-        required: ["uri", "cid", "creator", "name", "purpose", "indexedAt"],
+        type: 'object',
+        required: ['uri', 'cid', 'creator', 'name', 'purpose', 'indexedAt'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           creator: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileView",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileView',
           },
           name: {
-            type: "string",
+            type: 'string',
             maxLength: 64,
             minLength: 1,
           },
           purpose: {
-            type: "ref",
-            ref: "lex:so.sprk.graph.defs#listPurpose",
+            type: 'ref',
+            ref: 'lex:so.sprk.graph.defs#listPurpose',
           },
           description: {
-            type: "string",
+            type: 'string',
             maxGraphemes: 300,
             maxLength: 3000,
           },
           descriptionFacets: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:so.sprk.richtext.facet",
+              type: 'ref',
+              ref: 'lex:so.sprk.richtext.facet',
             },
           },
           avatar: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
           },
           listItemCount: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
           labels: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#label",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
             },
           },
           viewer: {
-            type: "ref",
-            ref: "lex:so.sprk.graph.defs#listViewerState",
+            type: 'ref',
+            ref: 'lex:so.sprk.graph.defs#listViewerState',
           },
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
         },
       },
       listItemView: {
-        type: "object",
-        required: ["uri", "subject"],
+        type: 'object',
+        required: ['uri', 'subject'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           subject: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileView",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileView',
           },
         },
       },
       starterPackView: {
-        type: "object",
-        required: ["uri", "cid", "record", "creator", "indexedAt"],
+        type: 'object',
+        required: ['uri', 'cid', 'record', 'creator', 'indexedAt'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           record: {
-            type: "unknown",
+            type: 'unknown',
           },
           creator: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileViewBasic",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileViewBasic',
           },
           list: {
-            type: "ref",
-            ref: "lex:so.sprk.graph.defs#listViewBasic",
+            type: 'ref',
+            ref: 'lex:so.sprk.graph.defs#listViewBasic',
           },
           listItemsSample: {
-            type: "array",
+            type: 'array',
             maxLength: 12,
             items: {
-              type: "ref",
-              ref: "lex:so.sprk.graph.defs#listItemView",
+              type: 'ref',
+              ref: 'lex:so.sprk.graph.defs#listItemView',
             },
           },
           feeds: {
-            type: "array",
+            type: 'array',
             maxLength: 3,
             items: {
-              type: "ref",
-              ref: "lex:so.sprk.feed.defs#generatorView",
+              type: 'ref',
+              ref: 'lex:so.sprk.feed.defs#generatorView',
             },
           },
           joinedWeekCount: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
           joinedAllTimeCount: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
           labels: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#label",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
             },
           },
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
         },
       },
       starterPackViewBasic: {
-        type: "object",
-        required: ["uri", "cid", "record", "creator", "indexedAt"],
+        type: 'object',
+        required: ['uri', 'cid', 'record', 'creator', 'indexedAt'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           record: {
-            type: "unknown",
+            type: 'unknown',
           },
           creator: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileViewBasic",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileViewBasic',
           },
           listItemCount: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
           joinedWeekCount: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
           joinedAllTimeCount: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
           labels: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#label",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
             },
           },
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
         },
       },
       listPurpose: {
-        type: "string",
+        type: 'string',
         knownValues: [
-          "so.sprk.graph.defs#modlist",
-          "so.sprk.graph.defs#curatelist",
-          "so.sprk.graph.defs#referencelist",
+          'so.sprk.graph.defs#modlist',
+          'so.sprk.graph.defs#curatelist',
+          'so.sprk.graph.defs#referencelist',
         ],
       },
       modlist: {
-        type: "token",
+        type: 'token',
         description:
-          "A list of actors to apply an aggregate moderation action (mute/block) on.",
+          'A list of actors to apply an aggregate moderation action (mute/block) on.',
       },
       curatelist: {
-        type: "token",
+        type: 'token',
         description:
-          "A list of actors used for curation purposes such as list feeds or interaction gating.",
+          'A list of actors used for curation purposes such as list feeds or interaction gating.',
       },
       referencelist: {
-        type: "token",
+        type: 'token',
         description:
-          "A list of actors used for only for reference purposes such as within a starter pack.",
+          'A list of actors used for only for reference purposes such as within a starter pack.',
       },
       listViewerState: {
-        type: "object",
+        type: 'object',
         properties: {
           muted: {
-            type: "boolean",
+            type: 'boolean',
           },
           blocked: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
         },
       },
       notFoundActor: {
-        type: "object",
-        description: "indicates that a handle or DID could not be resolved",
-        required: ["actor", "notFound"],
+        type: 'object',
+        description: 'indicates that a handle or DID could not be resolved',
+        required: ['actor', 'notFound'],
         properties: {
           actor: {
-            type: "string",
-            format: "at-identifier",
+            type: 'string',
+            format: 'at-identifier',
           },
           notFound: {
-            type: "boolean",
+            type: 'boolean',
             const: true,
           },
         },
       },
       relationship: {
-        type: "object",
+        type: 'object',
         description:
-          "lists the bi-directional graph relationships between one actor (not indicated in the object), and the target actors (the DID included in the object)",
-        required: ["did"],
+          'lists the bi-directional graph relationships between one actor (not indicated in the object), and the target actors (the DID included in the object)',
+        required: ['did'],
         properties: {
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           following: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
             description:
-              "if the actor follows this DID, this is the AT-URI of the follow record",
+              'if the actor follows this DID, this is the AT-URI of the follow record',
           },
           followedBy: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
             description:
-              "if the actor is followed by this DID, contains the AT-URI of the follow record",
+              'if the actor is followed by this DID, contains the AT-URI of the follow record',
           },
         },
       },
@@ -7662,24 +7871,24 @@ export const schemaDict = {
   },
   SoSprkGraphFollow: {
     lexicon: 1,
-    id: "so.sprk.graph.follow",
+    id: 'so.sprk.graph.follow',
     defs: {
       main: {
-        type: "record",
+        type: 'record',
         description:
           "Record declaring a social 'follow' relationship of another account. Duplicate follows will be ignored by the AppView.",
-        key: "tid",
+        key: 'tid',
         record: {
-          type: "object",
-          required: ["subject", "createdAt"],
+          type: 'object',
+          required: ['subject', 'createdAt'],
           properties: {
             subject: {
-              type: "string",
-              format: "did",
+              type: 'string',
+              format: 'did',
             },
             createdAt: {
-              type: "string",
-              format: "datetime",
+              type: 'string',
+              format: 'datetime',
             },
           },
         },
@@ -7688,44 +7897,44 @@ export const schemaDict = {
   },
   SoSprkGraphGetActorStarterPacks: {
     lexicon: 1,
-    id: "so.sprk.graph.getActorStarterPacks",
+    id: 'so.sprk.graph.getActorStarterPacks',
     defs: {
       main: {
-        type: "query",
-        description: "Get a list of starter packs created by the actor.",
+        type: 'query',
+        description: 'Get a list of starter packs created by the actor.',
         parameters: {
-          type: "params",
-          required: ["actor"],
+          type: 'params',
+          required: ['actor'],
           properties: {
             actor: {
-              type: "string",
-              format: "at-identifier",
+              type: 'string',
+              format: 'at-identifier',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["starterPacks"],
+            type: 'object',
+            required: ['starterPacks'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               starterPacks: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.graph.defs#starterPackViewBasic",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.graph.defs#starterPackViewBasic',
                 },
               },
             },
@@ -7736,40 +7945,40 @@ export const schemaDict = {
   },
   SoSprkGraphGetBlocks: {
     lexicon: 1,
-    id: "so.sprk.graph.getBlocks",
+    id: 'so.sprk.graph.getBlocks',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Enumerates which accounts the requesting account is currently blocking. Requires auth.",
+          'Enumerates which accounts the requesting account is currently blocking. Requires auth.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["blocks"],
+            type: 'object',
+            required: ['blocks'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               blocks: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.actor.defs#profileView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.actor.defs#profileView',
                 },
               },
             },
@@ -7780,49 +7989,49 @@ export const schemaDict = {
   },
   SoSprkGraphGetFollowers: {
     lexicon: 1,
-    id: "so.sprk.graph.getFollowers",
+    id: 'so.sprk.graph.getFollowers',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Enumerates accounts which follow a specified account (actor).",
+          'Enumerates accounts which follow a specified account (actor).',
         parameters: {
-          type: "params",
-          required: ["actor"],
+          type: 'params',
+          required: ['actor'],
           properties: {
             actor: {
-              type: "string",
-              format: "at-identifier",
+              type: 'string',
+              format: 'at-identifier',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["subject", "followers"],
+            type: 'object',
+            required: ['subject', 'followers'],
             properties: {
               subject: {
-                type: "ref",
-                ref: "lex:so.sprk.actor.defs#profileView",
+                type: 'ref',
+                ref: 'lex:so.sprk.actor.defs#profileView',
               },
               cursor: {
-                type: "string",
+                type: 'string',
               },
               followers: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.actor.defs#profileView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.actor.defs#profileView',
                 },
               },
             },
@@ -7833,49 +8042,49 @@ export const schemaDict = {
   },
   SoSprkGraphGetFollows: {
     lexicon: 1,
-    id: "so.sprk.graph.getFollows",
+    id: 'so.sprk.graph.getFollows',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Enumerates accounts which a specified account (actor) follows.",
+          'Enumerates accounts which a specified account (actor) follows.',
         parameters: {
-          type: "params",
-          required: ["actor"],
+          type: 'params',
+          required: ['actor'],
           properties: {
             actor: {
-              type: "string",
-              format: "at-identifier",
+              type: 'string',
+              format: 'at-identifier',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["subject", "follows"],
+            type: 'object',
+            required: ['subject', 'follows'],
             properties: {
               subject: {
-                type: "ref",
-                ref: "lex:so.sprk.actor.defs#profileView",
+                type: 'ref',
+                ref: 'lex:so.sprk.actor.defs#profileView',
               },
               cursor: {
-                type: "string",
+                type: 'string',
               },
               follows: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.actor.defs#profileView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.actor.defs#profileView',
                 },
               },
             },
@@ -7886,93 +8095,49 @@ export const schemaDict = {
   },
   SoSprkGraphGetKnownFollowers: {
     lexicon: 1,
-    id: "so.sprk.graph.getKnownFollowers",
+    id: 'so.sprk.graph.getKnownFollowers',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Enumerates accounts which follow a specified account (actor) and are followed by the viewer.",
+          'Enumerates accounts which follow a specified account (actor) and are followed by the viewer.',
         parameters: {
-          type: "params",
-          required: ["actor"],
+          type: 'params',
+          required: ['actor'],
           properties: {
             actor: {
-              type: "string",
-              format: "at-identifier",
+              type: 'string',
+              format: 'at-identifier',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["subject", "followers"],
+            type: 'object',
+            required: ['subject', 'followers'],
             properties: {
               subject: {
-                type: "ref",
-                ref: "lex:so.sprk.actor.defs#profileView",
+                type: 'ref',
+                ref: 'lex:so.sprk.actor.defs#profileView',
               },
               cursor: {
-                type: "string",
+                type: 'string',
               },
               followers: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.actor.defs#profileView",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  SoSprkGraphGetListBlocks: {
-    lexicon: 1,
-    id: "so.sprk.graph.getListBlocks",
-    defs: {
-      main: {
-        type: "query",
-        description:
-          "Get mod lists that the requesting account (actor) is blocking. Requires auth.",
-        parameters: {
-          type: "params",
-          properties: {
-            limit: {
-              type: "integer",
-              minimum: 1,
-              maximum: 100,
-              default: 50,
-            },
-            cursor: {
-              type: "string",
-            },
-          },
-        },
-        output: {
-          encoding: "application/json",
-          schema: {
-            type: "object",
-            required: ["lists"],
-            properties: {
-              cursor: {
-                type: "string",
-              },
-              lists: {
-                type: "array",
-                items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.graph.defs#listView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.actor.defs#profileView',
                 },
               },
             },
@@ -7983,50 +8148,94 @@ export const schemaDict = {
   },
   SoSprkGraphGetList: {
     lexicon: 1,
-    id: "so.sprk.graph.getList",
+    id: 'so.sprk.graph.getList',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
           "Gets a 'view' (with additional context) of a specified list.",
         parameters: {
-          type: "params",
-          required: ["list"],
+          type: 'params',
+          required: ['list'],
           properties: {
             list: {
-              type: "string",
-              format: "at-uri",
-              description: "Reference (AT-URI) of the list record to hydrate.",
+              type: 'string',
+              format: 'at-uri',
+              description: 'Reference (AT-URI) of the list record to hydrate.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["list", "items"],
+            type: 'object',
+            required: ['list', 'items'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               list: {
-                type: "ref",
-                ref: "lex:so.sprk.graph.defs#listView",
+                type: 'ref',
+                ref: 'lex:so.sprk.graph.defs#listView',
               },
               items: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.graph.defs#listItemView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.graph.defs#listItemView',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  SoSprkGraphGetListBlocks: {
+    lexicon: 1,
+    id: 'so.sprk.graph.getListBlocks',
+    defs: {
+      main: {
+        type: 'query',
+        description:
+          'Get mod lists that the requesting account (actor) is blocking. Requires auth.',
+        parameters: {
+          type: 'params',
+          properties: {
+            limit: {
+              type: 'integer',
+              minimum: 1,
+              maximum: 100,
+              default: 50,
+            },
+            cursor: {
+              type: 'string',
+            },
+          },
+        },
+        output: {
+          encoding: 'application/json',
+          schema: {
+            type: 'object',
+            required: ['lists'],
+            properties: {
+              cursor: {
+                type: 'string',
+              },
+              lists: {
+                type: 'array',
+                items: {
+                  type: 'ref',
+                  ref: 'lex:so.sprk.graph.defs#listView',
                 },
               },
             },
@@ -8037,40 +8246,40 @@ export const schemaDict = {
   },
   SoSprkGraphGetListMutes: {
     lexicon: 1,
-    id: "so.sprk.graph.getListMutes",
+    id: 'so.sprk.graph.getListMutes',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Enumerates mod lists that the requesting account (actor) currently has muted. Requires auth.",
+          'Enumerates mod lists that the requesting account (actor) currently has muted. Requires auth.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["lists"],
+            type: 'object',
+            required: ['lists'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               lists: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.graph.defs#listView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.graph.defs#listView',
                 },
               },
             },
@@ -8081,46 +8290,46 @@ export const schemaDict = {
   },
   SoSprkGraphGetLists: {
     lexicon: 1,
-    id: "so.sprk.graph.getLists",
+    id: 'so.sprk.graph.getLists',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Enumerates the lists created by a specified account (actor).",
+          'Enumerates the lists created by a specified account (actor).',
         parameters: {
-          type: "params",
-          required: ["actor"],
+          type: 'params',
+          required: ['actor'],
           properties: {
             actor: {
-              type: "string",
-              format: "at-identifier",
-              description: "The account (actor) to enumerate lists from.",
+              type: 'string',
+              format: 'at-identifier',
+              description: 'The account (actor) to enumerate lists from.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["lists"],
+            type: 'object',
+            required: ['lists'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               lists: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.graph.defs#listView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.graph.defs#listView',
                 },
               },
             },
@@ -8131,40 +8340,40 @@ export const schemaDict = {
   },
   SoSprkGraphGetMutes: {
     lexicon: 1,
-    id: "so.sprk.graph.getMutes",
+    id: 'so.sprk.graph.getMutes',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Enumerates accounts that the requesting account (actor) currently has muted. Requires auth.",
+          'Enumerates accounts that the requesting account (actor) currently has muted. Requires auth.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["mutes"],
+            type: 'object',
+            required: ['mutes'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               mutes: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.actor.defs#profileView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.actor.defs#profileView',
                 },
               },
             },
@@ -8175,50 +8384,50 @@ export const schemaDict = {
   },
   SoSprkGraphGetRelationships: {
     lexicon: 1,
-    id: "so.sprk.graph.getRelationships",
+    id: 'so.sprk.graph.getRelationships',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Enumerates public relationships between one account, and a list of other accounts. Does not require auth.",
+          'Enumerates public relationships between one account, and a list of other accounts. Does not require auth.',
         parameters: {
-          type: "params",
-          required: ["actor"],
+          type: 'params',
+          required: ['actor'],
           properties: {
             actor: {
-              type: "string",
-              format: "at-identifier",
-              description: "Primary account requesting relationships for.",
+              type: 'string',
+              format: 'at-identifier',
+              description: 'Primary account requesting relationships for.',
             },
             others: {
-              type: "array",
+              type: 'array',
               description:
                 "List of 'other' accounts to be related back to the primary.",
               maxLength: 30,
               items: {
-                type: "string",
-                format: "at-identifier",
+                type: 'string',
+                format: 'at-identifier',
               },
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["relationships"],
+            type: 'object',
+            required: ['relationships'],
             properties: {
               actor: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               relationships: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "union",
+                  type: 'union',
                   refs: [
-                    "lex:so.sprk.graph.defs#relationship",
-                    "lex:so.sprk.graph.defs#notFoundActor",
+                    'lex:so.sprk.graph.defs#relationship',
+                    'lex:so.sprk.graph.defs#notFoundActor',
                   ],
                 },
               },
@@ -8227,9 +8436,9 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "ActorNotFound",
+            name: 'ActorNotFound',
             description:
-              "the primary actor at-identifier could not be resolved",
+              'the primary actor at-identifier could not be resolved',
           },
         ],
       },
@@ -8237,31 +8446,31 @@ export const schemaDict = {
   },
   SoSprkGraphGetStarterPack: {
     lexicon: 1,
-    id: "so.sprk.graph.getStarterPack",
+    id: 'so.sprk.graph.getStarterPack',
     defs: {
       main: {
-        type: "query",
-        description: "Gets a view of a starter pack.",
+        type: 'query',
+        description: 'Gets a view of a starter pack.',
         parameters: {
-          type: "params",
-          required: ["starterPack"],
+          type: 'params',
+          required: ['starterPack'],
           properties: {
             starterPack: {
-              type: "string",
-              format: "at-uri",
-              description: "Reference (AT-URI) of the starter pack record.",
+              type: 'string',
+              format: 'at-uri',
+              description: 'Reference (AT-URI) of the starter pack record.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["starterPack"],
+            type: 'object',
+            required: ['starterPack'],
             properties: {
               starterPack: {
-                type: "ref",
-                ref: "lex:so.sprk.graph.defs#starterPackView",
+                type: 'ref',
+                ref: 'lex:so.sprk.graph.defs#starterPackView',
               },
             },
           },
@@ -8271,36 +8480,36 @@ export const schemaDict = {
   },
   SoSprkGraphGetStarterPacks: {
     lexicon: 1,
-    id: "so.sprk.graph.getStarterPacks",
+    id: 'so.sprk.graph.getStarterPacks',
     defs: {
       main: {
-        type: "query",
-        description: "Get views for a list of starter packs.",
+        type: 'query',
+        description: 'Get views for a list of starter packs.',
         parameters: {
-          type: "params",
-          required: ["uris"],
+          type: 'params',
+          required: ['uris'],
           properties: {
             uris: {
-              type: "array",
+              type: 'array',
               items: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
               maxLength: 25,
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["starterPacks"],
+            type: 'object',
+            required: ['starterPacks'],
             properties: {
               starterPacks: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.graph.defs#starterPackViewBasic",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.graph.defs#starterPackViewBasic',
                 },
               },
             },
@@ -8311,106 +8520,46 @@ export const schemaDict = {
   },
   SoSprkGraphGetSuggestedFollowsByActor: {
     lexicon: 1,
-    id: "so.sprk.graph.getSuggestedFollowsByActor",
+    id: 'so.sprk.graph.getSuggestedFollowsByActor',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Enumerates follows similar to a given account (actor). Expected use is to recommend additional accounts immediately after following one account.",
+          'Enumerates follows similar to a given account (actor). Expected use is to recommend additional accounts immediately after following one account.',
         parameters: {
-          type: "params",
-          required: ["actor"],
+          type: 'params',
+          required: ['actor'],
           properties: {
             actor: {
-              type: "string",
-              format: "at-identifier",
+              type: 'string',
+              format: 'at-identifier',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["suggestions"],
+            type: 'object',
+            required: ['suggestions'],
             properties: {
               suggestions: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.actor.defs#profileView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.actor.defs#profileView',
                 },
               },
               isFallback: {
-                type: "boolean",
+                type: 'boolean',
                 description:
-                  "If true, response has fallen-back to generic results, and is not scoped using relativeToDid",
+                  'If true, response has fallen-back to generic results, and is not scoped using relativeToDid',
                 default: false,
               },
               recId: {
-                type: "integer",
+                type: 'integer',
                 description:
-                  "Snowflake for this recommendation, use when submitting recommendation events.",
+                  'Snowflake for this recommendation, use when submitting recommendation events.',
               },
-            },
-          },
-        },
-      },
-    },
-  },
-  SoSprkGraphListblock: {
-    lexicon: 1,
-    id: "so.sprk.graph.listblock",
-    defs: {
-      main: {
-        type: "record",
-        description:
-          "Record representing a block relationship against an entire an entire list of accounts (actors).",
-        key: "tid",
-        record: {
-          type: "object",
-          required: ["subject", "createdAt"],
-          properties: {
-            subject: {
-              type: "string",
-              format: "at-uri",
-              description: "Reference (AT-URI) to the mod list record.",
-            },
-            createdAt: {
-              type: "string",
-              format: "datetime",
-            },
-          },
-        },
-      },
-    },
-  },
-  SoSprkGraphListitem: {
-    lexicon: 1,
-    id: "so.sprk.graph.listitem",
-    defs: {
-      main: {
-        type: "record",
-        description:
-          "Record representing an account's inclusion on a specific list. The AppView will ignore duplicate listitem records.",
-        key: "tid",
-        record: {
-          type: "object",
-          required: ["subject", "list", "createdAt"],
-          properties: {
-            subject: {
-              type: "string",
-              format: "did",
-              description: "The account which is included on the list.",
-            },
-            list: {
-              type: "string",
-              format: "at-uri",
-              description:
-                "Reference (AT-URI) to the list record (so.sprk.graph.list).",
-            },
-            createdAt: {
-              type: "string",
-              format: "datetime",
             },
           },
         },
@@ -8419,53 +8568,113 @@ export const schemaDict = {
   },
   SoSprkGraphList: {
     lexicon: 1,
-    id: "so.sprk.graph.list",
+    id: 'so.sprk.graph.list',
     defs: {
       main: {
-        type: "record",
+        type: 'record',
         description:
-          "Record representing a list of accounts (actors). Scope includes both moderation-oriented lists and curration-oriented lists.",
-        key: "tid",
+          'Record representing a list of accounts (actors). Scope includes both moderation-oriented lists and curration-oriented lists.',
+        key: 'tid',
         record: {
-          type: "object",
-          required: ["name", "purpose", "createdAt"],
+          type: 'object',
+          required: ['name', 'purpose', 'createdAt'],
           properties: {
             purpose: {
-              type: "ref",
+              type: 'ref',
               description:
-                "Defines the purpose of the list (aka, moderation-oriented or curration-oriented)",
-              ref: "lex:so.sprk.graph.defs#listPurpose",
+                'Defines the purpose of the list (aka, moderation-oriented or curration-oriented)',
+              ref: 'lex:so.sprk.graph.defs#listPurpose',
             },
             name: {
-              type: "string",
+              type: 'string',
               maxLength: 64,
               minLength: 1,
-              description: "Display name for list; can not be empty.",
+              description: 'Display name for list; can not be empty.',
             },
             description: {
-              type: "string",
+              type: 'string',
               maxGraphemes: 300,
               maxLength: 3000,
             },
             descriptionFacets: {
-              type: "array",
+              type: 'array',
               items: {
-                type: "ref",
-                ref: "lex:so.sprk.richtext.facet",
+                type: 'ref',
+                ref: 'lex:so.sprk.richtext.facet',
               },
             },
             avatar: {
-              type: "blob",
-              accept: ["image/png", "image/jpeg"],
+              type: 'blob',
+              accept: ['image/png', 'image/jpeg'],
               maxSize: 1048576,
             },
             labels: {
-              type: "union",
-              refs: ["lex:com.atproto.label.defs#selfLabels"],
+              type: 'union',
+              refs: ['lex:com.atproto.label.defs#selfLabels'],
             },
             createdAt: {
-              type: "string",
-              format: "datetime",
+              type: 'string',
+              format: 'datetime',
+            },
+          },
+        },
+      },
+    },
+  },
+  SoSprkGraphListblock: {
+    lexicon: 1,
+    id: 'so.sprk.graph.listblock',
+    defs: {
+      main: {
+        type: 'record',
+        description:
+          'Record representing a block relationship against an entire an entire list of accounts (actors).',
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['subject', 'createdAt'],
+          properties: {
+            subject: {
+              type: 'string',
+              format: 'at-uri',
+              description: 'Reference (AT-URI) to the mod list record.',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'datetime',
+            },
+          },
+        },
+      },
+    },
+  },
+  SoSprkGraphListitem: {
+    lexicon: 1,
+    id: 'so.sprk.graph.listitem',
+    defs: {
+      main: {
+        type: 'record',
+        description:
+          "Record representing an account's inclusion on a specific list. The AppView will ignore duplicate listitem records.",
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['subject', 'list', 'createdAt'],
+          properties: {
+            subject: {
+              type: 'string',
+              format: 'did',
+              description: 'The account which is included on the list.',
+            },
+            list: {
+              type: 'string',
+              format: 'at-uri',
+              description:
+                'Reference (AT-URI) to the list record (so.sprk.graph.list).',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'datetime',
             },
           },
         },
@@ -8474,21 +8683,21 @@ export const schemaDict = {
   },
   SoSprkGraphMuteActor: {
     lexicon: 1,
-    id: "so.sprk.graph.muteActor",
+    id: 'so.sprk.graph.muteActor',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Creates a mute relationship for the specified account. Mutes are private in Spark. Requires auth.",
+          'Creates a mute relationship for the specified account. Mutes are private in Spark. Requires auth.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["actor"],
+            type: 'object',
+            required: ['actor'],
             properties: {
               actor: {
-                type: "string",
-                format: "at-identifier",
+                type: 'string',
+                format: 'at-identifier',
               },
             },
           },
@@ -8498,21 +8707,21 @@ export const schemaDict = {
   },
   SoSprkGraphMuteActorList: {
     lexicon: 1,
-    id: "so.sprk.graph.muteActorList",
+    id: 'so.sprk.graph.muteActorList',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Creates a mute relationship for the specified list of accounts. Mutes are private in Spark. Requires auth.",
+          'Creates a mute relationship for the specified list of accounts. Mutes are private in Spark. Requires auth.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["list"],
+            type: 'object',
+            required: ['list'],
             properties: {
               list: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
             },
           },
@@ -8522,21 +8731,21 @@ export const schemaDict = {
   },
   SoSprkGraphMuteThread: {
     lexicon: 1,
-    id: "so.sprk.graph.muteThread",
+    id: 'so.sprk.graph.muteThread',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Mutes a thread preventing notifications from the thread and any of its children. Mutes are private in Spark. Requires auth.",
+          'Mutes a thread preventing notifications from the thread and any of its children. Mutes are private in Spark. Requires auth.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["root"],
+            type: 'object',
+            required: ['root'],
             properties: {
               root: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
             },
           },
@@ -8546,46 +8755,46 @@ export const schemaDict = {
   },
   SoSprkGraphSearchStarterPacks: {
     lexicon: 1,
-    id: "so.sprk.graph.searchStarterPacks",
+    id: 'so.sprk.graph.searchStarterPacks',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Find starter packs matching search criteria. Does not require auth.",
+          'Find starter packs matching search criteria. Does not require auth.',
         parameters: {
-          type: "params",
-          required: ["q"],
+          type: 'params',
+          required: ['q'],
           properties: {
             q: {
-              type: "string",
+              type: 'string',
               description:
-                "Search query string. Syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended.",
+                'Search query string. Syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 25,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["starterPacks"],
+            type: 'object',
+            required: ['starterPacks'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               starterPacks: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.graph.defs#starterPackViewBasic",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.graph.defs#starterPackViewBasic',
                 },
               },
             },
@@ -8596,63 +8805,63 @@ export const schemaDict = {
   },
   SoSprkGraphStarterpack: {
     lexicon: 1,
-    id: "so.sprk.graph.starterpack",
+    id: 'so.sprk.graph.starterpack',
     defs: {
       main: {
-        type: "record",
+        type: 'record',
         description:
-          "Record defining a starter pack of actors and feeds for new users.",
-        key: "tid",
+          'Record defining a starter pack of actors and feeds for new users.',
+        key: 'tid',
         record: {
-          type: "object",
-          required: ["name", "list", "createdAt"],
+          type: 'object',
+          required: ['name', 'list', 'createdAt'],
           properties: {
             name: {
-              type: "string",
+              type: 'string',
               maxGraphemes: 50,
               maxLength: 500,
               minLength: 1,
-              description: "Display name for starter pack; can not be empty.",
+              description: 'Display name for starter pack; can not be empty.',
             },
             description: {
-              type: "string",
+              type: 'string',
               maxGraphemes: 300,
               maxLength: 3000,
             },
             descriptionFacets: {
-              type: "array",
+              type: 'array',
               items: {
-                type: "ref",
-                ref: "lex:so.sprk.richtext.facet",
+                type: 'ref',
+                ref: 'lex:so.sprk.richtext.facet',
               },
             },
             list: {
-              type: "string",
-              format: "at-uri",
-              description: "Reference (AT-URI) to the list record.",
+              type: 'string',
+              format: 'at-uri',
+              description: 'Reference (AT-URI) to the list record.',
             },
             feeds: {
-              type: "array",
+              type: 'array',
               maxLength: 3,
               items: {
-                type: "ref",
-                ref: "lex:so.sprk.graph.starterpack#feedItem",
+                type: 'ref',
+                ref: 'lex:so.sprk.graph.starterpack#feedItem',
               },
             },
             createdAt: {
-              type: "string",
-              format: "datetime",
+              type: 'string',
+              format: 'datetime',
             },
           },
         },
       },
       feedItem: {
-        type: "object",
-        required: ["uri"],
+        type: 'object',
+        required: ['uri'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
         },
       },
@@ -8660,20 +8869,20 @@ export const schemaDict = {
   },
   SoSprkGraphUnmuteActor: {
     lexicon: 1,
-    id: "so.sprk.graph.unmuteActor",
+    id: 'so.sprk.graph.unmuteActor',
     defs: {
       main: {
-        type: "procedure",
-        description: "Unmutes the specified account. Requires auth.",
+        type: 'procedure',
+        description: 'Unmutes the specified account. Requires auth.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["actor"],
+            type: 'object',
+            required: ['actor'],
             properties: {
               actor: {
-                type: "string",
-                format: "at-identifier",
+                type: 'string',
+                format: 'at-identifier',
               },
             },
           },
@@ -8683,20 +8892,20 @@ export const schemaDict = {
   },
   SoSprkGraphUnmuteActorList: {
     lexicon: 1,
-    id: "so.sprk.graph.unmuteActorList",
+    id: 'so.sprk.graph.unmuteActorList',
     defs: {
       main: {
-        type: "procedure",
-        description: "Unmutes the specified list of accounts. Requires auth.",
+        type: 'procedure',
+        description: 'Unmutes the specified list of accounts. Requires auth.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["list"],
+            type: 'object',
+            required: ['list'],
             properties: {
               list: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
             },
           },
@@ -8706,20 +8915,20 @@ export const schemaDict = {
   },
   SoSprkGraphUnmuteThread: {
     lexicon: 1,
-    id: "so.sprk.graph.unmuteThread",
+    id: 'so.sprk.graph.unmuteThread',
     defs: {
       main: {
-        type: "procedure",
-        description: "Unmutes the specified thread. Requires auth.",
+        type: 'procedure',
+        description: 'Unmutes the specified thread. Requires auth.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["root"],
+            type: 'object',
+            required: ['root'],
             properties: {
               root: {
-                type: "string",
-                format: "at-uri",
+                type: 'string',
+                format: 'at-uri',
               },
             },
           },
@@ -8729,127 +8938,127 @@ export const schemaDict = {
   },
   SoSprkLabelerDefs: {
     lexicon: 1,
-    id: "so.sprk.labeler.defs",
+    id: 'so.sprk.labeler.defs',
     defs: {
       labelerView: {
-        type: "object",
-        required: ["uri", "cid", "creator", "indexedAt"],
+        type: 'object',
+        required: ['uri', 'cid', 'creator', 'indexedAt'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           creator: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileView",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileView',
           },
           likeCount: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
           lookCount: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
           viewer: {
-            type: "ref",
-            ref: "lex:so.sprk.labeler.defs#labelerViewerState",
+            type: 'ref',
+            ref: 'lex:so.sprk.labeler.defs#labelerViewerState',
           },
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           labels: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#label",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
             },
           },
         },
       },
       labelerViewDetailed: {
-        type: "object",
-        required: ["uri", "cid", "creator", "policies", "indexedAt"],
+        type: 'object',
+        required: ['uri', 'cid', 'creator', 'policies', 'indexedAt'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           creator: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileView",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileView',
           },
           policies: {
-            type: "ref",
-            ref: "lex:so.sprk.labeler.defs#labelerPolicies",
+            type: 'ref',
+            ref: 'lex:so.sprk.labeler.defs#labelerPolicies',
           },
           likeCount: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
           lookCount: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
           viewer: {
-            type: "ref",
-            ref: "lex:so.sprk.labeler.defs#labelerViewerState",
+            type: 'ref',
+            ref: 'lex:so.sprk.labeler.defs#labelerViewerState',
           },
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           labels: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#label",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
             },
           },
         },
       },
       labelerViewerState: {
-        type: "object",
+        type: 'object',
         properties: {
           like: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           look: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
         },
       },
       labelerPolicies: {
-        type: "object",
-        required: ["labelValues"],
+        type: 'object',
+        required: ['labelValues'],
         properties: {
           labelValues: {
-            type: "array",
+            type: 'array',
             description:
-              "The label values which this labeler publishes. May include global or custom labels.",
+              'The label values which this labeler publishes. May include global or custom labels.',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#labelValue",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#labelValue',
             },
           },
           labelValueDefinitions: {
-            type: "array",
+            type: 'array',
             description:
-              "Label values created by this labeler and scoped exclusively to it. Labels defined here will override global label definitions for this labeler.",
+              'Label values created by this labeler and scoped exclusively to it. Labels defined here will override global label definitions for this labeler.',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#labelValueDefinition",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#labelValueDefinition',
             },
           },
         },
@@ -8858,41 +9067,41 @@ export const schemaDict = {
   },
   SoSprkLabelerGetServices: {
     lexicon: 1,
-    id: "so.sprk.labeler.getServices",
+    id: 'so.sprk.labeler.getServices',
     defs: {
       main: {
-        type: "query",
-        description: "Get information about a list of labeler services.",
+        type: 'query',
+        description: 'Get information about a list of labeler services.',
         parameters: {
-          type: "params",
-          required: ["dids"],
+          type: 'params',
+          required: ['dids'],
           properties: {
             dids: {
-              type: "array",
+              type: 'array',
               items: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
             },
             detailed: {
-              type: "boolean",
+              type: 'boolean',
               default: false,
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["views"],
+            type: 'object',
+            required: ['views'],
             properties: {
               views: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "union",
+                  type: 'union',
                   refs: [
-                    "lex:so.sprk.labeler.defs#labelerView",
-                    "lex:so.sprk.labeler.defs#labelerViewDetailed",
+                    'lex:so.sprk.labeler.defs#labelerView',
+                    'lex:so.sprk.labeler.defs#labelerViewDetailed',
                   ],
                 },
               },
@@ -8904,27 +9113,27 @@ export const schemaDict = {
   },
   SoSprkLabelerService: {
     lexicon: 1,
-    id: "so.sprk.labeler.service",
+    id: 'so.sprk.labeler.service',
     defs: {
       main: {
-        type: "record",
-        description: "A declaration of the existence of labeler service.",
-        key: "literal:self",
+        type: 'record',
+        description: 'A declaration of the existence of labeler service.',
+        key: 'literal:self',
         record: {
-          type: "object",
-          required: ["policies", "createdAt"],
+          type: 'object',
+          required: ['policies', 'createdAt'],
           properties: {
             policies: {
-              type: "ref",
-              ref: "lex:so.sprk.labeler.defs#labelerPolicies",
+              type: 'ref',
+              ref: 'lex:so.sprk.labeler.defs#labelerPolicies',
             },
             labels: {
-              type: "union",
-              refs: ["lex:com.atproto.label.defs#selfLabels"],
+              type: 'union',
+              refs: ['lex:com.atproto.label.defs#selfLabels'],
             },
             createdAt: {
-              type: "string",
-              format: "datetime",
+              type: 'string',
+              format: 'datetime',
             },
           },
         },
@@ -8933,32 +9142,32 @@ export const schemaDict = {
   },
   SoSprkNotificationGetUnreadCount: {
     lexicon: 1,
-    id: "so.sprk.notification.getUnreadCount",
+    id: 'so.sprk.notification.getUnreadCount',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Count the number of unread notifications for the requesting account. Requires auth.",
+          'Count the number of unread notifications for the requesting account. Requires auth.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             priority: {
-              type: "boolean",
+              type: 'boolean',
             },
             seenAt: {
-              type: "string",
-              format: "datetime",
+              type: 'string',
+              format: 'datetime',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["count"],
+            type: 'object',
+            required: ['count'],
             properties: {
               count: {
-                type: "integer",
+                type: 'integer',
               },
             },
           },
@@ -8968,127 +9177,126 @@ export const schemaDict = {
   },
   SoSprkNotificationListNotifications: {
     lexicon: 1,
-    id: "so.sprk.notification.listNotifications",
+    id: 'so.sprk.notification.listNotifications',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Enumerate notifications for the requesting account. Requires auth.",
+          'Enumerate notifications for the requesting account. Requires auth.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             reasons: {
-              description: "Notification reasons to include in response.",
-              type: "array",
+              description: 'Notification reasons to include in response.',
+              type: 'array',
               items: {
-                type: "string",
+                type: 'string',
                 description:
-                  "A reason that matches the reason property of #notification.",
+                  'A reason that matches the reason property of #notification.',
               },
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             priority: {
-              type: "boolean",
+              type: 'boolean',
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
             seenAt: {
-              type: "string",
-              format: "datetime",
+              type: 'string',
+              format: 'datetime',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["notifications"],
+            type: 'object',
+            required: ['notifications'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               notifications: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref:
-                    "lex:so.sprk.notification.listNotifications#notification",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.notification.listNotifications#notification',
                 },
               },
               priority: {
-                type: "boolean",
+                type: 'boolean',
               },
               seenAt: {
-                type: "string",
-                format: "datetime",
+                type: 'string',
+                format: 'datetime',
               },
             },
           },
         },
       },
       notification: {
-        type: "object",
+        type: 'object',
         required: [
-          "uri",
-          "cid",
-          "author",
-          "reason",
-          "record",
-          "isRead",
-          "indexedAt",
+          'uri',
+          'cid',
+          'author',
+          'reason',
+          'record',
+          'isRead',
+          'indexedAt',
         ],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           cid: {
-            type: "string",
-            format: "cid",
+            type: 'string',
+            format: 'cid',
           },
           author: {
-            type: "ref",
-            ref: "lex:so.sprk.actor.defs#profileView",
+            type: 'ref',
+            ref: 'lex:so.sprk.actor.defs#profileView',
           },
           reason: {
-            type: "string",
+            type: 'string',
             description:
               "Expected values are 'like', 'repost', 'follow', 'mention', 'reply', 'quote', and 'starterpack-joined'.",
             knownValues: [
-              "like",
-              "repost",
-              "follow",
-              "mention",
-              "reply",
-              "quote",
-              "starterpack-joined",
+              'like',
+              'repost',
+              'follow',
+              'mention',
+              'reply',
+              'quote',
+              'starterpack-joined',
             ],
           },
           reasonSubject: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
           record: {
-            type: "unknown",
+            type: 'unknown',
           },
           isRead: {
-            type: "boolean",
+            type: 'boolean',
           },
           indexedAt: {
-            type: "string",
-            format: "datetime",
+            type: 'string',
+            format: 'datetime',
           },
           labels: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "ref",
-              ref: "lex:com.atproto.label.defs#label",
+              type: 'ref',
+              ref: 'lex:com.atproto.label.defs#label',
             },
           },
         },
@@ -9097,20 +9305,20 @@ export const schemaDict = {
   },
   SoSprkNotificationPutPreferences: {
     lexicon: 1,
-    id: "so.sprk.notification.putPreferences",
+    id: 'so.sprk.notification.putPreferences',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Set notification-related preferences for an account. Requires auth.",
+          'Set notification-related preferences for an account. Requires auth.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["priority"],
+            type: 'object',
+            required: ['priority'],
             properties: {
               priority: {
-                type: "boolean",
+                type: 'boolean',
               },
             },
           },
@@ -9120,31 +9328,31 @@ export const schemaDict = {
   },
   SoSprkNotificationRegisterPush: {
     lexicon: 1,
-    id: "so.sprk.notification.registerPush",
+    id: 'so.sprk.notification.registerPush',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Register to receive push notifications, via a specified service, for the requesting account. Requires auth.",
+          'Register to receive push notifications, via a specified service, for the requesting account. Requires auth.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["serviceDid", "token", "platform", "appId"],
+            type: 'object',
+            required: ['serviceDid', 'token', 'platform', 'appId'],
             properties: {
               serviceDid: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
               },
               token: {
-                type: "string",
+                type: 'string',
               },
               platform: {
-                type: "string",
-                knownValues: ["ios", "android", "web"],
+                type: 'string',
+                knownValues: ['ios', 'android', 'web'],
               },
               appId: {
-                type: "string",
+                type: 'string',
               },
             },
           },
@@ -9154,21 +9362,21 @@ export const schemaDict = {
   },
   SoSprkNotificationUpdateSeen: {
     lexicon: 1,
-    id: "so.sprk.notification.updateSeen",
+    id: 'so.sprk.notification.updateSeen',
     defs: {
       main: {
-        type: "procedure",
+        type: 'procedure',
         description:
-          "Notify server that the requesting account has seen notifications. Requires auth.",
+          'Notify server that the requesting account has seen notifications. Requires auth.',
         input: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["seenAt"],
+            type: 'object',
+            required: ['seenAt'],
             properties: {
               seenAt: {
-                type: "string",
-                format: "datetime",
+                type: 'string',
+                format: 'datetime',
               },
             },
           },
@@ -9178,79 +9386,79 @@ export const schemaDict = {
   },
   SoSprkRichtextFacet: {
     lexicon: 1,
-    id: "so.sprk.richtext.facet",
+    id: 'so.sprk.richtext.facet',
     defs: {
       main: {
-        type: "object",
-        description: "Annotation of a sub-string within rich text.",
-        required: ["index", "features"],
+        type: 'object',
+        description: 'Annotation of a sub-string within rich text.',
+        required: ['index', 'features'],
         properties: {
           index: {
-            type: "ref",
-            ref: "lex:so.sprk.richtext.facet#byteSlice",
+            type: 'ref',
+            ref: 'lex:so.sprk.richtext.facet#byteSlice',
           },
           features: {
-            type: "array",
+            type: 'array',
             items: {
-              type: "union",
+              type: 'union',
               refs: [
-                "lex:so.sprk.richtext.facet#mention",
-                "lex:so.sprk.richtext.facet#link",
-                "lex:so.sprk.richtext.facet#tag",
+                'lex:so.sprk.richtext.facet#mention',
+                'lex:so.sprk.richtext.facet#link',
+                'lex:so.sprk.richtext.facet#tag',
               ],
             },
           },
         },
       },
       mention: {
-        type: "object",
+        type: 'object',
         description:
           "Facet feature for mention of another account. The text is usually a handle, including a '@' prefix, but the facet reference is a DID.",
-        required: ["did"],
+        required: ['did'],
         properties: {
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
         },
       },
       link: {
-        type: "object",
+        type: 'object',
         description:
-          "Facet feature for a URL. The text URL may have been simplified or truncated, but the facet reference should be a complete URL.",
-        required: ["uri"],
+          'Facet feature for a URL. The text URL may have been simplified or truncated, but the facet reference should be a complete URL.',
+        required: ['uri'],
         properties: {
           uri: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
           },
         },
       },
       tag: {
-        type: "object",
+        type: 'object',
         description:
           "Facet feature for a hashtag. The text usually includes a '#' prefix, but the facet reference should not (except in the case of 'double hash tags').",
-        required: ["tag"],
+        required: ['tag'],
         properties: {
           tag: {
-            type: "string",
+            type: 'string',
             maxLength: 640,
             maxGraphemes: 64,
           },
         },
       },
       byteSlice: {
-        type: "object",
+        type: 'object',
         description:
-          "Specifies the sub-string range a facet feature applies to. Start index is inclusive, end index is exclusive. Indices are zero-indexed, counting bytes of the UTF-8 encoded text. NOTE: some languages, like Javascript, use UTF-16 or Unicode codepoints for string slice indexing; in these languages, convert to byte arrays before working with facets.",
-        required: ["byteStart", "byteEnd"],
+          'Specifies the sub-string range a facet feature applies to. Start index is inclusive, end index is exclusive. Indices are zero-indexed, counting bytes of the UTF-8 encoded text. NOTE: some languages, like Javascript, use UTF-16 or Unicode codepoints for string slice indexing; in these languages, convert to byte arrays before working with facets.',
+        required: ['byteStart', 'byteEnd'],
         properties: {
           byteStart: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
           byteEnd: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
           },
         },
@@ -9259,53 +9467,53 @@ export const schemaDict = {
   },
   SoSprkUnspeccedDefs: {
     lexicon: 1,
-    id: "so.sprk.unspecced.defs",
+    id: 'so.sprk.unspecced.defs',
     defs: {
       skeletonSearchPost: {
-        type: "object",
-        required: ["uri"],
+        type: 'object',
+        required: ['uri'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
         },
       },
       skeletonSearchActor: {
-        type: "object",
-        required: ["did"],
+        type: 'object',
+        required: ['did'],
         properties: {
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
         },
       },
       skeletonSearchStarterPack: {
-        type: "object",
-        required: ["uri"],
+        type: 'object',
+        required: ['uri'],
         properties: {
           uri: {
-            type: "string",
-            format: "at-uri",
+            type: 'string',
+            format: 'at-uri',
           },
         },
       },
       trendingTopic: {
-        type: "object",
-        required: ["topic", "link"],
+        type: 'object',
+        required: ['topic', 'link'],
         properties: {
           topic: {
-            type: "string",
+            type: 'string',
           },
           displayName: {
-            type: "string",
+            type: 'string',
           },
           description: {
-            type: "string",
+            type: 'string',
           },
           link: {
-            type: "string",
+            type: 'string',
           },
         },
       },
@@ -9313,19 +9521,19 @@ export const schemaDict = {
   },
   SoSprkUnspeccedGetConfig: {
     lexicon: 1,
-    id: "so.sprk.unspecced.getConfig",
+    id: 'so.sprk.unspecced.getConfig',
     defs: {
       main: {
-        type: "query",
-        description: "Get miscellaneous runtime configuration.",
+        type: 'query',
+        description: 'Get miscellaneous runtime configuration.',
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
+            type: 'object',
             required: [],
             properties: {
               checkEmailConfirmed: {
-                type: "boolean",
+                type: 'boolean',
               },
             },
           },
@@ -9335,42 +9543,42 @@ export const schemaDict = {
   },
   SoSprkUnspeccedGetPopularFeedGenerators: {
     lexicon: 1,
-    id: "so.sprk.unspecced.getPopularFeedGenerators",
+    id: 'so.sprk.unspecced.getPopularFeedGenerators',
     defs: {
       main: {
-        type: "query",
-        description: "An unspecced view of globally popular feed generators.",
+        type: 'query',
+        description: 'An unspecced view of globally popular feed generators.',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
             query: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["feeds"],
+            type: 'object',
+            required: ['feeds'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               feeds: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.feed.defs#generatorView",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.feed.defs#generatorView',
                 },
               },
             },
@@ -9381,64 +9589,64 @@ export const schemaDict = {
   },
   SoSprkUnspeccedGetSuggestionsSkeleton: {
     lexicon: 1,
-    id: "so.sprk.unspecced.getSuggestionsSkeleton",
+    id: 'so.sprk.unspecced.getSuggestionsSkeleton',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get a skeleton of suggested actors. Intended to be called and then hydrated through so.sprk.actor.getSuggestions",
+          'Get a skeleton of suggested actors. Intended to be called and then hydrated through so.sprk.actor.getSuggestions',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             viewer: {
-              type: "string",
-              format: "did",
+              type: 'string',
+              format: 'did',
               description:
-                "DID of the account making the request (not included for public/unauthenticated queries). Used to boost followed accounts in ranking.",
+                'DID of the account making the request (not included for public/unauthenticated queries). Used to boost followed accounts in ranking.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 50,
             },
             cursor: {
-              type: "string",
+              type: 'string',
             },
             relativeToDid: {
-              type: "string",
-              format: "did",
+              type: 'string',
+              format: 'did',
               description:
-                "DID of the account to get suggestions relative to. If not provided, suggestions will be based on the viewer.",
+                'DID of the account to get suggestions relative to. If not provided, suggestions will be based on the viewer.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["actors"],
+            type: 'object',
+            required: ['actors'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               actors: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.unspecced.defs#skeletonSearchActor",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.unspecced.defs#skeletonSearchActor',
                 },
               },
               relativeToDid: {
-                type: "string",
-                format: "did",
+                type: 'string',
+                format: 'did',
                 description:
-                  "DID of the account these suggestions are relative to. If this is returned undefined, suggestions are based on the viewer.",
+                  'DID of the account these suggestions are relative to. If this is returned undefined, suggestions are based on the viewer.',
               },
               recId: {
-                type: "integer",
+                type: 'integer',
                 description:
-                  "Snowflake for this recommendation, use when submitting recommendation events.",
+                  'Snowflake for this recommendation, use when submitting recommendation events.',
               },
             },
           },
@@ -9448,27 +9656,27 @@ export const schemaDict = {
   },
   SoSprkUnspeccedGetTaggedSuggestions: {
     lexicon: 1,
-    id: "so.sprk.unspecced.getTaggedSuggestions",
+    id: 'so.sprk.unspecced.getTaggedSuggestions',
     defs: {
       main: {
-        type: "query",
+        type: 'query',
         description:
-          "Get a list of suggestions (feeds and users) tagged with categories",
+          'Get a list of suggestions (feeds and users) tagged with categories',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {},
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["suggestions"],
+            type: 'object',
+            required: ['suggestions'],
             properties: {
               suggestions: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.unspecced.getTaggedSuggestions#suggestion",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.unspecced.getTaggedSuggestions#suggestion',
                 },
               },
             },
@@ -9476,19 +9684,19 @@ export const schemaDict = {
         },
       },
       suggestion: {
-        type: "object",
-        required: ["tag", "subjectType", "subject"],
+        type: 'object',
+        required: ['tag', 'subjectType', 'subject'],
         properties: {
           tag: {
-            type: "string",
+            type: 'string',
           },
           subjectType: {
-            type: "string",
-            knownValues: ["actor", "feed"],
+            type: 'string',
+            knownValues: ['actor', 'feed'],
           },
           subject: {
-            type: "string",
-            format: "uri",
+            type: 'string',
+            format: 'uri',
           },
         },
       },
@@ -9496,22 +9704,22 @@ export const schemaDict = {
   },
   SoSprkUnspeccedGetTrendingTopics: {
     lexicon: 1,
-    id: "so.sprk.unspecced.getTrendingTopics",
+    id: 'so.sprk.unspecced.getTrendingTopics',
     defs: {
       main: {
-        type: "query",
-        description: "Get a list of trending topics",
+        type: 'query',
+        description: 'Get a list of trending topics',
         parameters: {
-          type: "params",
+          type: 'params',
           properties: {
             viewer: {
-              type: "string",
-              format: "did",
+              type: 'string',
+              format: 'did',
               description:
-                "DID of the account making the request (not included for public/unauthenticated queries). Used to boost followed accounts in ranking.",
+                'DID of the account making the request (not included for public/unauthenticated queries). Used to boost followed accounts in ranking.',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 25,
               default: 10,
@@ -9519,23 +9727,23 @@ export const schemaDict = {
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["topics", "suggested"],
+            type: 'object',
+            required: ['topics', 'suggested'],
             properties: {
               topics: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.unspecced.defs#trendingTopic",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.unspecced.defs#trendingTopic',
                 },
               },
               suggested: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.unspecced.defs#trendingTopic",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.unspecced.defs#trendingTopic',
                 },
               },
             },
@@ -9546,62 +9754,62 @@ export const schemaDict = {
   },
   SoSprkUnspeccedSearchActorsSkeleton: {
     lexicon: 1,
-    id: "so.sprk.unspecced.searchActorsSkeleton",
+    id: 'so.sprk.unspecced.searchActorsSkeleton',
     defs: {
       main: {
-        type: "query",
-        description: "Backend Actors (profile) search, returns only skeleton.",
+        type: 'query',
+        description: 'Backend Actors (profile) search, returns only skeleton.',
         parameters: {
-          type: "params",
-          required: ["q"],
+          type: 'params',
+          required: ['q'],
           properties: {
             q: {
-              type: "string",
+              type: 'string',
               description:
-                "Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended. For typeahead search, only simple term match is supported, not full syntax.",
+                'Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended. For typeahead search, only simple term match is supported, not full syntax.',
             },
             viewer: {
-              type: "string",
-              format: "did",
+              type: 'string',
+              format: 'did',
               description:
-                "DID of the account making the request (not included for public/unauthenticated queries). Used to boost followed accounts in ranking.",
+                'DID of the account making the request (not included for public/unauthenticated queries). Used to boost followed accounts in ranking.',
             },
             typeahead: {
-              type: "boolean",
+              type: 'boolean',
               description: "If true, acts as fast/simple 'typeahead' query.",
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 25,
             },
             cursor: {
-              type: "string",
+              type: 'string',
               description:
-                "Optional pagination mechanism; may not necessarily allow scrolling through entire result set.",
+                'Optional pagination mechanism; may not necessarily allow scrolling through entire result set.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["actors"],
+            type: 'object',
+            required: ['actors'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               hitsTotal: {
-                type: "integer",
+                type: 'integer',
                 description:
-                  "Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.",
+                  'Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.',
               },
               actors: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.unspecced.defs#skeletonSearchActor",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.unspecced.defs#skeletonSearchActor',
                 },
               },
             },
@@ -9609,7 +9817,7 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "BadQueryString",
+            name: 'BadQueryString',
           },
         ],
       },
@@ -9617,69 +9825,69 @@ export const schemaDict = {
   },
   SoSprkUnspeccedSearchPostsSkeleton: {
     lexicon: 1,
-    id: "so.sprk.unspecced.searchPostsSkeleton",
+    id: 'so.sprk.unspecced.searchPostsSkeleton',
     defs: {
       main: {
-        type: "query",
-        description: "Backend Posts search, returns only skeleton",
+        type: 'query',
+        description: 'Backend Posts search, returns only skeleton',
         parameters: {
-          type: "params",
-          required: ["q"],
+          type: 'params',
+          required: ['q'],
           properties: {
             q: {
-              type: "string",
+              type: 'string',
               description:
-                "Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended.",
+                'Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended.',
             },
             sort: {
-              type: "string",
-              knownValues: ["top", "latest"],
-              default: "latest",
-              description: "Specifies the ranking order of results.",
+              type: 'string',
+              knownValues: ['top', 'latest'],
+              default: 'latest',
+              description: 'Specifies the ranking order of results.',
             },
             since: {
-              type: "string",
+              type: 'string',
               description:
                 "Filter results for posts after the indicated datetime (inclusive). Expected to use 'sortAt' timestamp, which may not match 'createdAt'. Can be a datetime, or just an ISO date (YYYY-MM-DD).",
             },
             until: {
-              type: "string",
+              type: 'string',
               description:
                 "Filter results for posts before the indicated datetime (not inclusive). Expected to use 'sortAt' timestamp, which may not match 'createdAt'. Can be a datetime, or just an ISO date (YYY-MM-DD).",
             },
             mentions: {
-              type: "string",
-              format: "at-identifier",
+              type: 'string',
+              format: 'at-identifier',
               description:
-                "Filter to posts which mention the given account. Handles are resolved to DID before query-time. Only matches rich-text facet mentions.",
+                'Filter to posts which mention the given account. Handles are resolved to DID before query-time. Only matches rich-text facet mentions.',
             },
             author: {
-              type: "string",
-              format: "at-identifier",
+              type: 'string',
+              format: 'at-identifier',
               description:
-                "Filter to posts by the given account. Handles are resolved to DID before query-time.",
+                'Filter to posts by the given account. Handles are resolved to DID before query-time.',
             },
             lang: {
-              type: "string",
-              format: "language",
+              type: 'string',
+              format: 'language',
               description:
-                "Filter to posts in the given language. Expected to be based on post language field, though server may override language detection.",
+                'Filter to posts in the given language. Expected to be based on post language field, though server may override language detection.',
             },
             domain: {
-              type: "string",
+              type: 'string',
               description:
-                "Filter to posts with URLs (facet links or embeds) linking to the given domain (hostname). Server may apply hostname normalization.",
+                'Filter to posts with URLs (facet links or embeds) linking to the given domain (hostname). Server may apply hostname normalization.',
             },
             url: {
-              type: "string",
-              format: "uri",
+              type: 'string',
+              format: 'uri',
               description:
-                "Filter to posts with links (facet links or embeds) pointing to this URL. Server may apply URL normalization or fuzzy matching.",
+                'Filter to posts with links (facet links or embeds) pointing to this URL. Server may apply URL normalization or fuzzy matching.',
             },
             tag: {
-              type: "array",
+              type: 'array',
               items: {
-                type: "string",
+                type: 'string',
                 maxLength: 640,
                 maxGraphemes: 64,
               },
@@ -9687,43 +9895,43 @@ export const schemaDict = {
                 "Filter to posts with the given tag (hashtag), based on rich-text facet or tag field. Do not include the hash (#) prefix. Multiple tags can be specified, with 'AND' matching.",
             },
             viewer: {
-              type: "string",
-              format: "did",
+              type: 'string',
+              format: 'did',
               description:
                 "DID of the account making the request (not included for public/unauthenticated queries). Used for 'from:me' queries.",
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 25,
             },
             cursor: {
-              type: "string",
+              type: 'string',
               description:
-                "Optional pagination mechanism; may not necessarily allow scrolling through entire result set.",
+                'Optional pagination mechanism; may not necessarily allow scrolling through entire result set.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["posts"],
+            type: 'object',
+            required: ['posts'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               hitsTotal: {
-                type: "integer",
+                type: 'integer',
                 description:
-                  "Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.",
+                  'Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.',
               },
               posts: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.unspecced.defs#skeletonSearchPost",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.unspecced.defs#skeletonSearchPost',
                 },
               },
             },
@@ -9731,7 +9939,7 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "BadQueryString",
+            name: 'BadQueryString',
           },
         ],
       },
@@ -9739,58 +9947,58 @@ export const schemaDict = {
   },
   SoSprkUnspeccedSearchStarterPacksSkeleton: {
     lexicon: 1,
-    id: "so.sprk.unspecced.searchStarterPacksSkeleton",
+    id: 'so.sprk.unspecced.searchStarterPacksSkeleton',
     defs: {
       main: {
-        type: "query",
-        description: "Backend Starter Pack search, returns only skeleton.",
+        type: 'query',
+        description: 'Backend Starter Pack search, returns only skeleton.',
         parameters: {
-          type: "params",
-          required: ["q"],
+          type: 'params',
+          required: ['q'],
           properties: {
             q: {
-              type: "string",
+              type: 'string',
               description:
-                "Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended.",
+                'Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended.',
             },
             viewer: {
-              type: "string",
-              format: "did",
+              type: 'string',
+              format: 'did',
               description:
-                "DID of the account making the request (not included for public/unauthenticated queries).",
+                'DID of the account making the request (not included for public/unauthenticated queries).',
             },
             limit: {
-              type: "integer",
+              type: 'integer',
               minimum: 1,
               maximum: 100,
               default: 25,
             },
             cursor: {
-              type: "string",
+              type: 'string',
               description:
-                "Optional pagination mechanism; may not necessarily allow scrolling through entire result set.",
+                'Optional pagination mechanism; may not necessarily allow scrolling through entire result set.',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["starterPacks"],
+            type: 'object',
+            required: ['starterPacks'],
             properties: {
               cursor: {
-                type: "string",
+                type: 'string',
               },
               hitsTotal: {
-                type: "integer",
+                type: 'integer',
                 description:
-                  "Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.",
+                  'Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.',
               },
               starterPacks: {
-                type: "array",
+                type: 'array',
                 items: {
-                  type: "ref",
-                  ref: "lex:so.sprk.unspecced.defs#skeletonSearchStarterPack",
+                  type: 'ref',
+                  ref: 'lex:so.sprk.unspecced.defs#skeletonSearchStarterPack',
                 },
               },
             },
@@ -9798,7 +10006,7 @@ export const schemaDict = {
         },
         errors: [
           {
-            name: "BadQueryString",
+            name: 'BadQueryString',
           },
         ],
       },
@@ -9806,39 +10014,39 @@ export const schemaDict = {
   },
   SoSprkVideoDefs: {
     lexicon: 1,
-    id: "so.sprk.video.defs",
+    id: 'so.sprk.video.defs',
     defs: {
       jobStatus: {
-        type: "object",
-        required: ["jobId", "did", "state"],
+        type: 'object',
+        required: ['jobId', 'did', 'state'],
         properties: {
           jobId: {
-            type: "string",
+            type: 'string',
           },
           did: {
-            type: "string",
-            format: "did",
+            type: 'string',
+            format: 'did',
           },
           state: {
-            type: "string",
+            type: 'string',
             description:
-              "The state of the video processing job. All values not listed as a known value indicate that the job is in process.",
-            knownValues: ["JOB_STATE_COMPLETED", "JOB_STATE_FAILED"],
+              'The state of the video processing job. All values not listed as a known value indicate that the job is in process.',
+            knownValues: ['JOB_STATE_COMPLETED', 'JOB_STATE_FAILED'],
           },
           progress: {
-            type: "integer",
+            type: 'integer',
             minimum: 0,
             maximum: 100,
-            description: "Progress within the current processing state.",
+            description: 'Progress within the current processing state.',
           },
           blob: {
-            type: "blob",
+            type: 'blob',
           },
           error: {
-            type: "string",
+            type: 'string',
           },
           message: {
-            type: "string",
+            type: 'string',
           },
         },
       },
@@ -9846,29 +10054,29 @@ export const schemaDict = {
   },
   SoSprkVideoGetJobStatus: {
     lexicon: 1,
-    id: "so.sprk.video.getJobStatus",
+    id: 'so.sprk.video.getJobStatus',
     defs: {
       main: {
-        type: "query",
-        description: "Get status details for a video processing job.",
+        type: 'query',
+        description: 'Get status details for a video processing job.',
         parameters: {
-          type: "params",
-          required: ["jobId"],
+          type: 'params',
+          required: ['jobId'],
           properties: {
             jobId: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["jobStatus"],
+            type: 'object',
+            required: ['jobStatus'],
             properties: {
               jobStatus: {
-                type: "ref",
-                ref: "lex:so.sprk.video.defs#jobStatus",
+                type: 'ref',
+                ref: 'lex:so.sprk.video.defs#jobStatus',
               },
             },
           },
@@ -9878,31 +10086,31 @@ export const schemaDict = {
   },
   SoSprkVideoGetUploadLimits: {
     lexicon: 1,
-    id: "so.sprk.video.getUploadLimits",
+    id: 'so.sprk.video.getUploadLimits',
     defs: {
       main: {
-        type: "query",
-        description: "Get video upload limits for the authenticated user.",
+        type: 'query',
+        description: 'Get video upload limits for the authenticated user.',
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["canUpload"],
+            type: 'object',
+            required: ['canUpload'],
             properties: {
               canUpload: {
-                type: "boolean",
+                type: 'boolean',
               },
               remainingDailyVideos: {
-                type: "integer",
+                type: 'integer',
               },
               remainingDailyBytes: {
-                type: "integer",
+                type: 'integer',
               },
               message: {
-                type: "string",
+                type: 'string',
               },
               error: {
-                type: "string",
+                type: 'string',
               },
             },
           },
@@ -9912,23 +10120,23 @@ export const schemaDict = {
   },
   SoSprkVideoUploadVideo: {
     lexicon: 1,
-    id: "so.sprk.video.uploadVideo",
+    id: 'so.sprk.video.uploadVideo',
     defs: {
       main: {
-        type: "procedure",
-        description: "Upload a video to be processed then stored on the PDS.",
+        type: 'procedure',
+        description: 'Upload a video to be processed then stored on the PDS.',
         input: {
-          encoding: "video/mp4",
+          encoding: 'video/mp4',
         },
         output: {
-          encoding: "application/json",
+          encoding: 'application/json',
           schema: {
-            type: "object",
-            required: ["jobStatus"],
+            type: 'object',
+            required: ['jobStatus'],
             properties: {
               jobStatus: {
-                type: "ref",
-                ref: "lex:so.sprk.video.defs#jobStatus",
+                type: 'ref',
+                ref: 'lex:so.sprk.video.defs#jobStatus',
               },
             },
           },
@@ -9936,23 +10144,22 @@ export const schemaDict = {
       },
     },
   },
-} as const satisfies Record<string, LexiconDoc>;
-
-export const schemas = Object.values(schemaDict) satisfies LexiconDoc[];
-export const lexicons: Lexicons = new Lexicons(schemas);
+} as const satisfies Record<string, LexiconDoc>
+export const schemas = Object.values(schemaDict) satisfies LexiconDoc[]
+export const lexicons: Lexicons = new Lexicons(schemas)
 
 export function validate<T extends { $type: string }>(
   v: unknown,
   id: string,
   hash: string,
   requiredType: true,
-): ValidationResult<T>;
+): ValidationResult<T>
 export function validate<T extends { $type?: string }>(
   v: unknown,
   id: string,
   hash: string,
   requiredType?: false,
-): ValidationResult<T>;
+): ValidationResult<T>
 export function validate(
   v: unknown,
   id: string,
@@ -9962,201 +10169,202 @@ export function validate(
   return (requiredType ? is$typed : maybe$typed)(v, id, hash)
     ? lexicons.validate(`${id}#${hash}`, v)
     : {
-      success: false,
-      error: new ValidationError(
-        `Must be an object with "${
-          hash === "main" ? id : `${id}#${hash}`
-        }" $type property`,
-      ),
-    };
+        success: false,
+        error: new ValidationError(
+          `Must be an object with "${hash === 'main' ? id : `${id}#${hash}`}" $type property`,
+        ),
+      }
 }
 
 export const ids = {
-  ComAtprotoAdminDefs: "com.atproto.admin.defs",
-  ComAtprotoAdminDeleteAccount: "com.atproto.admin.deleteAccount",
+  ComAtprotoAdminDefs: 'com.atproto.admin.defs',
+  ComAtprotoAdminDeleteAccount: 'com.atproto.admin.deleteAccount',
   ComAtprotoAdminDisableAccountInvites:
-    "com.atproto.admin.disableAccountInvites",
-  ComAtprotoAdminDisableInviteCodes: "com.atproto.admin.disableInviteCodes",
-  ComAtprotoAdminEnableAccountInvites: "com.atproto.admin.enableAccountInvites",
-  ComAtprotoAdminGetAccountInfo: "com.atproto.admin.getAccountInfo",
-  ComAtprotoAdminGetAccountInfos: "com.atproto.admin.getAccountInfos",
-  ComAtprotoAdminGetInviteCodes: "com.atproto.admin.getInviteCodes",
-  ComAtprotoAdminGetSubjectStatus: "com.atproto.admin.getSubjectStatus",
-  ComAtprotoAdminSearchAccounts: "com.atproto.admin.searchAccounts",
-  ComAtprotoAdminSendEmail: "com.atproto.admin.sendEmail",
-  ComAtprotoAdminUpdateAccountEmail: "com.atproto.admin.updateAccountEmail",
-  ComAtprotoAdminUpdateAccountHandle: "com.atproto.admin.updateAccountHandle",
+    'com.atproto.admin.disableAccountInvites',
+  ComAtprotoAdminDisableInviteCodes: 'com.atproto.admin.disableInviteCodes',
+  ComAtprotoAdminEnableAccountInvites: 'com.atproto.admin.enableAccountInvites',
+  ComAtprotoAdminGetAccountInfo: 'com.atproto.admin.getAccountInfo',
+  ComAtprotoAdminGetAccountInfos: 'com.atproto.admin.getAccountInfos',
+  ComAtprotoAdminGetInviteCodes: 'com.atproto.admin.getInviteCodes',
+  ComAtprotoAdminGetSubjectStatus: 'com.atproto.admin.getSubjectStatus',
+  ComAtprotoAdminSearchAccounts: 'com.atproto.admin.searchAccounts',
+  ComAtprotoAdminSendEmail: 'com.atproto.admin.sendEmail',
+  ComAtprotoAdminUpdateAccountEmail: 'com.atproto.admin.updateAccountEmail',
+  ComAtprotoAdminUpdateAccountHandle: 'com.atproto.admin.updateAccountHandle',
   ComAtprotoAdminUpdateAccountPassword:
-    "com.atproto.admin.updateAccountPassword",
-  ComAtprotoAdminUpdateSubjectStatus: "com.atproto.admin.updateSubjectStatus",
+    'com.atproto.admin.updateAccountPassword',
+  ComAtprotoAdminUpdateSubjectStatus: 'com.atproto.admin.updateSubjectStatus',
   ComAtprotoIdentityGetRecommendedDidCredentials:
-    "com.atproto.identity.getRecommendedDidCredentials",
+    'com.atproto.identity.getRecommendedDidCredentials',
   ComAtprotoIdentityRequestPlcOperationSignature:
-    "com.atproto.identity.requestPlcOperationSignature",
-  ComAtprotoIdentityResolveHandle: "com.atproto.identity.resolveHandle",
-  ComAtprotoIdentitySignPlcOperation: "com.atproto.identity.signPlcOperation",
+    'com.atproto.identity.requestPlcOperationSignature',
+  ComAtprotoIdentityResolveHandle: 'com.atproto.identity.resolveHandle',
+  ComAtprotoIdentitySignPlcOperation: 'com.atproto.identity.signPlcOperation',
   ComAtprotoIdentitySubmitPlcOperation:
-    "com.atproto.identity.submitPlcOperation",
-  ComAtprotoIdentityUpdateHandle: "com.atproto.identity.updateHandle",
-  ComAtprotoLabelDefs: "com.atproto.label.defs",
-  ComAtprotoLabelQueryLabels: "com.atproto.label.queryLabels",
-  ComAtprotoLabelSubscribeLabels: "com.atproto.label.subscribeLabels",
-  ComAtprotoLexiconSchema: "com.atproto.lexicon.schema",
-  ComAtprotoModerationCreateReport: "com.atproto.moderation.createReport",
-  ComAtprotoModerationDefs: "com.atproto.moderation.defs",
-  ComAtprotoRepoApplyWrites: "com.atproto.repo.applyWrites",
-  ComAtprotoRepoCreateRecord: "com.atproto.repo.createRecord",
-  ComAtprotoRepoDefs: "com.atproto.repo.defs",
-  ComAtprotoRepoDeleteRecord: "com.atproto.repo.deleteRecord",
-  ComAtprotoRepoDescribeRepo: "com.atproto.repo.describeRepo",
-  ComAtprotoRepoGetRecord: "com.atproto.repo.getRecord",
-  ComAtprotoRepoImportRepo: "com.atproto.repo.importRepo",
-  ComAtprotoRepoListMissingBlobs: "com.atproto.repo.listMissingBlobs",
-  ComAtprotoRepoListRecords: "com.atproto.repo.listRecords",
-  ComAtprotoRepoPutRecord: "com.atproto.repo.putRecord",
-  ComAtprotoRepoStrongRef: "com.atproto.repo.strongRef",
-  ComAtprotoRepoUploadBlob: "com.atproto.repo.uploadBlob",
-  ComAtprotoServerActivateAccount: "com.atproto.server.activateAccount",
-  ComAtprotoServerCheckAccountStatus: "com.atproto.server.checkAccountStatus",
-  ComAtprotoServerConfirmEmail: "com.atproto.server.confirmEmail",
-  ComAtprotoServerCreateAccount: "com.atproto.server.createAccount",
-  ComAtprotoServerCreateAppPassword: "com.atproto.server.createAppPassword",
-  ComAtprotoServerCreateInviteCode: "com.atproto.server.createInviteCode",
-  ComAtprotoServerCreateInviteCodes: "com.atproto.server.createInviteCodes",
-  ComAtprotoServerCreateSession: "com.atproto.server.createSession",
-  ComAtprotoServerDeactivateAccount: "com.atproto.server.deactivateAccount",
-  ComAtprotoServerDefs: "com.atproto.server.defs",
-  ComAtprotoServerDeleteAccount: "com.atproto.server.deleteAccount",
-  ComAtprotoServerDeleteSession: "com.atproto.server.deleteSession",
-  ComAtprotoServerDescribeServer: "com.atproto.server.describeServer",
+    'com.atproto.identity.submitPlcOperation',
+  ComAtprotoIdentityUpdateHandle: 'com.atproto.identity.updateHandle',
+  ComAtprotoLabelDefs: 'com.atproto.label.defs',
+  ComAtprotoLabelQueryLabels: 'com.atproto.label.queryLabels',
+  ComAtprotoLabelSubscribeLabels: 'com.atproto.label.subscribeLabels',
+  ComAtprotoLexiconSchema: 'com.atproto.lexicon.schema',
+  ComAtprotoModerationCreateReport: 'com.atproto.moderation.createReport',
+  ComAtprotoModerationDefs: 'com.atproto.moderation.defs',
+  ComAtprotoRepoApplyWrites: 'com.atproto.repo.applyWrites',
+  ComAtprotoRepoCreateRecord: 'com.atproto.repo.createRecord',
+  ComAtprotoRepoDefs: 'com.atproto.repo.defs',
+  ComAtprotoRepoDeleteRecord: 'com.atproto.repo.deleteRecord',
+  ComAtprotoRepoDescribeRepo: 'com.atproto.repo.describeRepo',
+  ComAtprotoRepoGetRecord: 'com.atproto.repo.getRecord',
+  ComAtprotoRepoImportRepo: 'com.atproto.repo.importRepo',
+  ComAtprotoRepoListMissingBlobs: 'com.atproto.repo.listMissingBlobs',
+  ComAtprotoRepoListRecords: 'com.atproto.repo.listRecords',
+  ComAtprotoRepoPutRecord: 'com.atproto.repo.putRecord',
+  ComAtprotoRepoStrongRef: 'com.atproto.repo.strongRef',
+  ComAtprotoRepoUploadBlob: 'com.atproto.repo.uploadBlob',
+  ComAtprotoServerActivateAccount: 'com.atproto.server.activateAccount',
+  ComAtprotoServerCheckAccountStatus: 'com.atproto.server.checkAccountStatus',
+  ComAtprotoServerConfirmEmail: 'com.atproto.server.confirmEmail',
+  ComAtprotoServerCreateAccount: 'com.atproto.server.createAccount',
+  ComAtprotoServerCreateAppPassword: 'com.atproto.server.createAppPassword',
+  ComAtprotoServerCreateInviteCode: 'com.atproto.server.createInviteCode',
+  ComAtprotoServerCreateInviteCodes: 'com.atproto.server.createInviteCodes',
+  ComAtprotoServerCreateSession: 'com.atproto.server.createSession',
+  ComAtprotoServerDeactivateAccount: 'com.atproto.server.deactivateAccount',
+  ComAtprotoServerDefs: 'com.atproto.server.defs',
+  ComAtprotoServerDeleteAccount: 'com.atproto.server.deleteAccount',
+  ComAtprotoServerDeleteSession: 'com.atproto.server.deleteSession',
+  ComAtprotoServerDescribeServer: 'com.atproto.server.describeServer',
   ComAtprotoServerGetAccountInviteCodes:
-    "com.atproto.server.getAccountInviteCodes",
-  ComAtprotoServerGetServiceAuth: "com.atproto.server.getServiceAuth",
-  ComAtprotoServerGetSession: "com.atproto.server.getSession",
-  ComAtprotoServerListAppPasswords: "com.atproto.server.listAppPasswords",
-  ComAtprotoServerRefreshSession: "com.atproto.server.refreshSession",
+    'com.atproto.server.getAccountInviteCodes',
+  ComAtprotoServerGetServiceAuth: 'com.atproto.server.getServiceAuth',
+  ComAtprotoServerGetSession: 'com.atproto.server.getSession',
+  ComAtprotoServerListAppPasswords: 'com.atproto.server.listAppPasswords',
+  ComAtprotoServerRefreshSession: 'com.atproto.server.refreshSession',
   ComAtprotoServerRequestAccountDelete:
-    "com.atproto.server.requestAccountDelete",
+    'com.atproto.server.requestAccountDelete',
   ComAtprotoServerRequestEmailConfirmation:
-    "com.atproto.server.requestEmailConfirmation",
-  ComAtprotoServerRequestEmailUpdate: "com.atproto.server.requestEmailUpdate",
+    'com.atproto.server.requestEmailConfirmation',
+  ComAtprotoServerRequestEmailUpdate: 'com.atproto.server.requestEmailUpdate',
   ComAtprotoServerRequestPasswordReset:
-    "com.atproto.server.requestPasswordReset",
-  ComAtprotoServerReserveSigningKey: "com.atproto.server.reserveSigningKey",
-  ComAtprotoServerResetPassword: "com.atproto.server.resetPassword",
-  ComAtprotoServerRevokeAppPassword: "com.atproto.server.revokeAppPassword",
-  ComAtprotoServerUpdateEmail: "com.atproto.server.updateEmail",
-  ComAtprotoSyncGetBlob: "com.atproto.sync.getBlob",
-  ComAtprotoSyncGetBlocks: "com.atproto.sync.getBlocks",
-  ComAtprotoSyncGetCheckout: "com.atproto.sync.getCheckout",
-  ComAtprotoSyncGetHead: "com.atproto.sync.getHead",
-  ComAtprotoSyncGetLatestCommit: "com.atproto.sync.getLatestCommit",
-  ComAtprotoSyncGetRecord: "com.atproto.sync.getRecord",
-  ComAtprotoSyncGetRepo: "com.atproto.sync.getRepo",
-  ComAtprotoSyncGetRepoStatus: "com.atproto.sync.getRepoStatus",
-  ComAtprotoSyncListBlobs: "com.atproto.sync.listBlobs",
-  ComAtprotoSyncListReposByCollection: "com.atproto.sync.listReposByCollection",
-  ComAtprotoSyncListRepos: "com.atproto.sync.listRepos",
-  ComAtprotoSyncNotifyOfUpdate: "com.atproto.sync.notifyOfUpdate",
-  ComAtprotoSyncRequestCrawl: "com.atproto.sync.requestCrawl",
-  ComAtprotoSyncSubscribeRepos: "com.atproto.sync.subscribeRepos",
-  ComAtprotoTempAddReservedHandle: "com.atproto.temp.addReservedHandle",
-  ComAtprotoTempCheckSignupQueue: "com.atproto.temp.checkSignupQueue",
-  ComAtprotoTempFetchLabels: "com.atproto.temp.fetchLabels",
+    'com.atproto.server.requestPasswordReset',
+  ComAtprotoServerReserveSigningKey: 'com.atproto.server.reserveSigningKey',
+  ComAtprotoServerResetPassword: 'com.atproto.server.resetPassword',
+  ComAtprotoServerRevokeAppPassword: 'com.atproto.server.revokeAppPassword',
+  ComAtprotoServerUpdateEmail: 'com.atproto.server.updateEmail',
+  ComAtprotoSyncGetBlob: 'com.atproto.sync.getBlob',
+  ComAtprotoSyncGetBlocks: 'com.atproto.sync.getBlocks',
+  ComAtprotoSyncGetCheckout: 'com.atproto.sync.getCheckout',
+  ComAtprotoSyncGetHead: 'com.atproto.sync.getHead',
+  ComAtprotoSyncGetLatestCommit: 'com.atproto.sync.getLatestCommit',
+  ComAtprotoSyncGetRecord: 'com.atproto.sync.getRecord',
+  ComAtprotoSyncGetRepo: 'com.atproto.sync.getRepo',
+  ComAtprotoSyncGetRepoStatus: 'com.atproto.sync.getRepoStatus',
+  ComAtprotoSyncListBlobs: 'com.atproto.sync.listBlobs',
+  ComAtprotoSyncListRepos: 'com.atproto.sync.listRepos',
+  ComAtprotoSyncListReposByCollection: 'com.atproto.sync.listReposByCollection',
+  ComAtprotoSyncNotifyOfUpdate: 'com.atproto.sync.notifyOfUpdate',
+  ComAtprotoSyncRequestCrawl: 'com.atproto.sync.requestCrawl',
+  ComAtprotoSyncSubscribeRepos: 'com.atproto.sync.subscribeRepos',
+  ComAtprotoTempAddReservedHandle: 'com.atproto.temp.addReservedHandle',
+  ComAtprotoTempCheckSignupQueue: 'com.atproto.temp.checkSignupQueue',
+  ComAtprotoTempFetchLabels: 'com.atproto.temp.fetchLabels',
   ComAtprotoTempRequestPhoneVerification:
-    "com.atproto.temp.requestPhoneVerification",
-  SoSprkActorDefs: "so.sprk.actor.defs",
-  SoSprkActorGetPreferences: "so.sprk.actor.getPreferences",
-  SoSprkActorGetProfile: "so.sprk.actor.getProfile",
-  SoSprkActorGetProfiles: "so.sprk.actor.getProfiles",
-  SoSprkActorGetSuggestions: "so.sprk.actor.getSuggestions",
-  SoSprkActorProfile: "so.sprk.actor.profile",
-  SoSprkActorPutPreferences: "so.sprk.actor.putPreferences",
-  SoSprkActorSearchActors: "so.sprk.actor.searchActors",
-  SoSprkActorSearchActorsTypeahead: "so.sprk.actor.searchActorsTypeahead",
-  SoSprkEmbedDefs: "so.sprk.embed.defs",
-  SoSprkEmbedImages: "so.sprk.embed.images",
-  SoSprkEmbedVideo: "so.sprk.embed.video",
-  SoSprkFeedDefs: "so.sprk.feed.defs",
-  SoSprkFeedDescribeFeedGenerator: "so.sprk.feed.describeFeedGenerator",
-  SoSprkFeedGenerator: "so.sprk.feed.generator",
-  SoSprkFeedGetActorFeeds: "so.sprk.feed.getActorFeeds",
-  SoSprkFeedGetActorLikes: "so.sprk.feed.getActorLikes",
-  SoSprkFeedGetActorLooks: "so.sprk.feed.getActorLooks",
-  SoSprkFeedGetAuthorFeed: "so.sprk.feed.getAuthorFeed",
-  SoSprkFeedGetFeedGenerator: "so.sprk.feed.getFeedGenerator",
-  SoSprkFeedGetFeedGenerators: "so.sprk.feed.getFeedGenerators",
-  SoSprkFeedGetFeed: "so.sprk.feed.getFeed",
-  SoSprkFeedGetFeedSkeleton: "so.sprk.feed.getFeedSkeleton",
-  SoSprkFeedGetLikes: "so.sprk.feed.getLikes",
-  SoSprkFeedGetListFeed: "so.sprk.feed.getListFeed",
-  SoSprkFeedGetLooks: "so.sprk.feed.getLooks",
-  SoSprkFeedGetPosts: "so.sprk.feed.getPosts",
-  SoSprkFeedGetPostThread: "so.sprk.feed.getPostThread",
-  SoSprkFeedGetQuotes: "so.sprk.feed.getQuotes",
-  SoSprkFeedGetRepostedBy: "so.sprk.feed.getRepostedBy",
-  SoSprkFeedGetSuggestedFeeds: "so.sprk.feed.getSuggestedFeeds",
-  SoSprkFeedGetTimeline: "so.sprk.feed.getTimeline",
-  SoSprkFeedLike: "so.sprk.feed.like",
-  SoSprkFeedLook: "so.sprk.feed.look",
-  SoSprkFeedPostgate: "so.sprk.feed.postgate",
-  SoSprkFeedPost: "so.sprk.feed.post",
-  SoSprkFeedRepost: "so.sprk.feed.repost",
-  SoSprkFeedSearchPosts: "so.sprk.feed.searchPosts",
-  SoSprkFeedSendInteractions: "so.sprk.feed.sendInteractions",
-  SoSprkFeedThreadgate: "so.sprk.feed.threadgate",
-  SoSprkGraphBlock: "so.sprk.graph.block",
-  SoSprkGraphDefs: "so.sprk.graph.defs",
-  SoSprkGraphFollow: "so.sprk.graph.follow",
-  SoSprkGraphGetActorStarterPacks: "so.sprk.graph.getActorStarterPacks",
-  SoSprkGraphGetBlocks: "so.sprk.graph.getBlocks",
-  SoSprkGraphGetFollowers: "so.sprk.graph.getFollowers",
-  SoSprkGraphGetFollows: "so.sprk.graph.getFollows",
-  SoSprkGraphGetKnownFollowers: "so.sprk.graph.getKnownFollowers",
-  SoSprkGraphGetListBlocks: "so.sprk.graph.getListBlocks",
-  SoSprkGraphGetList: "so.sprk.graph.getList",
-  SoSprkGraphGetListMutes: "so.sprk.graph.getListMutes",
-  SoSprkGraphGetLists: "so.sprk.graph.getLists",
-  SoSprkGraphGetMutes: "so.sprk.graph.getMutes",
-  SoSprkGraphGetRelationships: "so.sprk.graph.getRelationships",
-  SoSprkGraphGetStarterPack: "so.sprk.graph.getStarterPack",
-  SoSprkGraphGetStarterPacks: "so.sprk.graph.getStarterPacks",
+    'com.atproto.temp.requestPhoneVerification',
+  SoSprkActorDefs: 'so.sprk.actor.defs',
+  SoSprkActorGetPreferences: 'so.sprk.actor.getPreferences',
+  SoSprkActorGetProfile: 'so.sprk.actor.getProfile',
+  SoSprkActorGetProfiles: 'so.sprk.actor.getProfiles',
+  SoSprkActorGetSuggestions: 'so.sprk.actor.getSuggestions',
+  SoSprkActorProfile: 'so.sprk.actor.profile',
+  SoSprkActorPutPreferences: 'so.sprk.actor.putPreferences',
+  SoSprkActorSearchActors: 'so.sprk.actor.searchActors',
+  SoSprkActorSearchActorsTypeahead: 'so.sprk.actor.searchActorsTypeahead',
+  SoSprkEmbedDefs: 'so.sprk.embed.defs',
+  SoSprkEmbedImages: 'so.sprk.embed.images',
+  SoSprkEmbedVideo: 'so.sprk.embed.video',
+  SoSprkFeedDefs: 'so.sprk.feed.defs',
+  SoSprkFeedDescribeFeedGenerator: 'so.sprk.feed.describeFeedGenerator',
+  SoSprkFeedGenerator: 'so.sprk.feed.generator',
+  SoSprkFeedGetActorFeeds: 'so.sprk.feed.getActorFeeds',
+  SoSprkFeedGetActorLikes: 'so.sprk.feed.getActorLikes',
+  SoSprkFeedGetActorLooks: 'so.sprk.feed.getActorLooks',
+  SoSprkFeedGetAuthorFeed: 'so.sprk.feed.getAuthorFeed',
+  SoSprkFeedGetFeed: 'so.sprk.feed.getFeed',
+  SoSprkFeedGetFeedGenerator: 'so.sprk.feed.getFeedGenerator',
+  SoSprkFeedGetFeedGenerators: 'so.sprk.feed.getFeedGenerators',
+  SoSprkFeedGetFeedSkeleton: 'so.sprk.feed.getFeedSkeleton',
+  SoSprkFeedGetLikes: 'so.sprk.feed.getLikes',
+  SoSprkFeedGetListFeed: 'so.sprk.feed.getListFeed',
+  SoSprkFeedGetLooks: 'so.sprk.feed.getLooks',
+  SoSprkFeedGetPostThread: 'so.sprk.feed.getPostThread',
+  SoSprkFeedGetPosts: 'so.sprk.feed.getPosts',
+  SoSprkFeedGetQuotes: 'so.sprk.feed.getQuotes',
+  SoSprkFeedGetRepostedBy: 'so.sprk.feed.getRepostedBy',
+  SoSprkFeedGetStories: 'so.sprk.feed.getStories',
+  SoSprkFeedGetStoriesTimeline: 'so.sprk.feed.getStoriesTimeline',
+  SoSprkFeedGetSuggestedFeeds: 'so.sprk.feed.getSuggestedFeeds',
+  SoSprkFeedGetTimeline: 'so.sprk.feed.getTimeline',
+  SoSprkFeedLike: 'so.sprk.feed.like',
+  SoSprkFeedLook: 'so.sprk.feed.look',
+  SoSprkFeedPost: 'so.sprk.feed.post',
+  SoSprkFeedPostgate: 'so.sprk.feed.postgate',
+  SoSprkFeedRepost: 'so.sprk.feed.repost',
+  SoSprkFeedSearchPosts: 'so.sprk.feed.searchPosts',
+  SoSprkFeedSendInteractions: 'so.sprk.feed.sendInteractions',
+  SoSprkFeedStory: 'so.sprk.feed.story',
+  SoSprkFeedThreadgate: 'so.sprk.feed.threadgate',
+  SoSprkGraphBlock: 'so.sprk.graph.block',
+  SoSprkGraphDefs: 'so.sprk.graph.defs',
+  SoSprkGraphFollow: 'so.sprk.graph.follow',
+  SoSprkGraphGetActorStarterPacks: 'so.sprk.graph.getActorStarterPacks',
+  SoSprkGraphGetBlocks: 'so.sprk.graph.getBlocks',
+  SoSprkGraphGetFollowers: 'so.sprk.graph.getFollowers',
+  SoSprkGraphGetFollows: 'so.sprk.graph.getFollows',
+  SoSprkGraphGetKnownFollowers: 'so.sprk.graph.getKnownFollowers',
+  SoSprkGraphGetList: 'so.sprk.graph.getList',
+  SoSprkGraphGetListBlocks: 'so.sprk.graph.getListBlocks',
+  SoSprkGraphGetListMutes: 'so.sprk.graph.getListMutes',
+  SoSprkGraphGetLists: 'so.sprk.graph.getLists',
+  SoSprkGraphGetMutes: 'so.sprk.graph.getMutes',
+  SoSprkGraphGetRelationships: 'so.sprk.graph.getRelationships',
+  SoSprkGraphGetStarterPack: 'so.sprk.graph.getStarterPack',
+  SoSprkGraphGetStarterPacks: 'so.sprk.graph.getStarterPacks',
   SoSprkGraphGetSuggestedFollowsByActor:
-    "so.sprk.graph.getSuggestedFollowsByActor",
-  SoSprkGraphListblock: "so.sprk.graph.listblock",
-  SoSprkGraphListitem: "so.sprk.graph.listitem",
-  SoSprkGraphList: "so.sprk.graph.list",
-  SoSprkGraphMuteActor: "so.sprk.graph.muteActor",
-  SoSprkGraphMuteActorList: "so.sprk.graph.muteActorList",
-  SoSprkGraphMuteThread: "so.sprk.graph.muteThread",
-  SoSprkGraphSearchStarterPacks: "so.sprk.graph.searchStarterPacks",
-  SoSprkGraphStarterpack: "so.sprk.graph.starterpack",
-  SoSprkGraphUnmuteActor: "so.sprk.graph.unmuteActor",
-  SoSprkGraphUnmuteActorList: "so.sprk.graph.unmuteActorList",
-  SoSprkGraphUnmuteThread: "so.sprk.graph.unmuteThread",
-  SoSprkLabelerDefs: "so.sprk.labeler.defs",
-  SoSprkLabelerGetServices: "so.sprk.labeler.getServices",
-  SoSprkLabelerService: "so.sprk.labeler.service",
-  SoSprkNotificationGetUnreadCount: "so.sprk.notification.getUnreadCount",
-  SoSprkNotificationListNotifications: "so.sprk.notification.listNotifications",
-  SoSprkNotificationPutPreferences: "so.sprk.notification.putPreferences",
-  SoSprkNotificationRegisterPush: "so.sprk.notification.registerPush",
-  SoSprkNotificationUpdateSeen: "so.sprk.notification.updateSeen",
-  SoSprkRichtextFacet: "so.sprk.richtext.facet",
-  SoSprkUnspeccedDefs: "so.sprk.unspecced.defs",
-  SoSprkUnspeccedGetConfig: "so.sprk.unspecced.getConfig",
+    'so.sprk.graph.getSuggestedFollowsByActor',
+  SoSprkGraphList: 'so.sprk.graph.list',
+  SoSprkGraphListblock: 'so.sprk.graph.listblock',
+  SoSprkGraphListitem: 'so.sprk.graph.listitem',
+  SoSprkGraphMuteActor: 'so.sprk.graph.muteActor',
+  SoSprkGraphMuteActorList: 'so.sprk.graph.muteActorList',
+  SoSprkGraphMuteThread: 'so.sprk.graph.muteThread',
+  SoSprkGraphSearchStarterPacks: 'so.sprk.graph.searchStarterPacks',
+  SoSprkGraphStarterpack: 'so.sprk.graph.starterpack',
+  SoSprkGraphUnmuteActor: 'so.sprk.graph.unmuteActor',
+  SoSprkGraphUnmuteActorList: 'so.sprk.graph.unmuteActorList',
+  SoSprkGraphUnmuteThread: 'so.sprk.graph.unmuteThread',
+  SoSprkLabelerDefs: 'so.sprk.labeler.defs',
+  SoSprkLabelerGetServices: 'so.sprk.labeler.getServices',
+  SoSprkLabelerService: 'so.sprk.labeler.service',
+  SoSprkNotificationGetUnreadCount: 'so.sprk.notification.getUnreadCount',
+  SoSprkNotificationListNotifications: 'so.sprk.notification.listNotifications',
+  SoSprkNotificationPutPreferences: 'so.sprk.notification.putPreferences',
+  SoSprkNotificationRegisterPush: 'so.sprk.notification.registerPush',
+  SoSprkNotificationUpdateSeen: 'so.sprk.notification.updateSeen',
+  SoSprkRichtextFacet: 'so.sprk.richtext.facet',
+  SoSprkUnspeccedDefs: 'so.sprk.unspecced.defs',
+  SoSprkUnspeccedGetConfig: 'so.sprk.unspecced.getConfig',
   SoSprkUnspeccedGetPopularFeedGenerators:
-    "so.sprk.unspecced.getPopularFeedGenerators",
+    'so.sprk.unspecced.getPopularFeedGenerators',
   SoSprkUnspeccedGetSuggestionsSkeleton:
-    "so.sprk.unspecced.getSuggestionsSkeleton",
-  SoSprkUnspeccedGetTaggedSuggestions: "so.sprk.unspecced.getTaggedSuggestions",
-  SoSprkUnspeccedGetTrendingTopics: "so.sprk.unspecced.getTrendingTopics",
-  SoSprkUnspeccedSearchActorsSkeleton: "so.sprk.unspecced.searchActorsSkeleton",
-  SoSprkUnspeccedSearchPostsSkeleton: "so.sprk.unspecced.searchPostsSkeleton",
+    'so.sprk.unspecced.getSuggestionsSkeleton',
+  SoSprkUnspeccedGetTaggedSuggestions: 'so.sprk.unspecced.getTaggedSuggestions',
+  SoSprkUnspeccedGetTrendingTopics: 'so.sprk.unspecced.getTrendingTopics',
+  SoSprkUnspeccedSearchActorsSkeleton: 'so.sprk.unspecced.searchActorsSkeleton',
+  SoSprkUnspeccedSearchPostsSkeleton: 'so.sprk.unspecced.searchPostsSkeleton',
   SoSprkUnspeccedSearchStarterPacksSkeleton:
-    "so.sprk.unspecced.searchStarterPacksSkeleton",
-  SoSprkVideoDefs: "so.sprk.video.defs",
-  SoSprkVideoGetJobStatus: "so.sprk.video.getJobStatus",
-  SoSprkVideoGetUploadLimits: "so.sprk.video.getUploadLimits",
-  SoSprkVideoUploadVideo: "so.sprk.video.uploadVideo",
-} as const;
+    'so.sprk.unspecced.searchStarterPacksSkeleton',
+  SoSprkVideoDefs: 'so.sprk.video.defs',
+  SoSprkVideoGetJobStatus: 'so.sprk.video.getJobStatus',
+  SoSprkVideoGetUploadLimits: 'so.sprk.video.getUploadLimits',
+  SoSprkVideoUploadVideo: 'so.sprk.video.uploadVideo',
+} as const

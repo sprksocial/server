@@ -1,13 +1,8 @@
-import {
-  Database,
-  EmbedImage,
-  PostDocument,
-} from "../services/data-plane/server/index.ts";
+import { Database, PostDocument } from "../services/data-plane/server/index.ts";
 import type { Label } from "../lexicon/types/com/atproto/label/defs.ts";
-import type { ProfileViewBasic } from "../lexicon/types/so/sprk/actor/defs.ts";
-import type * as SoSprkEmbedImages from "../lexicon/types/so/sprk/embed/images.ts";
-import type * as SoSprkEmbedVideo from "../lexicon/types/so/sprk/embed/video.ts";
 import type * as SoSprkFeedDefs from "../lexicon/types/so/sprk/feed/defs.ts";
+import { transformEmbed } from "./embed-transformer.ts";
+import { createProfileViewBasic } from "./profile-helper.ts";
 
 // Transform DB post to PostView format
 export async function transformPostToPostView(
@@ -15,62 +10,32 @@ export async function transformPostToPostView(
   db: Database,
   userDid?: string,
 ): Promise<SoSprkFeedDefs.PostView> {
-  // Get like count
-  const likeCount = await db.models.Like.countDocuments({ subject: post.uri });
+  // Get counts in parallel
+  const [likeCount, replyCount, repostCount, lookCount, author] = await Promise
+    .all([
+      // Get like count
+      db.models.Like.countDocuments({ subject: post.uri }),
 
-  // Get reply count
-  const replyCount = await db.models.Post.countDocuments({
-    "reply.parent.uri": post.uri,
-  });
+      // Get reply count
+      db.models.Post.countDocuments({
+        "reply.parent.uri": post.uri,
+      }),
 
-  // Get repost count
-  const repostCount = await db.models.Repost.countDocuments({
-    "subject.uri": post.uri,
-  });
+      // Get repost count
+      db.models.Repost.countDocuments({
+        "subject.uri": post.uri,
+      }),
 
-  const lookCount = await db.models.Look.countDocuments({
-    "subject.uri": post.uri,
-  });
+      // Get look count
+      db.models.Look.countDocuments({
+        "subject.uri": post.uri,
+      }),
 
-  // Get author profile data
-  const profile = await db.models.Profile.findOne({
-    authorDid: post.authorDid,
-  }).lean();
+      // Create the author object with stories
+      createProfileViewBasic(post.authorDid, post.authorHandle, db),
+    ]);
 
-  // Create the author object
-  const author: ProfileViewBasic = {
-    did: post.authorDid,
-    handle: post.authorHandle,
-    displayName: profile?.displayName ?? post.authorHandle,
-    avatar:
-      `https://media.sprk.so/avatar/tiny/${profile?.authorDid}/${profile?.avatar?.ref?.$link}/webp`,
-  };
-
-  let embed;
-
-  if (post.embed?.$type === "so.sprk.embed.images" && post.embed.images) {
-    embed = {
-      $type: "so.sprk.embed.images#view",
-      images: post.embed.images.map((img: EmbedImage) => ({
-        thumb:
-          `https://media.sprk.so/img/medium/${post.authorDid}/${img.image.ref.$link}/webp`,
-        fullsize:
-          `https://media.sprk.so/img/full/${post.authorDid}/${img.image.ref.$link}/webp`,
-        alt: img.alt,
-        aspectRatio: img.aspectRatio,
-      })),
-    } satisfies SoSprkEmbedImages.View;
-  } else if (post.embed?.$type === "so.sprk.embed.video" && post.embed.video) {
-    embed = {
-      $type: "so.sprk.embed.video#view",
-      cid: post.cid,
-      alt: post.embed.alt,
-      playlist:
-        `https://media.sprk.so/video/${post.authorDid}/${post.embed.video.ref.$link}`,
-      thumbnail:
-        `https://thumb.sprk.so/${post.authorDid}/${post.embed.video.ref.$link}/thumbnail`,
-    } satisfies SoSprkEmbedVideo.View;
-  }
+  const embed = transformEmbed(post.embed, post.authorDid, post.cid);
 
   // Convert labels if any
   const labels = post.labels

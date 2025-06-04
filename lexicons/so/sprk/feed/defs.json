@@ -2,6 +2,24 @@
   "lexicon": 1,
   "id": "so.sprk.feed.defs",
   "defs": {
+    "storyView": {
+      "type": "object",
+      "required": ["uri", "cid", "author", "record", "indexedAt"],
+      "properties": {
+        "uri": { "type": "string", "format": "at-uri" },
+        "cid": { "type": "string", "format": "cid" },
+        "author": {
+          "type": "ref",
+          "ref": "so.sprk.actor.defs#profileViewBasic"
+        },
+        "record": { "type": "unknown" },
+        "media": {
+          "type": "union",
+          "refs": ["so.sprk.embed.images#view", "so.sprk.embed.video#view"]
+        },
+        "indexedAt": { "type": "string", "format": "datetime" }
+      }
+    },
     "postView": {
       "type": "object",
       "required": ["uri", "cid", "author", "record", "indexedAt"],
@@ -82,6 +100,27 @@
           "type": "string",
           "description": "Context provided by feed generator that may be passed back alongside interactions.",
           "maxLength": 2000
+        }
+      }
+    },
+    "feedViewStory": {
+      "type": "object",
+      "required": ["story"],
+      "properties": {
+        "story": { "type": "ref", "ref": "#storyView" }
+      }
+    },
+    "storiesByAuthor": {
+      "type": "object",
+      "required": ["author", "stories"],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "so.sprk.actor.defs#profileViewBasic"
+        },
+        "stories": {
+          "type": "array",
+          "items": { "type": "ref", "ref": "#storyView" }
         }
       }
     },

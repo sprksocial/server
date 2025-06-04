@@ -1,31 +1,35 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { BlobRef, ValidationResult } from "@atproto/lexicon";
-import { CID } from "multiformats/cid";
-import { validate as _validate } from "../../../../lexicons";
-import { $Typed, is$typed as _is$typed, OmitKey } from "../../../../util";
+import { type ValidationResult, BlobRef } from '@atproto/lexicon'
+import { CID } from 'multiformats/cid'
+import { validate as _validate } from '../../../../lexicons'
+import {
+  type $Typed,
+  is$typed as _is$typed,
+  type OmitKey,
+} from '../../../../util'
 
 const is$typed = _is$typed,
-  validate = _validate;
-const id = "so.sprk.graph.listitem";
+  validate = _validate
+const id = 'so.sprk.graph.listitem'
 
 export interface Record {
-  $type: "so.sprk.graph.listitem";
+  $type: 'so.sprk.graph.listitem'
   /** The account which is included on the list. */
-  subject: string;
+  subject: string
   /** Reference (AT-URI) to the list record (so.sprk.graph.list). */
-  list: string;
-  createdAt: string;
-  [k: string]: unknown;
+  list: string
+  createdAt: string
+  [k: string]: unknown
 }
 
-const hashRecord = "main";
+const hashRecord = 'main'
 
 export function isRecord<V>(v: V) {
-  return is$typed(v, id, hashRecord);
+  return is$typed(v, id, hashRecord)
 }
 
 export function validateRecord<V>(v: V) {
-  return validate<Record & V>(v, id, hashRecord, true);
+  return validate<Record & V>(v, id, hashRecord, true)
 }

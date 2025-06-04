@@ -3,6 +3,7 @@ import { Database } from "../db/connection.js";
 import type { NormalizedEvent } from "../types/events.js";
 import { handleLikeEvent } from "./like-handler.js";
 import { handlePostEvent } from "./post-handler.js";
+import { handleStoryEvent } from "./story-handler.js";
 import { handleFollowEvent } from "./follow-handler.js";
 import { handleBlockEvent } from "./block-handler.js";
 import { handleProfileEvent } from "./profile-handler.js";
@@ -42,6 +43,11 @@ export async function handleEvent(
 
     if (evt.collection === "so.sprk.feed.post") {
       await handlePostEvent(evt, db);
+      return;
+    }
+
+    if (evt.collection === "so.sprk.feed.story") {
+      await handleStoryEvent(evt, db);
       return;
     }
 

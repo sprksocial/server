@@ -1,58 +1,62 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import express from "express";
-import { BlobRef, ValidationResult } from "@atproto/lexicon";
-import { CID } from "multiformats/cid";
-import { validate as _validate } from "../../../../lexicons";
-import { $Typed, is$typed as _is$typed, OmitKey } from "../../../../util";
-import { HandlerAuth, HandlerPipeThrough } from "@atproto/xrpc-server";
-import type * as SoSprkFeedDefs from "./defs.ts";
+import express from 'express'
+import { type ValidationResult, BlobRef } from '@atproto/lexicon'
+import { CID } from 'multiformats/cid'
+import { validate as _validate } from '../../../../lexicons'
+import {
+  type $Typed,
+  is$typed as _is$typed,
+  type OmitKey,
+} from '../../../../util'
+import { HandlerAuth, HandlerPipeThrough } from '@atproto/xrpc-server'
+import type * as SoSprkFeedDefs from './defs.js'
 
 const is$typed = _is$typed,
-  validate = _validate;
-const id = "so.sprk.feed.getQuotes";
+  validate = _validate
+const id = 'so.sprk.feed.getQuotes'
 
 export interface QueryParams {
   /** Reference (AT-URI) of post record */
-  uri: string;
+  uri: string
   /** If supplied, filters to quotes of specific version (by CID) of the post record. */
-  cid?: string;
-  limit: number;
-  cursor?: string;
+  cid?: string
+  limit: number
+  cursor?: string
 }
 
-export type InputSchema = undefined;
+export type InputSchema = undefined
 
 export interface OutputSchema {
-  uri: string;
-  cid?: string;
-  cursor?: string;
-  posts: SoSprkFeedDefs.PostView[];
+  uri: string
+  cid?: string
+  cursor?: string
+  posts: SoSprkFeedDefs.PostView[]
 }
 
-export type HandlerInput = undefined;
+export type HandlerInput = undefined
 
 export interface HandlerSuccess {
-  encoding: "application/json";
-  body: OutputSchema;
-  headers?: { [key: string]: string };
+  encoding: 'application/json'
+  body: OutputSchema
+  headers?: { [key: string]: string }
 }
 
 export interface HandlerError {
-  status: number;
-  message?: string;
+  status: number
+  message?: string
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough;
+export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough
 export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA;
-  params: QueryParams;
-  input: HandlerInput;
-  req: express.Request;
-  res: express.Response;
-  resetRouteRateLimits: () => Promise<void>;
-};
+  auth: HA
+  params: QueryParams
+  input: HandlerInput
+  req: express.Request
+  res: express.Response
+  resetRouteRateLimits: () => Promise<void>
+}
 export type Handler<HA extends HandlerAuth = never> = (
   ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput;
+) => Promise<HandlerOutput> | HandlerOutput
