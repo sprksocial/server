@@ -1,85 +1,84 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type ValidationResult, BlobRef } from '@atproto/lexicon'
-import { CID } from 'multiformats/cid'
-import { validate as _validate } from '../../../../lexicons'
+import { BlobRef, type ValidationResult } from "@atproto/lexicon";
+import { CID } from "multiformats/cid";
+import { validate as _validate } from "../../../../lexicons";
 import {
   type $Typed,
   is$typed as _is$typed,
   type OmitKey,
-} from '../../../../util'
-import type * as SoSprkEmbedDefs from './defs.js'
+} from "../../../../util";
+import type * as SoSprkEmbedDefs from "./defs.js";
 
-const is$typed = _is$typed,
-  validate = _validate
-const id = 'so.sprk.embed.images'
+const is$typed = _is$typed, validate = _validate;
+const id = "so.sprk.embed.images";
 
 export interface Main {
-  $type?: 'so.sprk.embed.images'
-  images: Image[]
+  $type?: "so.sprk.embed.images";
+  images: (Image)[];
 }
 
-const hashMain = 'main'
+const hashMain = "main";
 
 export function isMain<V>(v: V) {
-  return is$typed(v, id, hashMain)
+  return is$typed(v, id, hashMain);
 }
 
 export function validateMain<V>(v: V) {
-  return validate<Main & V>(v, id, hashMain)
+  return validate<Main & V>(v, id, hashMain);
 }
 
 export interface Image {
-  $type?: 'so.sprk.embed.images#image'
-  image: BlobRef
+  $type?: "so.sprk.embed.images#image";
+  image: BlobRef;
   /** Alt text description of the image, for accessibility. */
-  alt: string
-  aspectRatio?: SoSprkEmbedDefs.AspectRatio
+  alt: string;
+  aspectRatio?: SoSprkEmbedDefs.AspectRatio;
 }
 
-const hashImage = 'image'
+const hashImage = "image";
 
 export function isImage<V>(v: V) {
-  return is$typed(v, id, hashImage)
+  return is$typed(v, id, hashImage);
 }
 
 export function validateImage<V>(v: V) {
-  return validate<Image & V>(v, id, hashImage)
+  return validate<Image & V>(v, id, hashImage);
 }
 
 export interface View {
-  $type?: 'so.sprk.embed.images#view'
-  images: ViewImage[]
+  $type?: "so.sprk.embed.images#view";
+  images: (ViewImage)[];
 }
 
-const hashView = 'view'
+const hashView = "view";
 
 export function isView<V>(v: V) {
-  return is$typed(v, id, hashView)
+  return is$typed(v, id, hashView);
 }
 
 export function validateView<V>(v: V) {
-  return validate<View & V>(v, id, hashView)
+  return validate<View & V>(v, id, hashView);
 }
 
 export interface ViewImage {
-  $type?: 'so.sprk.embed.images#viewImage'
+  $type?: "so.sprk.embed.images#viewImage";
   /** Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View. */
-  thumb: string
+  thumb: string;
   /** Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View. */
-  fullsize: string
+  fullsize: string;
   /** Alt text description of the image, for accessibility. */
-  alt: string
-  aspectRatio?: SoSprkEmbedDefs.AspectRatio
+  alt: string;
+  aspectRatio?: SoSprkEmbedDefs.AspectRatio;
 }
 
-const hashViewImage = 'viewImage'
+const hashViewImage = "viewImage";
 
 export function isViewImage<V>(v: V) {
-  return is$typed(v, id, hashViewImage)
+  return is$typed(v, id, hashViewImage);
 }
 
 export function validateViewImage<V>(v: V) {
-  return validate<ViewImage & V>(v, id, hashViewImage)
+  return validate<ViewImage & V>(v, id, hashViewImage);
 }

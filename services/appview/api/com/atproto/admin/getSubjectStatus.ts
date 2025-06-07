@@ -1,14 +1,14 @@
-import { AppContext } from "../../../../main.ts";
+import { AppContext, AppEnv } from "../../../../main.ts";
 import { Server } from "../../../../lexicon/index.ts";
-import { AuthRequiredError, XRPCError } from "@atproto/xrpc-server";
+import { AuthRequiredError, XRPCError } from "@sprk/xrpc-server";
 
-export default function (server: Server, ctx: AppContext) {
+export default function (server: Server<AppEnv>, ctx: AppContext) {
   server.com.atproto.admin.getSubjectStatus({
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth }) => {
       const { did, uri, blob } = params;
-      const { includeTakedowns } = ctx.authVerifier.parseCreds(auth);
-      if (!includeTakedowns) {
+
+      if (auth.credentials.type === "none") {
         throw new AuthRequiredError("Requires admin privileges");
       }
 

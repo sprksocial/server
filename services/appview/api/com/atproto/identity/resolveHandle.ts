@@ -1,5 +1,5 @@
 import * as ident from "@atproto/syntax";
-import { InvalidRequestError } from "@atproto/xrpc-server";
+import { InvalidRequestError } from "@sprk/xrpc-server";
 import { AppContext } from "../../../../main.ts";
 import { Hono } from "hono";
 

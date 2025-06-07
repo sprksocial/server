@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Env, Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
@@ -25,14 +25,14 @@ import { createResolveHandleRouter } from "./api/com/atproto/identity/resolveHan
 import wellKnownRouter from "./utils/well-known.ts";
 import { TakedownService } from "./services/takedown.ts";
 import { IndexingService } from "./services/indexing.ts";
-import { expressToHono } from "./utils/express-adapter.ts";
 import { createPutPreferencesRouter } from "./api/so/sprk/actor/putPreferences.ts";
 import { createGetPreferencesRouter } from "./api/so/sprk/actor/getPreferences.ts";
 import { BidirectionalResolver } from "./utils/id-resolver.ts";
-import { DidResolver } from "@atproto/identity";
+import { DidResolver } from "npm:@atproto/identity";
 import { AuthVerifier } from "./services/auth/auth-verifier.ts";
 import { createGetStoriesTimelineRouter } from "./api/so/sprk/feed/getStoriesTimeline.ts";
 import { createGetStoriesRouter } from "./api/so/sprk/feed/getStories.ts";
+import { AuthRequiredError } from "@sprk/xrpc-server";
 
 // Setup logger and database
 const appLogger = pino({ name: "server start" });
@@ -65,7 +65,7 @@ export type AppContext = {
   authVerifier: AuthVerifier;
 };
 
-export type AppEnv = {
+export type AppEnv = Env & {
   Bindings: AppContext;
   Variables: {
     did: string;
@@ -100,7 +100,7 @@ app.use("*", async (c, next) => {
 app.use("*", takedownFilterMiddleware);
 
 // Lexicon/XRPC server and routers
-const lexServer = createServer();
+const lexServer = createServer<AppEnv>();
 API(lexServer, ctx);
 
 app.route("/", createGetPostsRouter(ctx));
@@ -117,6 +117,7 @@ app.route("/", createResolveHandleRouter(ctx));
 app.route("/", createPutPreferencesRouter(ctx));
 app.route("/", createGetPreferencesRouter(ctx));
 app.route("/", wellKnownRouter());
+app.route("/", lexServer.xrpc.routes);
 
 // Root route
 app.get("/", (c) => {
@@ -125,15 +126,22 @@ app.get("/", (c) => {
   );
 });
 
-// Mount XRPC router
-app.use(expressToHono(lexServer.xrpc.router));
-
 // Error handling
 app.onError((err, c) => {
   if (err instanceof HTTPException) return err.getResponse();
+  
+  // Handle AuthRequiredError from XRPC server
+  if (err instanceof AuthRequiredError || err.constructor?.name === "AuthRequiredError") {
+    const authErr = err as AuthRequiredError;
+    return c.json({
+      error: authErr.message || "Authentication Required",
+      message: authErr.message || "Invalid credentials",
+    }, 401);
+  }
+
   appLogger.error({ err }, "Server error");
   return c.json({
-    error: "Internal Server Error",
+    error: "InternalServerError",
     message: "An unexpected error occurred",
   }, 500);
 });

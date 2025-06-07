@@ -9,6 +9,8 @@ services:
       - "27017:27017"
     volumes:
       - ./devdb:/data/db
+      - ../../xrpc-server:/app/xrpc-server
+      - ../../lex-cli:/app/lex-cli
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "'db.adminCommand(\"ping\")'"]
       interval: 10s
@@ -16,40 +18,40 @@ services:
       retries: 3
     restart: unless-stopped
 
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    environment:
-      NODE_ENV: development
-      HOST: 0.0.0.0
-      PORT: 3000
-      DB_HOST: db
-      DB_PORT: 27017
-      DB_USER: mongo
-      DB_PASSWORD: mongo
-      DB_NAME: dev
-      ADMIN_PASSWORD: "00000000000000000000000000000000"
-    ports:
-      - "4000:3000"
-    depends_on:
-      db:
-        condition: service_healthy
-    develop:
-      watch:
-        - path: ./api
-          action: sync
-          target: /app/api
-        - path: ./lexicon
-          action: sync
-          target: /app/lexicon
-        - path: ./services
-          action: sync
-          target: /app/services
-        - path: ./utils
-          action: sync
-          target: /app/utils
-        - path: ./main.ts
-          action: sync
-          target: /app/main.ts
-    restart: unless-stopped
+  # app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dev
+  #   environment:
+  #     NODE_ENV: development
+  #     HOST: 0.0.0.0
+  #     PORT: 3000
+  #     DB_HOST: db
+  #     DB_PORT: 27017
+  #     DB_USER: mongo
+  #     DB_PASSWORD: mongo
+  #     DB_NAME: dev
+  #     ADMIN_PASSWORD: "00000000000000000000000000000000"
+  #   ports:
+  #     - "4000:3000"
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   develop:
+  #     watch:
+  #       - path: ./api
+  #         action: sync
+  #         target: /app/api
+  #       - path: ./lexicon
+  #         action: sync
+  #         target: /app/lexicon
+  #       - path: ./services
+  #         action: sync
+  #         target: /app/services
+  #       - path: ./utils
+  #         action: sync
+  #         target: /app/utils
+  #       - path: ./main.ts
+  #         action: sync
+  #         target: /app/main.ts
+  #   restart: unless-stopped
