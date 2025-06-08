@@ -1,10 +1,10 @@
-import { AppContext, AppEnv } from "../../../../main.ts";
+import { AppContext } from "../../../../main.ts";
 import { mapDefined } from "@atproto/common";
 import { INVALID_HANDLE } from "@atproto/syntax";
 import { Server } from "../../../../lexicon/index.ts";
 import { AuthRequiredError } from "@sprk/xrpc-server";
 
-export default function (server: Server<AppEnv>, ctx: AppContext) {
+export default function (server: Server, ctx: AppContext) {
   server.com.atproto.admin.getAccountInfos({
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth }) => {

@@ -1,11 +1,11 @@
 import { HTTPException } from "hono/http-exception";
-import { AppContext, AppEnv } from "../../../../main.ts";
+import { AppContext } from "../../../../main.ts";
 import { Server } from "../../../../lexicon/index.ts";
 import type * as ComAtprotoAdminDefs from "../../../../lexicon/types/com/atproto/admin/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../../lexicon/types/com/atproto/repo/strongRef.ts";
 import { AuthRequiredError } from "@sprk/xrpc-server";
 
-export default function (server: Server<AppEnv>, ctx: AppContext) {
+export default function (server: Server, ctx: AppContext) {
   server.com.atproto.admin.updateSubjectStatus({
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ input, auth }) => {

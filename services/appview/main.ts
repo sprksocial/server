@@ -100,7 +100,7 @@ app.use("*", async (c, next) => {
 app.use("*", takedownFilterMiddleware);
 
 // Lexicon/XRPC server and routers
-const lexServer = createServer<AppEnv>();
+const lexServer = createServer();
 API(lexServer, ctx);
 
 app.route("/", createGetPostsRouter(ctx));

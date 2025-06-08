@@ -1,8 +1,8 @@
-import { AppContext, AppEnv } from "../../../../main.ts";
+import { AppContext } from "../../../../main.ts";
 import { Server } from "../../../../lexicon/index.ts";
 import { AuthRequiredError, XRPCError } from "@sprk/xrpc-server";
 
-export default function (server: Server<AppEnv>, ctx: AppContext) {
+export default function (server: Server, ctx: AppContext) {
   server.com.atproto.admin.getSubjectStatus({
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth }) => {
