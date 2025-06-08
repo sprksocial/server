@@ -1,6 +1,6 @@
 import { Context, Next } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { verifyJwt } from "@atproto/xrpc-server";
+import { verifyJwt } from "@sprk/xrpc-server";
 import { DidResolver } from "@atproto/identity";
 import { env } from "../../utils/env.ts";
 import { decodeBase64 } from "@std/encoding";

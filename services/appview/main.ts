@@ -25,7 +25,6 @@ import { createResolveHandleRouter } from "./api/com/atproto/identity/resolveHan
 import wellKnownRouter from "./utils/well-known.ts";
 import { TakedownService } from "./services/takedown.ts";
 import { IndexingService } from "./services/indexing.ts";
-import { expressToHono } from "./utils/express-adapter.ts";
 import { createPutPreferencesRouter } from "./api/so/sprk/actor/putPreferences.ts";
 import { createGetPreferencesRouter } from "./api/so/sprk/actor/getPreferences.ts";
 import { BidirectionalResolver } from "./utils/id-resolver.ts";
@@ -33,6 +32,7 @@ import { DidResolver } from "@atproto/identity";
 import { AuthVerifier } from "./services/auth/auth-verifier.ts";
 import { createGetStoriesTimelineRouter } from "./api/so/sprk/feed/getStoriesTimeline.ts";
 import { createGetStoriesRouter } from "./api/so/sprk/feed/getStories.ts";
+import { AuthRequiredError } from "@sprk/xrpc-server";
 
 // Setup logger and database
 const appLogger = pino({ name: "server start" });
@@ -117,6 +117,7 @@ app.route("/", createResolveHandleRouter(ctx));
 app.route("/", createPutPreferencesRouter(ctx));
 app.route("/", createGetPreferencesRouter(ctx));
 app.route("/", wellKnownRouter());
+app.route("/", lexServer.xrpc.routes);
 
 // Root route
 app.get("/", (c) => {
@@ -125,12 +126,22 @@ app.get("/", (c) => {
   );
 });
 
-// Mount XRPC router
-app.use(expressToHono(lexServer.xrpc.router));
-
 // Error handling
 app.onError((err, c) => {
   if (err instanceof HTTPException) return err.getResponse();
+
+  // Handle AuthRequiredError from XRPC server
+  if (
+    err instanceof AuthRequiredError ||
+    err.constructor?.name === "AuthRequiredError"
+  ) {
+    const authErr = err as AuthRequiredError;
+    return c.json({
+      error: authErr.message || "Authentication Required",
+      message: authErr.message || "Invalid or missing credentials",
+    }, 401);
+  }
+
   appLogger.error({ err }, "Server error");
   return c.json({
     error: "Internal Server Error",

@@ -2,7 +2,7 @@ import { AppContext } from "../../../../main.ts";
 import { mapDefined } from "@atproto/common";
 import { INVALID_HANDLE } from "@atproto/syntax";
 import { Server } from "../../../../lexicon/index.ts";
-import { AuthRequiredError } from "@atproto/xrpc-server";
+import { AuthRequiredError } from "@sprk/xrpc-server";
 
 export default function (server: Server, ctx: AppContext) {
   server.com.atproto.admin.getAccountInfos({

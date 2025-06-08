@@ -1,5 +1,5 @@
 import { AtUri } from "@atproto/syntax";
-import { InvalidRequestError } from "@atproto/xrpc-server";
+import { InvalidRequestError } from "@sprk/xrpc-server";
 import { Hono } from "hono";
 
 import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";

@@ -1,32 +1,31 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type ValidationResult, BlobRef } from '@atproto/lexicon'
-import { CID } from 'multiformats/cid'
-import { validate as _validate } from '../../../../lexicons'
+import { BlobRef, type ValidationResult } from "@atproto/lexicon";
+import { CID } from "multiformats/cid";
+import { validate as _validate } from "../../../../lexicons";
 import {
   type $Typed,
   is$typed as _is$typed,
   type OmitKey,
-} from '../../../../util'
+} from "../../../../util";
 
-const is$typed = _is$typed,
-  validate = _validate
-const id = 'so.sprk.embed.defs'
+const is$typed = _is$typed, validate = _validate;
+const id = "so.sprk.embed.defs";
 
 /** width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit. */
 export interface AspectRatio {
-  $type?: 'so.sprk.embed.defs#aspectRatio'
-  width: number
-  height: number
+  $type?: "so.sprk.embed.defs#aspectRatio";
+  width: number;
+  height: number;
 }
 
-const hashAspectRatio = 'aspectRatio'
+const hashAspectRatio = "aspectRatio";
 
 export function isAspectRatio<V>(v: V) {
-  return is$typed(v, id, hashAspectRatio)
+  return is$typed(v, id, hashAspectRatio);
 }
 
 export function validateAspectRatio<V>(v: V) {
-  return validate<AspectRatio & V>(v, id, hashAspectRatio)
+  return validate<AspectRatio & V>(v, id, hashAspectRatio);
 }

@@ -8,4 +8,5 @@ export default function (server: Server, ctx: AppContext) {
   getAccountInfos(server, ctx);
   getSubjectStatus(server, ctx);
   updateSubjectStatus(server, ctx);
+  return server;
 }

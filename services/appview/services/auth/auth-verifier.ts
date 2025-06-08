@@ -1,5 +1,5 @@
 import { KeyObject } from "node:crypto";
-import { IncomingHttpHeaders, IncomingMessage } from "node:http";
+import { IncomingHttpHeaders } from "node:http";
 import * as ui8 from "npm:uint8arrays";
 import * as jose from "npm:jose";
 import { verify } from "hono/jwt";
@@ -12,7 +12,7 @@ import {
   parseReqNsid,
   verifyJwt,
   VerifySignatureWithKeyFn,
-} from "@atproto/xrpc-server";
+} from "@sprk/xrpc-server";
 import {
   Code,
   DataPlaneClient,
@@ -22,6 +22,7 @@ import {
   unpackIdentityKeys,
 } from "../data-plane/client/index.ts";
 import { SignatureAlgorithm } from "hono/utils/jwt/jwa";
+import { HonoRequest } from "hono";
 
 interface MinimalRequest {
   url?: string;
@@ -45,35 +46,39 @@ export enum RoleStatus {
   Missing,
 }
 
-type NullOutput = {
+export type NullOutput = {
   credentials: {
     type: "none";
     iss: null;
   };
+  artifacts: unknown;
 };
 
-type StandardOutput = {
+export type StandardOutput = {
   credentials: {
     type: "standard";
     aud: string;
     iss: string;
   };
+  artifacts: unknown;
 };
 
-type RoleOutput = {
+export type RoleOutput = {
   credentials: {
     type: "role";
     admin: boolean;
   };
+  artifacts: unknown;
 };
 
 // NOTE this is not currently used, but is here for future use when we support mod services in future
-type ModServiceOutput = {
+export type ModServiceOutput = {
   credentials: {
     type: "mod_service";
     aud: string;
     iss: string;
   };
+  artifacts: unknown;
 };
 
 const ALLOWED_AUTH_SCOPES = new Set([
@@ -92,32 +97,39 @@ export type AuthVerifierOpts = {
 
 export interface ExtendedAuthVerifier {
   optionalStandardOrRole: (
-    ctx: ReqCtx,
+    ctx: AuthVerifierContext,
   ) => Promise<StandardOutput | RoleOutput | NullOutput>;
-  standardOrRole: (ctx: ReqCtx) => Promise<StandardOutput | RoleOutput>;
-  standard: (ctx: ReqCtx) => Promise<StandardOutput>;
-  role: (ctx: ReqCtx) => RoleOutput;
-  modService: (ctx: ReqCtx) => Promise<ModServiceOutput>;
-  roleOrModService: (ctx: ReqCtx) => Promise<RoleOutput | ModServiceOutput>;
+  standardOrRole: (
+    ctx: AuthVerifierContext,
+  ) => Promise<StandardOutput | RoleOutput>;
+  standard: (ctx: AuthVerifierContext) => Promise<StandardOutput>;
+  role: (ctx: AuthVerifierContext) => RoleOutput;
+  modService: (ctx: AuthVerifierContext) => Promise<ModServiceOutput>;
+  roleOrModService: (
+    ctx: AuthVerifierContext,
+  ) => Promise<RoleOutput | ModServiceOutput>;
   parseCreds: (
-    creds: StandardOutput | RoleOutput | ModServiceOutput | NullOutput,
+    auth: StandardOutput | RoleOutput | NullOutput | ModServiceOutput,
   ) => {
     viewer: string | null;
     includeTakedowns: boolean;
     include3pBlocks: boolean;
     canPerformTakedown: boolean;
   };
-  standardOptional: (ctx: ReqCtx) => Promise<StandardOutput | NullOutput>;
-  standardOptionalParameterized: (opts: StandardAuthOpts) => (
-    ctx: ReqCtx,
+  standardOptional: (
+    ctx: AuthVerifierContext,
   ) => Promise<StandardOutput | NullOutput>;
-  entrywaySession: (reqCtx: ReqCtx) => Promise<StandardOutput>;
+  standardOptionalParameterized: (opts: StandardAuthOpts) => (
+    ctx: AuthVerifierContext,
+  ) => Promise<StandardOutput | NullOutput>;
+  entrywaySession: (reqCtx: AuthVerifierContext) => Promise<StandardOutput>;
   parseRoleCreds: (req: MinimalRequest) => {
     status: RoleStatus;
     admin: boolean;
+    type?: "role";
   };
   verifyServiceJwt: (
-    reqCtx: ReqCtx,
+    reqCtx: AuthVerifierContext,
     opts: {
       iss: string[] | null;
       aud: string | null;
@@ -144,10 +156,11 @@ export function createAuthVerifier(
   const impl = new AuthVerifierImpl(dataplane, opts);
 
   // Create the callable function
-  const verifier = (ctx: AuthVerifierContext): Promise<AuthOutput> => {
-    const adaptedReq = adaptRequest(ctx.req);
-    return impl.optionalStandardOrRole({ req: adaptedReq });
-  };
+  const verifier = ((
+    ctx: AuthVerifierContext,
+  ): Promise<StandardOutput | RoleOutput | NullOutput> => {
+    return impl.optionalStandardOrRole(ctx);
+  }) as unknown as AuthVerifier;
 
   // Add properties and methods
   verifier.ownDid = opts.ownDid;
@@ -160,7 +173,12 @@ export function createAuthVerifier(
   verifier.entrywayJwtPublicKey = opts.entrywayJwtPublicKey;
 
   // Add all methods from impl
-  verifier.optionalStandardOrRole = impl.optionalStandardOrRole;
+  verifier.optionalStandardOrRole = (ctx: AuthVerifierContext) => {
+    if ("c" in ctx) {
+      return impl.optionalStandardOrRole(ctx);
+    }
+    return impl.optionalStandardOrRole(ctx as AuthVerifierContext);
+  };
   verifier.standardOrRole = impl.standardOrRole;
   verifier.standard = impl.standard;
   verifier.role = impl.role;
@@ -203,8 +221,7 @@ class AuthVerifierImpl {
   // verifiers (arrow fns to preserve scope)
   standardOptionalParameterized =
     (opts: StandardAuthOpts) =>
-    async (ctx: ReqCtx): Promise<StandardOutput | NullOutput> => {
-      // @TODO remove! basic auth + did supported just for testing.
+    async (ctx: AuthVerifierContext): Promise<StandardOutput | NullOutput> => {
       if (isBasicToken(ctx.req)) {
         const aud = this.ownDid;
         const iss = ctx.req.header("appview-as-did");
@@ -216,13 +233,12 @@ class AuthVerifierImpl {
         }
         return {
           credentials: { type: "standard", iss, aud },
+          artifacts: null,
         };
       } else if (isBearerToken(ctx.req)) {
-        // @NOTE temporarily accept entryway session tokens to shed load from PDS instances
         const token = bearerTokenFromReq(ctx.req);
         const header = token ? jose.decodeProtectedHeader(token) : undefined;
         if (header?.typ === "at+jwt") {
-          // we should never use entryway session tokens in the case of flexible auth audiences (namely in the case of getFeed)
           if (opts.skipAudCheck) {
             throw new AuthRequiredError("Malformed token", "InvalidToken");
           }
@@ -246,16 +262,19 @@ class AuthVerifierImpl {
             iss,
             aud,
           },
+          artifacts: null,
         };
       } else {
         return this.nullCreds();
       }
     };
 
-  standardOptional: (ctx: ReqCtx) => Promise<StandardOutput | NullOutput> = this
+  standardOptional: (
+    ctx: AuthVerifierContext,
+  ) => Promise<StandardOutput | NullOutput> = this
     .standardOptionalParameterized({});
 
-  standard = async (ctx: ReqCtx): Promise<StandardOutput> => {
+  standard = async (ctx: AuthVerifierContext): Promise<StandardOutput> => {
     const output = await this.standardOptional(ctx);
     if (output.credentials.type === "none") {
       throw new AuthRequiredError(undefined, "AuthMissing");
@@ -263,7 +282,7 @@ class AuthVerifierImpl {
     return output as StandardOutput;
   };
 
-  role = (ctx: ReqCtx): RoleOutput => {
+  role = (ctx: AuthVerifierContext): RoleOutput => {
     const creds = this.parseRoleCreds(ctx.req);
     if (creds.status !== RoleStatus.Valid) {
       throw new AuthRequiredError();
@@ -273,19 +292,32 @@ class AuthVerifierImpl {
         ...creds,
         type: "role",
       },
+      artifacts: null,
     };
   };
 
-  standardOrRole = (ctx: ReqCtx): Promise<StandardOutput> | RoleOutput => {
+  standardOrRole = async (
+    ctx: AuthVerifierContext,
+  ): Promise<StandardOutput | RoleOutput> => {
     if (isBearerToken(ctx.req)) {
-      return this.standard(ctx);
+      return await this.standard(ctx);
     } else {
-      return this.role(ctx);
+      const creds = this.parseRoleCreds(ctx.req);
+      if (creds.status !== RoleStatus.Valid) {
+        throw new AuthRequiredError();
+      }
+      return {
+        credentials: {
+          ...creds,
+          type: "role" as const,
+        },
+        artifacts: null,
+      };
     }
   };
 
   optionalStandardOrRole = async (
-    ctx: ReqCtx,
+    ctx: AuthVerifierContext,
   ): Promise<StandardOutput | RoleOutput | NullOutput> => {
     if (isBearerToken(ctx.req)) {
       return await this.standard(ctx);
@@ -297,6 +329,7 @@ class AuthVerifierImpl {
             ...creds,
             type: "role",
           },
+          artifacts: null,
         };
       } else if (creds.status === RoleStatus.Missing) {
         return this.nullCreds();
@@ -309,13 +342,14 @@ class AuthVerifierImpl {
   // @NOTE this auth verifier method is not recommended to be implemented by most appviews
   // this is a short term fix to remove proxy load from Bluesky's PDS and in line with possible
   // future plans to have the client talk directly with the appview
-  entrywaySession = async (reqCtx: ReqCtx): Promise<StandardOutput> => {
-    const token = bearerTokenFromReq(reqCtx.req);
+  entrywaySession = async (
+    ctx: AuthVerifierContext,
+  ): Promise<StandardOutput> => {
+    const token = bearerTokenFromReq(ctx.req);
     if (!token) {
       throw new AuthRequiredError(undefined, "AuthMissing");
     }
 
-    // if entryway jwt key not configured then do not parsed these tokens
     if (!this.entrywayJwtPublicKey) {
       throw new AuthRequiredError("Malformed token", "InvalidToken");
     }
@@ -351,36 +385,52 @@ class AuthVerifierImpl {
         aud: this.ownDid,
         iss: sub,
       },
+      artifacts: null,
     };
   };
 
-  modService = async (reqCtx: ReqCtx): Promise<ModServiceOutput> => {
-    const { iss, aud } = await this.verifyServiceJwt(reqCtx, {
+  modService = async (ctx: AuthVerifierContext): Promise<ModServiceOutput> => {
+    const { iss, aud } = await this.verifyServiceJwt(ctx, {
       aud: this.ownDid,
       iss: [this.modServiceDid, `${this.modServiceDid}#atproto_labeler`],
     });
-    return { credentials: { type: "mod_service", aud, iss } };
+    return {
+      credentials: { type: "mod_service", aud, iss },
+      artifacts: null,
+    };
   };
 
-  roleOrModService = (
-    reqCtx: ReqCtx,
-  ): Promise<ModServiceOutput> | RoleOutput => {
+  roleOrModService = async (
+    reqCtx: AuthVerifierContext,
+  ): Promise<RoleOutput | ModServiceOutput> => {
     if (isBearerToken(reqCtx.req)) {
-      return this.modService(reqCtx);
+      return await this.modService(reqCtx);
     } else {
-      return this.role(reqCtx);
+      const creds = this.parseRoleCreds(reqCtx.req);
+      if (creds.status !== RoleStatus.Valid) {
+        throw new AuthRequiredError();
+      }
+      return {
+        credentials: {
+          ...creds,
+          type: "role" as const,
+        },
+        artifacts: null,
+      };
     }
   };
 
-  parseRoleCreds(req: MinimalRequest) {
+  parseRoleCreds(
+    req: MinimalRequest | HonoRequest,
+  ): { status: RoleStatus; admin: boolean; type?: "role" } {
     const parsed = parseBasicAuth(req.header("Authorization") || "");
     const { Missing, Valid, Invalid } = RoleStatus;
     if (!parsed) {
-      return { status: Missing, admin: false, moderator: false, triage: false };
+      return { status: Missing, admin: false };
     }
     const { username, password } = parsed;
     if (username === "admin" && this.adminPasses.has(password)) {
-      return { status: Valid, admin: true };
+      return { status: Valid, admin: true, type: "role" as const };
     }
     return { status: Invalid, admin: false };
   }
@@ -388,7 +438,7 @@ class AuthVerifierImpl {
   // @NOTE this is not currently used, but is here for future use when we support mod services in future
   // and potentially for payment providers
   async verifyServiceJwt(
-    reqCtx: ReqCtx,
+    reqCtx: AuthVerifierContext,
     opts: {
       iss: string[] | null;
       aud: string | null;
@@ -423,10 +473,7 @@ class AuthVerifierImpl {
       return didKey;
     };
     const assertLxmCheck = () => {
-      const lxm = parseReqNsid({
-        url: reqCtx.req.url,
-        method: reqCtx.req.method,
-      } as IncomingMessage);
+      const lxm = parseReqNsid(reqCtx.req);
       if (
         (opts.lxmCheck && !opts.lxmCheck(payload.lxm)) ||
         (!opts.lxmCheck && payload.lxm !== lxm)
@@ -476,29 +523,24 @@ class AuthVerifierImpl {
         type: "none",
         iss: null,
       },
+      artifacts: null,
     };
   }
 
   parseCreds(
-    creds: StandardOutput | RoleOutput | ModServiceOutput | NullOutput,
+    auth: StandardOutput | RoleOutput | NullOutput | ModServiceOutput,
   ) {
-    const viewer = creds.credentials.type === "standard"
-      ? creds.credentials.iss
-      : null;
-    const includeTakedownsAnd3pBlocks =
-      (creds.credentials.type === "role" && creds.credentials.admin) ||
-      creds.credentials.type === "mod_service" ||
-      (creds.credentials.type === "standard" &&
-        this.isModService(creds.credentials.iss));
-    const canPerformTakedown =
-      (creds.credentials.type === "role" && creds.credentials.admin) ||
-      creds.credentials.type === "mod_service";
-
+    const creds = auth.credentials;
+    const isAdmin = creds.type === "role" && creds.admin;
+    const isModService =
+      (creds.type === "standard" || creds.type === "mod_service") &&
+      creds.iss && this.isModService(creds.iss);
+    const includeTakedownsAnd3pBlocks = Boolean(isAdmin || isModService);
     return {
-      viewer,
+      viewer: creds.type === "standard" ? creds.iss : null,
       includeTakedowns: includeTakedownsAnd3pBlocks,
       include3pBlocks: includeTakedownsAnd3pBlocks,
-      canPerformTakedown,
+      canPerformTakedown: includeTakedownsAnd3pBlocks,
     };
   }
 }
@@ -509,15 +551,15 @@ class AuthVerifierImpl {
 const BEARER = "Bearer ";
 const BASIC = "Basic ";
 
-const isBearerToken = (req: MinimalRequest): boolean => {
+const isBearerToken = (req: MinimalRequest | HonoRequest): boolean => {
   return req.header("Authorization")?.startsWith(BEARER) ?? false;
 };
 
-const isBasicToken = (req: MinimalRequest): boolean => {
+const isBasicToken = (req: MinimalRequest | HonoRequest): boolean => {
   return req.header("Authorization")?.startsWith(BASIC) ?? false;
 };
 
-const bearerTokenFromReq = (req: MinimalRequest) => {
+const bearerTokenFromReq = (req: MinimalRequest | HonoRequest) => {
   const header = req.header("Authorization") || "";
   if (!header.startsWith(BEARER)) return null;
   return header.slice(BEARER.length).trim();
@@ -571,14 +613,3 @@ export const verifySignatureWithKey: VerifySignatureWithKeyFn = async (
 
   return cryptoVerifySignatureWithKey(didKey, msgBytes, sigBytes, alg);
 };
-
-// Helper function to adapt request
-function adaptRequest(req: IncomingMessage): MinimalRequest {
-  return {
-    url: req.url,
-    method: req.method,
-    header: (name: string) =>
-      req.headers[name.toLowerCase()] as string | undefined,
-    headers: req.headers,
-  };
-}
