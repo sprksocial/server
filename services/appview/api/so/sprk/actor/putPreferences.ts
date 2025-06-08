@@ -1,23 +1,16 @@
-import { Hono } from "hono";
-import { AppContext, AppEnv } from "../../../../main.ts";
-import { authMiddleware } from "../../../../services/auth/middleware.ts";
+import { Server } from "../../../../lexicon/index.ts";
+import { AppContext } from "../../../../main.ts";
 import * as SoSprkActorPutPreferences from "../../../../lexicon/types/so/sprk/actor/putPreferences.ts";
 
-export const createPutPreferencesRouter = (ctx: AppContext) => {
-  const router = new Hono<AppEnv>();
-
-  router.post(
-    "/xrpc/so.sprk.actor.putPreferences",
-    authMiddleware,
-    async (c) => {
-      const userDid = c.get("did") as string;
-      const body = await c.req.json() as SoSprkActorPutPreferences.InputSchema;
+export default function (server: Server, ctx: AppContext) {
+  server.so.sprk.actor.putPreferences({
+    auth: ctx.authVerifier.standard,
+    handler: async ({ input, auth }) => {
+      const userDid = auth.credentials.iss;
+      const body = input as SoSprkActorPutPreferences.InputSchema;
 
       if (body.followMode && !["bsky", "sprk"].includes(body.followMode)) {
-        return c.json(
-          { error: 'Invalid followMode parameter. Must be "bsky" or "sprk"' },
-          400,
-        );
+        throw new Error('Invalid followMode parameter. Must be "bsky" or "sprk"');
       }
 
       try {
@@ -41,21 +34,17 @@ export const createPutPreferencesRouter = (ctx: AppContext) => {
         }
 
         // Queue indexing of Bsky follows if switched to bsky mode
-        const indexingService = c.env.indexingService;
         if (body.followMode === "bsky" && oldMode !== "bsky") {
-          indexingService.indexBSkyFollows(userDid).catch((error) =>
+          ctx.indexingService.indexBSkyFollows(userDid).catch((error) =>
             ctx.logger.error({ error, userDid }, "Failed to index bsky follows")
           );
         }
 
-        // Respond with all current preferences, including the updated followMode
-        return c.json({ followMode: userPref.followMode }, 200);
+        return;
       } catch (error) {
         ctx.logger.error({ error, userDid }, "Failed to put preferences");
-        return c.json({ error: "Failed to put preferences" }, 500);
+        throw error;
       }
     },
-  );
-
-  return router;
-};
+  });
+}

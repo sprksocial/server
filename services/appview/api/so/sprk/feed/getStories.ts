@@ -1,11 +1,9 @@
-import { Hono } from "hono";
-
-import type * as SoSprkFeedDefs from "../../../../lexicon/types/so/sprk/feed/defs.ts";
-import { OutputSchema as GetStoriesView } from "../../../../lexicon/types/so/sprk/feed/getStories.ts";
-import { AppContext } from "../../../../main.ts";
-import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";
-import { Database } from "../../../../services/data-plane/server/index.ts";
-import { transformStoryToStoryView } from "../../../../utils/story-transformer.ts";
+import type * as SoSprkFeedDefs from '../../../../lexicon/types/so/sprk/feed/defs.ts'
+import { OutputSchema as GetStoriesView } from '../../../../lexicon/types/so/sprk/feed/getStories.ts'
+import { Server } from '../../../../lexicon/index.ts'
+import { AppContext } from '../../../../main.ts'
+import { Database } from '../../../../services/data-plane/server/index.ts'
+import { transformStoryToStoryView } from '../../../../utils/story-transformer.ts'
 
 // Function to fetch stories by URIs
 async function getStories(
@@ -34,23 +32,25 @@ async function getStories(
   return storyViews;
 }
 
-export const createGetStoriesRouter = (ctx: AppContext) => {
-  const router = new Hono();
-
-  router.get(
-    "/xrpc/so.sprk.feed.getStories",
-    optionalAuthMiddleware,
-    async (c) => {
-      const uris = c.req.queries("uris");
+export default function (server: Server, ctx: AppContext) {
+  server.so.sprk.feed.getStories({
+    auth: ctx.authVerifier.standardOptional,
+    handler: async ({ params }) => {
+      const { uris } = params;
 
       if (!uris || uris.length === 0) {
-        return c.json({ stories: [] } as GetStoriesView);
+        return {
+          encoding: "application/json",
+          body: { stories: [] } as GetStoriesView,
+        };
       }
 
       const stories = await getStories(uris, ctx.db);
 
-      return c.json({ stories } as GetStoriesView);
+      return {
+        encoding: "application/json",
+        body: { stories } as GetStoriesView,
+      };
     },
-  );
-  return router;
-};
+  });
+}

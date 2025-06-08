@@ -1,56 +1,36 @@
-import { Hono } from "hono";
-
+import { Server } from "../../../../lexicon/index.ts";
+import { AppContext } from "../../../../main.ts";
 import { OutputSchema as GetPostsView } from "../../../../lexicon/types/so/sprk/feed/getPosts.ts";
-import { AppContext, AppEnv } from "../../../../main.ts";
 import { transformPostToPostView } from "../../../../utils/post-transformer.ts";
-import { Database } from "../../../../services/data-plane/server/index.ts";
-import type * as SoSprkFeedDefs from "../../../../lexicon/types/so/sprk/feed/defs.ts";
-import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";
 
-// Function to fetch posts by URIs
-async function getPosts(
-  uris: string | string[],
-  db: Database,
-  userDid?: string,
-): Promise<SoSprkFeedDefs.PostView[]> {
-  if (!uris) {
-    return [];
-  }
-
-  const uriArray = Array.isArray(uris) ? uris : [uris];
-
-  if (uriArray.length === 0) {
-    return [];
-  }
-
-  const dbPosts = await db.models.Post.find({ uri: { $in: uriArray } }).lean();
-
-  // Transform each post to PostView format
-  const postViews = await Promise.all(
-    dbPosts.map((post) => transformPostToPostView(post, db, userDid)),
-  );
-
-  return postViews;
-}
-
-export const createGetPostsRouter = (ctx: AppContext) => {
-  const router = new Hono<AppEnv>();
-
-  router.get(
-    "/xrpc/so.sprk.feed.getPosts",
-    optionalAuthMiddleware,
-    async (c) => {
-      const uris = c.req.queries("uris");
-      const userDid = c.get("did") as string | undefined;
+export default function (server: Server, ctx: AppContext) {
+  server.so.sprk.feed.getPosts({
+    auth: ctx.authVerifier.standardOptional,
+    handler: async ({ params, auth }) => {
+      const { uris } = params;
+      const userDid = auth.credentials.type === "standard"
+        ? auth.credentials.iss
+        : undefined;
 
       if (!uris || uris.length === 0) {
-        return c.json({ posts: [] } as GetPostsView);
+        return {
+          encoding: "application/json",
+          body: { posts: [] } as GetPostsView,
+        };
       }
 
-      const posts = await getPosts(uris, ctx.db, userDid);
+      const uriArray = Array.isArray(uris) ? uris : [uris];
+      const dbPosts = await ctx.db.models.Post.find({ uri: { $in: uriArray } }).lean();
 
-      return c.json({ posts } as GetPostsView);
+      // Transform each post to PostView format
+      const postViews = await Promise.all(
+        dbPosts.map((post) => transformPostToPostView(post, ctx.db, userDid)),
+      );
+
+      return {
+        encoding: "application/json",
+        body: { posts: postViews } as GetPostsView,
+      };
     },
-  );
-  return router;
-};
+  });
+}

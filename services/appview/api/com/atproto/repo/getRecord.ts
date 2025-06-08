@@ -1,9 +1,7 @@
 import { AtUri } from "@atproto/syntax";
 import { InvalidRequestError } from "@sprk/xrpc-server";
-import { Hono } from "hono";
-
-import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";
-import { AppContext, AppEnv } from "../../../../main.ts";
+import { Server } from "../../../../lexicon/index.ts";
+import { AppContext } from "../../../../main.ts";
 import { OutputSchema } from "../../../../lexicon/types/com/atproto/repo/getRecord.ts";
 
 interface TakedownInfo {
@@ -13,18 +11,15 @@ interface TakedownInfo {
   warning: string;
 }
 
-export const createGetRecordRouter = (ctx: AppContext) => {
-  const router = new Hono<AppEnv>();
-
-  router.get(
-    "/xrpc/com.atproto.repo.getRecord",
-    optionalAuthMiddleware,
-    async (c) => {
-      const { repo, collection, rkey, cid } = c.req.query();
-      const isAdmin = c.get("isAdmin") as boolean | undefined;
+export default function (server: Server, ctx: AppContext) {
+  server.com.atproto.repo.getRecord({
+    auth: ctx.authVerifier.optionalStandardOrRole,
+    handler: async ({ params, auth }) => {
+      const { repo, collection, rkey, cid } = params;
+      const { includeTakedowns } = ctx.authVerifier.parseCreds(auth);
 
       if (!repo || !collection || !rkey) {
-        return c.json({ error: "Missing required parameters" }, 400);
+        throw new InvalidRequestError("Missing required parameters");
       }
 
       // Resolve the handle to DID if needed
@@ -62,8 +57,7 @@ export const createGetRecordRouter = (ctx: AppContext) => {
         } else if (collection.includes("look")) {
           record = await ctx.db.models.Look.findOne({ uri }).lean();
         } else if (collection.includes("profile")) {
-          record = await ctx.db.models.Profile.findOne({ authorDid: did })
-            .lean();
+          record = await ctx.db.models.Profile.findOne({ authorDid: did }).lean();
         } else if (collection.includes("follow")) {
           record = await ctx.db.models.Follow.findOne({ uri }).lean();
         } else if (collection.includes("block")) {
@@ -72,7 +66,7 @@ export const createGetRecordRouter = (ctx: AppContext) => {
 
         if (!record || (cid && record.cid !== cid)) {
           // For admins, provide more detailed information about what we tried to query
-          if (isAdmin) {
+          if (includeTakedowns) {
             ctx.logger.info({
               uri,
               collection,
@@ -90,7 +84,7 @@ export const createGetRecordRouter = (ctx: AppContext) => {
         const takedown = await ctx.takedownService.getTakedown(uri);
 
         // If record is taken down and user is not an admin, deny access
-        if (takedown && !isAdmin) {
+        if (takedown && !includeTakedowns) {
           throw new InvalidRequestError(`Record is taken down: ${uri}`);
         }
 
@@ -102,17 +96,19 @@ export const createGetRecordRouter = (ctx: AppContext) => {
         };
 
         // Include takedown info for admins
-        if (isAdmin && takedown) {
+        if (includeTakedowns && takedown) {
           response.takedown = {
             reason: takedown.reason,
             takenDownBy: takedown.takenDownBy,
             takenDownAt: takedown.takenDownAt,
-            warning:
-              "This content has been taken down and is only visible to admins",
+            warning: "This content has been taken down and is only visible to admins",
           };
         }
 
-        return c.json(response);
+        return {
+          encoding: "application/json",
+          body: response,
+        };
       } catch (err) {
         if (err instanceof InvalidRequestError) {
           throw err;
@@ -120,9 +116,5 @@ export const createGetRecordRouter = (ctx: AppContext) => {
         throw new InvalidRequestError(`Error retrieving record: ${uri}`);
       }
     },
-  );
-
-  return router;
-};
-
-export default (ctx: AppContext) => createGetRecordRouter(ctx);
+  });
+}

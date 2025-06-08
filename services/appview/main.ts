@@ -13,25 +13,12 @@ import {
   createIdResolver,
 } from "./utils/id-resolver.ts";
 import { takedownFilterMiddleware } from "./services/takedown-filter.ts";
-import { createGetProfileRouter } from "./api/so/sprk/actor/getProfile.ts";
-import { createSearchActorRouter } from "./api/so/sprk/actor/searchActors.ts";
-import { createGetAuthorFeedRouter } from "./api/so/sprk/feed/getAuthorFeed.ts";
-import { createGetPostsRouter } from "./api/so/sprk/feed/getPosts.ts";
-import { createGetPostThreadRouter } from "./api/so/sprk/feed/getPostThread.ts";
-import { createGetFollowersRouter } from "./api/so/sprk/graph/getFollowers.ts";
-import { createGetFollowsRouter } from "./api/so/sprk/graph/getFollows.ts";
-import { createGetRecordRouter } from "./api/com/atproto/repo/getRecord.ts";
-import { createResolveHandleRouter } from "./api/com/atproto/identity/resolveHandle.ts";
 import wellKnownRouter from "./utils/well-known.ts";
 import { TakedownService } from "./services/takedown.ts";
 import { IndexingService } from "./services/indexing.ts";
-import { createPutPreferencesRouter } from "./api/so/sprk/actor/putPreferences.ts";
-import { createGetPreferencesRouter } from "./api/so/sprk/actor/getPreferences.ts";
 import { BidirectionalResolver } from "./utils/id-resolver.ts";
 import { DidResolver } from "@atproto/identity";
 import { AuthVerifier } from "./services/auth/auth-verifier.ts";
-import { createGetStoriesTimelineRouter } from "./api/so/sprk/feed/getStoriesTimeline.ts";
-import { createGetStoriesRouter } from "./api/so/sprk/feed/getStories.ts";
 import { AuthRequiredError } from "@sprk/xrpc-server";
 
 // Setup logger and database
@@ -103,19 +90,6 @@ app.use("*", takedownFilterMiddleware);
 const lexServer = createServer();
 API(lexServer, ctx);
 
-app.route("/", createGetPostsRouter(ctx));
-app.route("/", createGetStoriesRouter(ctx));
-app.route("/", createGetStoriesTimelineRouter(ctx));
-app.route("/", createGetPostThreadRouter(ctx));
-app.route("/", createGetProfileRouter(ctx));
-app.route("/", createGetFollowersRouter(ctx));
-app.route("/", createGetFollowsRouter(ctx));
-app.route("/", createGetAuthorFeedRouter(ctx));
-app.route("/", createSearchActorRouter(ctx));
-app.route("/", createGetRecordRouter(ctx));
-app.route("/", createResolveHandleRouter(ctx));
-app.route("/", createPutPreferencesRouter(ctx));
-app.route("/", createGetPreferencesRouter(ctx));
 app.route("/", wellKnownRouter());
 app.route("/", lexServer.xrpc.routes);
 

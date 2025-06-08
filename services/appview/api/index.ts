@@ -3,10 +3,35 @@ import { AppContext } from "../main.ts";
 import getAccountInfos from "./com/atproto/admin/getAccountInfos.ts";
 import getSubjectStatus from "./com/atproto/admin/getSubjectStatus.ts";
 import updateSubjectStatus from "./com/atproto/admin/updateSubjectStatus.ts";
+import getPosts from "./so/sprk/feed/getPosts.ts";
+import getProfile from "./so/sprk/actor/getProfile.ts";
+import getAuthorFeed from "./so/sprk/feed/getAuthorFeed.ts";
+import getPostThread from "./so/sprk/feed/getPostThread.ts";
+import getFollows from "./so/sprk/graph/getFollows.ts";
+import getFollowers from "./so/sprk/graph/getFollowers.ts";
+import putPreferences from "./so/sprk/actor/putPreferences.ts";
+import getPreferences from "./so/sprk/actor/getPreferences.ts";
+import searchActors from "./so/sprk/actor/searchActors.ts";
+import getRecord from "./com/atproto/repo/getRecord.ts";
+import resolveHandle from "./com/atproto/identity/resolveHandle.ts";
+import getStories from "./so/sprk/feed/getStories.ts";
+import getStoriesTimeline from "./so/sprk/feed/getStoriesTimeline.ts";
 
 export default function (server: Server, ctx: AppContext) {
   getAccountInfos(server, ctx);
   getSubjectStatus(server, ctx);
   updateSubjectStatus(server, ctx);
-  return server;
+  getPosts(server, ctx);
+  getProfile(server, ctx);
+  getAuthorFeed(server, ctx);
+  getPostThread(server, ctx);
+  getFollows(server, ctx);
+  getFollowers(server, ctx);
+  putPreferences(server, ctx);
+  getPreferences(server, ctx);
+  searchActors(server, ctx);
+  getRecord(server, ctx);
+  resolveHandle(server, ctx);
+  getStories(server, ctx);
+  getStoriesTimeline(server, ctx);
 }

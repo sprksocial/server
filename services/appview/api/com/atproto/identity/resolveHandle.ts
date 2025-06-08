@@ -1,25 +1,26 @@
 import * as ident from "@atproto/syntax";
 import { InvalidRequestError } from "@sprk/xrpc-server";
+import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { Hono } from "hono";
 
-export const createResolveHandleRouter = (ctx: AppContext) => {
-  const router = new Hono();
+export default function (server: Server, ctx: AppContext) {
+  server.com.atproto.identity.resolveHandle({
+    handler: async ({ params }) => {
+      const { handle } = params;
+      if (!handle) {
+        throw new InvalidRequestError("Missing handle");
+      }
 
-  router.get("/xrpc/com.atproto.identity.resolveHandle", async (c) => {
-    if (!c.req.query("handle")) {
-      throw new InvalidRequestError("Missing handle");
-    }
+      const normalizedHandle = ident.normalizeHandle(handle);
+      const actor = await ctx.db.models.Actor.findOne({ handle: normalizedHandle });
+      if (!actor) {
+        throw new InvalidRequestError("Unable to resolve handle");
+      }
 
-    const handle = ident.normalizeHandle(c.req.query("handle")!);
-
-    const actor = await ctx.db.models.Actor.findOne({ handle });
-    if (!actor) {
-      throw new InvalidRequestError("Unable to resolve handle");
-    }
-
-    return c.json({ did: actor.did });
+      return {
+        encoding: "application/json",
+        body: { did: actor.did },
+      };
+    },
   });
-
-  return router;
-};
+}
