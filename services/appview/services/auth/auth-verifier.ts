@@ -100,12 +100,14 @@ export interface ExtendedAuthVerifier {
     ctx: AuthVerifierContext,
   ) => Promise<StandardOutput | RoleOutput | NullOutput>;
   standardOrRole: (
-    ctx: AuthVerifierContext
+    ctx: AuthVerifierContext,
   ) => Promise<StandardOutput | RoleOutput>;
   standard: (ctx: AuthVerifierContext) => Promise<StandardOutput>;
   role: (ctx: AuthVerifierContext) => RoleOutput;
   modService: (ctx: AuthVerifierContext) => Promise<ModServiceOutput>;
-  roleOrModService: (ctx: AuthVerifierContext) => Promise<RoleOutput | ModServiceOutput>;
+  roleOrModService: (
+    ctx: AuthVerifierContext,
+  ) => Promise<RoleOutput | ModServiceOutput>;
   parseCreds: (
     auth: StandardOutput | RoleOutput | NullOutput | ModServiceOutput,
   ) => {
@@ -114,7 +116,9 @@ export interface ExtendedAuthVerifier {
     include3pBlocks: boolean;
     canPerformTakedown: boolean;
   };
-  standardOptional: (ctx: AuthVerifierContext) => Promise<StandardOutput | NullOutput>;
+  standardOptional: (
+    ctx: AuthVerifierContext,
+  ) => Promise<StandardOutput | NullOutput>;
   standardOptionalParameterized: (opts: StandardAuthOpts) => (
     ctx: AuthVerifierContext,
   ) => Promise<StandardOutput | NullOutput>;
@@ -152,7 +156,9 @@ export function createAuthVerifier(
   const impl = new AuthVerifierImpl(dataplane, opts);
 
   // Create the callable function
-  const verifier = ((ctx: AuthVerifierContext): Promise<StandardOutput | RoleOutput | NullOutput> => {
+  const verifier = ((
+    ctx: AuthVerifierContext,
+  ): Promise<StandardOutput | RoleOutput | NullOutput> => {
     return impl.optionalStandardOrRole(ctx);
   }) as unknown as AuthVerifier;
 
@@ -168,7 +174,7 @@ export function createAuthVerifier(
 
   // Add all methods from impl
   verifier.optionalStandardOrRole = (ctx: AuthVerifierContext) => {
-    if ('c' in ctx) {
+    if ("c" in ctx) {
       return impl.optionalStandardOrRole(ctx);
     }
     return impl.optionalStandardOrRole(ctx as AuthVerifierContext);
@@ -263,7 +269,9 @@ class AuthVerifierImpl {
       }
     };
 
-  standardOptional: (ctx: AuthVerifierContext) => Promise<StandardOutput | NullOutput> = this
+  standardOptional: (
+    ctx: AuthVerifierContext,
+  ) => Promise<StandardOutput | NullOutput> = this
     .standardOptionalParameterized({});
 
   standard = async (ctx: AuthVerifierContext): Promise<StandardOutput> => {
@@ -288,7 +296,9 @@ class AuthVerifierImpl {
     };
   };
 
-  standardOrRole = async (ctx: AuthVerifierContext): Promise<StandardOutput | RoleOutput> => {
+  standardOrRole = async (
+    ctx: AuthVerifierContext,
+  ): Promise<StandardOutput | RoleOutput> => {
     if (isBearerToken(ctx.req)) {
       return await this.standard(ctx);
     } else {
@@ -332,7 +342,9 @@ class AuthVerifierImpl {
   // @NOTE this auth verifier method is not recommended to be implemented by most appviews
   // this is a short term fix to remove proxy load from Bluesky's PDS and in line with possible
   // future plans to have the client talk directly with the appview
-  entrywaySession = async (ctx: AuthVerifierContext): Promise<StandardOutput> => {
+  entrywaySession = async (
+    ctx: AuthVerifierContext,
+  ): Promise<StandardOutput> => {
     const token = bearerTokenFromReq(ctx.req);
     if (!token) {
       throw new AuthRequiredError(undefined, "AuthMissing");
@@ -382,7 +394,7 @@ class AuthVerifierImpl {
       aud: this.ownDid,
       iss: [this.modServiceDid, `${this.modServiceDid}#atproto_labeler`],
     });
-    return { 
+    return {
       credentials: { type: "mod_service", aud, iss },
       artifacts: null,
     };
@@ -409,7 +421,7 @@ class AuthVerifierImpl {
   };
 
   parseRoleCreds(
-    req: MinimalRequest | HonoRequest
+    req: MinimalRequest | HonoRequest,
   ): { status: RoleStatus; admin: boolean; type?: "role" } {
     const parsed = parseBasicAuth(req.header("Authorization") || "");
     const { Missing, Valid, Invalid } = RoleStatus;
@@ -515,13 +527,17 @@ class AuthVerifierImpl {
     };
   }
 
-  parseCreds(auth: StandardOutput | RoleOutput | NullOutput | ModServiceOutput) {
+  parseCreds(
+    auth: StandardOutput | RoleOutput | NullOutput | ModServiceOutput,
+  ) {
     const creds = auth.credentials;
-    const isAdmin = creds.type === 'role' && creds.admin;
-    const isModService = (creds.type === 'standard' || creds.type === 'mod_service') && creds.iss && this.isModService(creds.iss);
+    const isAdmin = creds.type === "role" && creds.admin;
+    const isModService =
+      (creds.type === "standard" || creds.type === "mod_service") &&
+      creds.iss && this.isModService(creds.iss);
     const includeTakedownsAnd3pBlocks = Boolean(isAdmin || isModService);
     return {
-      viewer: creds.type === 'standard' ? creds.iss : null,
+      viewer: creds.type === "standard" ? creds.iss : null,
       includeTakedowns: includeTakedownsAnd3pBlocks,
       include3pBlocks: includeTakedownsAnd3pBlocks,
       canPerformTakedown: includeTakedownsAnd3pBlocks,

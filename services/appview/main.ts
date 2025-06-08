@@ -129,9 +129,12 @@ app.get("/", (c) => {
 // Error handling
 app.onError((err, c) => {
   if (err instanceof HTTPException) return err.getResponse();
-  
+
   // Handle AuthRequiredError from XRPC server
-  if (err instanceof AuthRequiredError || err.constructor?.name === "AuthRequiredError") {
+  if (
+    err instanceof AuthRequiredError ||
+    err.constructor?.name === "AuthRequiredError"
+  ) {
     const authErr = err as AuthRequiredError;
     return c.json({
       error: authErr.message || "Authentication Required",

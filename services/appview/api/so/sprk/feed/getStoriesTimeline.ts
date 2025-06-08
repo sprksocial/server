@@ -129,14 +129,10 @@ export const createGetStoriesTimelineRouter = (ctx: AppContext) => {
         // Sort author groups by the latest story from each author (newest first)
         storiesByAuthor.sort((a, b) => {
           const latestA = Math.max(
-            ...a.stories.map((s) =>
-              new Date(s.indexedAt).getTime()
-            ),
+            ...a.stories.map((s) => new Date(s.indexedAt).getTime()),
           );
           const latestB = Math.max(
-            ...b.stories.map((s) =>
-              new Date(s.indexedAt).getTime()
-            ),
+            ...b.stories.map((s) => new Date(s.indexedAt).getTime()),
           );
           return latestB - latestA;
         });
