@@ -1,4 +1,4 @@
-import { Env, Hono } from "hono";
+import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
@@ -28,7 +28,7 @@ import { IndexingService } from "./services/indexing.ts";
 import { createPutPreferencesRouter } from "./api/so/sprk/actor/putPreferences.ts";
 import { createGetPreferencesRouter } from "./api/so/sprk/actor/getPreferences.ts";
 import { BidirectionalResolver } from "./utils/id-resolver.ts";
-import { DidResolver } from "npm:@atproto/identity";
+import { DidResolver } from "@atproto/identity";
 import { AuthVerifier } from "./services/auth/auth-verifier.ts";
 import { createGetStoriesTimelineRouter } from "./api/so/sprk/feed/getStoriesTimeline.ts";
 import { createGetStoriesRouter } from "./api/so/sprk/feed/getStories.ts";
@@ -65,7 +65,7 @@ export type AppContext = {
   authVerifier: AuthVerifier;
 };
 
-export type AppEnv = Env & {
+export type AppEnv = {
   Bindings: AppContext;
   Variables: {
     did: string;
@@ -135,13 +135,13 @@ app.onError((err, c) => {
     const authErr = err as AuthRequiredError;
     return c.json({
       error: authErr.message || "Authentication Required",
-      message: authErr.message || "Invalid credentials",
+      message: authErr.message || "Invalid or missing credentials",
     }, 401);
   }
 
   appLogger.error({ err }, "Server error");
   return c.json({
-    error: "InternalServerError",
+    error: "Internal Server Error",
     message: "An unexpected error occurred",
   }, 500);
 });
