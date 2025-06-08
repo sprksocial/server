@@ -10,10 +10,6 @@ export default function (server: Server<AppEnv>, ctx: AppContext) {
     handler: async ({ params, auth }) => {
       const { dids } = params;
 
-      if (auth.credentials.type === "none") {
-        throw new AuthRequiredError("Requires admin privileges");
-      }
-
       const { includeTakedowns } = ctx.authVerifier.parseCreds(auth);
       if (!includeTakedowns) {
         throw new AuthRequiredError("Requires admin privileges");
