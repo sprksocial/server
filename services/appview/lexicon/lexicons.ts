@@ -22183,6 +22183,16 @@ export const schemaDict = {
         "type": "token",
         "description": "Appeal: appeal a previously taken moderation action",
       },
+      "subjectType": {
+        "type": "string",
+        "description":
+          "Tag describing a type of subject that might be reported.",
+        "knownValues": [
+          "account",
+          "record",
+          "chat",
+        ],
+      },
     },
   },
   "ComAtprotoModerationCreateReport": {

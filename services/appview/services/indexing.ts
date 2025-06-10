@@ -141,7 +141,7 @@ export class IndexingService {
         return;
       }
 
-      // Resolve DID to handle and get DID document
+      // Resolve DID to handle
       const didDoc = await this.resolver.resolveDidToDidDoc(did);
 
       // Verify handle ownership
@@ -167,18 +167,12 @@ export class IndexingService {
         }
       }
 
-      // Store the DID document's keys and services
-      const keys = JSON.stringify(didDoc.verificationMethod || {});
-      const services = JSON.stringify(didDoc.service || {});
-
       await this.db.models.Actor.updateOne(
         { did },
         {
           $set: {
             handle,
             indexedAt: timestamp,
-            keys,
-            services,
           },
         },
         { upsert: true },

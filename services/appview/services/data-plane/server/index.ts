@@ -3,7 +3,6 @@ import { pino } from "pino";
 import { IdResolver, MemoryCache } from "@atproto/identity";
 import { env } from "../../../utils/env.ts";
 import { DataPlaneClient, GetIdentityByDidResponse } from "../client/index.ts";
-import { Buffer } from "node:buffer";
 
 const HOUR = 60e3 * 60;
 const DAY = HOUR * 24;

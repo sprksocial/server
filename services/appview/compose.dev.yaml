@@ -30,6 +30,8 @@ services:
       DB_PASSWORD: mongo
       DB_NAME: dev
       ADMIN_PASSWORD: "00000000000000000000000000000000"
+    env_file:
+      - .env
     ports:
       - "4000:3000"
     depends_on:
