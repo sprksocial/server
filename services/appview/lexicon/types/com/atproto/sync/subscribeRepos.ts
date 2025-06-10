@@ -1,14 +1,9 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { BlobRef, type ValidationResult } from "@atproto/lexicon";
 import { CID } from "multiformats/cid";
-import { validate as _validate } from "../../../../lexicons";
-import {
-  type $Typed,
-  is$typed as _is$typed,
-  type OmitKey,
-} from "../../../../util";
+import { validate as _validate } from "../../../../lexicons.ts";
+import { is$typed as _is$typed } from "../../../../util.ts";
 import { ErrorFrame, HandlerAuth } from "@sprk/xrpc-server";
 import { IncomingMessage } from "node:http";
 
@@ -112,7 +107,7 @@ export interface Account {
     | "suspended"
     | "deleted"
     | "deactivated"
-    | (string & {});
+    | (string & Record<PropertyKey, never>);
 }
 
 const hashAccount = "account";
@@ -183,7 +178,7 @@ export function validateTombstone<V>(v: V) {
 
 export interface Info {
   $type?: "com.atproto.sync.subscribeRepos#info";
-  name: "OutdatedCursor" | (string & {});
+  name: "OutdatedCursor" | (string & Record<PropertyKey, never>);
   message?: string;
 }
 
@@ -200,7 +195,11 @@ export function validateInfo<V>(v: V) {
 /** A repo operation, ie a mutation of a single record. */
 export interface RepoOp {
   $type?: "com.atproto.sync.subscribeRepos#repoOp";
-  action: "create" | "update" | "delete" | (string & {});
+  action:
+    | "create"
+    | "update"
+    | "delete"
+    | (string & Record<PropertyKey, never>);
   path: string;
   /** For creates and updates, the new record CID. For deletions, null. */
   cid: CID | null;

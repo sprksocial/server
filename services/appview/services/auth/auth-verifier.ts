@@ -226,44 +226,45 @@ class AuthVerifierImpl {
         const aud = this.ownDid;
         const iss = ctx.req.header("appview-as-did");
         if (typeof iss !== "string" || !iss.startsWith("did:")) {
-          throw new AuthRequiredError("bad issuer");
+          return this.nullCreds();
         }
         if (!this.parseRoleCreds(ctx.req).admin) {
-          throw new AuthRequiredError("bad credentials");
+          return this.nullCreds();
         }
         return {
           credentials: { type: "standard", iss, aud },
           artifacts: null,
         };
       } else if (isBearerToken(ctx.req)) {
-        const token = bearerTokenFromReq(ctx.req);
-        const header = token ? jose.decodeProtectedHeader(token) : undefined;
-        if (header?.typ === "at+jwt") {
-          if (opts.skipAudCheck) {
-            throw new AuthRequiredError("Malformed token", "InvalidToken");
+        try {
+          const token = bearerTokenFromReq(ctx.req);
+          const header = token ? jose.decodeProtectedHeader(token) : undefined;
+          if (header?.typ === "at+jwt") {
+            if (opts.skipAudCheck) {
+              return this.nullCreds();
+            }
+            return this.entrywaySession(ctx);
           }
-          return this.entrywaySession(ctx);
-        }
 
-        const { iss, aud } = await this.verifyServiceJwt(ctx, {
-          lxmCheck: opts.lxmCheck,
-          iss: null,
-          aud: null,
-        });
-        if (!opts.skipAudCheck && !this.standardAudienceDids.has(aud)) {
-          throw new AuthRequiredError(
-            "jwt audience does not match service did",
-            "BadJwtAudience",
-          );
+          const { iss, aud } = await this.verifyServiceJwt(ctx, {
+            lxmCheck: opts.lxmCheck,
+            iss: null,
+            aud: null,
+          });
+          if (!opts.skipAudCheck && !this.standardAudienceDids.has(aud)) {
+            return this.nullCreds();
+          }
+          return {
+            credentials: {
+              type: "standard",
+              iss,
+              aud,
+            },
+            artifacts: null,
+          };
+        } catch {
+          return this.nullCreds();
         }
-        return {
-          credentials: {
-            type: "standard",
-            iss,
-            aud,
-          },
-          artifacts: null,
-        };
       } else {
         return this.nullCreds();
       }

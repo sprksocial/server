@@ -1,18 +1,6 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { BlobRef, type ValidationResult } from "@atproto/lexicon";
-import { CID } from "multiformats/cid";
-import { validate as _validate } from "../../../../lexicons";
-import {
-  type $Typed,
-  is$typed as _is$typed,
-  type OmitKey,
-} from "../../../../util";
-
-const is$typed = _is$typed, validate = _validate;
-const id = "com.atproto.moderation.defs";
-
 export type ReasonType =
   | "com.atproto.moderation.defs#reasonSpam"
   | "com.atproto.moderation.defs#reasonViolation"
@@ -21,7 +9,7 @@ export type ReasonType =
   | "com.atproto.moderation.defs#reasonRude"
   | "com.atproto.moderation.defs#reasonOther"
   | "com.atproto.moderation.defs#reasonAppeal"
-  | (string & {});
+  | (string & Record<PropertyKey, never>);
 
 /** Spam: frequent unwanted promotion, replies, mentions */
 export const REASONSPAM = `${id}#reasonSpam`;

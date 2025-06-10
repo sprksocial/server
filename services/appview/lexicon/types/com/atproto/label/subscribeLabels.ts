@@ -1,17 +1,11 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { BlobRef, type ValidationResult } from "@atproto/lexicon";
-import { CID } from "multiformats/cid";
-import { validate as _validate } from "../../../../lexicons";
-import {
-  type $Typed,
-  is$typed as _is$typed,
-  type OmitKey,
-} from "../../../../util";
+import { validate as _validate } from "../../../../lexicons.ts";
+import { is$typed as _is$typed } from "../../../../util.ts";
 import { ErrorFrame, HandlerAuth } from "@sprk/xrpc-server";
 import { IncomingMessage } from "node:http";
-import type * as ComAtprotoLabelDefs from "./defs.js";
+import type * as ComAtprotoLabelDefs from "./defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "com.atproto.label.subscribeLabels";
@@ -52,7 +46,7 @@ export function validateLabels<V>(v: V) {
 
 export interface Info {
   $type?: "com.atproto.label.subscribeLabels#info";
-  name: "OutdatedCursor" | (string & {});
+  name: "OutdatedCursor" | (string & Record<PropertyKey, never>);
   message?: string;
 }
 

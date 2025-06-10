@@ -3,6 +3,7 @@ import { pino } from "pino";
 import { IdResolver, MemoryCache } from "@atproto/identity";
 import { env } from "../../../utils/env.ts";
 import { DataPlaneClient, GetIdentityByDidResponse } from "../client/index.ts";
+import { Buffer } from "node:buffer";
 
 const HOUR = 60e3 * 60;
 const DAY = HOUR * 24;
@@ -554,6 +555,8 @@ export interface ActorDocument extends Document {
   indexedAt: string;
   takedownRef: string | null;
   upstreamStatus: string | null;
+  keys: string;
+  services: string;
 }
 
 export const actorSchema = new Schema<ActorDocument>({
@@ -562,6 +565,8 @@ export const actorSchema = new Schema<ActorDocument>({
   indexedAt: { type: String, required: true },
   takedownRef: { type: String, required: false },
   upstreamStatus: { type: String, required: false },
+  keys: { type: String, required: true },
+  services: { type: String, required: true },
 });
 
 // Add compound indexes for Actor
@@ -725,8 +730,8 @@ export class Database implements DataPlaneClient {
     return {
       did: actor.did,
       handle: actor.handle || undefined,
-      keys: new Uint8Array(), // TODO: Implement key storage
-      services: new Uint8Array(), // TODO: Implement services storage
+      keys: new TextEncoder().encode(actor.keys),
+      services: new TextEncoder().encode(actor.services),
     };
   }
 }

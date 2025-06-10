@@ -1,0 +1,71 @@
+/**
+ * GENERATED CODE - DO NOT MODIFY
+ */
+import { type HonoRequest } from "hono";
+import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
+import type * as ToolsOzoneModerationDefs from "./defs.ts";
+import type * as ComAtprotoAdminDefs from "../../../com/atproto/admin/defs.ts";
+import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef.ts";
+
+export type QueryParams = Record<never, never>;
+
+export interface InputSchema {
+  event:
+    | $Typed<ToolsOzoneModerationDefs.ModEventTakedown>
+    | $Typed<ToolsOzoneModerationDefs.ModEventAcknowledge>
+    | $Typed<ToolsOzoneModerationDefs.ModEventEscalate>
+    | $Typed<ToolsOzoneModerationDefs.ModEventComment>
+    | $Typed<ToolsOzoneModerationDefs.ModEventLabel>
+    | $Typed<ToolsOzoneModerationDefs.ModEventReport>
+    | $Typed<ToolsOzoneModerationDefs.ModEventMute>
+    | $Typed<ToolsOzoneModerationDefs.ModEventUnmute>
+    | $Typed<ToolsOzoneModerationDefs.ModEventMuteReporter>
+    | $Typed<ToolsOzoneModerationDefs.ModEventUnmuteReporter>
+    | $Typed<ToolsOzoneModerationDefs.ModEventReverseTakedown>
+    | $Typed<ToolsOzoneModerationDefs.ModEventResolveAppeal>
+    | $Typed<ToolsOzoneModerationDefs.ModEventEmail>
+    | $Typed<ToolsOzoneModerationDefs.ModEventDivert>
+    | $Typed<ToolsOzoneModerationDefs.ModEventTag>
+    | $Typed<ToolsOzoneModerationDefs.AccountEvent>
+    | $Typed<ToolsOzoneModerationDefs.IdentityEvent>
+    | $Typed<ToolsOzoneModerationDefs.RecordEvent>
+    | $Typed<ToolsOzoneModerationDefs.ModEventPriorityScore>
+    | { $type: string };
+  subject:
+    | $Typed<ComAtprotoAdminDefs.RepoRef>
+    | $Typed<ComAtprotoRepoStrongRef.Main>
+    | { $type: string };
+  subjectBlobCids?: (string)[];
+  createdBy: string;
+}
+
+export type OutputSchema = ToolsOzoneModerationDefs.ModEventView;
+
+export interface HandlerInput {
+  encoding: "application/json";
+  body: InputSchema;
+}
+
+export interface HandlerSuccess {
+  encoding: "application/json";
+  body: OutputSchema;
+  headers?: { [key: string]: string };
+}
+
+export interface HandlerError {
+  status: number;
+  message?: string;
+  error?: "SubjectHasAction";
+}
+
+export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough;
+export type HandlerReqCtx<HA extends HandlerAuth = never> = {
+  auth: HA;
+  params: QueryParams;
+  input: HandlerInput;
+  req: HonoRequest;
+  resetRouteRateLimits: () => Promise<void>;
+};
+export type Handler<HA extends HandlerAuth = never> = (
+  ctx: HandlerReqCtx<HA>,
+) => Promise<HandlerOutput> | HandlerOutput;

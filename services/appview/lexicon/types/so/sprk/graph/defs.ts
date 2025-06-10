@@ -1,18 +1,12 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { BlobRef, type ValidationResult } from "@atproto/lexicon";
-import { CID } from "multiformats/cid";
-import { validate as _validate } from "../../../../lexicons";
-import {
-  type $Typed,
-  is$typed as _is$typed,
-  type OmitKey,
-} from "../../../../util";
-import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.js";
-import type * as SoSprkActorDefs from "../actor/defs.js";
-import type * as SoSprkRichtextFacet from "../richtext/facet.js";
-import type * as SoSprkFeedDefs from "../feed/defs.js";
+import { validate as _validate } from "../../../../lexicons.ts";
+import { is$typed as _is$typed } from "../../../../util.ts";
+import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
+import type * as SoSprkActorDefs from "../actor/defs.ts";
+import type * as SoSprkRichtextFacet from "../richtext/facet.ts";
+import type * as SoSprkFeedDefs from "../feed/defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.graph.defs";
@@ -134,7 +128,7 @@ export type ListPurpose =
   | "so.sprk.graph.defs#modlist"
   | "so.sprk.graph.defs#curatelist"
   | "so.sprk.graph.defs#referencelist"
-  | (string & {});
+  | (string & Record<PropertyKey, never>);
 
 /** A list of actors to apply an aggregate moderation action (mute/block) on. */
 export const MODLIST = `${id}#modlist`;

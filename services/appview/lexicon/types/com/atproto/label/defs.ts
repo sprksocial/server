@@ -1,14 +1,8 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { BlobRef, type ValidationResult } from "@atproto/lexicon";
-import { CID } from "multiformats/cid";
-import { validate as _validate } from "../../../../lexicons";
-import {
-  type $Typed,
-  is$typed as _is$typed,
-  type OmitKey,
-} from "../../../../util";
+import { validate as _validate } from "../../../../lexicons.ts";
+import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "com.atproto.label.defs";
@@ -85,11 +79,15 @@ export interface LabelValueDefinition {
   /** The value of the label being defined. Must only include lowercase ascii and the '-' character ([a-z-]+). */
   identifier: string;
   /** How should a client visually convey this label? 'inform' means neutral and informational; 'alert' means negative and warning; 'none' means show nothing. */
-  severity: "inform" | "alert" | "none" | (string & {});
+  severity: "inform" | "alert" | "none" | (string & Record<PropertyKey, never>);
   /** What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing. */
-  blurs: "content" | "media" | "none" | (string & {});
+  blurs: "content" | "media" | "none" | (string & Record<PropertyKey, never>);
   /** The default setting for this label. */
-  defaultSetting: "ignore" | "warn" | "hide" | (string & {});
+  defaultSetting:
+    | "ignore"
+    | "warn"
+    | "hide"
+    | (string & Record<PropertyKey, never>);
   /** Does the user need to have adult content enabled in order to configure this label? */
   adultOnly?: boolean;
   locales: (LabelValueDefinitionStrings)[];
@@ -142,4 +140,4 @@ export type LabelValue =
   | "nudity"
   | "nsfl"
   | "gore"
-  | (string & {});
+  | (string & Record<PropertyKey, never>);

@@ -1,20 +1,15 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { BlobRef, type ValidationResult } from "@atproto/lexicon";
-import { CID } from "multiformats/cid";
-import { validate as _validate } from "../../../../lexicons";
-import {
-  type $Typed,
-  is$typed as _is$typed,
-  type OmitKey,
-} from "../../../../util";
-import type * as SoSprkActorDefs from "../actor/defs.js";
-import type * as SoSprkEmbedImages from "../embed/images.js";
-import type * as SoSprkEmbedVideo from "../embed/video.js";
-import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.js";
-import type * as SoSprkRichtextFacet from "../richtext/facet.js";
-import type * as SoSprkGraphDefs from "../graph/defs.js";
+import { validate as _validate } from "../../../../lexicons.ts";
+import { is$typed as _is$typed } from "../../../../util.ts";
+import { type $Typed } from "../../../../util.ts";
+import type * as SoSprkActorDefs from "../actor/defs.ts";
+import type * as SoSprkEmbedImages from "../embed/images.ts";
+import type * as SoSprkEmbedVideo from "../embed/video.ts";
+import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
+import type * as SoSprkRichtextFacet from "../richtext/facet.ts";
+import type * as SoSprkGraphDefs from "../graph/defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.feed.defs";
@@ -324,7 +319,7 @@ export interface GeneratorView {
   contentMode?:
     | "so.sprk.feed.defs#contentModeUnspecified"
     | "so.sprk.feed.defs#contentModeVideo"
-    | (string & {});
+    | (string & Record<PropertyKey, never>);
   indexedAt: string;
 }
 
@@ -437,7 +432,7 @@ export interface Interaction {
     | "so.sprk.feed.defs#interactionReply"
     | "so.sprk.feed.defs#interactionQuote"
     | "so.sprk.feed.defs#interactionShare"
-    | (string & {});
+    | (string & Record<PropertyKey, never>);
   /** Context on a feed item that was originally supplied by the feed generator on getFeedSkeleton. */
   feedContext?: string;
 }
