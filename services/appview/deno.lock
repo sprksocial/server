@@ -2,7 +2,7 @@
   "version": "5",
   "specifiers": {
     "jsr:@hono/hono@^4.7.10": "4.7.11",
-    "jsr:@sprk/xrpc-server@~0.1.2": "0.1.2",
+    "jsr:@sprk/xrpc-server@~0.1.4": "0.1.4",
     "jsr:@std/assert@*": "1.0.13",
     "jsr:@std/encoding@*": "1.0.10",
     "jsr:@std/encoding@1": "1.0.10",
@@ -54,8 +54,8 @@
     "@hono/hono@4.7.11": {
       "integrity": "52b9395e4f2448fbaf82a6bd7925d15e59f4055037e74d6c2f657f3618b11193"
     },
-    "@sprk/xrpc-server@0.1.2": {
-      "integrity": "b5720788dfa64b7c060cb33376d9cb1e2a0c8c83671448a3847a7d519cdc02fa",
+    "@sprk/xrpc-server@0.1.4": {
+      "integrity": "ca3a22c418b1f4459c729eb789ea8580400c22f083f2362c329f6aa355582be0",
       "dependencies": [
         "jsr:@hono/hono",
         "npm:@atproto/common@~0.4.11",
@@ -1219,7 +1219,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@hono/hono@^4.7.10",
-      "jsr:@sprk/xrpc-server@~0.1.2",
+      "jsr:@sprk/xrpc-server@~0.1.4",
       "jsr:@std/encoding@1",
       "npm:@atproto/api@~0.14.9",
       "npm:@atproto/common@~0.4.8",
