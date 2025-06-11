@@ -3,9 +3,44 @@ import { pino } from "pino";
 import { IdResolver, MemoryCache } from "@atproto/identity";
 import { env } from "../../../utils/env.ts";
 import { DataPlaneClient, GetIdentityByDidResponse } from "../client/index.ts";
+import { DidDocument } from "@atproto/identity";
+import { Buffer } from "node:buffer";
+import { Timestamp } from "npm:@bufbuild/protobuf@1.5.0";
 
 const HOUR = 60e3 * 60;
 const DAY = HOUR * 24;
+
+const getDid = (doc: DidDocument) => doc.id
+const getHandle = (doc: DidDocument) => doc.alsoKnownAs?.find(aka => aka.startsWith('at://'))?.replace('at://', '')
+
+const getResultFromDoc = (doc: DidDocument) => {
+  const keys: Record<string, { Type: string; PublicKeyMultibase: string }> = {}
+  doc.verificationMethod?.forEach((method) => {
+    const id = method.id.split('#').at(1)
+    if (!id) return
+    keys[id] = {
+      Type: method.type,
+      PublicKeyMultibase: method.publicKeyMultibase || '',
+    }
+  })
+  const services: Record<string, { Type: string; URL: string }> = {}
+  doc.service?.forEach((service) => {
+    const id = service.id.split('#').at(1)
+    if (!id) return
+    if (typeof service.serviceEndpoint !== 'string') return
+    services[id] = {
+      Type: service.type,
+      URL: service.serviceEndpoint,
+    }
+  })
+  return {
+    did: getDid(doc),
+    handle: getHandle(doc),
+    keys: Buffer.from(JSON.stringify(keys)),
+    services: Buffer.from(JSON.stringify(services)),
+    updated: Timestamp.fromDate(new Date()),
+  }
+}
 
 export interface MediaRef {
   $type: string;
@@ -554,7 +589,7 @@ export interface ActorDocument extends Document {
   indexedAt: string;
   takedownRef: string | null;
   upstreamStatus: string | null;
-  keys: string;
+  keys: string[];
   services: string;
 }
 
@@ -564,7 +599,7 @@ export const actorSchema = new Schema<ActorDocument>({
   indexedAt: { type: String, required: true },
   takedownRef: { type: String, required: false },
   upstreamStatus: { type: String, required: false },
-  keys: { type: String, required: true },
+  keys: { type: [String], required: true },
   services: { type: String, required: true },
 });
 
@@ -722,15 +757,10 @@ export class Database implements DataPlaneClient {
   async getIdentityByDid(
     { did }: { did: string },
   ): Promise<GetIdentityByDidResponse> {
-    const actor = await this.models.Actor.findOne({ did }).exec();
-    if (!actor) {
-      throw new Error("Actor not found");
+    const doc = await this.idResolver.did.resolve(did);
+    if (!doc) {
+      throw new Error("DID not found");
     }
-    return {
-      did: actor.did,
-      handle: actor.handle || undefined,
-      keys: new TextEncoder().encode(actor.keys),
-      services: new TextEncoder().encode(actor.services),
-    };
+    return getResultFromDoc(doc);
   }
 }

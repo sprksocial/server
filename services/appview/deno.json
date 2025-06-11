@@ -28,6 +28,5 @@
     "jsx": "precompile",
     "jsxImportSource": "hono/jsx"
   },
-  "patch": ["../../../xrpc-server"],
   "unstable": ["sloppy-imports"]
 }

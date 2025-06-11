@@ -21,6 +21,8 @@
     "npm:@atproto/syntax@~0.3.4": "0.3.4",
     "npm:@atproto/xrpc-server@~0.7.19": "0.7.19",
     "npm:@atproto/xrpc@0.7": "0.7.0",
+    "npm:@bufbuild/protobuf@*": "2.5.2",
+    "npm:@bufbuild/protobuf@1.5.0": "1.5.0",
     "npm:@types/node@*": "22.15.15",
     "npm:cbor-x@^1.6.0": "1.6.0",
     "npm:dotenv@*": "16.5.0",
@@ -29,9 +31,11 @@
     "npm:http-errors@2": "2.0.0",
     "npm:jose@*": "6.0.11",
     "npm:jose@^6.0.11": "6.0.11",
+    "npm:key-encoder@*": "2.0.3",
     "npm:key-encoder@^2.0.3": "2.0.3",
     "npm:lodash@*": "4.17.21",
     "npm:mime-types@^3.0.1": "3.0.1",
+    "npm:mongodb@*": "6.16.0",
     "npm:mongoose@^8.12.1": "8.15.1",
     "npm:multiformats@^13.3.6": "13.3.6",
     "npm:multiformats@^9.9.0": "9.9.0",
@@ -187,6 +191,12 @@
         "@atproto/lexicon",
         "zod"
       ]
+    },
+    "@bufbuild/protobuf@1.5.0": {
+      "integrity": "sha512-0Jg+B7Vl8YGCi7c3iZ8/38iTbZrwdU7or6QZlsA9lhSrhumaXOTMsGO8gqwDuus/THEkTiY3Uxn+PEJwgsLt0w=="
+    },
+    "@bufbuild/protobuf@2.5.2": {
+      "integrity": "sha512-foZ7qr0IsUBjzWIq+SuBLfdQCpJ1j8cTuNNT4owngTHoN5KsJb8L9t65fzz7SCeSWzescoOil/0ldqiL041ABg=="
     },
     "@cbor-extract/cbor-extract-darwin-arm64@2.2.0": {
       "integrity": "sha512-P7swiOAdF7aSi0H+tHtHtr6zrpF3aAq/W9FXx5HektRvLTM2O89xCyXF3pk7pLc7QpaY7AoaE8UowVf9QBdh3w==",

@@ -2,16 +2,12 @@ import { KeyObject } from "node:crypto";
 import { IncomingHttpHeaders } from "node:http";
 import * as ui8 from "npm:uint8arrays";
 import * as jose from "npm:jose";
-import { verify } from "hono/jwt";
-import { parseDidKey, SECP256K1_JWT_ALG } from "@atproto/crypto";
 import {
   AuthOutput,
   AuthRequiredError,
   AuthVerifierContext,
-  cryptoVerifySignatureWithKey,
   parseReqNsid,
-  verifyJwt,
-  VerifySignatureWithKeyFn,
+  verifyJwt
 } from "@sprk/xrpc-server";
 import {
   Code,
@@ -21,7 +17,6 @@ import {
   isDataplaneError,
   unpackIdentityKeys,
 } from "../data-plane/client/index.ts";
-import { SignatureAlgorithm } from "hono/utils/jwt/jwa";
 import { HonoRequest } from "hono";
 
 interface MinimalRequest {
@@ -30,10 +25,6 @@ interface MinimalRequest {
   header: (name: string) => string | undefined;
   headers: IncomingHttpHeaders;
 }
-
-type ReqCtx = {
-  req: MinimalRequest;
-};
 
 type StandardAuthOpts = {
   skipAudCheck?: boolean;
@@ -226,45 +217,44 @@ class AuthVerifierImpl {
         const aud = this.ownDid;
         const iss = ctx.req.header("appview-as-did");
         if (typeof iss !== "string" || !iss.startsWith("did:")) {
-          return this.nullCreds();
+          throw new AuthRequiredError("bad issuer");
         }
         if (!this.parseRoleCreds(ctx.req).admin) {
-          return this.nullCreds();
+          throw new AuthRequiredError("bad credentials");
         }
         return {
           credentials: { type: "standard", iss, aud },
           artifacts: null,
         };
       } else if (isBearerToken(ctx.req)) {
-        try {
-          const token = bearerTokenFromReq(ctx.req);
-          const header = token ? jose.decodeProtectedHeader(token) : undefined;
-          if (header?.typ === "at+jwt") {
-            if (opts.skipAudCheck) {
-              return this.nullCreds();
-            }
-            return this.entrywaySession(ctx);
+        const token = bearerTokenFromReq(ctx.req);
+        const header = token ? jose.decodeProtectedHeader(token) : undefined;
+        if (header?.typ === "at+jwt") {
+          if (opts.skipAudCheck) {
+            throw new AuthRequiredError("Malformed token", "InvalidToken");
           }
-
-          const { iss, aud } = await this.verifyServiceJwt(ctx, {
-            lxmCheck: opts.lxmCheck,
-            iss: null,
-            aud: null,
-          });
-          if (!opts.skipAudCheck && !this.standardAudienceDids.has(aud)) {
-            return this.nullCreds();
-          }
-          return {
-            credentials: {
-              type: "standard",
-              iss,
-              aud,
-            },
-            artifacts: null,
-          };
-        } catch {
-          return this.nullCreds();
+          return this.entrywaySession(ctx);
         }
+
+        const { iss, aud } = await this.verifyServiceJwt(ctx, {
+          lxmCheck: opts.lxmCheck,
+          iss: null,
+          aud: null,
+        });
+        if (!opts.skipAudCheck && !this.standardAudienceDids.has(aud)) {
+          throw new AuthRequiredError(
+            "jwt audience does not match service did",
+            "BadJwtAudience",
+          );
+        }
+        return {
+          credentials: {
+            type: "standard",
+            iss,
+            aud,
+          },
+          artifacts: null,
+        };
       } else {
         return this.nullCreds();
       }
@@ -497,8 +487,7 @@ class AuthVerifierImpl {
       jwtStr,
       opts.aud,
       null,
-      getSigningKey,
-      verifySignatureWithKey,
+      getSigningKey
     );
     if (
       !payload.iss.endsWith("#atproto_labeler") ||
@@ -587,30 +576,4 @@ export const buildBasicAuth = (username: string, password: string): string => {
     BASIC +
     ui8.toString(ui8.fromString(`${username}:${password}`, "utf8"), "base64pad")
   );
-};
-
-export const verifySignatureWithKey: VerifySignatureWithKeyFn = async (
-  didKey: string,
-  msgBytes: Uint8Array,
-  sigBytes: Uint8Array,
-  alg: string,
-): Promise<boolean> => {
-  if (alg === SECP256K1_JWT_ALG) {
-    const parsed = parseDidKey(didKey);
-    if (alg !== parsed.jwtAlg) {
-      throw new Error(`Expected key alg ${alg}, got ${parsed.jwtAlg}`);
-    }
-
-    try {
-      // Convert message and signature to base64 strings as expected by hono/jwt verify
-      const message = ui8.toString(msgBytes, "base64url");
-
-      await verify(message, didKey, parsed.jwtAlg as SignatureAlgorithm);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  return cryptoVerifySignatureWithKey(didKey, msgBytes, sigBytes, alg);
 };
