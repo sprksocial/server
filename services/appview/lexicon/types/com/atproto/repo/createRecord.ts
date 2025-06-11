@@ -26,10 +26,7 @@ export interface OutputSchema {
   uri: string;
   cid: string;
   commit?: ComAtprotoRepoDefs.CommitMeta;
-  validationStatus?:
-    | "valid"
-    | "unknown"
-    | (string & Record<PropertyKey, never>);
+  validationStatus?: "valid" | "unknown" | (string & { __brand?: never });
 }
 
 export interface HandlerInput {

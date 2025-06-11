@@ -4,13 +4,14 @@
 import { BlobRef } from "@atproto/lexicon";
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
+import { type $Typed } from "../../../../util.ts";
 import type * as SoSprkRichtextFacet from "../richtext/facet.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.feed.generator";
 
-export interface Record {
+export interface MainRecord {
   $type: "so.sprk.feed.generator";
   did: string;
   displayName: string;
@@ -23,17 +24,17 @@ export interface Record {
   contentMode?:
     | "so.sprk.feed.defs#contentModeUnspecified"
     | "so.sprk.feed.defs#contentModeVideo"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
   createdAt: string;
   [k: string]: unknown;
 }
 
-const hashRecord = "main";
+const hashMainRecord = "main";
 
-export function isRecord<V>(v: V) {
-  return is$typed(v, id, hashRecord);
+export function isMainRecord<V>(v: V) {
+  return is$typed(v, id, hashMainRecord);
 }
 
-export function validateRecord<V>(v: V) {
-  return validate<Record & V>(v, id, hashRecord, true);
+export function validateMainRecord<V>(v: V) {
+  return validate<MainRecord & V>(v, id, hashMainRecord, true);
 }

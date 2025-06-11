@@ -1,6 +1,8 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
+const id = "com.atproto.moderation.defs";
+
 export type ReasonType =
   | "com.atproto.moderation.defs#reasonSpam"
   | "com.atproto.moderation.defs#reasonViolation"
@@ -9,7 +11,7 @@ export type ReasonType =
   | "com.atproto.moderation.defs#reasonRude"
   | "com.atproto.moderation.defs#reasonOther"
   | "com.atproto.moderation.defs#reasonAppeal"
-  | (string & Record<PropertyKey, never>);
+  | (string & { __brand?: never });
 
 /** Spam: frequent unwanted promotion, replies, mentions */
 export const REASONSPAM = `${id}#reasonSpam`;
@@ -31,4 +33,4 @@ export type SubjectType =
   | "account"
   | "record"
   | "chat"
-  | (string & Record<PropertyKey, never>);
+  | (string & { __brand?: never });

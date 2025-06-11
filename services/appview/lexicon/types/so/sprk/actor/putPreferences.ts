@@ -7,7 +7,7 @@ import { HandlerAuth } from "@sprk/xrpc-server";
 export type QueryParams = Record<never, never>;
 
 export interface InputSchema {
-  followMode?: "bsky" | "sprk" | (string & Record<PropertyKey, never>);
+  followMode?: "bsky" | "sprk" | (string & { __brand?: never });
 }
 
 export type OutputSchema = undefined;

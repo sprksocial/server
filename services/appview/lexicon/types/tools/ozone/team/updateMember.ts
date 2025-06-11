@@ -14,7 +14,7 @@ export interface InputSchema {
     | "tools.ozone.team.defs#roleAdmin"
     | "tools.ozone.team.defs#roleModerator"
     | "tools.ozone.team.defs#roleTriage"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
 }
 
 export type OutputSchema = ToolsOzoneTeamDefs.Member;

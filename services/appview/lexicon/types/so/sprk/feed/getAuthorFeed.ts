@@ -16,7 +16,7 @@ export interface QueryParams {
     | "posts_with_media"
     | "posts_and_author_threads"
     | "posts_with_video"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
   includePins: boolean;
 }
 

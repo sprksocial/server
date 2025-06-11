@@ -16,7 +16,7 @@ export interface JobStatus {
   state:
     | "JOB_STATE_COMPLETED"
     | "JOB_STATE_FAILED"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
   /** Progress within the current processing state. */
   progress?: number;
   blob?: BlobRef;

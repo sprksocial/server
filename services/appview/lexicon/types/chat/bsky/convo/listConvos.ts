@@ -8,8 +8,8 @@ import type * as ChatBskyConvoDefs from "./defs.ts";
 export interface QueryParams {
   limit: number;
   cursor?: string;
-  readState?: "unread" | (string & Record<PropertyKey, never>);
-  status?: "request" | "accepted" | (string & Record<PropertyKey, never>);
+  readState?: "unread" | (string & { __brand?: never });
+  status?: "request" | "accepted" | (string & { __brand?: never });
 }
 
 export type InputSchema = undefined;

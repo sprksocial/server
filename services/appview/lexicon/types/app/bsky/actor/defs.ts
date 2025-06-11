@@ -110,11 +110,7 @@ export function validateProfileAssociated<V>(v: V) {
 
 export interface ProfileAssociatedChat {
   $type?: "app.bsky.actor.defs#profileAssociatedChat";
-  allowIncoming:
-    | "all"
-    | "none"
-    | "following"
-    | (string & Record<PropertyKey, never>);
+  allowIncoming: "all" | "none" | "following" | (string & { __brand?: never });
 }
 
 const hashProfileAssociatedChat = "profileAssociatedChat";
@@ -210,7 +206,7 @@ export interface ContentLabelPref {
     | "show"
     | "warn"
     | "hide"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
 }
 
 const hashContentLabelPref = "contentLabelPref";
@@ -226,7 +222,7 @@ export function validateContentLabelPref<V>(v: V) {
 export interface SavedFeed {
   $type?: "app.bsky.actor.defs#savedFeed";
   id: string;
-  type: "feed" | "list" | "timeline" | (string & Record<PropertyKey, never>);
+  type: "feed" | "list" | "timeline" | (string & { __brand?: never });
   value: string;
   pinned: boolean;
 }
@@ -324,7 +320,7 @@ export interface ThreadViewPref {
     | "most-likes"
     | "random"
     | "hotness"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
   /** Show followed users at the top of all replies. */
   prioritizeFollowedUsers?: boolean;
 }
@@ -358,7 +354,7 @@ export function validateInterestsPref<V>(v: V) {
 export type MutedWordTarget =
   | "content"
   | "tag"
-  | (string & Record<PropertyKey, never>);
+  | (string & { __brand?: never });
 
 /** A word that the account owner has muted. */
 export interface MutedWord {
@@ -369,10 +365,7 @@ export interface MutedWord {
   /** The intended targets of the muted word. */
   targets: (MutedWordTarget)[];
   /** Groups of users to apply the muted word to. If undefined, applies to all users. */
-  actorTarget:
-    | "all"
-    | "exclude-following"
-    | (string & Record<PropertyKey, never>);
+  actorTarget: "all" | "exclude-following" | (string & { __brand?: never });
   /** The date and time at which the muted word will expire and no longer be applied. */
   expiresAt?: string;
 }

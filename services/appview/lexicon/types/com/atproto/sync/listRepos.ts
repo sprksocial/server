@@ -58,7 +58,7 @@ export interface Repo {
     | "takendown"
     | "suspended"
     | "deactivated"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
 }
 
 const hashRepo = "repo";

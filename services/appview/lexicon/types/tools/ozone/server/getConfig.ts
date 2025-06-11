@@ -66,7 +66,7 @@ export interface ViewerConfig {
     | "tools.ozone.team.defs#roleAdmin"
     | "tools.ozone.team.defs#roleModerator"
     | "tools.ozone.team.defs#roleTriage"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
 }
 
 const hashViewerConfig = "viewerConfig";

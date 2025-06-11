@@ -9,14 +9,14 @@ export type QueryParams = Record<never, never>;
 
 export interface InputSchema {
   key: string;
-  scope: "instance" | "personal" | (string & Record<PropertyKey, never>);
+  scope: "instance" | "personal" | (string & { __brand?: never });
   value: { [_ in string]: unknown };
   description?: string;
   managerRole?:
     | "tools.ozone.team.defs#roleModerator"
     | "tools.ozone.team.defs#roleTriage"
     | "tools.ozone.team.defs#roleAdmin"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
 }
 
 export interface OutputSchema {

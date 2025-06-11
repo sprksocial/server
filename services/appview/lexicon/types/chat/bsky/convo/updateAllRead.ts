@@ -7,7 +7,7 @@ import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
 export type QueryParams = Record<never, never>;
 
 export interface InputSchema {
-  status?: "request" | "accepted" | (string & Record<PropertyKey, never>);
+  status?: "request" | "accepted" | (string & { __brand?: never });
 }
 
 export interface OutputSchema {

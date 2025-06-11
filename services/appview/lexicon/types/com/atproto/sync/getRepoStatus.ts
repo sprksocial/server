@@ -19,7 +19,7 @@ export interface OutputSchema {
     | "takendown"
     | "suspended"
     | "deactivated"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
   /** Optional field, the current rev of the repo, if active=true */
   rev?: string;
 }

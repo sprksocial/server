@@ -20,7 +20,7 @@ export interface Member {
     | "lex:tools.ozone.team.defs#roleAdmin"
     | "lex:tools.ozone.team.defs#roleModerator"
     | "lex:tools.ozone.team.defs#roleTriage"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
 }
 
 const hashMember = "member";

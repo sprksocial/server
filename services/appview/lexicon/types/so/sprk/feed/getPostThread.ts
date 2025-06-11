@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { type HonoRequest } from "hono";
+import { type $Typed } from "../../../../util.ts";
 import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
 import type * as SoSprkFeedDefs from "./defs.ts";
 

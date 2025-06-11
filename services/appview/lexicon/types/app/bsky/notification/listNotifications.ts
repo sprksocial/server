@@ -68,7 +68,7 @@ export interface Notification {
     | "reply"
     | "quote"
     | "starterpack-joined"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
   reasonSubject?: string;
   record: { [_ in string]: unknown };
   isRead: boolean;

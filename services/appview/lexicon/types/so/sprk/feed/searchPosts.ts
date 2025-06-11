@@ -9,7 +9,7 @@ export interface QueryParams {
   /** Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended. */
   q: string;
   /** Specifies the ranking order of results. */
-  sort: "top" | "latest" | (string & Record<PropertyKey, never>);
+  sort: "top" | "latest" | (string & { __brand?: never });
   /** Filter results for posts after the indicated datetime (inclusive). Expected to use 'sortAt' timestamp, which may not match 'createdAt'. Can be a datetime, or just an ISO date (YYYY-MM-DD). */
   since?: string;
   /** Filter results for posts before the indicated datetime (not inclusive). Expected to use 'sortAt' timestamp, which may not match 'createdAt'. Can be a datetime, or just an ISO date (YYY-MM-DD). */

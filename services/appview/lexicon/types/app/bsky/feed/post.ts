@@ -3,6 +3,7 @@
  */
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
+import { type $Typed } from "../../../../util.ts";
 import type * as AppBskyRichtextFacet from "../richtext/facet.ts";
 import type * as AppBskyEmbedImages from "../embed/images.ts";
 import type * as AppBskyEmbedVideo from "../embed/video.ts";
@@ -15,7 +16,7 @@ import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongR
 const is$typed = _is$typed, validate = _validate;
 const id = "app.bsky.feed.post";
 
-export interface Record {
+export interface MainRecord {
   $type: "app.bsky.feed.post";
   /** The primary post content. May be an empty string, if there are embeds. */
   text: string;
@@ -41,14 +42,14 @@ export interface Record {
   [k: string]: unknown;
 }
 
-const hashRecord = "main";
+const hashMainRecord = "main";
 
-export function isRecord<V>(v: V) {
-  return is$typed(v, id, hashRecord);
+export function isMainRecord<V>(v: V) {
+  return is$typed(v, id, hashMainRecord);
 }
 
-export function validateRecord<V>(v: V) {
-  return validate<Record & V>(v, id, hashRecord, true);
+export function validateMainRecord<V>(v: V) {
+  return validate<MainRecord & V>(v, id, hashMainRecord, true);
 }
 
 export interface ReplyRef {

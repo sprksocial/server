@@ -128,7 +128,7 @@ export type ListPurpose =
   | "app.bsky.graph.defs#modlist"
   | "app.bsky.graph.defs#curatelist"
   | "app.bsky.graph.defs#referencelist"
-  | (string & Record<PropertyKey, never>);
+  | (string & { __brand?: never });
 
 /** A list of actors to apply an aggregate moderation action (mute/block) on. */
 export const MODLIST = `${id}#modlist`;

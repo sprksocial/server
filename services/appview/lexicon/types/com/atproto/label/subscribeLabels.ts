@@ -3,6 +3,7 @@
  */
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
+import { type $Typed } from "../../../../util.ts";
 import { ErrorFrame, HandlerAuth } from "@sprk/xrpc-server";
 import { IncomingMessage } from "node:http";
 import type * as ComAtprotoLabelDefs from "./defs.ts";
@@ -46,7 +47,7 @@ export function validateLabels<V>(v: V) {
 
 export interface Info {
   $type?: "com.atproto.label.subscribeLabels#info";
-  name: "OutdatedCursor" | (string & Record<PropertyKey, never>);
+  name: "OutdatedCursor" | (string & { __brand?: never });
   message?: string;
 }
 

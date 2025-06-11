@@ -44,7 +44,7 @@ export type Handler<HA extends HandlerAuth = never> = (
 export interface Suggestion {
   $type?: "app.bsky.unspecced.getTaggedSuggestions#suggestion";
   tag: string;
-  subjectType: "actor" | "feed" | (string & Record<PropertyKey, never>);
+  subjectType: "actor" | "feed" | (string & { __brand?: never });
   subject: string;
 }
 

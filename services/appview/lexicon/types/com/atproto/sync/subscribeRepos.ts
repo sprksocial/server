@@ -4,6 +4,7 @@
 import { CID } from "multiformats/cid";
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
+import { type $Typed } from "../../../../util.ts";
 import { ErrorFrame, HandlerAuth } from "@sprk/xrpc-server";
 import { IncomingMessage } from "node:http";
 
@@ -107,7 +108,7 @@ export interface Account {
     | "suspended"
     | "deleted"
     | "deactivated"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
 }
 
 const hashAccount = "account";
@@ -178,7 +179,7 @@ export function validateTombstone<V>(v: V) {
 
 export interface Info {
   $type?: "com.atproto.sync.subscribeRepos#info";
-  name: "OutdatedCursor" | (string & Record<PropertyKey, never>);
+  name: "OutdatedCursor" | (string & { __brand?: never });
   message?: string;
 }
 
@@ -195,11 +196,7 @@ export function validateInfo<V>(v: V) {
 /** A repo operation, ie a mutation of a single record. */
 export interface RepoOp {
   $type?: "com.atproto.sync.subscribeRepos#repoOp";
-  action:
-    | "create"
-    | "update"
-    | "delete"
-    | (string & Record<PropertyKey, never>);
+  action: "create" | "update" | "delete" | (string & { __brand?: never });
   path: string;
   /** For creates and updates, the new record CID. For deletions, null. */
   cid: CID | null;

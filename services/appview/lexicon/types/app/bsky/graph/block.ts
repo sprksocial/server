@@ -7,7 +7,7 @@ import { is$typed as _is$typed } from "../../../../util.ts";
 const is$typed = _is$typed, validate = _validate;
 const id = "app.bsky.graph.block";
 
-export interface Record {
+export interface MainRecord {
   $type: "app.bsky.graph.block";
   /** DID of the account to be blocked. */
   subject: string;
@@ -15,12 +15,12 @@ export interface Record {
   [k: string]: unknown;
 }
 
-const hashRecord = "main";
+const hashMainRecord = "main";
 
-export function isRecord<V>(v: V) {
-  return is$typed(v, id, hashRecord);
+export function isMainRecord<V>(v: V) {
+  return is$typed(v, id, hashMainRecord);
 }
 
-export function validateRecord<V>(v: V) {
-  return validate<Record & V>(v, id, hashRecord, true);
+export function validateMainRecord<V>(v: V) {
+  return validate<MainRecord & V>(v, id, hashMainRecord, true);
 }

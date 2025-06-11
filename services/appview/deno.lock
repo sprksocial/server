@@ -19,6 +19,7 @@
     "npm:@atproto/lexicon@~0.4.11": "0.4.11",
     "npm:@atproto/lexicon@~0.4.8": "0.4.11",
     "npm:@atproto/syntax@~0.3.4": "0.3.4",
+    "npm:@atproto/xrpc-server@~0.7.19": "0.7.19",
     "npm:@atproto/xrpc@0.7": "0.7.0",
     "npm:@types/node@*": "22.15.15",
     "npm:cbor-x@^1.6.0": "1.6.0",
@@ -155,6 +156,23 @@
     },
     "@atproto/syntax@0.4.0": {
       "integrity": "sha512-b9y5ceHS8YKOfP3mdKmwAx5yVj9294UN7FG2XzP6V5aKUdFazEYRnR9m5n5ZQFKa3GNvz7de9guZCJ/sUTcOAA=="
+    },
+    "@atproto/xrpc-server@0.7.19": {
+      "integrity": "sha512-YSCl/tU2NDykgDYslFSOYCr96esUgDwncFiADKL59/fyIFPLoT0qY8Uq/budpxUh0qPzjow4HHgVWESOaOpUmA==",
+      "dependencies": [
+        "@atproto/common",
+        "@atproto/crypto",
+        "@atproto/lexicon",
+        "@atproto/xrpc@0.7.0",
+        "cbor-x",
+        "express",
+        "http-errors",
+        "mime-types@2.1.35",
+        "rate-limiter-flexible",
+        "uint8arrays@3.0.0",
+        "ws",
+        "zod"
+      ]
     },
     "@atproto/xrpc@0.6.12": {
       "integrity": "sha512-Ut3iISNLujlmY9Gu8sNU+SPDJDvqlVzWddU8qUr0Yae5oD4SguaUFjjhireMGhQ3M5E0KljQgDbTmnBo1kIZ3w==",
@@ -1199,6 +1217,7 @@
       "npm:@atproto/identity@~0.4.8",
       "npm:@atproto/lexicon@~0.4.8",
       "npm:@atproto/syntax@~0.3.4",
+      "npm:@atproto/xrpc-server@~0.7.19",
       "npm:express@^4.21.2",
       "npm:jose@^6.0.11",
       "npm:key-encoder@^2.0.3",

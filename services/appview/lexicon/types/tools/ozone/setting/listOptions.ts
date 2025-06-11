@@ -8,7 +8,7 @@ import type * as ToolsOzoneSettingDefs from "./defs.ts";
 export interface QueryParams {
   limit: number;
   cursor?: string;
-  scope: "instance" | "personal" | (string & Record<PropertyKey, never>);
+  scope: "instance" | "personal" | (string & { __brand?: never });
   /** Filter keys by prefix */
   prefix?: string;
   /** Filter for only the specified keys. Ignored if prefix is provided */

@@ -63,7 +63,7 @@ export interface QueryParams {
   /** If specified, subjects belonging to the given collections will be returned. When subjectType is set to 'account', this will be ignored. */
   collections?: string[];
   /** If specified, subjects of the given type (account or record) will be returned. When this is set to 'account' the 'collections' parameter will be ignored. When includeAllUserRecords or subject is set, this will be ignored. */
-  subjectType?: "account" | "record" | (string & Record<PropertyKey, never>);
+  subjectType?: "account" | "record" | (string & { __brand?: never });
   /** If specified, only subjects that belong to an account that has at least this many suspensions will be returned. */
   minAccountSuspendCount?: number;
   /** If specified, only subjects that belong to an account that has at least this many reported records will be returned. */

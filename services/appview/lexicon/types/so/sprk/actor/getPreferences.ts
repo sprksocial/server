@@ -8,7 +8,7 @@ export type QueryParams = Record<never, never>;
 export type InputSchema = undefined;
 
 export interface OutputSchema {
-  followMode?: "bsky" | "sprk" | (string & Record<PropertyKey, never>);
+  followMode?: "bsky" | "sprk" | (string & { __brand?: never });
 }
 
 export type HandlerInput = undefined;

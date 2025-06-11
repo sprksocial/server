@@ -4,6 +4,7 @@
 import { type HonoRequest } from "hono";
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
+import { type $Typed } from "../../../../util.ts";
 import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
 import type * as ComAtprotoRepoDefs from "./defs.ts";
 
@@ -114,10 +115,7 @@ export interface CreateResult {
   $type?: "com.atproto.repo.applyWrites#createResult";
   uri: string;
   cid: string;
-  validationStatus?:
-    | "valid"
-    | "unknown"
-    | (string & Record<PropertyKey, never>);
+  validationStatus?: "valid" | "unknown" | (string & { __brand?: never });
 }
 
 const hashCreateResult = "createResult";
@@ -134,10 +132,7 @@ export interface UpdateResult {
   $type?: "com.atproto.repo.applyWrites#updateResult";
   uri: string;
   cid: string;
-  validationStatus?:
-    | "valid"
-    | "unknown"
-    | (string & Record<PropertyKey, never>);
+  validationStatus?: "valid" | "unknown" | (string & { __brand?: never });
 }
 
 const hashUpdateResult = "updateResult";

@@ -7,19 +7,19 @@ import { is$typed as _is$typed } from "../../../../util.ts";
 const is$typed = _is$typed, validate = _validate;
 const id = "com.atproto.lexicon.schema";
 
-export interface Record {
+export interface MainRecord {
   $type: "com.atproto.lexicon.schema";
   /** Indicates the 'version' of the Lexicon language. Must be '1' for the current atproto/Lexicon schema system. */
   lexicon: number;
   [k: string]: unknown;
 }
 
-const hashRecord = "main";
+const hashMainRecord = "main";
 
-export function isRecord<V>(v: V) {
-  return is$typed(v, id, hashRecord);
+export function isMainRecord<V>(v: V) {
+  return is$typed(v, id, hashMainRecord);
 }
 
-export function validateRecord<V>(v: V) {
-  return validate<Record & V>(v, id, hashRecord, true);
+export function validateMainRecord<V>(v: V) {
+  return validate<MainRecord & V>(v, id, hashMainRecord, true);
 }

@@ -6,7 +6,7 @@ import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
 import type * as ComAtprotoServerDefs from "../server/defs.ts";
 
 export interface QueryParams {
-  sort: "recent" | "usage" | (string & Record<PropertyKey, never>);
+  sort: "recent" | "usage" | (string & { __brand?: never });
   limit: number;
   cursor?: string;
 }

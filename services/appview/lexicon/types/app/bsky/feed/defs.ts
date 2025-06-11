@@ -248,7 +248,7 @@ export interface GeneratorView {
   contentMode?:
     | "app.bsky.feed.defs#contentModeUnspecified"
     | "app.bsky.feed.defs#contentModeVideo"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
   indexedAt: string;
 }
 
@@ -360,7 +360,7 @@ export interface Interaction {
     | "app.bsky.feed.defs#interactionReply"
     | "app.bsky.feed.defs#interactionQuote"
     | "app.bsky.feed.defs#interactionShare"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
   /** Context on a feed item that was originally supplied by the feed generator on getFeedSkeleton. */
   feedContext?: string;
 }

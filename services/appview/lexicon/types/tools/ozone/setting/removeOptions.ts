@@ -8,7 +8,7 @@ export type QueryParams = Record<never, never>;
 
 export interface InputSchema {
   keys: (string)[];
-  scope: "instance" | "personal" | (string & Record<PropertyKey, never>);
+  scope: "instance" | "personal" | (string & { __brand?: never });
 }
 
 export type OutputSchema = Record<never, never>;

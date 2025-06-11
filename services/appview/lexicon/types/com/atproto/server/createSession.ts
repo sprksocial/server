@@ -30,7 +30,7 @@ export interface OutputSchema {
     | "takendown"
     | "suspended"
     | "deactivated"
-    | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
 }
 
 export interface HandlerInput {

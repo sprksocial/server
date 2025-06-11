@@ -9,7 +9,7 @@ export type QueryParams = Record<never, never>;
 export interface InputSchema {
   serviceDid: string;
   token: string;
-  platform: "ios" | "android" | "web" | (string & Record<PropertyKey, never>);
+  platform: "ios" | "android" | "web" | (string & { __brand?: never });
   appId: string;
 }
 

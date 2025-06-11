@@ -4,13 +4,14 @@
 import { BlobRef } from "@atproto/lexicon";
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
+import { type $Typed } from "../../../../util.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.actor.profile";
 
-export interface Record {
+export interface MainRecord {
   $type: "so.sprk.actor.profile";
   displayName?: string;
   /** Free-form profile description text. */
@@ -26,12 +27,12 @@ export interface Record {
   [k: string]: unknown;
 }
 
-const hashRecord = "main";
+const hashMainRecord = "main";
 
-export function isRecord<V>(v: V) {
-  return is$typed(v, id, hashRecord);
+export function isMainRecord<V>(v: V) {
+  return is$typed(v, id, hashMainRecord);
 }
 
-export function validateRecord<V>(v: V) {
-  return validate<Record & V>(v, id, hashRecord, true);
+export function validateMainRecord<V>(v: V) {
+  return validate<MainRecord & V>(v, id, hashMainRecord, true);
 }

@@ -19,8 +19,8 @@ export interface Option {
     | "tools.ozone.team.defs#roleModerator"
     | "tools.ozone.team.defs#roleTriage"
     | "tools.ozone.team.defs#roleAdmin"
-    | (string & Record<PropertyKey, never>);
-  scope: "instance" | "personal" | (string & Record<PropertyKey, never>);
+    | (string & { __brand?: never });
+  scope: "instance" | "personal" | (string & { __brand?: never });
   createdBy: string;
   lastUpdatedBy: string;
 }
