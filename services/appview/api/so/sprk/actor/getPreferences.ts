@@ -1,33 +1,27 @@
-import { Hono } from "hono";
-import { AppContext, AppEnv } from "../../../../main.ts";
-import { authMiddleware } from "../../../../services/auth/middleware.ts";
+import { Server } from "../../../../lexicon/index.ts";
+import { AppContext } from "../../../../main.ts";
 
-export const createGetPreferencesRouter = (ctx: AppContext) => {
-  const router = new Hono<AppEnv>();
-
-  router.get(
-    "/xrpc/so.sprk.actor.getPreferences",
-    authMiddleware,
-    async (c) => {
-      const userDid = c.get("did") as string;
+export default function (server: Server, ctx: AppContext) {
+  server.so.sprk.actor.getPreferences({
+    auth: ctx.authVerifier.standard,
+    handler: async ({ auth }) => {
+      const userDid = auth.credentials.iss;
 
       try {
         const userPref = await ctx.db.models.UserPreference.findOne({
           userDid,
         });
 
-        return c.json(
-          {
-            followMode: userPref?.followMode || "sprk",
+        return {
+          encoding: "application/json",
+          body: {
+            followMode: (userPref?.followMode || "sprk") as "sprk" | "bsky",
           },
-          200,
-        );
+        };
       } catch (error) {
         ctx.logger.error({ error, userDid }, "Failed to get preferences");
-        return c.json({ error: "Failed to get preferences" }, 500);
+        throw error;
       }
     },
-  );
-
-  return router;
-};
+  });
+}
