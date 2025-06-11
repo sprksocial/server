@@ -93,12 +93,14 @@ export default function (server: Server, ctx: AppContext) {
           // Get handle through DID resolution
           let handle = null;
           try {
-            const didData = await ctx.resolver.resolveDidToDidDoc(follow.subject);
+            const didData = await ctx.resolver.resolveDidToDidDoc(
+              follow.subject,
+            );
             handle = didData.handle;
           } catch (error) {
             ctx.logger.warn(
               { did: follow.subject, error: (error as Error).message },
-              "Failed to resolve DID to handle"
+              "Failed to resolve DID to handle",
             );
           }
 

@@ -57,7 +57,8 @@ export default function (server: Server, ctx: AppContext) {
         } else if (collection.includes("look")) {
           record = await ctx.db.models.Look.findOne({ uri }).lean();
         } else if (collection.includes("profile")) {
-          record = await ctx.db.models.Profile.findOne({ authorDid: did }).lean();
+          record = await ctx.db.models.Profile.findOne({ authorDid: did })
+            .lean();
         } else if (collection.includes("follow")) {
           record = await ctx.db.models.Follow.findOne({ uri }).lean();
         } else if (collection.includes("block")) {
@@ -101,7 +102,8 @@ export default function (server: Server, ctx: AppContext) {
             reason: takedown.reason,
             takenDownBy: takedown.takenDownBy,
             takenDownAt: takedown.takenDownAt,
-            warning: "This content has been taken down and is only visible to admins",
+            warning:
+              "This content has been taken down and is only visible to admins",
           };
         }
 

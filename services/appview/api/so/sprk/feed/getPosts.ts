@@ -20,7 +20,8 @@ export default function (server: Server, ctx: AppContext) {
       }
 
       const uriArray = Array.isArray(uris) ? uris : [uris];
-      const dbPosts = await ctx.db.models.Post.find({ uri: { $in: uriArray } }).lean();
+      const dbPosts = await ctx.db.models.Post.find({ uri: { $in: uriArray } })
+        .lean();
 
       // Transform each post to PostView format
       const postViews = await Promise.all(

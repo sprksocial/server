@@ -7,7 +7,7 @@ import {
   AuthRequiredError,
   AuthVerifierContext,
   parseReqNsid,
-  verifyJwt
+  verifyJwt,
 } from "@sprk/xrpc-server";
 import {
   Code,
@@ -487,7 +487,7 @@ class AuthVerifierImpl {
       jwtStr,
       opts.aud,
       null,
-      getSigningKey
+      getSigningKey,
     );
     if (
       !payload.iss.endsWith("#atproto_labeler") ||

@@ -15,13 +15,18 @@ export default function (server: Server, ctx: AppContext) {
         depth = 0,
       ): Promise<SoSprkFeedDefs.ThreadViewPost> {
         // Get the full post document
-        const fullPost = await ctx.db.models.Post.findOne({ uri: post.uri }).lean();
+        const fullPost = await ctx.db.models.Post.findOne({ uri: post.uri })
+          .lean();
         if (!fullPost) {
           throw new Error(`Post not found: ${post.uri}`);
         }
 
         // Convert the post to a post view
-        const postView = await transformPostToPostView(fullPost, ctx.db, userDid);
+        const postView = await transformPostToPostView(
+          fullPost,
+          ctx.db,
+          userDid,
+        );
 
         // If we've reached the maximum depth, don't fetch replies
         if (depth <= 0) {
@@ -58,7 +63,9 @@ export default function (server: Server, ctx: AppContext) {
 
       const { uri } = params;
       const depth = typeof params.depth === "number" ? params.depth : 6;
-      const parentHeight = typeof params.parentHeight === "number" ? params.parentHeight : 80;
+      const parentHeight = typeof params.parentHeight === "number"
+        ? params.parentHeight
+        : 80;
       const userDid = auth.credentials.type === "standard"
         ? auth.credentials.iss
         : undefined;

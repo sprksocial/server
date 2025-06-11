@@ -10,7 +10,9 @@ export default function (server: Server, ctx: AppContext) {
       const body = input as SoSprkActorPutPreferences.InputSchema;
 
       if (body.followMode && !["bsky", "sprk"].includes(body.followMode)) {
-        throw new Error('Invalid followMode parameter. Must be "bsky" or "sprk"');
+        throw new Error(
+          'Invalid followMode parameter. Must be "bsky" or "sprk"',
+        );
       }
 
       try {

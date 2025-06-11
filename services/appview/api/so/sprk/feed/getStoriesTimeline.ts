@@ -14,10 +14,14 @@ export default function (server: Server, ctx: AppContext) {
     handler: async ({ params, auth }) => {
       const { limit: limitParam = 50, cursor } = params;
       const userDid = auth.credentials.iss;
-      const limit = typeof limitParam === 'string' ? parseInt(limitParam) : limitParam;
+      const limit = typeof limitParam === "string"
+        ? parseInt(limitParam)
+        : limitParam;
 
       if (isNaN(limit) || limit < 1 || limit > 100) {
-        throw new InvalidRequestError("Invalid limit: must be between 1 and 100");
+        throw new InvalidRequestError(
+          "Invalid limit: must be between 1 and 100",
+        );
       }
 
       try {
@@ -52,7 +56,9 @@ export default function (server: Server, ctx: AppContext) {
 
         if (cursor) {
           try {
-            const decodedCursor = Buffer.from(cursor, "base64").toString("utf-8");
+            const decodedCursor = Buffer.from(cursor, "base64").toString(
+              "utf-8",
+            );
             const [timestamp, id] = decodedCursor.split("::");
             createdAtCursor = timestamp;
             idCursor = id;

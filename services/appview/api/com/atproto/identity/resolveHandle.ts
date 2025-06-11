@@ -12,7 +12,9 @@ export default function (server: Server, ctx: AppContext) {
       }
 
       const normalizedHandle = ident.normalizeHandle(handle);
-      const actor = await ctx.db.models.Actor.findOne({ handle: normalizedHandle });
+      const actor = await ctx.db.models.Actor.findOne({
+        handle: normalizedHandle,
+      });
       if (!actor) {
         throw new InvalidRequestError("Unable to resolve handle");
       }

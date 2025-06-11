@@ -10,37 +10,38 @@ import { Timestamp } from "npm:@bufbuild/protobuf@1.5.0";
 const HOUR = 60e3 * 60;
 const DAY = HOUR * 24;
 
-const getDid = (doc: DidDocument) => doc.id
-const getHandle = (doc: DidDocument) => doc.alsoKnownAs?.find(aka => aka.startsWith('at://'))?.replace('at://', '')
+const getDid = (doc: DidDocument) => doc.id;
+const getHandle = (doc: DidDocument) =>
+  doc.alsoKnownAs?.find((aka) => aka.startsWith("at://"))?.replace("at://", "");
 
 const getResultFromDoc = (doc: DidDocument) => {
-  const keys: Record<string, { Type: string; PublicKeyMultibase: string }> = {}
+  const keys: Record<string, { Type: string; PublicKeyMultibase: string }> = {};
   doc.verificationMethod?.forEach((method) => {
-    const id = method.id.split('#').at(1)
-    if (!id) return
+    const id = method.id.split("#").at(1);
+    if (!id) return;
     keys[id] = {
       Type: method.type,
-      PublicKeyMultibase: method.publicKeyMultibase || '',
-    }
-  })
-  const services: Record<string, { Type: string; URL: string }> = {}
+      PublicKeyMultibase: method.publicKeyMultibase || "",
+    };
+  });
+  const services: Record<string, { Type: string; URL: string }> = {};
   doc.service?.forEach((service) => {
-    const id = service.id.split('#').at(1)
-    if (!id) return
-    if (typeof service.serviceEndpoint !== 'string') return
+    const id = service.id.split("#").at(1);
+    if (!id) return;
+    if (typeof service.serviceEndpoint !== "string") return;
     services[id] = {
       Type: service.type,
       URL: service.serviceEndpoint,
-    }
-  })
+    };
+  });
   return {
     did: getDid(doc),
     handle: getHandle(doc),
     keys: Buffer.from(JSON.stringify(keys)),
     services: Buffer.from(JSON.stringify(services)),
     updated: Timestamp.fromDate(new Date()),
-  }
-}
+  };
+};
 
 export interface MediaRef {
   $type: string;

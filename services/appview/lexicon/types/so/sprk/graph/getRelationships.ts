@@ -17,12 +17,11 @@ export type InputSchema = undefined;
 
 export interface OutputSchema {
   actor?: string;
-  relationships:
-    (
-      | $Typed<SoSprkGraphDefs.Relationship>
-      | $Typed<SoSprkGraphDefs.NotFoundActor>
-      | { $type: string }
-    )[];
+  relationships: (
+    | $Typed<SoSprkGraphDefs.Relationship>
+    | $Typed<SoSprkGraphDefs.NotFoundActor>
+    | { $type: string }
+  )[];
 }
 
 export type HandlerInput = undefined;

@@ -14,15 +14,17 @@ export default function (server: Server, ctx: AppContext) {
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth }) => {
       const { q, limit: limitParam = 25, cursor: cursorParam } = params;
-      const userDid = auth.credentials.type === "standard" 
-        ? auth.credentials.iss 
+      const userDid = auth.credentials.type === "standard"
+        ? auth.credentials.iss
         : undefined;
 
       if (!q?.trim()) {
         throw new Error("Search query (q) is required");
       }
 
-      let limit = typeof limitParam === 'string' ? parseInt(limitParam) : limitParam;
+      let limit = typeof limitParam === "string"
+        ? parseInt(limitParam)
+        : limitParam;
       if (isNaN(limit)) limit = 25;
       if (limit < 1 || limit > 100) {
         throw new Error("Limit must be between 1 and 100");
