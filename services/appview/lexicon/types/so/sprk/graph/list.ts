@@ -1,22 +1,18 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { BlobRef, type ValidationResult } from "@atproto/lexicon";
-import { CID } from "multiformats/cid";
-import { validate as _validate } from "../../../../lexicons";
-import {
-  type $Typed,
-  is$typed as _is$typed,
-  type OmitKey,
-} from "../../../../util";
-import type * as SoSprkGraphDefs from "./defs.js";
-import type * as SoSprkRichtextFacet from "../richtext/facet.js";
-import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.js";
+import { BlobRef } from "@atproto/lexicon";
+import { validate as _validate } from "../../../../lexicons.ts";
+import { is$typed as _is$typed } from "../../../../util.ts";
+import { type $Typed } from "../../../../util.ts";
+import type * as SoSprkGraphDefs from "./defs.ts";
+import type * as SoSprkRichtextFacet from "../richtext/facet.ts";
+import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.graph.list";
 
-export interface Record {
+export interface MainRecord {
   $type: "so.sprk.graph.list";
   purpose: SoSprkGraphDefs.ListPurpose;
   /** Display name for list; can not be empty. */
@@ -29,12 +25,12 @@ export interface Record {
   [k: string]: unknown;
 }
 
-const hashRecord = "main";
+const hashMainRecord = "main";
 
-export function isRecord<V>(v: V) {
-  return is$typed(v, id, hashRecord);
+export function isMainRecord<V>(v: V) {
+  return is$typed(v, id, hashMainRecord);
 }
 
-export function validateRecord<V>(v: V) {
-  return validate<Record & V>(v, id, hashRecord, true);
+export function validateMainRecord<V>(v: V) {
+  return validate<MainRecord & V>(v, id, hashMainRecord, true);
 }

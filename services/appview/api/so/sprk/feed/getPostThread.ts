@@ -1,24 +1,77 @@
-import { Hono } from "hono";
+import { Server } from "../../../../lexicon/index.ts";
 import { OutputSchema as GetPostThreadView } from "../../../../lexicon/types/so/sprk/feed/getPostThread.ts";
 import type * as SoSprkFeedDefs from "../../../../lexicon/types/so/sprk/feed/defs.ts";
-import { AppContext, AppEnv } from "../../../../main.ts";
+import { AppContext } from "../../../../main.ts";
 import { transformPostToPostView } from "../../../../utils/post-transformer.ts";
-import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";
 
-export const createGetPostThreadRouter = (ctx: AppContext) => {
-  const router = new Hono<AppEnv>();
+export default function (server: Server, ctx: AppContext) {
+  server.so.sprk.feed.getPostThread({
+    auth: ctx.authVerifier.standardOptional,
+    handler: async ({ params, auth }) => {
+      // Recursive function to build a thread view for a post and its replies
+      async function buildThreadView(
+        post: { uri: string; reply?: { parent: { uri: string } } },
+        userDid?: string,
+        depth = 0,
+      ): Promise<SoSprkFeedDefs.ThreadViewPost> {
+        // Get the full post document
+        const fullPost = await ctx.db.models.Post.findOne({ uri: post.uri })
+          .lean();
+        if (!fullPost) {
+          throw new Error(`Post not found: ${post.uri}`);
+        }
 
-  router.get(
-    "/xrpc/so.sprk.feed.getPostThread",
-    optionalAuthMiddleware,
-    async (c) => {
-      const uri = c.req.query("uri");
-      const depth = parseInt(c.req.query("depth") || "6", 10);
-      const parentHeight = parseInt(c.req.query("parentHeight") || "80", 10);
-      const userDid = c.get("did") as string | undefined;
+        // Convert the post to a post view
+        const postView = await transformPostToPostView(
+          fullPost,
+          ctx.db,
+          userDid,
+        );
+
+        // If we've reached the maximum depth, don't fetch replies
+        if (depth <= 0) {
+          return {
+            $type: "so.sprk.feed.defs#threadViewPost",
+            post: postView,
+            replies: [],
+            threadContext: {},
+          } as SoSprkFeedDefs.ThreadViewPost;
+        }
+
+        // Get replies to this post
+        const replies = await ctx.db.models.Post.find({
+          "reply.parent.uri": post.uri,
+        }).sort({ createdAt: 1 }).lean();
+
+        // Convert replies to thread views recursively
+        const replyThreads = await Promise.all(
+          replies.map(async (reply: { uri: string }) => {
+            return await buildThreadView(reply, userDid, depth - 1);
+          }),
+        );
+
+        // Check for user specific thread context
+        const threadContext: SoSprkFeedDefs.ThreadContext = {};
+
+        return {
+          $type: "so.sprk.feed.defs#threadViewPost",
+          post: postView,
+          replies: replyThreads,
+          threadContext,
+        } as SoSprkFeedDefs.ThreadViewPost;
+      }
+
+      const { uri } = params;
+      const depth = typeof params.depth === "number" ? params.depth : 6;
+      const parentHeight = typeof params.parentHeight === "number"
+        ? params.parentHeight
+        : 80;
+      const userDid = auth.credentials.type === "standard"
+        ? auth.credentials.iss
+        : undefined;
 
       if (!uri) {
-        return c.json({ error: "URI is required" }, 400);
+        throw new Error("URI is required");
       }
 
       try {
@@ -26,13 +79,16 @@ export const createGetPostThreadRouter = (ctx: AppContext) => {
         const mainPost = await ctx.db.models.Post.findOne({ uri }).lean();
 
         if (!mainPost) {
-          return c.json({
-            thread: {
-              $type: "so.sprk.feed.defs#notFoundPost",
-              uri,
-              notFound: true,
-            },
-          } as GetPostThreadView, 404);
+          return {
+            encoding: "application/json",
+            body: {
+              thread: {
+                $type: "so.sprk.feed.defs#notFoundPost",
+                uri,
+                notFound: true,
+              },
+            } as GetPostThreadView,
+          };
         }
 
         // Convert the main post to a PostView
@@ -85,7 +141,7 @@ export const createGetPostThreadRouter = (ctx: AppContext) => {
         // Convert replies to thread views recursively
         const replyThreads = await Promise.all(
           replies.map(async (reply: { uri: string }) => {
-            return await buildThreadView(reply, ctx, userDid, depth - 1);
+            return await buildThreadView(reply, userDid, depth - 1);
           }),
         );
 
@@ -126,62 +182,13 @@ export const createGetPostThreadRouter = (ctx: AppContext) => {
           thread.parent = currentParent;
         }
 
-        return c.json({ thread } as GetPostThreadView);
+        return {
+          encoding: "application/json",
+          body: { thread } as GetPostThreadView,
+        };
       } catch (error) {
-        console.error("Error fetching post thread:", error);
-        return c.json({ error: "Failed to get post thread" }, 500);
+        throw error;
       }
     },
-  );
-
-  return router;
-};
-
-// Recursive function to build a thread view for a post and its replies
-async function buildThreadView(
-  post: { uri: string; reply?: { parent: { uri: string } } },
-  ctx: AppContext,
-  userDid?: string,
-  depth = 0,
-): Promise<SoSprkFeedDefs.ThreadViewPost> {
-  // Get the full post document
-  const fullPost = await ctx.db.models.Post.findOne({ uri: post.uri }).lean();
-  if (!fullPost) {
-    throw new Error(`Post not found: ${post.uri}`);
-  }
-
-  // Convert the post to a post view
-  const postView = await transformPostToPostView(fullPost, ctx.db, userDid);
-
-  // If we've reached the maximum depth, don't fetch replies
-  if (depth <= 0) {
-    return {
-      $type: "so.sprk.feed.defs#threadViewPost",
-      post: postView,
-      replies: [],
-      threadContext: {},
-    } as SoSprkFeedDefs.ThreadViewPost;
-  }
-
-  // Get replies to this post
-  const replies = await ctx.db.models.Post.find({
-    "reply.parent.uri": post.uri,
-  }).sort({ createdAt: 1 }).lean();
-
-  // Convert replies to thread views recursively
-  const replyThreads = await Promise.all(
-    replies.map(async (reply: { uri: string }) => {
-      return await buildThreadView(reply, ctx, userDid, depth - 1);
-    }),
-  );
-
-  // Check for user specific thread context
-  const threadContext: SoSprkFeedDefs.ThreadContext = {};
-
-  return {
-    $type: "so.sprk.feed.defs#threadViewPost",
-    post: postView,
-    replies: replyThreads,
-    threadContext,
-  } as SoSprkFeedDefs.ThreadViewPost;
+  });
 }

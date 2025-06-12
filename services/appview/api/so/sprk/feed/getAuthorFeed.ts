@@ -1,35 +1,26 @@
-import { Hono } from "hono";
-import { HTTPException } from "hono/http-exception";
-import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";
-import { AppContext, AppEnv } from "../../../../main.ts";
+import { Server } from "../../../../lexicon/index.ts";
+import { AppContext } from "../../../../main.ts";
 import { transformPostToPostView } from "../../../../utils/post-transformer.ts";
 import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
 
-export const createGetAuthorFeedRouter = (ctx: AppContext) => {
-  const router = new Hono<AppEnv>();
-
-  router.get(
-    "/xrpc/so.sprk.feed.getAuthorFeed",
-    optionalAuthMiddleware,
-    async (c) => {
+export default function (server: Server, ctx: AppContext) {
+  server.so.sprk.feed.getAuthorFeed({
+    auth: ctx.authVerifier.standardOptional,
+    handler: async ({ params, auth }) => {
       // Get query parameters
-      const actor = c.req.query("actor");
-      const limit = parseInt(c.req.query("limit") || "50", 10);
-      const cursor = c.req.query("cursor");
-      const filter = c.req.query("filter") || "posts_with_replies";
-      const includePins = c.req.query("includePins") === "true";
-      const viewerDid = c.var.did as string | undefined;
+      const { actor, limit, cursor, filter, includePins } = params;
+      const userDid = auth.credentials.type === "standard"
+        ? auth.credentials.iss
+        : undefined;
 
       // Validate required parameters
       if (!actor) {
-        throw new HTTPException(400, { message: "Actor is required" });
+        throw new Error("Actor is required");
       }
 
       // Validate limit
-      if (isNaN(limit) || limit < 1 || limit > 100) {
-        throw new HTTPException(400, {
-          message: "Invalid limit: must be between 1 and 100",
-        });
+      if (limit < 1 || limit > 100) {
+        throw new Error("Invalid limit: must be between 1 and 100");
       }
 
       try {
@@ -40,30 +31,28 @@ export const createGetAuthorFeedRouter = (ctx: AppContext) => {
             const didDoc = await ctx.resolver.resolveHandleToDidDoc(actor);
             actorDid = didDoc.did;
           } catch {
-            throw new HTTPException(400, {
-              message: "Invalid actor: could not resolve handle",
-            });
+            throw new Error("Invalid actor: could not resolve handle");
           }
         }
 
         // Check if user is blocked or blocking the actor
-        if (viewerDid) {
+        if (userDid) {
           const userIsBlocked = await ctx.db.models.Block.findOne({
             authorDid: actorDid,
-            subject: viewerDid,
+            subject: userDid,
           });
 
           if (userIsBlocked) {
-            throw new HTTPException(403, { message: "BlockedByActor" });
+            throw new Error("BlockedByActor");
           }
 
           const userIsBlocking = await ctx.db.models.Block.findOne({
-            authorDid: viewerDid,
+            authorDid: userDid,
             subject: actorDid,
           });
 
           if (userIsBlocking) {
-            throw new HTTPException(403, { message: "BlockedActor" });
+            throw new Error("BlockedActor");
           }
         }
 
@@ -99,7 +88,7 @@ export const createGetAuthorFeedRouter = (ctx: AppContext) => {
             createdAtCursor = timestamp;
             idCursor = id;
           } catch {
-            throw new HTTPException(400, { message: "Invalid cursor format" });
+            throw new Error("Invalid cursor format");
           }
         }
 
@@ -149,7 +138,7 @@ export const createGetAuthorFeedRouter = (ctx: AppContext) => {
             const postView = await transformPostToPostView(
               post,
               ctx.db,
-              viewerDid,
+              userDid,
             );
 
             return {
@@ -167,22 +156,16 @@ export const createGetAuthorFeedRouter = (ctx: AppContext) => {
           );
         }
 
-        return c.json({
-          cursor: nextCursor,
-          feed: feedViewPosts,
-        });
+        return {
+          encoding: "application/json",
+          body: {
+            cursor: nextCursor,
+            feed: feedViewPosts,
+          },
+        };
       } catch (error) {
-        if (error instanceof HTTPException) {
-          throw error;
-        }
-
-        console.error("Error fetching author feed:", error);
-        throw new HTTPException(500, {
-          message: "Failed to fetch author feed",
-        });
+        throw error;
       }
     },
-  );
-
-  return router;
-};
+  });
+}

@@ -1,21 +1,16 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { BlobRef, type ValidationResult } from "@atproto/lexicon";
-import { CID } from "multiformats/cid";
-import { validate as _validate } from "../../../../lexicons";
-import {
-  type $Typed,
-  is$typed as _is$typed,
-  type OmitKey,
-} from "../../../../util";
-import type * as SoSprkLabelerDefs from "./defs.js";
-import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.js";
+import { validate as _validate } from "../../../../lexicons.ts";
+import { is$typed as _is$typed } from "../../../../util.ts";
+import { type $Typed } from "../../../../util.ts";
+import type * as SoSprkLabelerDefs from "./defs.ts";
+import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.labeler.service";
 
-export interface Record {
+export interface MainRecord {
   $type: "so.sprk.labeler.service";
   policies: SoSprkLabelerDefs.LabelerPolicies;
   labels?: $Typed<ComAtprotoLabelDefs.SelfLabels> | { $type: string };
@@ -23,12 +18,12 @@ export interface Record {
   [k: string]: unknown;
 }
 
-const hashRecord = "main";
+const hashMainRecord = "main";
 
-export function isRecord<V>(v: V) {
-  return is$typed(v, id, hashRecord);
+export function isMainRecord<V>(v: V) {
+  return is$typed(v, id, hashMainRecord);
 }
 
-export function validateRecord<V>(v: V) {
-  return validate<Record & V>(v, id, hashRecord, true);
+export function validateMainRecord<V>(v: V) {
+  return validate<MainRecord & V>(v, id, hashMainRecord, true);
 }

@@ -1,41 +1,42 @@
-import { Hono } from "hono";
-import { HTTPException } from "hono/http-exception";
+import { InvalidRequestError } from "@sprk/xrpc-server";
 import { transformStoryToStoryView } from "../../../../utils/story-transformer.ts";
-import { authMiddleware } from "../../../../services/auth/middleware.ts";
-import { AppContext, AppEnv } from "../../../../main.ts";
+import { Server } from "../../../../lexicon/index.ts";
+import { AppContext } from "../../../../main.ts";
 import { RootFilterQuery } from "mongoose";
 import type { StoryDocument } from "../../../../services/data-plane/server/index.ts";
 import { Buffer } from "node:buffer";
 import type { ProfileViewBasic } from "../../../../lexicon/types/so/sprk/actor/defs.ts";
 import type * as SoSprkFeedDefs from "../../../../lexicon/types/so/sprk/feed/defs.ts";
 
-export const createGetStoriesTimelineRouter = (ctx: AppContext) => {
-  const router = new Hono<AppEnv>();
-
-  router.get(
-    "/xrpc/so.sprk.feed.getStoriesTimeline",
-    authMiddleware,
-    async (c) => {
-      const limit = parseInt(c.req.query("limit") || "50", 10);
-      const cursor = c.req.query("cursor");
-      const viewerDid = c.get("did") as string;
+export default function (server: Server, ctx: AppContext) {
+  server.so.sprk.feed.getStoriesTimeline({
+    auth: ctx.authVerifier.standard,
+    handler: async ({ params, auth }) => {
+      const { limit: limitParam = 50, cursor } = params;
+      const userDid = auth.credentials.iss;
+      const limit = typeof limitParam === "string"
+        ? parseInt(limitParam)
+        : limitParam;
 
       if (isNaN(limit) || limit < 1 || limit > 100) {
-        throw new HTTPException(400, {
-          message: "Invalid limit: must be between 1 and 100",
-        });
+        throw new InvalidRequestError(
+          "Invalid limit: must be between 1 and 100",
+        );
       }
 
       try {
         // Get accounts that the viewer follows
         const follows = await ctx.db.models.Follow.find({
-          authorDid: viewerDid,
+          authorDid: userDid,
         }).lean();
 
         if (follows.length === 0) {
-          return c.json({
-            storiesByAuthor: [],
-          });
+          return {
+            encoding: "application/json",
+            body: {
+              storiesByAuthor: [],
+            },
+          };
         }
 
         const followedDids = follows.map((follow) => follow.subject);
@@ -62,7 +63,7 @@ export const createGetStoriesTimelineRouter = (ctx: AppContext) => {
             createdAtCursor = timestamp;
             idCursor = id;
           } catch (_error) {
-            throw new HTTPException(400, { message: "Invalid cursor format" });
+            throw new InvalidRequestError("Invalid cursor format");
           }
         }
 
@@ -146,22 +147,20 @@ export const createGetStoriesTimelineRouter = (ctx: AppContext) => {
           ).toString("base64");
         }
 
-        return c.json({
-          cursor: nextCursor,
-          storiesByAuthor,
-        });
+        return {
+          encoding: "application/json",
+          body: {
+            cursor: nextCursor,
+            storiesByAuthor,
+          },
+        };
       } catch (error) {
-        if (error instanceof HTTPException) {
+        if (error instanceof InvalidRequestError) {
           throw error;
         }
-
-        console.error("Error fetching stories timeline:", error);
-        throw new HTTPException(500, {
-          message: "Failed to fetch stories timeline",
-        });
+        ctx.logger.error("Error fetching stories timeline:", error);
+        throw new InvalidRequestError("Failed to fetch stories timeline");
       }
     },
-  );
-
-  return router;
-};
+  });
+}

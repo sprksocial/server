@@ -1,27 +1,22 @@
-import { Hono } from "hono";
-
-import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";
+import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
 import type * as SoSprkActorDefs from "../../../../lexicon/types/so/sprk/actor/defs.ts";
 
-export const createGetFollowersRouter = (ctx: AppContext) => {
-  const router = new Hono();
-
-  router.get(
-    "/xrpc/so.sprk.graph.getFollowers",
-    optionalAuthMiddleware,
-    async (c) => {
-      const actor = c.req.query("actor");
-      const limit = parseInt(c.req.query("limit") ?? "50");
-      const cursor = c.req.query("cursor");
+export default function (server: Server, ctx: AppContext) {
+  server.so.sprk.graph.getFollowers({
+    auth: ctx.authVerifier.standardOptional,
+    handler: async ({ params }) => {
+      const { actor } = params;
+      const limit = params.limit ?? 50;
+      const cursor = params.cursor;
 
       if (!actor) {
-        return c.json({ error: "Actor is required" }, 400);
+        throw new Error("Actor is required");
       }
 
       // Validate limit
       if (limit < 1 || limit > 100) {
-        return c.json({ error: "Limit must be between 1 and 100" }, 400);
+        throw new Error("Limit must be between 1 and 100");
       }
 
       // Build query
@@ -58,11 +53,15 @@ export const createGetFollowersRouter = (ctx: AppContext) => {
 
           // If we found a profile, add the additional fields
           if (profile) {
+            const avatarUrl = profile.avatar?.ref?.$link
+              ? `https://media.sprk.so/avatar/tiny/${profile.authorDid}/${profile.avatar.ref.$link}/webp`
+              : undefined;
+
             return {
               ...basicProfileView,
               displayName: profile.displayName,
               description: profile.description,
-              avatar: profile.avatar?.ref?.$link,
+              avatar: avatarUrl,
               indexedAt: profile.indexedAt,
               createdAt: profile.createdAt,
             };
@@ -74,9 +73,8 @@ export const createGetFollowersRouter = (ctx: AppContext) => {
 
       // Get next cursor
       const nextCursor = followers.length === limit
-        ? followers[followers.length - 1]._id
+        ? followers[followers.length - 1]._id.toString()
         : undefined;
-      console.log("nextCursor", nextCursor);
 
       // Get subject profile if it exists
       const subjectProfile = await ctx.db.models.Profile.findOne({
@@ -104,23 +102,28 @@ export const createGetFollowersRouter = (ctx: AppContext) => {
 
       // If we found the subject profile, add the additional fields
       if (subjectProfile) {
+        const avatarUrl = subjectProfile.avatar?.ref?.$link
+          ? `https://media.sprk.so/avatar/tiny/${subjectProfile.authorDid}/${subjectProfile.avatar.ref.$link}/webp`
+          : undefined;
+
         Object.assign(subjectProfileView, {
           handle: subjectProfile.authorHandle,
           displayName: subjectProfile.displayName,
           description: subjectProfile.description,
-          avatar: subjectProfile.avatar?.ref?.$link,
+          avatar: avatarUrl,
           indexedAt: subjectProfile.indexedAt,
           createdAt: subjectProfile.createdAt,
         });
       }
 
-      return c.json({
-        subject: subjectProfileView,
-        followers: profileViews,
-        cursor: nextCursor,
-      });
+      return {
+        encoding: "application/json",
+        body: {
+          subject: subjectProfileView,
+          followers: profileViews,
+          cursor: nextCursor,
+        },
+      };
     },
-  );
-
-  return router;
-};
+  });
+}

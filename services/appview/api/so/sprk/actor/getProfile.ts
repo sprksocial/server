@@ -1,24 +1,21 @@
 import { ensureValidDid, isValidHandle } from "@atproto/syntax";
-import { Hono } from "hono";
-
+import { Server } from "../../../../lexicon/index.ts";
 import type { Label } from "../../../../lexicon/types/com/atproto/label/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../../lexicon/types/com/atproto/repo/strongRef.ts";
 import type * as SoSprkActorDefs from "../../../../lexicon/types/so/sprk/actor/defs.ts";
-import { AppContext, AppEnv } from "../../../../main.ts";
-import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";
+import { AppContext } from "../../../../main.ts";
 
-export const createGetProfileRouter = (ctx: AppContext) => {
-  const router = new Hono<AppEnv>();
-
-  router.get(
-    "/xrpc/so.sprk.actor.getProfile",
-    optionalAuthMiddleware,
-    async (c) => {
-      const actorParam = c.req.query("actor");
-      const viewerDid = c.get("did") as string | undefined;
+export default function (server: Server, ctx: AppContext) {
+  server.so.sprk.actor.getProfile({
+    auth: ctx.authVerifier.standardOptional,
+    handler: async ({ params, auth }) => {
+      const { actor: actorParam } = params;
+      const viewerDid = auth.credentials.type === "standard"
+        ? auth.credentials.iss
+        : undefined;
 
       if (!actorParam) {
-        return c.json({ error: "Actor not provided" }, 400);
+        throw new Error("Actor not provided");
       }
 
       let actorDidDoc;
@@ -29,12 +26,11 @@ export const createGetProfileRouter = (ctx: AppContext) => {
           ensureValidDid(actorParam);
           actorDidDoc = await ctx.resolver.resolveDidToDidDoc(actorParam);
         } catch (_err) {
-          return c.json({ error: "Invalid actor" }, 400);
+          throw new Error("Invalid actor");
         }
       }
 
       const actorDid = actorDidDoc.did;
-
       const now = new Date().toISOString();
 
       await ctx.indexingService.indexHandle(actorDid, now);
@@ -66,11 +62,11 @@ export const createGetProfileRouter = (ctx: AppContext) => {
       }
 
       if (!actorDoc) {
-        return c.json({ error: "Actor not found" }, 404);
+        throw new Error("Actor not found");
       }
 
       if (!profile) {
-        return c.json({ error: "Profile not found" }, 404);
+        throw new Error("Profile not found");
       }
 
       // Use actor's handle if available, otherwise resolve from DID
@@ -233,9 +229,10 @@ export const createGetProfileRouter = (ctx: AppContext) => {
         stories: stories.length > 0 ? stories : undefined,
       };
 
-      return c.json(profileView);
+      return {
+        encoding: "application/json",
+        body: profileView,
+      };
     },
-  );
-
-  return router;
-};
+  });
+}

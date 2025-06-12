@@ -1,11 +1,12 @@
 {
   "tasks": {
     "dev": "deno run --allow-net --allow-env --allow-sys --allow-read --allow-ffi --watch main.ts",
-    "codegen": "deno run -A jsr:@sprk/lex-cli gen-server --yes ./lexicon ../../lexicons/com/atproto/*/* ../../lexicons/so/sprk/*/*",
+    "codegen": "deno run -A jsr:@sprk/lex-cli@^0.1.5 gen-server --hono-import hono --yes ./lexicon ../../lexicons",
     "start": "deno run --allow-net --allow-env --allow-sys --allow-read --allow-ffi main.ts",
     "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
   },
   "imports": {
+    "@atproto/xrpc-server": "npm:@atproto/xrpc-server@^0.7.19",
     "hono": "jsr:@hono/hono@^4.7.10",
     "@std/encoding": "jsr:@std/encoding@1",
     "@atproto/api": "npm:@atproto/api@^0.14.9",
@@ -14,7 +15,7 @@
     "@atproto/identity": "npm:@atproto/identity@^0.4.8",
     "@atproto/lexicon": "npm:@atproto/lexicon@^0.4.8",
     "@atproto/syntax": "npm:@atproto/syntax@^0.3.4",
-    "@sprk/xrpc-server": "jsr:@sprk/xrpc-server@^0.1.2",
+    "@sprk/xrpc-server": "jsr:@sprk/xrpc-server@^0.1.5",
     "express": "npm:express@^4.21.2",
     "jose": "npm:jose@^6.0.11",
     "key-encoder": "npm:key-encoder@^2.0.3",
@@ -26,12 +27,6 @@
   "compilerOptions": {
     "jsx": "precompile",
     "jsxImportSource": "hono/jsx"
-  },
-  "lint": {
-    "exclude": ["lexicon/"]
-  },
-  "fmt": {
-    "exclude": ["lexicon/"]
   },
   "unstable": ["sloppy-imports"]
 }

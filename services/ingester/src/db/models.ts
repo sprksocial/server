@@ -467,6 +467,8 @@ export interface ActorDocument extends Document {
   indexedAt: string;
   takedownRef: string | null;
   upstreamStatus: string | null;
+  keys: string;
+  services: string;
 }
 
 export const actorSchema = new Schema<ActorDocument>({
@@ -475,6 +477,8 @@ export const actorSchema = new Schema<ActorDocument>({
   indexedAt: { type: String, required: true },
   takedownRef: { type: String, required: false },
   upstreamStatus: { type: String, required: false },
+  keys: { type: String, required: true },
+  services: { type: String, required: true },
 });
 
 // Add compound indexes for Actor

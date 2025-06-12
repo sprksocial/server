@@ -1,18 +1,13 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { BlobRef, type ValidationResult } from "@atproto/lexicon";
-import { CID } from "multiformats/cid";
-import { validate as _validate } from "../../../../lexicons";
-import {
-  type $Typed,
-  is$typed as _is$typed,
-  type OmitKey,
-} from "../../../../util";
-import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.js";
-import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef.js";
-import type * as SoSprkGraphDefs from "../graph/defs.js";
-import type * as SoSprkFeedThreadgate from "../feed/threadgate.js";
+import { validate as _validate } from "../../../../lexicons.ts";
+import { is$typed as _is$typed } from "../../../../util.ts";
+import { type $Typed } from "../../../../util.ts";
+import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
+import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef.ts";
+import type * as SoSprkGraphDefs from "../graph/defs.ts";
+import type * as SoSprkFeedThreadgate from "../feed/threadgate.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.actor.defs";
@@ -118,7 +113,7 @@ export function validateProfileAssociated<V>(v: V) {
 
 export interface ProfileAssociatedChat {
   $type?: "so.sprk.actor.defs#profileAssociatedChat";
-  allowIncoming: "all" | "none" | "following" | (string & {});
+  allowIncoming: "all" | "none" | "following" | (string & { __brand?: never });
 }
 
 const hashProfileAssociatedChat = "profileAssociatedChat";
@@ -171,22 +166,21 @@ export function validateKnownFollowers<V>(v: V) {
   return validate<KnownFollowers & V>(v, id, hashKnownFollowers);
 }
 
-export type Preferences =
-  (
-    | $Typed<AdultContentPref>
-    | $Typed<ContentLabelPref>
-    | $Typed<SavedFeedsPref>
-    | $Typed<SavedFeedsPrefV2>
-    | $Typed<PersonalDetailsPref>
-    | $Typed<FeedViewPref>
-    | $Typed<ThreadViewPref>
-    | $Typed<InterestsPref>
-    | $Typed<MutedWordsPref>
-    | $Typed<HiddenPostsPref>
-    | $Typed<LabelersPref>
-    | $Typed<PostInteractionSettingsPref>
-    | { $type: string }
-  )[];
+export type Preferences = (
+  | $Typed<AdultContentPref>
+  | $Typed<ContentLabelPref>
+  | $Typed<SavedFeedsPref>
+  | $Typed<SavedFeedsPrefV2>
+  | $Typed<PersonalDetailsPref>
+  | $Typed<FeedViewPref>
+  | $Typed<ThreadViewPref>
+  | $Typed<InterestsPref>
+  | $Typed<MutedWordsPref>
+  | $Typed<HiddenPostsPref>
+  | $Typed<LabelersPref>
+  | $Typed<PostInteractionSettingsPref>
+  | { $type: string }
+)[];
 
 export interface AdultContentPref {
   $type?: "so.sprk.actor.defs#adultContentPref";
@@ -208,7 +202,12 @@ export interface ContentLabelPref {
   /** Which labeler does this preference apply to? If undefined, applies globally. */
   labelerDid?: string;
   label: string;
-  visibility: "ignore" | "show" | "warn" | "hide" | (string & {});
+  visibility:
+    | "ignore"
+    | "show"
+    | "warn"
+    | "hide"
+    | (string & { __brand?: never });
 }
 
 const hashContentLabelPref = "contentLabelPref";
@@ -224,7 +223,7 @@ export function validateContentLabelPref<V>(v: V) {
 export interface SavedFeed {
   $type?: "so.sprk.actor.defs#savedFeed";
   id: string;
-  type: "feed" | "list" | "timeline" | (string & {});
+  type: "feed" | "list" | "timeline" | (string & { __brand?: never });
   value: string;
   pinned: boolean;
 }
@@ -325,7 +324,7 @@ export interface ThreadViewPref {
     | "most-looks"
     | "random"
     | "hotness"
-    | (string & {});
+    | (string & { __brand?: never });
   /** Show followed users at the top of all replies. */
   prioritizeFollowedUsers?: boolean;
 }
@@ -356,7 +355,10 @@ export function validateInterestsPref<V>(v: V) {
   return validate<InterestsPref & V>(v, id, hashInterestsPref);
 }
 
-export type MutedWordTarget = "content" | "tag" | (string & {});
+export type MutedWordTarget =
+  | "content"
+  | "tag"
+  | (string & { __brand?: never });
 
 /** A word that the account owner has muted. */
 export interface MutedWord {
@@ -367,7 +369,7 @@ export interface MutedWord {
   /** The intended targets of the muted word. */
   targets: (MutedWordTarget)[];
   /** Groups of users to apply the muted word to. If undefined, applies to all users. */
-  actorTarget: "all" | "exclude-following" | (string & {});
+  actorTarget: "all" | "exclude-following" | (string & { __brand?: never });
   /** The date and time at which the muted word will expire and no longer be applied. */
   expiresAt?: string;
 }
@@ -448,14 +450,13 @@ export function validateLabelerPrefItem<V>(v: V) {
 export interface PostInteractionSettingsPref {
   $type?: "so.sprk.actor.defs#postInteractionSettingsPref";
   /** Matches threadgate record. List of rules defining who can reply to this users posts. If value is an empty array, no one can reply. If value is undefined, anyone can reply. */
-  threadgateAllowRules?:
-    (
-      | $Typed<SoSprkFeedThreadgate.MentionRule>
-      | $Typed<SoSprkFeedThreadgate.FollowerRule>
-      | $Typed<SoSprkFeedThreadgate.FollowingRule>
-      | $Typed<SoSprkFeedThreadgate.ListRule>
-      | { $type: string }
-    )[];
+  threadgateAllowRules?: (
+    | $Typed<SoSprkFeedThreadgate.MentionRule>
+    | $Typed<SoSprkFeedThreadgate.FollowerRule>
+    | $Typed<SoSprkFeedThreadgate.FollowingRule>
+    | $Typed<SoSprkFeedThreadgate.ListRule>
+    | { $type: string }
+  )[];
 }
 
 const hashPostInteractionSettingsPref = "postInteractionSettingsPref";

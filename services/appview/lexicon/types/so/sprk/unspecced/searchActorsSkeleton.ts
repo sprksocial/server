@@ -1,20 +1,9 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import express from "express";
-import { BlobRef, type ValidationResult } from "@atproto/lexicon";
-import { CID } from "multiformats/cid";
-import { validate as _validate } from "../../../../lexicons";
-import {
-  type $Typed,
-  is$typed as _is$typed,
-  type OmitKey,
-} from "../../../../util";
+import { type HonoRequest } from "hono";
 import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
-import type * as SoSprkUnspeccedDefs from "./defs.js";
-
-const is$typed = _is$typed, validate = _validate;
-const id = "so.sprk.unspecced.searchActorsSkeleton";
+import type * as SoSprkUnspeccedDefs from "./defs.ts";
 
 export interface QueryParams {
   /** Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended. For typeahead search, only simple term match is supported, not full syntax. */
@@ -56,8 +45,7 @@ export type HandlerReqCtx<HA extends HandlerAuth = never> = {
   auth: HA;
   params: QueryParams;
   input: HandlerInput;
-  req: express.Request;
-  res: express.Response;
+  req: HonoRequest;
   resetRouteRateLimits: () => Promise<void>;
 };
 export type Handler<HA extends HandlerAuth = never> = (

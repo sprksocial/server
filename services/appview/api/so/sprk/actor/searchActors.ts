@@ -1,6 +1,5 @@
-import { Hono } from "hono";
-import { optionalAuthMiddleware } from "../../../../services/auth/middleware.ts";
-import { AppContext, AppEnv } from "../../../../main.ts";
+import { Server } from "../../../../lexicon/index.ts";
+import { AppContext } from "../../../../main.ts";
 import type { Label } from "../../../../lexicon/types/com/atproto/label/defs.ts";
 import type * as SoSprkActorDefs from "../../../../lexicon/types/so/sprk/actor/defs.ts";
 import type * as SoSprkActorSearch from "../../../../lexicon/types/so/sprk/actor/searchActors.ts";
@@ -10,38 +9,39 @@ function escapeRegExp(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export const createSearchActorRouter = (ctx: AppContext) => {
-  const router = new Hono<AppEnv>();
+export default function (server: Server, ctx: AppContext) {
+  server.so.sprk.actor.searchActors({
+    auth: ctx.authVerifier.standardOptional,
+    handler: async ({ params, auth }) => {
+      const { q, limit: limitParam = 25, cursor: cursorParam } = params;
+      const userDid = auth.credentials.type === "standard"
+        ? auth.credentials.iss
+        : undefined;
 
-  router.get(
-    "/xrpc/so.sprk.actor.searchActors",
-    optionalAuthMiddleware,
-    async (c) => {
-      const q = c.req.query("q")?.trim();
-
-      if (!q) {
-        return c.json({ error: "Search query (q) is required" }, 400);
+      if (!q?.trim()) {
+        throw new Error("Search query (q) is required");
       }
 
-      let limit = parseInt(c.req.query("limit") ?? "25");
+      let limit = typeof limitParam === "string"
+        ? parseInt(limitParam)
+        : limitParam;
       if (isNaN(limit)) limit = 25;
       if (limit < 1 || limit > 100) {
-        return c.json({ error: "Limit must be between 1 and 100" }, 400);
+        throw new Error("Limit must be between 1 and 100");
       }
 
       let skip = 0;
-      const cursorParam = c.req.query("cursor");
       if (cursorParam) {
         skip = parseInt(cursorParam);
         if (isNaN(skip) || skip < 0) {
-          return c.json({ error: "Invalid cursor" }, 400);
+          throw new Error("Invalid cursor");
         }
       }
 
       const filter: Record<string, unknown> = {};
       const sort: { createdAt: -1 } = { createdAt: -1 };
 
-      const escaped = escapeRegExp(q);
+      const escaped = escapeRegExp(q.trim());
       const regex = new RegExp(escaped, "i");
       filter.$or = [
         { displayName: regex },
@@ -70,8 +70,6 @@ export const createSearchActorRouter = (ctx: AppContext) => {
 
       const fullProfiles = [...profiles, ...handleProfiles];
 
-      const viewerDid = c.get("did") as string | undefined;
-
       const actors: SoSprkActorDefs.ProfileView[] = (
         await Promise.all(
           fullProfiles.map(async (p) => {
@@ -93,26 +91,25 @@ export const createSearchActorRouter = (ctx: AppContext) => {
             }
 
             let viewer: SoSprkActorDefs.ViewerState | undefined = undefined;
-            if (viewerDid) {
+            if (userDid) {
               const [follow, followedBy, block, blockedBy] = await Promise.all([
                 ctx.db.models.Follow.findOne({
                   subject: p.authorDid,
-                  authorDid: viewerDid,
+                  authorDid: userDid,
                 }),
                 ctx.db.models.Follow.findOne({
-                  subject: viewerDid,
+                  subject: userDid,
                   authorDid: p.authorDid,
                 }),
                 ctx.db.models.Block.findOne({
                   subject: p.authorDid,
-                  authorDid: viewerDid,
+                  authorDid: userDid,
                 }),
                 ctx.db.models.Block.findOne({
-                  subject: viewerDid,
+                  subject: userDid,
                   authorDid: p.authorDid,
                 }),
               ]);
-              console.log(follow, followedBy, block, blockedBy);
               viewer = {};
               if (follow) viewer.following = follow.uri;
               if (followedBy) viewer.followedBy = followedBy.uri;
@@ -142,14 +139,14 @@ export const createSearchActorRouter = (ctx: AppContext) => {
       const nextCursor = profiles.length === limit
         ? String(skip + limit)
         : undefined;
-      const result: SoSprkActorSearch.OutputSchema = { actors };
-      if (nextCursor) {
-        result.cursor = nextCursor;
-      }
 
-      return c.json(result);
+      return {
+        encoding: "application/json",
+        body: {
+          actors,
+          ...(nextCursor ? { cursor: nextCursor } : {}),
+        } as SoSprkActorSearch.OutputSchema,
+      };
     },
-  );
-
-  return router;
-};
+  });
+}

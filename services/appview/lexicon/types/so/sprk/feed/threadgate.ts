@@ -1,45 +1,39 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { BlobRef, type ValidationResult } from "@atproto/lexicon";
-import { CID } from "multiformats/cid";
-import { validate as _validate } from "../../../../lexicons";
-import {
-  type $Typed,
-  is$typed as _is$typed,
-  type OmitKey,
-} from "../../../../util";
+import { validate as _validate } from "../../../../lexicons.ts";
+import { is$typed as _is$typed } from "../../../../util.ts";
+import { type $Typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.feed.threadgate";
 
-export interface Record {
+export interface MainRecord {
   $type: "so.sprk.feed.threadgate";
   /** Reference (AT-URI) to the post record. */
   post: string;
   /** List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply. */
-  allow?:
-    (
-      | $Typed<MentionRule>
-      | $Typed<FollowerRule>
-      | $Typed<FollowingRule>
-      | $Typed<ListRule>
-      | { $type: string }
-    )[];
+  allow?: (
+    | $Typed<MentionRule>
+    | $Typed<FollowerRule>
+    | $Typed<FollowingRule>
+    | $Typed<ListRule>
+    | { $type: string }
+  )[];
   createdAt: string;
   /** List of hidden reply URIs. */
   hiddenReplies?: (string)[];
   [k: string]: unknown;
 }
 
-const hashRecord = "main";
+const hashMainRecord = "main";
 
-export function isRecord<V>(v: V) {
-  return is$typed(v, id, hashRecord);
+export function isMainRecord<V>(v: V) {
+  return is$typed(v, id, hashMainRecord);
 }
 
-export function validateRecord<V>(v: V) {
-  return validate<Record & V>(v, id, hashRecord, true);
+export function validateMainRecord<V>(v: V) {
+  return validate<MainRecord & V>(v, id, hashMainRecord, true);
 }
 
 /** Allow replies from actors mentioned in your post. */

@@ -1,0 +1,98 @@
+/**
+ * GENERATED CODE - DO NOT MODIFY
+ */
+import { validate as _validate } from "../../../../lexicons.ts";
+import { is$typed as _is$typed } from "../../../../util.ts";
+import { type $Typed } from "../../../../util.ts";
+
+const is$typed = _is$typed, validate = _validate;
+const id = "app.bsky.feed.threadgate";
+
+export interface MainRecord {
+  $type: "app.bsky.feed.threadgate";
+  /** Reference (AT-URI) to the post record. */
+  post: string;
+  /** List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply. */
+  allow?: (
+    | $Typed<MentionRule>
+    | $Typed<FollowerRule>
+    | $Typed<FollowingRule>
+    | $Typed<ListRule>
+    | { $type: string }
+  )[];
+  createdAt: string;
+  /** List of hidden reply URIs. */
+  hiddenReplies?: (string)[];
+  [k: string]: unknown;
+}
+
+const hashMainRecord = "main";
+
+export function isMainRecord<V>(v: V) {
+  return is$typed(v, id, hashMainRecord);
+}
+
+export function validateMainRecord<V>(v: V) {
+  return validate<MainRecord & V>(v, id, hashMainRecord, true);
+}
+
+/** Allow replies from actors mentioned in your post. */
+export interface MentionRule {
+  $type?: "app.bsky.feed.threadgate#mentionRule";
+}
+
+const hashMentionRule = "mentionRule";
+
+export function isMentionRule<V>(v: V) {
+  return is$typed(v, id, hashMentionRule);
+}
+
+export function validateMentionRule<V>(v: V) {
+  return validate<MentionRule & V>(v, id, hashMentionRule);
+}
+
+/** Allow replies from actors who follow you. */
+export interface FollowerRule {
+  $type?: "app.bsky.feed.threadgate#followerRule";
+}
+
+const hashFollowerRule = "followerRule";
+
+export function isFollowerRule<V>(v: V) {
+  return is$typed(v, id, hashFollowerRule);
+}
+
+export function validateFollowerRule<V>(v: V) {
+  return validate<FollowerRule & V>(v, id, hashFollowerRule);
+}
+
+/** Allow replies from actors you follow. */
+export interface FollowingRule {
+  $type?: "app.bsky.feed.threadgate#followingRule";
+}
+
+const hashFollowingRule = "followingRule";
+
+export function isFollowingRule<V>(v: V) {
+  return is$typed(v, id, hashFollowingRule);
+}
+
+export function validateFollowingRule<V>(v: V) {
+  return validate<FollowingRule & V>(v, id, hashFollowingRule);
+}
+
+/** Allow replies from actors on a list. */
+export interface ListRule {
+  $type?: "app.bsky.feed.threadgate#listRule";
+  list: string;
+}
+
+const hashListRule = "listRule";
+
+export function isListRule<V>(v: V) {
+  return is$typed(v, id, hashListRule);
+}
+
+export function validateListRule<V>(v: V) {
+  return validate<ListRule & V>(v, id, hashListRule);
+}

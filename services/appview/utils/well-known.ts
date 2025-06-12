@@ -13,7 +13,10 @@ const wellKnownRouter = () => {
     const multikey = formatMultikey(keypair.jwtAlg, keypair.publicKeyBytes());
 
     return c.json({
-      "@context": ["https://www.w3.org/ns/did/v1"],
+      "@context": [
+        "https://www.w3.org/ns/did/v1",
+        "https://w3id.org/security/multikey/v1",
+      ],
       id: `did:web:${domain}`,
       verificationMethod: [
         {
