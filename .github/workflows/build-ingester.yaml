@@ -7,6 +7,8 @@ on:
       - "ingester/v*"
     branches:
       - main
+    paths:
+      - "services/ingester/**"
 
 jobs:
   build-and-push-ingester:
