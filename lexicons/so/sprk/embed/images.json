@@ -40,7 +40,7 @@
         "images": {
           "type": "array",
           "items": { "type": "ref", "ref": "#viewImage" },
-          "maxLength": 4
+          "maxLength": 12
         }
       }
     },
