@@ -13,11 +13,12 @@ export interface QueryParams {
 export type InputSchema = undefined;
 
 export interface OutputSchema {
-  repos: (
-    | $Typed<ToolsOzoneModerationDefs.RepoViewDetail>
-    | $Typed<ToolsOzoneModerationDefs.RepoViewNotFound>
-    | { $type: string }
-  )[];
+  repos:
+    (
+      | $Typed<ToolsOzoneModerationDefs.RepoViewDetail>
+      | $Typed<ToolsOzoneModerationDefs.RepoViewNotFound>
+      | { $type: string }
+    )[];
 }
 
 export type HandlerInput = undefined;

@@ -2,6 +2,7 @@
   "version": "5",
   "specifiers": {
     "jsr:@hono/hono@^4.7.10": "4.7.11",
+    "jsr:@sprk/xrpc-server@~0.1.5": "0.1.5",
     "jsr:@std/assert@*": "1.0.13",
     "jsr:@std/encoding@*": "1.0.10",
     "jsr:@std/encoding@1": "1.0.10",
@@ -52,6 +53,21 @@
     },
     "@hono/hono@4.7.11": {
       "integrity": "52b9395e4f2448fbaf82a6bd7925d15e59f4055037e74d6c2f657f3618b11193"
+    },
+    "@sprk/xrpc-server@0.1.5": {
+      "integrity": "2ad3f3a8b8de8ef576280d522a33b65b1c444f692ffce2e5c9c1aefb39e62d90",
+      "dependencies": [
+        "jsr:@hono/hono",
+        "npm:@atproto/common@~0.4.11",
+        "npm:@atproto/crypto@~0.4.4",
+        "npm:@atproto/lexicon@~0.4.11",
+        "npm:@atproto/xrpc",
+        "npm:http-errors",
+        "npm:rate-limiter-flexible",
+        "npm:uint8arrays@3.0.0",
+        "npm:ws",
+        "npm:zod"
+      ]
     },
     "@std/assert@1.0.13": {
       "integrity": "ae0d31e41919b12c656c742b22522c32fb26ed0cba32975cb0de2a273cb68b29",

@@ -27,6 +27,8 @@ export interface MainRecord {
   [k: string]: unknown;
 }
 
+export type Record = MainRecord;
+
 const hashMainRecord = "main";
 
 export function isMainRecord<V>(v: V) {

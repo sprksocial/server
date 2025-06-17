@@ -1,6 +1,7 @@
 import { Database, PostDocument } from "../services/data-plane/server/index.ts";
 import type { Label } from "../lexicon/types/com/atproto/label/defs.ts";
 import type * as SoSprkFeedDefs from "../lexicon/types/so/sprk/feed/defs.ts";
+import type * as SoSprkFeedPost from "../lexicon/types/so/sprk/feed/post.ts";
 import { transformEmbed } from "./embed-transformer.ts";
 import { createProfileViewBasic } from "./profile-helper.ts";
 
@@ -80,11 +81,14 @@ export async function transformPostToPostView(
     cid: post.cid,
     author,
     record: {
+      $type: "so.sprk.feed.post",
       text: post.text,
+      embed: post.embed as SoSprkFeedPost.MainRecord["embed"],
       facets: post.facets,
       langs: post.langs,
       tags: post.tags,
-    },
+      createdAt: post.createdAt,
+    } satisfies SoSprkFeedPost.MainRecord,
     embed: embed,
     viewer,
     replyCount,
