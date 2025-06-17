@@ -100,6 +100,12 @@ app.get("/", (c) => {
   );
 });
 
+// Health endpoint
+app.get("/xrpc/_health", (c) => {
+  const version = Deno.env.get("COMMIT_SHA") ?? "unknown";
+  return c.json({ version });
+});
+
 // Error handling
 app.onError((err, c) => {
   if (err instanceof HTTPException) return err.getResponse();
