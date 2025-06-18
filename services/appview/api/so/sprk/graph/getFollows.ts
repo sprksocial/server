@@ -1,4 +1,5 @@
 import { Server } from "../../../../lexicon/index.ts";
+import { FollowDocument } from "../../../../data-plane/server/index.ts";
 import { PipelineStage } from "mongoose";
 import { AppContext } from "../../../../main.ts";
 import type * as SoSprkActorDefs from "../../../../lexicon/types/so/sprk/actor/defs.ts";
@@ -85,7 +86,7 @@ export default function (server: Server, ctx: AppContext) {
 
       // Get profile views for each follow
       const profileViews = await Promise.all(
-        follows.map(async (follow) => {
+        follows.map(async (follow: FollowDocument) => {
           const profile = await ctx.db.models.Profile.findOne({
             authorDid: follow.subject,
           });

@@ -1,6 +1,7 @@
-import { Database } from "../services/data-plane/server/index.ts";
+import { Database } from "../data-plane/server/index.ts";
 import type { ProfileViewBasic } from "../lexicon/types/so/sprk/actor/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../lexicon/types/com/atproto/repo/strongRef.ts";
+import type { StoryDocument } from "../data-plane/server/index.ts";
 
 // Helper function to create ProfileViewBasic with stories
 export async function createProfileViewBasic(
@@ -32,7 +33,7 @@ export async function createProfileViewBasic(
         .lean();
 
       // Convert recent stories to strongRefs
-      stories = recentStories.map((story) => ({
+      stories = recentStories.map((story: StoryDocument) => ({
         uri: story.uri,
         cid: story.cid,
       }));

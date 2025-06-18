@@ -3,9 +3,9 @@ import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { pino } from "pino";
-import { Database } from "./services/data-plane/server/index.ts";
+import { Database } from "./data-plane/server/index.ts";
 import { env } from "./utils/env.ts";
-import { createAuthVerifier } from "./services/auth/auth-verifier.ts";
+import { createAuthVerifier } from "./services/auth-verifier.ts";
 import API from "./api/index.ts";
 import { createServer } from "./lexicon/index.ts";
 import {
@@ -18,7 +18,7 @@ import { TakedownService } from "./services/takedown.ts";
 import { IndexingService } from "./services/indexing.ts";
 import { BidirectionalResolver } from "./utils/id-resolver.ts";
 import { DidResolver } from "@atproto/identity";
-import { AuthVerifier } from "./services/auth/auth-verifier.ts";
+import { AuthVerifier } from "./services/auth-verifier.ts";
 import { AuthRequiredError } from "@sprk/xrpc-server";
 
 // Setup logger and database

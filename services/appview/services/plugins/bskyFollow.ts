@@ -4,7 +4,7 @@ import { pino } from "pino";
 import {
   Database,
   FollowDocument,
-} from "../../services/data-plane/server/index.ts";
+} from "../../data-plane/server/index.ts";
 
 const logger = pino({ name: "bsky-follow-processor" });
 

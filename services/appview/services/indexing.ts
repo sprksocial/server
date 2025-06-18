@@ -2,12 +2,12 @@ import { AtUri } from "@atproto/syntax";
 import { CID } from "multiformats/cid";
 import { Document } from "mongoose";
 import { BidirectionalResolver } from "../utils/id-resolver.ts";
-import { Database } from "../services/data-plane/server/index.ts";
+import { Database } from "../data-plane/server/index.ts";
 import { pino } from "pino";
 import * as Post from "./plugins/post.ts";
 import * as BskyFollow from "./plugins/bskyFollow.ts";
 import { Agent } from "@atproto/api";
-import { ActorDocument } from "../services/data-plane/server/index.ts";
+import { ActorDocument } from "../data-plane/server/index.ts";
 
 // Generic type for model processors
 type RecordProcessor = {

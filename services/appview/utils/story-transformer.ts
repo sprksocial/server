@@ -2,7 +2,7 @@ import type * as SoSprkFeedDefs from "../lexicon/types/so/sprk/feed/defs.ts";
 import {
   Database,
   StoryDocument,
-} from "../services/data-plane/server/index.ts";
+} from "../data-plane/server/index.ts";
 import { transformEmbed } from "./embed-transformer.ts";
 import { createProfileViewBasic } from "./profile-helper.ts";
 

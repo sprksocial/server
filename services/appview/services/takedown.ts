@@ -1,4 +1,4 @@
-import { Database } from "../services/data-plane/server/index.ts";
+import { Database, BlobTakedownDocument, RepoTakedownDocument, TakedownDocument } from "../data-plane/server/index.ts";
 
 export class TakedownService {
   constructor(private db: Database) {}
@@ -139,7 +139,7 @@ export class TakedownService {
     const items = takedowns.slice(0, limit);
 
     return {
-      takedowns: items.map((t) => ({
+      takedowns: items.map((t: TakedownDocument) => ({
         targetUri: t.targetUri,
         targetCid: t.targetCid,
         reason: t.reason,
@@ -174,7 +174,7 @@ export class TakedownService {
     const items = takedowns.slice(0, limit);
 
     return {
-      repoTakedowns: items.map((t) => ({
+      repoTakedowns: items.map((t: RepoTakedownDocument) => ({
         did: t.did,
         reason: t.reason,
         takenDownBy: t.takenDownBy,
@@ -208,7 +208,7 @@ export class TakedownService {
     const items = takedowns.slice(0, limit);
 
     return {
-      blobTakedowns: items.map((t) => ({
+      blobTakedowns: items.map((t: BlobTakedownDocument) => ({
         did: t.did,
         cid: t.cid,
         reason: t.reason,

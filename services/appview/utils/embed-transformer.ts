@@ -1,5 +1,5 @@
 import type * as SoSprkEmbedImages from "../lexicon/types/so/sprk/embed/images.ts";
-import { PostEmbed } from "../services/data-plane/server/index.ts";
+import { PostEmbed, EmbedImage } from "../data-plane/server/index.ts";
 
 interface ImageTransformOptions {
   /** If true, only return the first image (useful for stories) */
@@ -24,7 +24,7 @@ export function transformImagesEmbed(
   return {
     $type: "so.sprk.embed.images#view",
     images: imagesToProcess.map(
-      (img): SoSprkEmbedImages.ViewImage => ({
+      (img: EmbedImage): SoSprkEmbedImages.ViewImage => ({
         thumb:
           `https://media.sprk.so/img/medium/${authorDid}/${img.image.ref.$link}/webp`,
         fullsize:
