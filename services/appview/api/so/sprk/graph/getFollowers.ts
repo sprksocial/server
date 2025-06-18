@@ -1,6 +1,7 @@
 import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
 import type * as SoSprkActorDefs from "../../../../lexicon/types/so/sprk/actor/defs.ts";
+import { FollowDocument } from "../../../../data-plane/server/index.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.graph.getFollowers({
@@ -35,7 +36,7 @@ export default function (server: Server, ctx: AppContext) {
 
       // Get profile views for each follower
       const profileViews = await Promise.all(
-        followers.map(async (follow) => {
+        followers.map(async (follow: FollowDocument) => {
           const profile = await ctx.db.models.Profile.findOne({
             authorDid: follow.authorDid,
           });

@@ -2,6 +2,7 @@ import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { OutputSchema as GetPostsView } from "../../../../lexicon/types/so/sprk/feed/getPosts.ts";
 import { transformPostToPostView } from "../../../../utils/post-transformer.ts";
+import { PostDocument } from "../../../../data-plane/server/index.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.feed.getPosts({
@@ -25,7 +26,7 @@ export default function (server: Server, ctx: AppContext) {
 
       // Transform each post to PostView format
       const postViews = await Promise.all(
-        dbPosts.map((post) => transformPostToPostView(post, ctx.db, userDid)),
+        dbPosts.map((post: PostDocument) => transformPostToPostView(post, ctx.db, userDid)),
       );
 
       return {

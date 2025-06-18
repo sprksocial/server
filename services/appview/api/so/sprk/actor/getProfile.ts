@@ -4,6 +4,7 @@ import type { Label } from "../../../../lexicon/types/com/atproto/label/defs.ts"
 import type * as ComAtprotoRepoStrongRef from "../../../../lexicon/types/com/atproto/repo/strongRef.ts";
 import type * as SoSprkActorDefs from "../../../../lexicon/types/so/sprk/actor/defs.ts";
 import { AppContext } from "../../../../main.ts";
+import { StoryDocument } from "../../../../data-plane/server/index.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.actor.getProfile({
@@ -174,7 +175,7 @@ export default function (server: Server, ctx: AppContext) {
             .sort({ indexedAt: -1 })
             .limit(15)
             .lean()
-            .catch((error) => {
+            .catch((error: Error) => {
               ctx.logger.warn(
                 { error, actorDid },
                 "Failed to fetch stories for profile",
@@ -187,7 +188,7 @@ export default function (server: Server, ctx: AppContext) {
             { $match: { subject: actorDid } },
             { $group: { _id: "$authorDid" } },
             { $count: "total" },
-          ]).then((result) => result[0]?.total || 0),
+          ]).then((result: { total: number }[]) => result[0]?.total || 0),
 
           // Count follows based on actor's follow mode preference
           ctx.db.models.Follow.countDocuments({
@@ -203,7 +204,7 @@ export default function (server: Server, ctx: AppContext) {
 
       // Convert recent stories to strongRefs
       const stories: ComAtprotoRepoStrongRef.Main[] = recentStories.map(
-        (story) => ({
+        (story: StoryDocument) => ({
           uri: story.uri,
           cid: story.cid,
         }),
