@@ -32,8 +32,7 @@ jobs:
 
       - name: Check formatting
         if: steps.changed_files.outputs.all_changed_files != ''
-        working-directory: services/appview
-        run: deno fmt --check --ignore=lexicon
+        run: deno fmt --check --ignore=lexicon ${{ steps.changed_files.outputs.all_changed_files }}
 
   lint:
     runs-on: ubuntu-latest
