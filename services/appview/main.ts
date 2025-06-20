@@ -22,7 +22,7 @@ import { AuthVerifier } from "./services/auth-verifier.ts";
 import { AuthRequiredError } from "@sprk/xrpc-server";
 
 // Setup logger and database
-const appLogger = pino({ name: "server start" });
+const appLogger = pino({ name: "server started" });
 const db = new Database();
 await db.connect();
 
