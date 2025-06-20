@@ -8,7 +8,7 @@ const wellKnownRouter = () => {
   router.get("/.well-known/did.json", async (c) => {
     const domain = env.PUBLIC_URL?.split("://")[1] || "localhost";
     const keypair = await Secp256k1Keypair.import(
-      env.APPVIEW_K256_PRIVATE_KEY_HEX,
+      Deno.env.get("APPVIEW_K256_PRIVATE_KEY_HEX") || "",
     );
     const multikey = formatMultikey(keypair.jwtAlg, keypair.publicKeyBytes());
 

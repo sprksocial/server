@@ -1,0 +1,93 @@
+name: Deno AppView Service Check
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed AppView files
+        id: changed_files
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            services/appview/**/*.ts
+            services/appview/**/*.js
+            services/appview/**/*.json
+            services/appview/**/deno.json
+            services/appview/**/deno.lock
+
+      - uses: denoland/setup-deno@v2
+        if: steps.changed_files.outputs.all_changed_files != ''
+        with:
+          deno-version: v2.x
+          cache: true
+
+      - name: Check formatting
+        if: steps.changed_files.outputs.all_changed_files != ''
+        run: deno fmt --check --ignore=lexicon ${{ steps.changed_files.outputs.all_changed_files }}
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed AppView files
+        id: changed_files
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            services/appview/**/*.ts
+            services/appview/**/*.js
+            services/appview/**/*.json
+            services/appview/**/deno.json
+            services/appview/**/deno.lock
+
+      - uses: denoland/setup-deno@v2
+        if: steps.changed_files.outputs.all_changed_files != ''
+        with:
+          deno-version: v2.x
+          cache: true
+
+      - name: Lint
+        if: steps.changed_files.outputs.all_changed_files != ''
+        working-directory: services/appview
+        run: deno lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed AppView files
+        id: changed_files
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            services/appview/**/*.ts
+            services/appview/**/*.js
+            services/appview/**/*.json
+            services/appview/**/deno.json
+            services/appview/**/deno.lock
+
+      - uses: denoland/setup-deno@v2
+        if: steps.changed_files.outputs.all_changed_files != ''
+        with:
+          deno-version: v2.x
+          cache: true
+
+      - name: Test
+        if: steps.changed_files.outputs.all_changed_files != ''
+        working-directory: services/appview
+        run: deno test --allow-all

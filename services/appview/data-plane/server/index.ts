@@ -1,7 +1,7 @@
 import mongoose, { Connection, Document, Model, Schema } from "mongoose";
 import { pino } from "pino";
 import { IdResolver, MemoryCache } from "@atproto/identity";
-import { env } from "../../../utils/env.ts";
+import { env } from "../../utils/env.ts";
 import { DataPlaneClient, GetIdentityByDidResponse } from "../client/index.ts";
 import { DidDocument } from "@atproto/identity";
 import { Buffer } from "node:buffer";
