@@ -10,6 +10,8 @@ import { Timestamp } from "npm:@bufbuild/protobuf@1.5.0";
 const HOUR = 60e3 * 60;
 const DAY = HOUR * 24;
 
+test
+
 const getDid = (doc: DidDocument) => doc.id;
 const getHandle = (doc: DidDocument) =>
   doc.alsoKnownAs?.find((aka) => aka.startsWith("at://"))?.replace("at://", "");
