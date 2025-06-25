@@ -1,13 +1,12 @@
 import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
-import * as SoSprkActorPutPreferences from "../../../../lexicon/types/so/sprk/actor/putPreferences.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.actor.putPreferences({
     auth: ctx.authVerifier.standard,
     handler: async ({ input, auth }) => {
       const userDid = auth.credentials.iss;
-      const body = input as SoSprkActorPutPreferences.InputSchema;
+      const body = input.body;
 
       if (body.followMode && !["bsky", "sprk"].includes(body.followMode)) {
         throw new Error(
