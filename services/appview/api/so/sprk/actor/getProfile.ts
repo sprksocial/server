@@ -199,6 +199,7 @@ export default function (server: Server, ctx: AppContext) {
           // Count posts
           ctx.db.models.Post.countDocuments({
             authorDid: actorDid,
+            reply: null,
           }),
         ]);
 
