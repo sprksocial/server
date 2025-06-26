@@ -64,7 +64,7 @@ export default function (server: Server, ctx: AppContext) {
       }
 
       if (!profile) {
-        throw new XRPCError(404,  "Profile not found", "NotFound");
+        throw new XRPCError(404, "Profile not found", "NotFound");
       }
 
       // Use actor's handle if available, otherwise resolve from DID
