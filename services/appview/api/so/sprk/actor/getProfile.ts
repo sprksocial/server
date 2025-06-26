@@ -5,6 +5,7 @@ import type * as ComAtprotoRepoStrongRef from "../../../../lexicon/types/com/atp
 import type * as SoSprkActorDefs from "../../../../lexicon/types/so/sprk/actor/defs.ts";
 import { AppContext } from "../../../../main.ts";
 import { StoryDocument } from "../../../../data-plane/server/index.ts";
+import { XRPCError } from "@sprk/xrpc-server";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.actor.getProfile({
@@ -15,10 +16,6 @@ export default function (server: Server, ctx: AppContext) {
         ? auth.credentials.iss
         : undefined;
 
-      if (!actorParam) {
-        throw new Error("Actor not provided");
-      }
-
       let actorDidDoc;
       if (isValidHandle(actorParam)) {
         actorDidDoc = await ctx.resolver.resolveHandleToDidDoc(actorParam);
@@ -27,7 +24,7 @@ export default function (server: Server, ctx: AppContext) {
           ensureValidDid(actorParam);
           actorDidDoc = await ctx.resolver.resolveDidToDidDoc(actorParam);
         } catch (_err) {
-          throw new Error("Invalid actor");
+          throw new XRPCError(400, "Invalid actor");
         }
       }
 
@@ -63,11 +60,11 @@ export default function (server: Server, ctx: AppContext) {
       }
 
       if (!actorDoc) {
-        throw new Error("Actor not found");
+        throw new XRPCError(404, "Actor not found", "NotFound");
       }
 
       if (!profile) {
-        throw new Error("Profile not found");
+        throw new XRPCError(404, "Profile not found", "NotFound");
       }
 
       // Use actor's handle if available, otherwise resolve from DID
