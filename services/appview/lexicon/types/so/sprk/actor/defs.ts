@@ -166,22 +166,21 @@ export function validateKnownFollowers<V>(v: V) {
   return validate<KnownFollowers & V>(v, id, hashKnownFollowers);
 }
 
-export type Preferences =
-  (
-    | $Typed<AdultContentPref>
-    | $Typed<ContentLabelPref>
-    | $Typed<SavedFeedsPref>
-    | $Typed<SavedFeedsPrefV2>
-    | $Typed<PersonalDetailsPref>
-    | $Typed<FeedViewPref>
-    | $Typed<ThreadViewPref>
-    | $Typed<InterestsPref>
-    | $Typed<MutedWordsPref>
-    | $Typed<HiddenPostsPref>
-    | $Typed<LabelersPref>
-    | $Typed<PostInteractionSettingsPref>
-    | { $type: string }
-  )[];
+export type Preferences = (
+  | $Typed<AdultContentPref>
+  | $Typed<ContentLabelPref>
+  | $Typed<SavedFeedsPref>
+  | $Typed<SavedFeedsPrefV2>
+  | $Typed<PersonalDetailsPref>
+  | $Typed<FeedViewPref>
+  | $Typed<ThreadViewPref>
+  | $Typed<InterestsPref>
+  | $Typed<MutedWordsPref>
+  | $Typed<HiddenPostsPref>
+  | $Typed<LabelersPref>
+  | $Typed<PostInteractionSettingsPref>
+  | { $type: string }
+)[];
 
 export interface AdultContentPref {
   $type?: "so.sprk.actor.defs#adultContentPref";
@@ -451,14 +450,13 @@ export function validateLabelerPrefItem<V>(v: V) {
 export interface PostInteractionSettingsPref {
   $type?: "so.sprk.actor.defs#postInteractionSettingsPref";
   /** Matches threadgate record. List of rules defining who can reply to this users posts. If value is an empty array, no one can reply. If value is undefined, anyone can reply. */
-  threadgateAllowRules?:
-    (
-      | $Typed<SoSprkFeedThreadgate.MentionRule>
-      | $Typed<SoSprkFeedThreadgate.FollowerRule>
-      | $Typed<SoSprkFeedThreadgate.FollowingRule>
-      | $Typed<SoSprkFeedThreadgate.ListRule>
-      | { $type: string }
-    )[];
+  threadgateAllowRules?: (
+    | $Typed<SoSprkFeedThreadgate.MentionRule>
+    | $Typed<SoSprkFeedThreadgate.FollowerRule>
+    | $Typed<SoSprkFeedThreadgate.FollowingRule>
+    | $Typed<SoSprkFeedThreadgate.ListRule>
+    | { $type: string }
+  )[];
 }
 
 const hashPostInteractionSettingsPref = "postInteractionSettingsPref";

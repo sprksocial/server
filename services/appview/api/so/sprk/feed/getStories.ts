@@ -2,7 +2,10 @@ import type * as SoSprkFeedDefs from "../../../../lexicon/types/so/sprk/feed/def
 import { OutputSchema as GetStoriesView } from "../../../../lexicon/types/so/sprk/feed/getStories.ts";
 import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { Database, StoryDocument } from "../../../../data-plane/server/index.ts";
+import {
+  Database,
+  StoryDocument,
+} from "../../../../data-plane/server/index.ts";
 import { transformStoryToStoryView } from "../../../../utils/story-transformer.ts";
 
 // Function to fetch stories by URIs
@@ -26,7 +29,9 @@ async function getStories(
 
   // Transform each story to StoryView format
   const storyViews = await Promise.all(
-    dbStories.map((story: StoryDocument) => transformStoryToStoryView(story, db)),
+    dbStories.map((story: StoryDocument) =>
+      transformStoryToStoryView(story, db)
+    ),
   );
 
   return storyViews;

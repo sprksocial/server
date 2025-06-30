@@ -617,13 +617,20 @@ export interface UserPreferenceDocument extends Document {
 
 export const userPreferenceSchema = new Schema<UserPreferenceDocument>({
   userDid: { type: String, required: true, unique: true, index: true },
-  followMode: {
-    type: String,
-    required: true,
-    enum: ["bsky", "sprk"],
-    default: "sprk",
-  },
+  followMode: { type: String, required: true, default: "sprk" },
   createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+});
+
+export interface CursorStateDocument extends Document {
+  id: string;
+  cursorPosition: number;
+  updatedAt: string;
+}
+
+export const cursorStateSchema = new Schema<CursorStateDocument>({
+  id: { type: String, required: true, unique: true, default: "jetstream" },
+  cursorPosition: { type: Number, required: true },
   updatedAt: { type: String, required: true },
 });
 
@@ -644,6 +651,7 @@ export interface DatabaseModels {
   BlobTakedown: Model<BlobTakedownDocument>;
   Actor: Model<ActorDocument>;
   UserPreference: Model<UserPreferenceDocument>;
+  CursorState: Model<CursorStateDocument>;
 }
 
 export class Database implements DataPlaneClient {
@@ -713,6 +721,10 @@ export class Database implements DataPlaneClient {
           "UserPreference",
           userPreferenceSchema,
         ),
+        CursorState: this.connection.model<CursorStateDocument>(
+          "CursorState",
+          cursorStateSchema,
+        ),
       };
 
       this.logger.info("Connected to MongoDB");
@@ -763,5 +775,35 @@ export class Database implements DataPlaneClient {
       throw new Error("DID not found");
     }
     return getResultFromDoc(doc);
+  }
+
+  async getCursorState(): Promise<number | null> {
+    try {
+      const cursorState = await this.models.CursorState.findOne({
+        id: "jetstream",
+      });
+      return cursorState?.cursorPosition || null;
+    } catch (error) {
+      this.logger.error({ error }, "Failed to get cursor state");
+      return null;
+    }
+  }
+
+  async saveCursorState(cursorPosition: number): Promise<void> {
+    try {
+      await this.models.CursorState.findOneAndUpdate(
+        { id: "jetstream" },
+        {
+          cursorPosition,
+          updatedAt: new Date().toISOString(),
+        },
+        { upsert: true },
+      );
+    } catch (error) {
+      this.logger.error(
+        { error, cursorPosition },
+        "Failed to save cursor state",
+      );
+    }
   }
 }

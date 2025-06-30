@@ -26,6 +26,7 @@
     "npm:@types/node@*": "22.15.15",
     "npm:cbor-x@^1.6.0": "1.6.0",
     "npm:dotenv@*": "16.5.0",
+    "npm:dotenv@17": "17.0.0",
     "npm:express@^4.21.2": "4.21.2",
     "npm:get-port@^7.1.0": "7.1.0",
     "npm:http-errors@2": "2.0.0",
@@ -45,6 +46,7 @@
     "npm:uint8arrays@*": "5.1.0",
     "npm:uint8arrays@3.0.0": "3.0.0",
     "npm:ws@^8.12.0": "8.18.2",
+    "npm:ws@^8.18.0": "8.18.2",
     "npm:zod@^3.23.8": "3.25.39"
   },
   "jsr": {
@@ -65,7 +67,7 @@
         "npm:http-errors",
         "npm:rate-limiter-flexible",
         "npm:uint8arrays@3.0.0",
-        "npm:ws",
+        "npm:ws@^8.12.0",
         "npm:zod"
       ]
     },
@@ -476,6 +478,9 @@
     },
     "dotenv@16.5.0": {
       "integrity": "sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg=="
+    },
+    "dotenv@17.0.0": {
+      "integrity": "sha512-A0BJ5lrpJVSfnMMXjmeO0xUnoxqsBHWCoqqTnGwGYVdnctqXXUEhJOO7LxmgxJon9tEZFGpe0xPRX0h2v3AANQ=="
     },
     "dunder-proto@1.0.1": {
       "integrity": "sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==",
@@ -1228,13 +1233,15 @@
       "npm:@atproto/lexicon@~0.4.8",
       "npm:@atproto/syntax@~0.3.4",
       "npm:@atproto/xrpc-server@~0.7.19",
+      "npm:dotenv@17",
       "npm:express@^4.21.2",
       "npm:jose@^6.0.11",
       "npm:key-encoder@^2.0.3",
       "npm:mongoose@^8.12.1",
       "npm:multiformats@^9.9.0",
       "npm:pino-pretty@^10.3.1",
-      "npm:pino@^8.19.0"
+      "npm:pino@^8.19.0",
+      "npm:ws@^8.18.0"
     ]
   }
 }
