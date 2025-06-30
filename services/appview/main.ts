@@ -20,6 +20,7 @@ import { BidirectionalResolver } from "./utils/id-resolver.ts";
 import { DidResolver } from "@atproto/identity";
 import { AuthVerifier } from "./services/auth-verifier.ts";
 import { AuthRequiredError } from "@sprk/xrpc-server";
+import startJetstreamIngester from "./ingester/index.ts";
 
 // Setup logger and database
 const appLogger = pino({ name: "server start" });
@@ -127,6 +128,11 @@ app.onError((err, c) => {
     error: "Internal Server Error",
     message: "An unexpected error occurred",
   }, 500);
+});
+
+startJetstreamIngester().catch((err) => {
+  appLogger.error({ err }, "Failed to start Jetstream ingester");
+  Deno.exit(1);
 });
 
 // Start server

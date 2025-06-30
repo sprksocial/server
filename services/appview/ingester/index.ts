@@ -9,7 +9,7 @@ import { customConfig } from "./utils/logger-config.ts";
 
 const logger = pino(customConfig("ingester"));
 
-async function main() {
+export default async function startJetstreamIngester() {
   logger.info("Starting Jetstream ingester service");
 
   // Set up database connection
@@ -47,8 +47,3 @@ async function main() {
 
   logger.info("Ingester service is running");
 }
-
-main().catch((err) => {
-  logger.error({ err }, "Fatal error in main process");
-  Deno.exit(1);
-});
