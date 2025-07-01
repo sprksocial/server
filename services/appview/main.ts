@@ -22,26 +22,6 @@ import { AuthVerifier } from "./services/auth-verifier.ts";
 import { AuthRequiredError } from "@sprk/xrpc-server";
 import startJetstreamIngester from "./ingester/index.ts";
 
-// Setup logger and database
-const appLogger = pino({ name: "server start" });
-const db = new Database();
-await db.connect();
-
-// DID and resolver setup
-const baseIdResolver = createIdResolver();
-const resolver = createBidirectionalResolver(baseIdResolver);
-const serviceDid = env.SERVICE_DID;
-
-// Services
-const takedownService = new TakedownService(db);
-const indexingService = new IndexingService(db, resolver);
-const authVerifier = createAuthVerifier(db, {
-  ownDid: serviceDid,
-  alternateAudienceDids: [],
-  modServiceDid: env.MOD_SERVICE_DID,
-  adminPasses: [env.ADMIN_PASSWORD],
-});
-
 export type AppContext = {
   db: Database;
   logger: pino.Logger;
@@ -61,100 +41,155 @@ export type AppEnv = {
   };
 };
 
-const ctx = {
-  db,
-  logger: appLogger,
-  resolver,
-  serviceDid,
-  didResolver: baseIdResolver.did,
-  takedownService,
-  indexingService,
-  authVerifier,
-};
+// Create app without starting services
+export function createApp(ctx: AppContext): Hono<AppEnv> {
+  const app = new Hono<AppEnv>();
 
-// Initialize Hono app
-const app = new Hono<AppEnv>();
+  app.use("*", cors());
+  app.use("*", logger());
+  app.use("*", async (c, next) => {
+    // Only set env properties if c.env exists (for testing compatibility)
+    if (c.env) {
+      c.env.serviceDid = ctx.serviceDid;
+      c.env.didResolver = ctx.didResolver;
+      c.env.takedownService = ctx.takedownService;
+      c.env.indexingService = ctx.indexingService;
+      c.env.authVerifier = ctx.authVerifier;
+    }
+    await next();
+  });
+  app.use("*", takedownFilterMiddleware);
 
-app.use("*", cors());
-app.use("*", logger());
-app.use("*", async (c, next) => {
-  c.env.serviceDid = serviceDid;
-  c.env.didResolver = baseIdResolver.did;
-  c.env.takedownService = takedownService;
-  c.env.indexingService = indexingService;
-  c.env.authVerifier = authVerifier;
-  await next();
-});
-app.use("*", takedownFilterMiddleware);
+  // Lexicon/XRPC server and routers
+  const lexServer = createServer();
+  API(lexServer, ctx);
 
-// Lexicon/XRPC server and routers
-const lexServer = createServer();
-API(lexServer, ctx);
+  app.route("/", wellKnownRouter());
+  app.route("/", lexServer.xrpc.routes);
 
-app.route("/", wellKnownRouter());
-app.route("/", lexServer.xrpc.routes);
+  // Root route
+  app.get("/", (c) => {
+    return c.text(
+      "✧･ﾟ: ✧･ﾟ:. ݁₊ ⊹ . ݁˖ . ݁ SPARK API . ݁₊ ⊹ . ݁˖ . ݁ :･ﾟ✧:･ﾟ✧",
+    );
+  });
 
-// Root route
-app.get("/", (c) => {
-  return c.text(
-    "✧･ﾟ: ✧･ﾟ:. ݁₊ ⊹ . ݁˖ . ݁ SPARK API . ݁₊ ⊹ . ݁˖ . ݁ :･ﾟ✧:･ﾟ✧",
-  );
-});
+  // Health endpoint
+  app.get("/xrpc/_health", (c) => {
+    const version = Deno.env.get("COMMIT_SHA") ?? "unknown";
+    return c.json({ version });
+  });
 
-// Health endpoint
-app.get("/xrpc/_health", (c) => {
-  const version = Deno.env.get("COMMIT_SHA") ?? "unknown";
-  return c.json({ version });
-});
+  // Error handling
+  app.onError((err, c) => {
+    if (err instanceof HTTPException) return err.getResponse();
 
-// Error handling
-app.onError((err, c) => {
-  if (err instanceof HTTPException) return err.getResponse();
+    // Handle AuthRequiredError from XRPC server
+    if (
+      err instanceof AuthRequiredError ||
+      err.constructor?.name === "AuthRequiredError"
+    ) {
+      const authErr = err as AuthRequiredError;
+      return c.json({
+        error: authErr.message || "Authentication Required",
+        message: authErr.message || "Invalid or missing credentials",
+      }, 401);
+    }
 
-  // Handle AuthRequiredError from XRPC server
-  if (
-    err instanceof AuthRequiredError ||
-    err.constructor?.name === "AuthRequiredError"
-  ) {
-    const authErr = err as AuthRequiredError;
+    ctx.logger.error({ err }, "Server error");
     return c.json({
-      error: authErr.message || "Authentication Required",
-      message: authErr.message || "Invalid or missing credentials",
-    }, 401);
+      error: "Internal Server Error",
+      message: "An unexpected error occurred",
+    }, 500);
+  });
+
+  return app;
+}
+
+// Setup function to create context and app
+export async function setupApp(): Promise<
+  { app: Hono<AppEnv>; ctx: AppContext }
+> {
+  // Setup logger and database
+  const appLogger = pino({ name: "server start" });
+  const db = new Database();
+  await db.connect();
+
+  // DID and resolver setup
+  const baseIdResolver = createIdResolver();
+  const resolver = createBidirectionalResolver(baseIdResolver);
+  const serviceDid = env.SERVICE_DID;
+
+  // Services
+  const takedownService = new TakedownService(db);
+  const indexingService = new IndexingService(db, resolver);
+  const authVerifier = createAuthVerifier(db, {
+    ownDid: serviceDid,
+    alternateAudienceDids: [],
+    modServiceDid: env.MOD_SERVICE_DID,
+    adminPasses: [env.ADMIN_PASSWORD],
+  });
+
+  const ctx = {
+    db,
+    logger: appLogger,
+    resolver,
+    serviceDid,
+    didResolver: baseIdResolver.did,
+    takedownService,
+    indexingService,
+    authVerifier,
+  };
+
+  const app = createApp(ctx);
+  return { app, ctx };
+}
+
+// Start server function
+export async function startServer(): Promise<void> {
+  const { app, ctx } = await setupApp();
+
+  // Start Jetstream ingester
+  startJetstreamIngester().catch((err) => {
+    ctx.logger.error({ err }, "Failed to start Jetstream ingester");
+    Deno.exit(1);
+  });
+
+  // Start server
+  const { HOST, PORT } = env;
+  Deno.serve({
+    hostname: HOST,
+    port: PORT,
+    onListen: (info) => {
+      ctx.logger.info(`Server listening on ${info.hostname}:${info.port}`);
+    },
+  }, app.fetch);
+
+  // Handle shutdown
+  Deno.addSignalListener("SIGINT", async () => {
+    ctx.logger.info("Shutting down server");
+    await ctx.db.disconnect();
+    Deno.exit(0);
+  });
+  Deno.addSignalListener("SIGTERM", async () => {
+    ctx.logger.info("Shutting down server");
+    await ctx.db.disconnect();
+    Deno.exit(0);
+  });
+}
+
+// Default export for backward compatibility (creates app without starting services)
+let defaultApp: Hono<AppEnv> | null = null;
+
+export default async function getApp(): Promise<Hono<AppEnv>> {
+  if (!defaultApp) {
+    const result = await setupApp();
+    defaultApp = result.app;
   }
+  return defaultApp;
+}
 
-  appLogger.error({ err }, "Server error");
-  return c.json({
-    error: "Internal Server Error",
-    message: "An unexpected error occurred",
-  }, 500);
-});
-
-startJetstreamIngester().catch((err) => {
-  appLogger.error({ err }, "Failed to start Jetstream ingester");
-  Deno.exit(1);
-});
-
-// Start server
-const { HOST, PORT } = env;
-Deno.serve({
-  hostname: HOST,
-  port: PORT,
-  onListen: (info) => {
-    appLogger.info(`Server listening on ${info.hostname}:${info.port}`);
-  },
-}, app.fetch);
-
-// Handle shutdown
-Deno.addSignalListener("SIGINT", async () => {
-  appLogger.info("Shutting down server");
-  await db.disconnect();
-  Deno.exit(0);
-});
-Deno.addSignalListener("SIGTERM", async () => {
-  appLogger.info("Shutting down server");
-  await db.disconnect();
-  Deno.exit(0);
-});
-
-export default app;
+// Start the server if this file is run directly
+if (import.meta.main) {
+  await startServer();
+}

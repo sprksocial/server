@@ -1,12 +1,15 @@
 import { assertEquals } from "jsr:@std/assert";
-import app from "./main.ts";
 import { assertMatch } from "jsr:@std/assert/match";
-
-const testEnv = {
-  SERVICE_DID: "did:web:test",
-  MOD_SERVICE_DID: "did:web:test",
-  ADMIN_PASSWORD: "test",
-};
+import { createApp } from "./main.ts";
+import { Database } from "./data-plane/server/index.ts";
+import {
+  createBidirectionalResolver,
+  createIdResolver,
+} from "./utils/id-resolver.ts";
+import { TakedownService } from "./services/takedown.ts";
+import { IndexingService } from "./services/indexing.ts";
+import { createAuthVerifier } from "./services/auth-verifier.ts";
+import { pino } from "pino";
 
 Deno.env.set("SERVICE_DID", "did:web:test");
 Deno.env.set("MOD_SERVICE_DID", "did:web:test");
@@ -16,22 +19,70 @@ Deno.env.set(
   "5676df35fd3a185a1771a43536635ad90057e0c0d1fd91436344bb50ce23a460", // random valid test key
 );
 
-Deno.test("Server Running", async () => {
+// Create a mock context for testing without database
+function createMockContext() {
+  const appLogger = pino({ name: "test" });
+  const baseIdResolver = createIdResolver();
+  const resolver = createBidirectionalResolver(baseIdResolver);
+  const serviceDid = "did:web:test";
+
+  // Create mock database that doesn't actually connect
+  const mockDb = {
+    connect: () => Promise.resolve(),
+    disconnect: () => Promise.resolve(),
+    models: {},
+  } as unknown as Database;
+
+  const takedownService = new TakedownService(mockDb);
+  const indexingService = new IndexingService(mockDb, resolver);
+  const authVerifier = createAuthVerifier(mockDb, {
+    ownDid: serviceDid,
+    alternateAudienceDids: [],
+    modServiceDid: "did:web:test",
+    adminPasses: ["test"],
+  });
+
+  return {
+    db: mockDb,
+    logger: appLogger,
+    resolver,
+    serviceDid,
+    didResolver: baseIdResolver.did,
+    takedownService,
+    indexingService,
+    authVerifier,
+  };
+}
+
+Deno.test("Basic App Creation", async () => {
+  console.log("Testing basic app creation...");
+
+  const ctx = createMockContext();
+  const app = createApp(ctx);
+
+  console.log("App created successfully");
+
   const res = await app.request("/", {
     headers: {
       "Content-Type": "application/json",
     },
-  }, testEnv);
+  });
 
   assertEquals(res.status, 200);
+  console.log("Basic app test passed");
 });
 
-Deno.test("Well Known", async () => {
+Deno.test("Well Known Endpoint", async () => {
+  console.log("Testing well-known endpoint...");
+
+  const ctx = createMockContext();
+  const app = createApp(ctx);
+
   const res = await app.request("/.well-known/did.json", {
     headers: {
       "Content-Type": "application/json",
     },
-  }, testEnv);
+  });
 
   assertMatch(
     await res.text(),
@@ -55,4 +106,5 @@ Deno.test("Well Known", async () => {
       ].join(""),
     ),
   );
+  console.log("Well-known endpoint test passed");
 });
