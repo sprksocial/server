@@ -1,7 +1,16 @@
 import { Database } from "../data-plane/server/index.ts";
-import type { ProfileViewBasic } from "../lexicon/types/so/sprk/actor/defs.ts";
+import type {
+  ProfileAssociated,
+  ProfileViewBasic,
+  ProfileViewDetailed,
+  ViewerState,
+} from "../lexicon/types/so/sprk/actor/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../lexicon/types/com/atproto/repo/strongRef.ts";
 import type { StoryDocument } from "../data-plane/server/index.ts";
+import type { Label } from "../lexicon/types/com/atproto/label/defs.ts";
+import { ensureValidDid, isValidHandle } from "@atproto/syntax";
+import { AppContext } from "../main.ts";
+import { XRPCError } from "@sprk/xrpc-server";
 
 // Helper function to create ProfileViewBasic with stories
 export async function createProfileViewBasic(
@@ -52,4 +61,291 @@ export async function createProfileViewBasic(
       : undefined,
     stories: stories.length > 0 ? stories : undefined,
   };
+}
+
+/**
+ * Get a single profile by actor identifier (handle or DID)
+ */
+export async function getProfile(
+  ctx: AppContext,
+  actorParam: string,
+  viewerDid?: string,
+): Promise<ProfileViewDetailed> {
+  const profiles = await getProfiles(ctx, [actorParam], viewerDid);
+
+  if (profiles.length === 0) {
+    throw new XRPCError(404, "Profile not found", "NotFound");
+  }
+
+  return profiles[0];
+}
+
+/**
+ * Get multiple profiles in parallel by actor identifiers (handles or DIDs)
+ */
+export async function getProfiles(
+  ctx: AppContext,
+  actorParams: string[],
+  viewerDid?: string,
+): Promise<ProfileViewDetailed[]> {
+  if (!actorParams || actorParams.length === 0) {
+    return [];
+  }
+
+  const now = new Date().toISOString();
+
+  // Get viewer preferences once for all profiles if viewer is authenticated
+  let viewerFollowMode = "sprk";
+
+  if (viewerDid) {
+    const viewerPref = await ctx.db.models.UserPreference.findOne({
+      userDid: viewerDid,
+    });
+    viewerFollowMode = viewerPref?.followMode || "sprk";
+  }
+
+  // Helper function to get a single profile data
+  const getProfileData = async (
+    actorParam: string,
+  ): Promise<ProfileViewDetailed | null> => {
+    try {
+      // Resolve actor identifier to DID
+      let actorDidDoc;
+      if (isValidHandle(actorParam)) {
+        actorDidDoc = await ctx.resolver.resolveHandleToDidDoc(actorParam);
+      } else {
+        try {
+          ensureValidDid(actorParam);
+          actorDidDoc = await ctx.resolver.resolveDidToDidDoc(actorParam);
+        } catch (_err) {
+          return null; // Invalid actor, skip
+        }
+      }
+
+      const actorDid = actorDidDoc.did;
+
+      // Index the actor
+      await ctx.indexingService.indexHandle(actorDid, now);
+
+      // Fetch actor and profile documents in parallel
+      const [actorDoc, profile] = await Promise.all([
+        ctx.db.models.Actor.findOne({ did: actorDid }),
+        ctx.db.models.Profile.findOne({ authorDid: actorDid }),
+      ]);
+
+      // If actor doesn't exist, try to index and refetch
+      let finalActorDoc = actorDoc;
+      if (!actorDoc) {
+        try {
+          ctx.logger.info(
+            { did: actorDid },
+            "No actor found, attempting to index",
+          );
+          await ctx.indexingService.indexHandle(actorDid, now, true);
+
+          // Refetch after indexing
+          finalActorDoc = await ctx.db.models.Actor.findOne({
+            did: actorDid,
+          });
+        } catch (error) {
+          ctx.logger.error({ error, did: actorDid }, "Failed to index handle");
+          return null;
+        }
+      }
+
+      if (!finalActorDoc || !profile) {
+        return null; // Actor or profile not found, skip
+      }
+
+      // Get actor's handle and preferences
+      const handle = finalActorDoc.handle ||
+        (await ctx.resolver.resolveDidToHandle(actorDid));
+
+      const actorPref = await ctx.db.models.UserPreference.findOne({
+        userDid: actorDid,
+      });
+      const actorFollowMode = actorPref?.followMode || "sprk";
+
+      // Twenty-four hours ago for recent stories
+      const twentyFourHoursAgo = new Date();
+      twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
+
+      const [
+        recentStories,
+        followersCount,
+        followsCount,
+        postsCount,
+        feedgensCount,
+        follow,
+        followedBy,
+        block,
+        blockedBy,
+      ] = await Promise.all([
+        // Fetch recent stories (within 24 hours)
+        ctx.db.models.Story.find({
+          authorDid: actorDid,
+          indexedAt: { $gte: twentyFourHoursAgo.toISOString() },
+        })
+          .sort({ indexedAt: -1 })
+          .limit(15)
+          .lean()
+          .catch((error: Error) => {
+            ctx.logger.warn(
+              { error, actorDid },
+              "Failed to fetch stories for profile",
+            );
+            return [];
+          }),
+
+        // Count unique followers across both Sprk and Bsky follow types
+        ctx.db.models.Follow.aggregate([
+          { $match: { subject: actorDid } },
+          { $group: { _id: "$authorDid" } },
+          { $count: "total" },
+        ]).then((result: { total: number }[]) => result[0]?.total || 0),
+
+        // Count follows based on actor's follow mode preference
+        ctx.db.models.Follow.countDocuments({
+          authorDid: actorDid,
+          type: actorFollowMode,
+        }),
+
+        // Count posts
+        ctx.db.models.Post.countDocuments({
+          authorDid: actorDid,
+          reply: null,
+        }),
+
+        // Check for feed generators
+        (async () => {
+          try {
+            if (ctx.db.models.Generator) {
+              return await ctx.db.models.Generator.countDocuments({
+                authorDid: actorDid,
+              });
+            }
+            return 0;
+          } catch (_error) {
+            return 0;
+          }
+        })(),
+
+        // Viewer state queries (only if viewer is authenticated)
+        viewerDid
+          ? ctx.db.models.Follow.findOne({
+            subject: actorDid,
+            authorDid: viewerDid,
+            type: viewerFollowMode,
+          })
+          : Promise.resolve(null),
+
+        viewerDid
+          ? ctx.db.models.Follow.findOne({
+            subject: viewerDid,
+            authorDid: actorDid,
+            type: actorFollowMode,
+          })
+          : Promise.resolve(null),
+
+        viewerDid
+          ? ctx.db.models.Block.findOne({
+            subject: actorDid,
+            authorDid: viewerDid,
+          })
+          : Promise.resolve(null),
+
+        viewerDid
+          ? ctx.db.models.Block.findOne({
+            subject: viewerDid,
+            authorDid: actorDid,
+          })
+          : Promise.resolve(null),
+      ]);
+
+      // Build viewer state
+      const viewer: ViewerState = {};
+      if (viewerDid) {
+        if (follow) viewer.following = follow.uri;
+        if (followedBy) viewer.followedBy = followedBy.uri;
+        if (block) viewer.blocking = block.uri;
+        if (blockedBy) viewer.blockedBy = true;
+      }
+
+      // Build associated services
+      const associated: ProfileAssociated = {};
+      if (typeof feedgensCount === "number" && feedgensCount > 0) {
+        associated.feedgens = feedgensCount;
+      }
+
+      // Get avatar and banner URLs
+      const avatar = profile.avatar
+        ? `https://media.sprk.so/avatar/tiny/${actorDid}/${profile.avatar.ref.$link}/webp`
+        : undefined;
+      const banner = profile.banner
+        ? `https://media.sprk.so/img/tiny/${actorDid}/${profile.banner.ref.$link}/webp`
+        : undefined;
+
+      // Convert labels to the correct type if it exists
+      let labels: Label[] | undefined = undefined;
+      if (profile.labels) {
+        labels = Array.isArray(profile.labels)
+          ? (profile.labels as Label[])
+          : undefined;
+      }
+
+      // Convert pinnedPost to the correct type if it exists
+      let pinnedPost: ComAtprotoRepoStrongRef.Main | undefined = undefined;
+      if (profile.pinnedPost) {
+        pinnedPost = profile
+          .pinnedPost as unknown as ComAtprotoRepoStrongRef.Main;
+      }
+
+      // Convert recent stories to strongRefs
+      const stories: ComAtprotoRepoStrongRef.Main[] =
+        Array.isArray(recentStories)
+          ? recentStories.map((story: StoryDocument) => ({
+            uri: story.uri,
+            cid: story.cid,
+          }))
+          : [];
+
+      // Build the ProfileViewDetailed response
+      const profileView: ProfileViewDetailed = {
+        did: actorDid,
+        handle: handle,
+        displayName: profile.displayName,
+        description: profile.description,
+        avatar,
+        banner,
+        followersCount: typeof followersCount === "number" ? followersCount : 0,
+        followsCount: typeof followsCount === "number" ? followsCount : 0,
+        postsCount: typeof postsCount === "number" ? postsCount : 0,
+        associated: Object.keys(associated).length > 0 ? associated : undefined,
+        indexedAt: profile.indexedAt,
+        createdAt: profile.createdAt,
+        viewer: Object.keys(viewer).length > 0 ? viewer : undefined,
+        labels,
+        pinnedPost,
+        stories: stories.length > 0 ? stories : undefined,
+      };
+
+      return profileView;
+    } catch (error) {
+      ctx.logger.error({ error, actorParam }, "Failed to get profile");
+      return null;
+    }
+  };
+
+  // Process all profiles in parallel
+  const profilePromises = actorParams.map((actorParam) =>
+    getProfileData(actorParam)
+  );
+  const profileResults = await Promise.all(profilePromises);
+
+  // Filter out null results (failed or not found profiles)
+  const profiles = profileResults.filter((
+    profile,
+  ): profile is ProfileViewDetailed => profile !== null);
+
+  return profiles;
 }

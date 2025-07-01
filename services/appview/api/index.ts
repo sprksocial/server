@@ -16,6 +16,7 @@ import getRecord from "./com/atproto/repo/getRecord.ts";
 import resolveHandle from "./com/atproto/identity/resolveHandle.ts";
 import getStories from "./so/sprk/feed/getStories.ts";
 import getStoriesTimeline from "./so/sprk/feed/getStoriesTimeline.ts";
+import getProfiles from "./so/sprk/actor/getProfiles.ts";
 
 export default function (server: Server, ctx: AppContext) {
   getAccountInfos(server, ctx);
@@ -23,6 +24,7 @@ export default function (server: Server, ctx: AppContext) {
   updateSubjectStatus(server, ctx);
   getPosts(server, ctx);
   getProfile(server, ctx);
+  getProfiles(server, ctx);
   getAuthorFeed(server, ctx);
   getPostThread(server, ctx);
   getFollows(server, ctx);
