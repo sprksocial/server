@@ -13,13 +13,14 @@ export interface MainRecord {
   /** Reference (AT-URI) to the post record. */
   post: string;
   /** List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply. */
-  allow?: (
-    | $Typed<MentionRule>
-    | $Typed<FollowerRule>
-    | $Typed<FollowingRule>
-    | $Typed<ListRule>
-    | { $type: string }
-  )[];
+  allow?:
+    (
+      | $Typed<MentionRule>
+      | $Typed<FollowerRule>
+      | $Typed<FollowingRule>
+      | $Typed<ListRule>
+      | { $type: string }
+    )[];
   createdAt: string;
   /** List of hidden reply URIs. */
   hiddenReplies?: (string)[];

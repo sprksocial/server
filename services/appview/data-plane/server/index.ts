@@ -617,21 +617,26 @@ export interface UserPreferenceDocument extends Document {
 
 export const userPreferenceSchema = new Schema<UserPreferenceDocument>({
   userDid: { type: String, required: true, unique: true, index: true },
-  followMode: { type: String, required: true, default: "sprk" },
+  followMode: {
+    type: String,
+    required: true,
+    enum: ["bsky", "sprk"],
+    default: "sprk",
+  },
   createdAt: { type: String, required: true },
   updatedAt: { type: String, required: true },
 });
 
 export interface CursorStateDocument extends Document {
-  id: string;
-  cursorPosition: number;
-  updatedAt: string;
+  identifier: string; // To ensure a single document, e.g., 'last_processed_cursor'
+  cursorValue: number;
+  updatedAt: Date;
 }
 
 export const cursorStateSchema = new Schema<CursorStateDocument>({
-  id: { type: String, required: true, unique: true, default: "jetstream" },
-  cursorPosition: { type: Number, required: true },
-  updatedAt: { type: String, required: true },
+  identifier: { type: String, required: true, unique: true, index: true },
+  cursorValue: { type: Number, required: true },
+  updatedAt: { type: Date, default: Date.now },
 });
 
 export interface DatabaseModels {
@@ -780,9 +785,9 @@ export class Database implements DataPlaneClient {
   async getCursorState(): Promise<number | null> {
     try {
       const cursorState = await this.models.CursorState.findOne({
-        id: "jetstream",
+        identifier: "jetstream",
       });
-      return cursorState?.cursorPosition || null;
+      return cursorState?.cursorValue || null;
     } catch (error) {
       this.logger.error({ error }, "Failed to get cursor state");
       return null;
@@ -792,10 +797,10 @@ export class Database implements DataPlaneClient {
   async saveCursorState(cursorPosition: number): Promise<void> {
     try {
       await this.models.CursorState.findOneAndUpdate(
-        { id: "jetstream" },
+        { identifier: "jetstream" },
         {
-          cursorPosition,
-          updatedAt: new Date().toISOString(),
+          cursorValue: cursorPosition,
+          updatedAt: new Date(),
         },
         { upsert: true },
       );

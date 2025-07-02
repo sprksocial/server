@@ -17,11 +17,12 @@ export interface QueryParams {
 export type InputSchema = undefined;
 
 export interface OutputSchema {
-  messages: (
-    | $Typed<ChatBskyConvoDefs.MessageView>
-    | $Typed<ChatBskyConvoDefs.DeletedMessageView>
-    | { $type: string }
-  )[];
+  messages:
+    (
+      | $Typed<ChatBskyConvoDefs.MessageView>
+      | $Typed<ChatBskyConvoDefs.DeletedMessageView>
+      | { $type: string }
+    )[];
 }
 
 export type HandlerInput = undefined;
