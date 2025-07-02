@@ -785,7 +785,7 @@ export class Database implements DataPlaneClient {
   async getCursorState(): Promise<number | null> {
     try {
       const cursorState = await this.models.CursorState.findOne({
-        identifier: "jetstream",
+        identifier: "last_processed_cursor",
       });
       return cursorState?.cursorValue || null;
     } catch (error) {
@@ -797,7 +797,7 @@ export class Database implements DataPlaneClient {
   async saveCursorState(cursorPosition: number): Promise<void> {
     try {
       await this.models.CursorState.findOneAndUpdate(
-        { identifier: "jetstream" },
+        { identifier: "last_processed_cursor" },
         {
           cursorValue: cursorPosition,
           updatedAt: new Date(),
