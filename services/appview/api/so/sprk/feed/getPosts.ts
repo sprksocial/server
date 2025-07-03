@@ -26,7 +26,9 @@ export default function (server: Server, ctx: AppContext) {
 
       // Transform each post to PostView format
       const postViews = await Promise.all(
-        dbPosts.map((post: PostDocument) => transformPostToPostView(post, ctx.db, userDid)),
+        dbPosts.map((post: PostDocument) =>
+          transformPostToPostView(post, ctx.db, userDid)
+        ),
       );
 
       return {

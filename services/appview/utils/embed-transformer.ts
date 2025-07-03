@@ -1,5 +1,5 @@
 import type * as SoSprkEmbedImages from "../lexicon/types/so/sprk/embed/images.ts";
-import { PostEmbed, EmbedImage } from "../data-plane/server/index.ts";
+import { EmbedImage, PostEmbed } from "../data-plane/server/index.ts";
 
 interface ImageTransformOptions {
   /** If true, only return the first image (useful for stories) */

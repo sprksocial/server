@@ -1,4 +1,9 @@
-import { Database, BlobTakedownDocument, RepoTakedownDocument, TakedownDocument } from "../data-plane/server/index.ts";
+import {
+  BlobTakedownDocument,
+  Database,
+  RepoTakedownDocument,
+  TakedownDocument,
+} from "../data-plane/server/index.ts";
 
 export class TakedownService {
   constructor(private db: Database) {}

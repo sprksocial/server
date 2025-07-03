@@ -7,6 +7,7 @@
   },
   "imports": {
     "@atproto/xrpc-server": "npm:@atproto/xrpc-server@^0.7.19",
+    "dotenv": "npm:dotenv@^17.0.0",
     "hono": "jsr:@hono/hono@^4.7.10",
     "@std/encoding": "jsr:@std/encoding@1",
     "@atproto/api": "npm:@atproto/api@^0.14.9",
@@ -22,7 +23,7 @@
     "mongoose": "npm:mongoose@^8.12.1",
     "multiformats": "npm:multiformats@^9.9.0",
     "pino": "npm:pino@^8.19.0",
-    "pino-pretty": "npm:pino-pretty@^10.3.1"
+    "ws": "npm:ws@^8.18.0"
   },
   "compilerOptions": {
     "jsx": "precompile",

@@ -627,6 +627,18 @@ export const userPreferenceSchema = new Schema<UserPreferenceDocument>({
   updatedAt: { type: String, required: true },
 });
 
+export interface CursorStateDocument extends Document {
+  identifier: string; // To ensure a single document, e.g., 'last_processed_cursor'
+  cursorValue: number;
+  updatedAt: Date;
+}
+
+export const cursorStateSchema = new Schema<CursorStateDocument>({
+  identifier: { type: String, required: true, unique: true, index: true },
+  cursorValue: { type: Number, required: true },
+  updatedAt: { type: Date, default: Date.now },
+});
+
 export interface DatabaseModels {
   Like: Model<LikeDocument>;
   Post: Model<PostDocument>;
@@ -644,6 +656,7 @@ export interface DatabaseModels {
   BlobTakedown: Model<BlobTakedownDocument>;
   Actor: Model<ActorDocument>;
   UserPreference: Model<UserPreferenceDocument>;
+  CursorState: Model<CursorStateDocument>;
 }
 
 export class Database implements DataPlaneClient {
@@ -713,6 +726,10 @@ export class Database implements DataPlaneClient {
           "UserPreference",
           userPreferenceSchema,
         ),
+        CursorState: this.connection.model<CursorStateDocument>(
+          "CursorState",
+          cursorStateSchema,
+        ),
       };
 
       this.logger.info("Connected to MongoDB");
@@ -763,5 +780,35 @@ export class Database implements DataPlaneClient {
       throw new Error("DID not found");
     }
     return getResultFromDoc(doc);
+  }
+
+  async getCursorState(): Promise<number | null> {
+    try {
+      const cursorState = await this.models.CursorState.findOne({
+        identifier: "last_processed_cursor",
+      });
+      return cursorState?.cursorValue || null;
+    } catch (error) {
+      this.logger.error({ error }, "Failed to get cursor state");
+      return null;
+    }
+  }
+
+  async saveCursorState(cursorPosition: number): Promise<void> {
+    try {
+      await this.models.CursorState.findOneAndUpdate(
+        { identifier: "last_processed_cursor" },
+        {
+          cursorValue: cursorPosition,
+          updatedAt: new Date(),
+        },
+        { upsert: true },
+      );
+    } catch (error) {
+      this.logger.error(
+        { error, cursorPosition },
+        "Failed to save cursor state",
+      );
+    }
   }
 }

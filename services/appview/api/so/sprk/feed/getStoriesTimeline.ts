@@ -3,7 +3,10 @@ import { transformStoryToStoryView } from "../../../../utils/story-transformer.t
 import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { RootFilterQuery } from "mongoose";
-import { FollowDocument, StoryDocument } from "../../../../data-plane/server/index.ts";
+import {
+  FollowDocument,
+  StoryDocument,
+} from "../../../../data-plane/server/index.ts";
 import { Buffer } from "node:buffer";
 import type { ProfileViewBasic } from "../../../../lexicon/types/so/sprk/actor/defs.ts";
 import type * as SoSprkFeedDefs from "../../../../lexicon/types/so/sprk/feed/defs.ts";
@@ -39,7 +42,9 @@ export default function (server: Server, ctx: AppContext) {
           };
         }
 
-        const followedDids = follows.map((follow: FollowDocument) => follow.subject);
+        const followedDids = follows.map((follow: FollowDocument) =>
+          follow.subject
+        );
 
         const twentyFourHoursAgo = new Date();
         twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
