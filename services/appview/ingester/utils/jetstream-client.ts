@@ -1,9 +1,9 @@
 import { pino } from "pino";
 import WebSocket from "ws";
-import { env } from "./env.ts";
+import { env } from "../../utils/env.ts";
 import type { JetstreamEvent, NormalizedEvent } from "../types/events.ts";
 import { Database } from "../../data-plane/server/index.ts";
-import type { BidirectionalResolver } from "./id-resolver.ts";
+import type { BidirectionalResolver } from "../../utils/id-resolver.ts";
 import { handleEvent } from "../handlers/index.ts";
 import { customConfig } from "./logger-config.ts";
 import { Buffer } from "node:buffer";

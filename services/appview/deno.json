@@ -6,6 +6,8 @@
     "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
   },
   "imports": {
+    "@atproto/repo": "npm:@atproto/repo@^0.8.4",
+    "@atproto/xrpc": "npm:@atproto/xrpc@^0.7.0",
     "@atproto/xrpc-server": "npm:@atproto/xrpc-server@^0.7.19",
     "dotenv": "npm:dotenv@^17.0.0",
     "hono": "jsr:@hono/hono@^4.7.10",
@@ -22,6 +24,7 @@
     "key-encoder": "npm:key-encoder@^2.0.3",
     "mongoose": "npm:mongoose@^8.12.1",
     "multiformats": "npm:multiformats@^9.9.0",
+    "p-queue": "npm:p-queue@^8.1.0",
     "pino": "npm:pino@^8.19.0",
     "ws": "npm:ws@^8.18.0"
   },

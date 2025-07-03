@@ -1,5 +1,5 @@
 import type { LoggerOptions } from "pino";
-import { env } from "./env.ts";
+import { env } from "../../utils/env.ts";
 
 export const customConfig = (name: string): LoggerOptions => {
   return {

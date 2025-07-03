@@ -73,6 +73,56 @@ interface Label {
   neg: boolean;
 }
 
+export interface RecordDocument extends Document {
+  uri: string;
+  cid: string;
+  did: string;
+  collectionName: string;
+  rkey: string;
+  createdAt: string;
+  indexedAt: string;
+  json?: string;
+  invalidReplyRoot?: boolean;
+}
+
+export const recordSchema = new Schema<RecordDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  cid: { type: String, required: true },
+  did: { type: String, required: true, index: true },
+  collectionName: { type: String, required: true, index: true },
+  rkey: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+  json: { type: String, required: false },
+  invalidReplyRoot: { type: Boolean, required: false },
+});
+
+export interface DuplicateRecordDocument extends Document {
+  uri: string;
+  cid: string;
+  duplicateOf: string;
+  indexedAt: string;
+}
+
+export const duplicateRecordSchema = new Schema<DuplicateRecordDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  cid: { type: String, required: true },
+  duplicateOf: { type: String, required: true, index: true },
+  indexedAt: { type: String, required: true },
+});
+
+export interface ActorSyncDocument extends Document {
+  did: string;
+  commitCid: string;
+  repoRev: string | null;
+}
+
+export const actorSyncSchema = new Schema<ActorSyncDocument>({
+  did: { type: String, required: true, unique: true, index: true },
+  commitCid: { type: String, required: true },
+  repoRev: { type: String, required: false, default: null },
+});
+
 export interface LikeDocument extends Document {
   uri: string;
   subject: string;
@@ -82,6 +132,8 @@ export interface LikeDocument extends Document {
   createdAt: string;
   indexedAt: string;
   cid: string;
+  via?: string | null;
+  viaCid?: string | null;
 }
 
 export const likeSchema = new Schema<LikeDocument>({
@@ -93,6 +145,8 @@ export const likeSchema = new Schema<LikeDocument>({
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
+  via: { type: String, required: false },
+  viaCid: { type: String, required: false },
 });
 
 export interface LookDocument extends Document {
@@ -207,6 +261,16 @@ profileSchema.index({
   description: "text",
 });
 
+export interface ProfileAggDocument extends Document {
+  did: string;
+  postsCount: number;
+}
+
+export const profileAggSchema = new Schema<ProfileAggDocument>({
+  did: { type: String, required: true, unique: true, index: true },
+  postsCount: { type: Number, required: true, default: 0 },
+});
+
 export interface AudioDocument extends Document {
   uri: string;
   sound: string;
@@ -252,6 +316,8 @@ export interface RepostDocument extends Document {
   createdAt: string;
   indexedAt: string;
   cid: string;
+  via?: string | null;
+  viaCid?: string | null;
 }
 
 export const repostSchema = new Schema<RepostDocument>({
@@ -265,6 +331,8 @@ export const repostSchema = new Schema<RepostDocument>({
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
+  via: { type: String, required: false },
+  viaCid: { type: String, required: false },
 });
 
 export interface MusicDocument extends Document {
@@ -408,6 +476,16 @@ export const postSchema = new Schema<PostDocument>({
 // Compound indexes for more efficient queries
 postSchema.index({ authorDid: 1, createdAt: -1 });
 postSchema.index({ tags: 1, createdAt: -1 });
+
+export interface PostAggDocument extends Document {
+  uri: string;
+  replyCount: number;
+}
+
+export const postAggSchema = new Schema<PostAggDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  replyCount: { type: Number, required: true, default: 0 },
+});
 
 export interface StoryDocument extends Document {
   uri: string;
@@ -640,12 +718,16 @@ export const cursorStateSchema = new Schema<CursorStateDocument>({
 });
 
 export interface DatabaseModels {
+  Record: Model<RecordDocument>;
+  DuplicateRecord: Model<DuplicateRecordDocument>;
   Like: Model<LikeDocument>;
   Post: Model<PostDocument>;
+  PostAgg: Model<PostAggDocument>;
   Story: Model<StoryDocument>;
   Follow: Model<FollowDocument>;
   Block: Model<BlockDocument>;
   Profile: Model<ProfileDocument>;
+  ProfileAgg: Model<ProfileAggDocument>;
   Audio: Model<AudioDocument>;
   Repost: Model<RepostDocument>;
   Music: Model<MusicDocument>;
@@ -655,6 +737,7 @@ export interface DatabaseModels {
   RepoTakedown: Model<RepoTakedownDocument>;
   BlobTakedown: Model<BlobTakedownDocument>;
   Actor: Model<ActorDocument>;
+  ActorSync: Model<ActorSyncDocument>;
   UserPreference: Model<UserPreferenceDocument>;
   CursorState: Model<CursorStateDocument>;
 }
@@ -662,7 +745,7 @@ export interface DatabaseModels {
 export class Database implements DataPlaneClient {
   private connection!: Connection;
   public models!: DatabaseModels;
-  private logger = pino({ name: "database" });
+  public logger = pino({ name: "database" });
   public idResolver: IdResolver;
 
   constructor() {
@@ -692,6 +775,11 @@ export class Database implements DataPlaneClient {
 
       // Initialize models
       this.models = {
+        Record: this.connection.model<RecordDocument>("Record", recordSchema),
+        DuplicateRecord: this.connection.model<DuplicateRecordDocument>(
+          "DuplicateRecord",
+          duplicateRecordSchema,
+        ),
         Like: this.connection.model<LikeDocument>("Like", likeSchema),
         Post: this.connection.model<PostDocument>("Post", postSchema),
         Story: this.connection.model<StoryDocument>("Story", storySchema),
@@ -701,6 +789,11 @@ export class Database implements DataPlaneClient {
           "Profile",
           profileSchema,
         ),
+        ProfileAgg: this.connection.model<ProfileAggDocument>(
+          "ProfileAgg",
+          profileAggSchema,
+        ),
+        PostAgg: this.connection.model<PostAggDocument>("PostAgg", postAggSchema),
         Audio: this.connection.model<AudioDocument>("Audio", audioSchema),
         Repost: this.connection.model<RepostDocument>("Repost", repostSchema),
         Music: this.connection.model<MusicDocument>("Music", musicSchema),
@@ -722,6 +815,10 @@ export class Database implements DataPlaneClient {
           blobTakedownSchema,
         ),
         Actor: this.connection.model<ActorDocument>("Actor", actorSchema),
+        ActorSync: this.connection.model<ActorSyncDocument>(
+          "ActorSync",
+          actorSyncSchema,
+        ),
         UserPreference: this.connection.model<UserPreferenceDocument>(
           "UserPreference",
           userPreferenceSchema,

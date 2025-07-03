@@ -12,7 +12,9 @@ export const env = {
   SERVICE_DID: envStr("SERVICE_DID") ?? "did:web:localhost",
   MOD_SERVICE_DID: envStr("MOD_SERVICE_DID") ?? "did:web:localhost",
   ADMIN_PASSWORD: envStr("ADMIN_PASSWORD") ?? "admin-token",
-
+  JETSTREAM_URL: envStr("JETSTREAM_URL") ??
+    "wss://jetstream2.us-east.bsky.network/subscribe",
+  
   DB_URI: envStr("DB_URI"),
   DB_NAME: envStr("DB_NAME") ?? "dev",
   DB_HOST: envStr("DB_HOST") ?? "localhost",

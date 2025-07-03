@@ -18,6 +18,7 @@
     "npm:@atproto/lex-cli@*": "0.8.2",
     "npm:@atproto/lexicon@~0.4.11": "0.4.11",
     "npm:@atproto/lexicon@~0.4.8": "0.4.11",
+    "npm:@atproto/repo@~0.8.4": "0.8.4",
     "npm:@atproto/syntax@~0.3.4": "0.3.4",
     "npm:@atproto/xrpc-server@~0.7.19": "0.7.19",
     "npm:@atproto/xrpc@0.7": "0.7.0",
@@ -40,6 +41,7 @@
     "npm:mongoose@^8.12.1": "8.15.1",
     "npm:multiformats@^13.3.6": "13.3.6",
     "npm:multiformats@^9.9.0": "9.9.0",
+    "npm:p-queue@^8.1.0": "8.1.0",
     "npm:pino@^8.19.0": "8.21.0",
     "npm:rate-limiter-flexible@^2.4.1": "2.4.2",
     "npm:uint8arrays@*": "5.1.0",
@@ -153,6 +155,20 @@
         "@atproto/syntax@0.4.0",
         "iso-datestring-validator",
         "multiformats@9.9.0",
+        "zod"
+      ]
+    },
+    "@atproto/repo@0.8.4": {
+      "integrity": "sha512-WgyARo6UcOnhbRsRVuNjXOH5MPTTHVDsaIavPeQl5erq5foE/pQKC7B7FLTJmhpC6GPZHJ5M2doAyXRXv5UHGA==",
+      "dependencies": [
+        "@atproto/common",
+        "@atproto/common-web",
+        "@atproto/crypto",
+        "@atproto/lexicon",
+        "@ipld/dag-cbor",
+        "multiformats@9.9.0",
+        "uint8arrays@3.0.0",
+        "varint",
         "zod"
       ]
     },
@@ -525,6 +541,9 @@
     "event-target-shim@5.0.1": {
       "integrity": "sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ=="
     },
+    "eventemitter3@5.0.1": {
+      "integrity": "sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA=="
+    },
     "events@3.3.0": {
       "integrity": "sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q=="
     },
@@ -820,6 +839,16 @@
         "ee-first"
       ]
     },
+    "p-queue@8.1.0": {
+      "integrity": "sha512-mxLDbbGIBEXTJL0zEx8JIylaj3xQ7Z/7eEVjcF9fJX4DBiH9oqe+oahYnlKKxm0Ci9TlWTyhSHgygxMxjIB2jw==",
+      "dependencies": [
+        "eventemitter3",
+        "p-timeout"
+      ]
+    },
+    "p-timeout@6.1.4": {
+      "integrity": "sha512-MyIV3ZA/PmyBN/ud8vV9XzwTrNtR4jFrObymZYnZqMmW0zA8Z17vnT0rBgFE/TlohB+YCHqXMgZzb3Csp49vqg=="
+    },
     "parseurl@1.3.3": {
       "integrity": "sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ=="
     },
@@ -1085,6 +1114,9 @@
     "utils-merge@1.0.1": {
       "integrity": "sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA=="
     },
+    "varint@6.0.0": {
+      "integrity": "sha512-cXEIW6cfr15lFv563k4GuVuW/fiwjknytD37jIOLSdSWuOI6WnO/oKwmP2FQTU2l01LP8/M5TSAJpzUaGe3uWg=="
+    },
     "vary@1.1.2": {
       "integrity": "sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg=="
     },
@@ -1161,14 +1193,17 @@
       "npm:@atproto/crypto@~0.4.4",
       "npm:@atproto/identity@~0.4.8",
       "npm:@atproto/lexicon@~0.4.8",
+      "npm:@atproto/repo@~0.8.4",
       "npm:@atproto/syntax@~0.3.4",
       "npm:@atproto/xrpc-server@~0.7.19",
+      "npm:@atproto/xrpc@0.7",
       "npm:dotenv@17",
       "npm:express@^4.21.2",
       "npm:jose@^6.0.11",
       "npm:key-encoder@^2.0.3",
       "npm:mongoose@^8.12.1",
       "npm:multiformats@^9.9.0",
+      "npm:p-queue@^8.1.0",
       "npm:pino@^8.19.0",
       "npm:ws@^8.18.0"
     ]

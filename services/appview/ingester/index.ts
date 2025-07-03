@@ -3,7 +3,7 @@ import { Database } from "../data-plane/server/index.ts";
 import {
   createBidirectionalResolver,
   createIdResolver,
-} from "./utils/id-resolver.ts";
+} from "../utils/id-resolver.ts";
 import { createJetstreamClient } from "./utils/jetstream-client.ts";
 import { customConfig } from "./utils/logger-config.ts";
 

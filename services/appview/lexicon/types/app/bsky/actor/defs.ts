@@ -163,23 +163,22 @@ export function validateKnownFollowers<V>(v: V) {
   return validate<KnownFollowers & V>(v, id, hashKnownFollowers);
 }
 
-export type Preferences =
-  (
-    | $Typed<AdultContentPref>
-    | $Typed<ContentLabelPref>
-    | $Typed<SavedFeedsPref>
-    | $Typed<SavedFeedsPrefV2>
-    | $Typed<PersonalDetailsPref>
-    | $Typed<FeedViewPref>
-    | $Typed<ThreadViewPref>
-    | $Typed<InterestsPref>
-    | $Typed<MutedWordsPref>
-    | $Typed<HiddenPostsPref>
-    | $Typed<BskyAppStatePref>
-    | $Typed<LabelersPref>
-    | $Typed<PostInteractionSettingsPref>
-    | { $type: string }
-  )[];
+export type Preferences = (
+  | $Typed<AdultContentPref>
+  | $Typed<ContentLabelPref>
+  | $Typed<SavedFeedsPref>
+  | $Typed<SavedFeedsPrefV2>
+  | $Typed<PersonalDetailsPref>
+  | $Typed<FeedViewPref>
+  | $Typed<ThreadViewPref>
+  | $Typed<InterestsPref>
+  | $Typed<MutedWordsPref>
+  | $Typed<HiddenPostsPref>
+  | $Typed<BskyAppStatePref>
+  | $Typed<LabelersPref>
+  | $Typed<PostInteractionSettingsPref>
+  | { $type: string }
+)[];
 
 export interface AdultContentPref {
   $type?: "app.bsky.actor.defs#adultContentPref";
@@ -503,14 +502,13 @@ export function validateNux<V>(v: V) {
 export interface PostInteractionSettingsPref {
   $type?: "app.bsky.actor.defs#postInteractionSettingsPref";
   /** Matches threadgate record. List of rules defining who can reply to this users posts. If value is an empty array, no one can reply. If value is undefined, anyone can reply. */
-  threadgateAllowRules?:
-    (
-      | $Typed<AppBskyFeedThreadgate.MentionRule>
-      | $Typed<AppBskyFeedThreadgate.FollowerRule>
-      | $Typed<AppBskyFeedThreadgate.FollowingRule>
-      | $Typed<AppBskyFeedThreadgate.ListRule>
-      | { $type: string }
-    )[];
+  threadgateAllowRules?: (
+    | $Typed<AppBskyFeedThreadgate.MentionRule>
+    | $Typed<AppBskyFeedThreadgate.FollowerRule>
+    | $Typed<AppBskyFeedThreadgate.FollowingRule>
+    | $Typed<AppBskyFeedThreadgate.ListRule>
+    | { $type: string }
+  )[];
   /** Matches postgate record. List of rules defining who can embed this users posts. If value is an empty array or is undefined, no particular rules apply and anyone can embed. */
   postgateEmbeddingRules?:
     ($Typed<AppBskyFeedPostgate.DisableRule> | { $type: string })[];

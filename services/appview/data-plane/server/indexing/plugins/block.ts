@@ -1,0 +1,99 @@
+import { CID } from "multiformats/cid";
+import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
+import * as lex from "../../../../lexicon/lexicons.ts";
+import * as Block from "../../../../lexicon/types/app/bsky/graph/block.ts";
+import { BackgroundQueue } from "../../background.ts";
+import { BlockDocument, Database } from "../../index.ts";
+import { RecordProcessor } from "../processor.ts";
+
+const lexIds = [lex.ids.AppBskyGraphBlock];
+type IndexedBlock = BlockDocument;
+
+const insertFn = async (
+  db: Database,
+  uri: AtUri,
+  cid: CID,
+  obj: Block.Record,
+  timestamp: string,
+): Promise<IndexedBlock | null> => {
+  const block = {
+    uri: uri.toString(),
+    cid: cid.toString(),
+    authorDid: uri.host,
+    subject: obj.subject,
+    createdAt: normalizeDatetimeAlways(obj.createdAt),
+    indexedAt: timestamp,
+  };
+
+  // Check if block already exists
+  const existingBlock = await db.models.Block.findOne({ uri: block.uri })
+    .lean();
+  if (existingBlock) {
+    return null; // Block already indexed
+  }
+
+  // Use findOneAndUpdate with upsert to handle potential duplicate key errors
+  try {
+    const insertedBlock = await db.models.Block.findOneAndUpdate(
+      { uri: block.uri },
+      block,
+      { upsert: true, new: true },
+    );
+    return insertedBlock;
+  } catch (err) {
+    // Handle duplicate key errors gracefully
+    const mongoError = err as { code?: number };
+    if (mongoError.code === 11000) {
+      return null; // Silently skip duplicates
+    }
+    throw err;
+  }
+};
+
+const findDuplicate = async (
+  db: Database,
+  uri: AtUri,
+  obj: Block.Record,
+): Promise<AtUri | null> => {
+  const found = await db.models.Block.findOne({
+    authorDid: uri.host,
+    subject: obj.subject,
+  }).lean();
+  return found ? new AtUri(found.uri) : null;
+};
+
+const notifsForInsert = () => {
+  return [];
+};
+
+const deleteFn = async (
+  db: Database,
+  uri: AtUri,
+): Promise<IndexedBlock | null> => {
+  const deleted = await db.models.Block.findOneAndDelete({
+    uri: uri.toString(),
+  });
+  return deleted;
+};
+
+const notifsForDelete = () => {
+  return { notifs: [], toDelete: [] };
+};
+
+export type PluginType = RecordProcessor<Block.Record, IndexedBlock>;
+
+export const makePlugin = (
+  db: Database,
+  background: BackgroundQueue,
+): PluginType => {
+  return new RecordProcessor(db, background, {
+    lexIds,
+    insertFn,
+    findDuplicate,
+    deleteFn,
+    notifsForInsert,
+    notifsForDelete,
+  });
+};
+
+export default makePlugin;
