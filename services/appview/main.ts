@@ -48,14 +48,15 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
   app.use("*", cors());
   app.use("*", logger());
   app.use("*", async (c, next) => {
-    // Only set env properties if c.env exists (for testing compatibility)
-    if (c.env) {
-      c.env.serviceDid = ctx.serviceDid;
-      c.env.didResolver = ctx.didResolver;
-      c.env.takedownService = ctx.takedownService;
-      c.env.indexingService = ctx.indexingService;
-      c.env.authVerifier = ctx.authVerifier;
+    // Initialize c.env if it doesn't exist (for testing compatibility)
+    if (!c.env) {
+      c.env = {} as AppContext;
     }
+    c.env.serviceDid = ctx.serviceDid;
+    c.env.didResolver = ctx.didResolver;
+    c.env.takedownService = ctx.takedownService;
+    c.env.indexingService = ctx.indexingService;
+    c.env.authVerifier = ctx.authVerifier;
     await next();
   });
   app.use("*", takedownFilterMiddleware);
