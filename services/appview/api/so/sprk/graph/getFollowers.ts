@@ -2,28 +2,51 @@ import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
 import type * as SoSprkActorDefs from "../../../../lexicon/types/so/sprk/actor/defs.ts";
 import { FollowDocument } from "../../../../data-plane/server/index.ts";
+import { ensureValidDid, isValidHandle } from "@atproto/syntax";
+import { RootFilterQuery } from "mongoose";
+import { XRPCError } from "@sprk/xrpc-server";
+import { OutputSchema } from "../../../../lexicon/types/so/sprk/graph/getFollowers.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.graph.getFollowers({
     auth: ctx.authVerifier.standardOptional,
-    handler: async ({ params }) => {
+    handler: async ({ params, auth }) => {
       const { actor } = params;
-      const limit = params.limit ?? 50;
+      const limit = params.limit;
       const cursor = params.cursor;
+      const viewerDid = auth.credentials.type === "standard"
+        ? auth.credentials.iss
+        : undefined;
 
-      if (!actor) {
-        throw new Error("Actor is required");
+      let actorDid;
+
+      if (isValidHandle(actor)) {
+        const actorDidDoc = await ctx.resolver.resolveHandleToDidDoc(actor);
+        actorDid = actorDidDoc.did;
+      } else {
+        try {
+          ensureValidDid(actor);
+          actorDid = actor;
+        } catch (error) {
+          ctx.logger.warn(
+            { did: actor, error: (error as Error).message },
+            "Failed to ensure valid DID",
+          );
+          throw new XRPCError(400, "Invalid actor DID");
+        }
       }
 
-      // Validate limit
-      if (limit < 1 || limit > 100) {
-        throw new Error("Limit must be between 1 and 100");
-      }
+      const actorPref = await ctx.db.models.UserPreference.findOne({
+        userDid: actorDid,
+      });
+      const actorFollowMode = actorPref?.followMode || "sprk";
 
       // Build query
-      const query: { subject: string; _id?: { $gt: string } } = {
-        subject: actor,
+      const query: RootFilterQuery<FollowDocument> = {
+        subject: actorDid,
+        type: actorFollowMode,
       };
+
       if (cursor) {
         query._id = { $gt: cursor };
       }
@@ -41,6 +64,11 @@ export default function (server: Server, ctx: AppContext) {
             authorDid: follow.authorDid,
           });
 
+          const viewerFollow = await ctx.db.models.Follow.findOne({
+            subject: follow.authorDid,
+            authorDid: viewerDid,
+          });
+
           // Basic profile view with just DID and handle
           const basicProfileView: SoSprkActorDefs.ProfileView = {
             $type: "so.sprk.actor.defs#profileView",
@@ -48,7 +76,7 @@ export default function (server: Server, ctx: AppContext) {
             handle: follow.authorHandle,
             viewer: {
               $type: "so.sprk.actor.defs#viewerState",
-              following: follow.uri,
+              following: viewerFollow ? viewerFollow.uri : undefined,
             },
           };
 
@@ -79,26 +107,27 @@ export default function (server: Server, ctx: AppContext) {
 
       // Get subject profile if it exists
       const subjectProfile = await ctx.db.models.Profile.findOne({
-        authorDid: actor,
+        authorDid: actorDid,
       });
 
       // Basic subject profile view with just DID and handle
       let handle = null;
       try {
-        if (actor) {
-          const didData = await ctx.resolver.resolveDidToDidDoc(actor);
+        if (actorDid) {
+          const didData = await ctx.resolver.resolveDidToDidDoc(actorDid);
           handle = didData.handle;
         }
       } catch (error) {
         ctx.logger.warn(
-          { did: actor, error: (error as Error).message },
+          { did: actorDid, error: (error as Error).message },
           "Failed to resolve DID to handle",
         );
       }
+
       const subjectProfileView: SoSprkActorDefs.ProfileView = {
         $type: "so.sprk.actor.defs#profileView",
-        did: actor,
-        handle: handle ?? "unknown",
+        did: actorDid,
+        handle: handle ?? "unknown.invalid",
       };
 
       // If we found the subject profile, add the additional fields
@@ -117,14 +146,16 @@ export default function (server: Server, ctx: AppContext) {
         });
       }
 
-      return {
+      const res = {
         encoding: "application/json",
         body: {
           subject: subjectProfileView,
           followers: profileViews,
           cursor: nextCursor,
-        },
-      };
+        } satisfies OutputSchema,
+      } as const;
+
+      return res;
     },
   });
 }
