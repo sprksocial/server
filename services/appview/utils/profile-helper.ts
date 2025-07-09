@@ -1,6 +1,7 @@
 import { Database } from "../data-plane/server/index.ts";
 import type {
   ProfileAssociated,
+  ProfileView,
   ProfileViewBasic,
   ProfileViewDetailed,
   ViewerState,
@@ -61,6 +62,60 @@ export async function createProfileViewBasic(
       : undefined,
     stories: stories.length > 0 ? stories : undefined,
   };
+}
+
+export async function getProfileView(
+  ctx: AppContext,
+  actorDid: string,
+  viewerDid?: string,
+): Promise<ProfileView> {
+  const { db, resolver } = ctx;
+
+  const profile = await db.models.Profile.findOne({ authorDid: actorDid });
+  const handle = profile?.authorHandle ??
+    (await resolver.resolveDidToHandle(actorDid)) ?? "unknown.invalid";
+
+  const baseView: ProfileView = {
+    $type: "so.sprk.actor.defs#profileView",
+    did: actorDid,
+    handle: handle,
+  };
+
+  if (viewerDid) {
+    const [following, followedBy] = await Promise.all([
+      db.models.Follow.findOne({
+        authorDid: viewerDid,
+        subject: actorDid,
+      }).select("uri").lean(),
+      db.models.Follow.findOne({
+        authorDid: actorDid,
+        subject: viewerDid,
+      }).select("uri").lean(),
+    ]);
+
+    baseView.viewer = {
+      $type: "so.sprk.actor.defs#viewerState",
+      following: following?.uri,
+      followedBy: followedBy?.uri,
+    };
+  }
+
+  if (profile) {
+    const avatarUrl = profile.avatar?.ref?.$link
+      ? `https://media.sprk.so/avatar/tiny/${profile.authorDid}/${profile.avatar.ref.$link}/webp`
+      : undefined;
+
+    return {
+      ...baseView,
+      displayName: profile.displayName,
+      description: profile.description,
+      avatar: avatarUrl,
+      indexedAt: profile.indexedAt,
+      createdAt: profile.createdAt,
+    };
+  }
+
+  return baseView;
 }
 
 /**
@@ -197,12 +252,11 @@ export async function getProfiles(
             return [];
           }),
 
-        // Count unique followers across both Sprk and Bsky follow types
-        ctx.db.models.Follow.aggregate([
-          { $match: { subject: actorDid } },
-          { $group: { _id: "$authorDid" } },
-          { $count: "total" },
-        ]).then((result: { total: number }[]) => result[0]?.total || 0),
+        // Count followers based on actor's follow mode preference
+        ctx.db.models.Follow.countDocuments({
+          subject: actorDid,
+          type: actorFollowMode,
+        }),
 
         // Count follows based on actor's follow mode preference
         ctx.db.models.Follow.countDocuments({

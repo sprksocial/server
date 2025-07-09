@@ -45,6 +45,14 @@ export type AppEnv = {
 export function createApp(ctx: AppContext): Hono<AppEnv> {
   const app = new Hono<AppEnv>();
 
+  app.use("*", async (c, next) => {
+    await next();
+    if (c.res.status === 500) {
+      ctx.logger.error(`Internal server error`, c.error);
+      console.log(c.error);
+    }
+  });
+
   app.use("*", cors());
   app.use("*", logger());
   app.use("*", async (c, next) => {
