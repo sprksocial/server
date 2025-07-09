@@ -20,11 +20,11 @@ export function createBidirectionalResolver(resolver: IdResolver) {
   return {
     async resolveDidToHandle(did: string): Promise<string> {
       const didDoc = await resolver.did.resolveAtprotoData(did);
-      const resolvedHandle = await resolver.handle.resolve(didDoc.handle);
-      if (resolvedHandle === did) {
+      const resolvedDid = await resolver.handle.resolve(didDoc.handle);
+      if (resolvedDid === did) {
         return didDoc.handle;
       }
-      return did;
+      return "unknown.invalid";
     },
 
     async resolveDidToDidDoc(did: string): Promise<AtprotoData> {
