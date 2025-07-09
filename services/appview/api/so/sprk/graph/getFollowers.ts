@@ -1,11 +1,11 @@
 import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
-import type * as SoSprkActorDefs from "../../../../lexicon/types/so/sprk/actor/defs.ts";
 import { FollowDocument } from "../../../../data-plane/server/index.ts";
 import { ensureValidDid, isValidHandle } from "@atproto/syntax";
 import { RootFilterQuery } from "mongoose";
 import { XRPCError } from "@sprk/xrpc-server";
 import { OutputSchema } from "../../../../lexicon/types/so/sprk/graph/getFollowers.ts";
+import { getProfileView } from "../../../../utils/profile-helper.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.graph.getFollowers({
@@ -59,45 +59,9 @@ export default function (server: Server, ctx: AppContext) {
 
       // Get profile views for each follower
       const profileViews = await Promise.all(
-        followers.map(async (follow: FollowDocument) => {
-          const profile = await ctx.db.models.Profile.findOne({
-            authorDid: follow.authorDid,
-          });
-
-          const viewerFollow = await ctx.db.models.Follow.findOne({
-            subject: follow.authorDid,
-            authorDid: viewerDid,
-          });
-
-          // Basic profile view with just DID and handle
-          const basicProfileView: SoSprkActorDefs.ProfileView = {
-            $type: "so.sprk.actor.defs#profileView",
-            did: follow.authorDid,
-            handle: follow.authorHandle,
-            viewer: {
-              $type: "so.sprk.actor.defs#viewerState",
-              following: viewerFollow ? viewerFollow.uri : undefined,
-            },
-          };
-
-          // If we found a profile, add the additional fields
-          if (profile) {
-            const avatarUrl = profile.avatar?.ref?.$link
-              ? `https://media.sprk.so/avatar/tiny/${profile.authorDid}/${profile.avatar.ref.$link}/webp`
-              : undefined;
-
-            return {
-              ...basicProfileView,
-              displayName: profile.displayName,
-              description: profile.description,
-              avatar: avatarUrl,
-              indexedAt: profile.indexedAt,
-              createdAt: profile.createdAt,
-            };
-          }
-
-          return basicProfileView;
-        }),
+        followers.map((follow: FollowDocument) =>
+          getProfileView(ctx, follow.authorDid, viewerDid)
+        ),
       );
 
       // Get next cursor
@@ -106,45 +70,7 @@ export default function (server: Server, ctx: AppContext) {
         : undefined;
 
       // Get subject profile if it exists
-      const subjectProfile = await ctx.db.models.Profile.findOne({
-        authorDid: actorDid,
-      });
-
-      // Basic subject profile view with just DID and handle
-      let handle = null;
-      try {
-        if (actorDid) {
-          const didData = await ctx.resolver.resolveDidToDidDoc(actorDid);
-          handle = didData.handle;
-        }
-      } catch (error) {
-        ctx.logger.warn(
-          { did: actorDid, error: (error as Error).message },
-          "Failed to resolve DID to handle",
-        );
-      }
-
-      const subjectProfileView: SoSprkActorDefs.ProfileView = {
-        $type: "so.sprk.actor.defs#profileView",
-        did: actorDid,
-        handle: handle ?? "unknown.invalid",
-      };
-
-      // If we found the subject profile, add the additional fields
-      if (subjectProfile) {
-        const avatarUrl = subjectProfile.avatar?.ref?.$link
-          ? `https://media.sprk.so/avatar/tiny/${subjectProfile.authorDid}/${subjectProfile.avatar.ref.$link}/webp`
-          : undefined;
-
-        Object.assign(subjectProfileView, {
-          handle: subjectProfile.authorHandle,
-          displayName: subjectProfile.displayName,
-          description: subjectProfile.description,
-          avatar: avatarUrl,
-          indexedAt: subjectProfile.indexedAt,
-          createdAt: subjectProfile.createdAt,
-        });
-      }
+      const subjectProfileView = await getProfileView(ctx, actorDid, viewerDid);
 
       const res = {
         encoding: "application/json",
