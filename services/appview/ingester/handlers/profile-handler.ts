@@ -59,7 +59,7 @@ async function handleCreateOrUpdate(
       joinedViaStarterPack: record.joinedViaStarterPack,
       pinnedPost: record.pinnedPost,
       authorDid: evt.did,
-      authorHandle: evt.handle || "unknown",
+      authorHandle: evt.handle || "unknown.invalid",
       createdAt: record.createdAt,
       indexedAt: now.toISOString(),
       cid: evt.commit.cid,

@@ -54,7 +54,7 @@ async function handleCreateOrUpdate(
         subject: record.subject.uri,
         subjectCid: record.subject.cid,
         authorDid: evt.did,
-        authorHandle: evt.handle || "unknown",
+        authorHandle: evt.handle || "unknown.invalid",
         createdAt: record.createdAt || now.toISOString(),
         indexedAt: now.toISOString(),
         cid: evt.commit.cid,

@@ -49,7 +49,7 @@ async function handleCreateOrUpdate(
       labels: record.labels || null,
       tags: record.tags || [],
       authorDid: evt.did,
-      authorHandle: evt.handle || "unknown",
+      authorHandle: evt.handle || "unknown.invalid",
       createdAt: record.createdAt,
       indexedAt: now.toISOString(),
       cid: evt.commit.cid,
