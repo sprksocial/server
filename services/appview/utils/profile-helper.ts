@@ -197,12 +197,11 @@ export async function getProfiles(
             return [];
           }),
 
-        // Count unique followers across both Sprk and Bsky follow types
-        ctx.db.models.Follow.aggregate([
-          { $match: { subject: actorDid } },
-          { $group: { _id: "$authorDid" } },
-          { $count: "total" },
-        ]).then((result: { total: number }[]) => result[0]?.total || 0),
+        // Count followers based on actor's follow mode preference
+        ctx.db.models.Follow.countDocuments({
+          subject: actorDid,
+          type: actorFollowMode,
+        }),
 
         // Count follows based on actor's follow mode preference
         ctx.db.models.Follow.countDocuments({
