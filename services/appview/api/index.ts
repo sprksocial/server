@@ -17,6 +17,7 @@ import resolveHandle from "./com/atproto/identity/resolveHandle.ts";
 import getStories from "./so/sprk/feed/getStories.ts";
 import getStoriesTimeline from "./so/sprk/feed/getStoriesTimeline.ts";
 import getProfiles from "./so/sprk/actor/getProfiles.ts";
+import searchPosts from "./so/sprk/feed/searchPosts.ts";
 
 export default function (server: Server, ctx: AppContext) {
   getAccountInfos(server, ctx);
@@ -36,4 +37,5 @@ export default function (server: Server, ctx: AppContext) {
   resolveHandle(server, ctx);
   getStories(server, ctx);
   getStoriesTimeline(server, ctx);
+  searchPosts(server, ctx);
 }
