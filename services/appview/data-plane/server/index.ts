@@ -128,7 +128,6 @@ export interface LikeDocument extends Document {
   subject: string;
   subjectCid: string;
   authorDid: string;
-  authorHandle: string;
   createdAt: string;
   indexedAt: string;
   cid: string;
@@ -141,7 +140,6 @@ export const likeSchema = new Schema<LikeDocument>({
   subject: { type: String, required: true, index: true },
   subjectCid: { type: String, required: true },
   authorDid: { type: String, required: true, index: true },
-  authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
@@ -154,7 +152,6 @@ export interface LookDocument extends Document {
   subject: string;
   subjectCid: string;
   authorDid: string;
-  authorHandle: string;
   createdAt: string;
   indexedAt: string;
   cid: string;
@@ -165,7 +162,6 @@ export const lookSchema = new Schema<LookDocument>({
   subject: { type: String, required: true, index: true },
   subjectCid: { type: String, required: true },
   authorDid: { type: String, required: true, index: true },
-  authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
@@ -175,7 +171,6 @@ export interface FollowDocument extends Document {
   uri: string;
   subject: string;
   authorDid: string;
-  authorHandle: string;
   createdAt: string;
   indexedAt: string;
   cid: string;
@@ -186,7 +181,6 @@ export const followSchema = new Schema<FollowDocument>({
   uri: { type: String, required: true, unique: true, index: true },
   subject: { type: String, required: true, index: true },
   authorDid: { type: String, required: true, index: true },
-  authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
@@ -203,7 +197,6 @@ export interface BlockDocument extends Document {
   uri: string;
   subject: string;
   authorDid: string;
-  authorHandle: string;
   createdAt: string;
   indexedAt: string;
   cid: string;
@@ -213,7 +206,6 @@ export const blockSchema = new Schema<BlockDocument>({
   uri: { type: String, required: true, unique: true, index: true },
   subject: { type: String, required: true, index: true },
   authorDid: { type: String, required: true, index: true },
-  authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
@@ -233,7 +225,6 @@ export interface ProfileDocument extends Document {
   labels?: Label[];
   pinnedPost?: PinnedPost;
   authorDid: string;
-  authorHandle: string;
   createdAt: string;
   indexedAt: string;
   cid: string;
@@ -248,7 +239,6 @@ export const profileSchema = new Schema<ProfileDocument>({
   labels: { type: Object, required: false },
   pinnedPost: { type: Object, required: false },
   authorDid: { type: String, required: true, index: true },
-  authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
@@ -257,7 +247,6 @@ export const profileSchema = new Schema<ProfileDocument>({
 // Add text index for profile search
 profileSchema.index({
   displayName: "text",
-  authorHandle: "text",
   description: "text",
 });
 
@@ -282,7 +271,6 @@ export interface AudioDocument extends Document {
   text?: string;
   labels?: PostLabel[];
   authorDid: string;
-  authorHandle: string;
   createdAt: string;
   indexedAt: string;
   cid: string;
@@ -299,7 +287,6 @@ export const audioSchema = new Schema<AudioDocument>({
   text: { type: String, required: false },
   labels: { type: Object, required: false },
   authorDid: { type: String, required: true, index: true },
-  authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
@@ -312,7 +299,6 @@ export interface RepostDocument extends Document {
     cid: string;
   };
   authorDid: string;
-  authorHandle: string;
   createdAt: string;
   indexedAt: string;
   cid: string;
@@ -327,7 +313,6 @@ export const repostSchema = new Schema<RepostDocument>({
     cid: { type: String, required: true },
   },
   authorDid: { type: String, required: true, index: true },
-  authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
@@ -350,7 +335,6 @@ export interface MusicDocument extends Document {
   labels?: PostLabel[];
   tags?: string[];
   authorDid: string;
-  authorHandle: string;
   createdAt: string;
   indexedAt: string;
   cid: string;
@@ -371,7 +355,6 @@ export const musicSchema = new Schema<MusicDocument>({
   labels: { type: Object, required: false },
   tags: { type: [String], required: false },
   authorDid: { type: String, required: true, index: true },
-  authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
@@ -430,7 +413,6 @@ export interface PostDocument extends Document {
   labels: PostLabel[] | null;
   tags: string[];
   authorDid: string;
-  authorHandle: string;
   createdAt: string;
   indexedAt: string;
   cid: string;
@@ -467,7 +449,6 @@ export const postSchema = new Schema<PostDocument>({
   labels: { type: Object, required: false, default: null },
   tags: { type: [String], required: false, default: [] },
   authorDid: { type: String, required: true, index: true },
-  authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
@@ -497,7 +478,6 @@ export interface StoryDocument extends Document {
   labels: PostLabel[] | null;
   tags: string[];
   authorDid: string;
-  authorHandle: string;
   createdAt: string;
   indexedAt: string;
   cid: string;
@@ -517,7 +497,6 @@ export const storySchema = new Schema<StoryDocument>({
   labels: { type: Object, required: false, default: null },
   tags: { type: [String], required: false, default: [] },
   authorDid: { type: String, required: true, index: true },
-  authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
@@ -572,7 +551,6 @@ export interface GeneratorDocument extends Document {
   labels?: PostLabel[];
   contentMode?: string;
   authorDid: string;
-  authorHandle: string;
   createdAt: string;
   indexedAt: string;
   cid: string;
@@ -589,7 +567,6 @@ export const generatorSchema = new Schema<GeneratorDocument>({
   labels: { type: Object, required: false },
   contentMode: { type: String, required: false },
   authorDid: { type: String, required: true, index: true },
-  authorHandle: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   cid: { type: String, required: true },
@@ -754,7 +731,7 @@ export class Database implements DataPlaneClient {
     });
   }
 
-  async connect(): Promise<void> {
+  connect() {
     const { DB_URI, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = env;
 
     const uri = DB_URI ||
@@ -767,7 +744,7 @@ export class Database implements DataPlaneClient {
     );
 
     try {
-      this.connection = await mongoose.createConnection(uri, {
+      this.connection = mongoose.createConnection(uri, {
         autoIndex: true,
         autoCreate: true,
         dbName: DB_NAME,
@@ -793,7 +770,10 @@ export class Database implements DataPlaneClient {
           "ProfileAgg",
           profileAggSchema,
         ),
-        PostAgg: this.connection.model<PostAggDocument>("PostAgg", postAggSchema),
+        PostAgg: this.connection.model<PostAggDocument>(
+          "PostAgg",
+          postAggSchema,
+        ),
         Audio: this.connection.model<AudioDocument>("Audio", audioSchema),
         Repost: this.connection.model<RepostDocument>("Repost", repostSchema),
         Music: this.connection.model<MusicDocument>("Music", musicSchema),

@@ -37,7 +37,6 @@ export function makePlugin(db: Database) {
           uri: uri.toString(),
           subject: record.subject,
           authorDid: uri.hostname,
-          authorHandle: actor.handle || uri.hostname,
           createdAt: record.createdAt,
           indexedAt: timestamp,
           cid: cid.toString(),

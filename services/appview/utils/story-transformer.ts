@@ -1,18 +1,18 @@
 import type * as SoSprkFeedDefs from "../lexicon/types/so/sprk/feed/defs.ts";
-import { Database, StoryDocument } from "../data-plane/server/index.ts";
+import { StoryDocument } from "../data-plane/server/index.ts";
 import { transformEmbed } from "./embed-transformer.ts";
 import { createProfileViewBasic } from "./profile-helper.ts";
+import { AppContext } from "../main.ts";
 
 // Transform DB story to StoryView format
 export async function transformStoryToStoryView(
   story: StoryDocument,
-  db: Database,
+  ctx: AppContext,
 ): Promise<SoSprkFeedDefs.StoryView> {
   // Create the author object with stories
   const authorView = await createProfileViewBasic(
     story.authorDid,
-    story.authorHandle,
-    db,
+    ctx,
   );
 
   const embedView = transformEmbed(story.media, story.authorDid, story.cid, {

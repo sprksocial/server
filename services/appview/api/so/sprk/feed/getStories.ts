@@ -2,16 +2,13 @@ import type * as SoSprkFeedDefs from "../../../../lexicon/types/so/sprk/feed/def
 import { OutputSchema as GetStoriesView } from "../../../../lexicon/types/so/sprk/feed/getStories.ts";
 import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
-import {
-  Database,
-  StoryDocument,
-} from "../../../../data-plane/server/index.ts";
+import { StoryDocument } from "../../../../data-plane/server/index.ts";
 import { transformStoryToStoryView } from "../../../../utils/story-transformer.ts";
 
 // Function to fetch stories by URIs
 async function getStories(
   uris: string | string[],
-  db: Database,
+  ctx: AppContext,
 ): Promise<SoSprkFeedDefs.StoryView[]> {
   if (!uris) {
     return [];
@@ -23,14 +20,14 @@ async function getStories(
     return [];
   }
 
-  const dbStories = await db.models.Story.find({
+  const dbStories = await ctx.db.models.Story.find({
     uri: { $in: uriArray },
   }).lean();
 
   // Transform each story to StoryView format
   const storyViews = await Promise.all(
     dbStories.map((story: StoryDocument) =>
-      transformStoryToStoryView(story, db)
+      transformStoryToStoryView(story, ctx)
     ),
   );
 
@@ -50,7 +47,7 @@ export default function (server: Server, ctx: AppContext) {
         };
       }
 
-      const stories = await getStories(uris, ctx.db);
+      const stories = await getStories(uris, ctx);
 
       return {
         encoding: "application/json",

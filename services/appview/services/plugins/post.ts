@@ -75,7 +75,6 @@ export function makePlugin(db: Database): PostPluginType {
           labels: record.labels || null,
           tags: record.tags || [],
           authorDid: uri.hostname,
-          authorHandle: actor.handle || uri.hostname,
           createdAt: record.createdAt,
           indexedAt: timestamp,
         };
@@ -135,7 +134,6 @@ export function makePlugin(db: Database): PostPluginType {
           labels: record.labels || null,
           tags: record.tags || [],
           authorDid: uri.hostname,
-          authorHandle: actor.handle || uri.hostname,
           indexedAt: timestamp,
         };
 

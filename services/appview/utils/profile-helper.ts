@@ -1,4 +1,3 @@
-import { Database } from "../data-plane/server/index.ts";
 import type {
   ProfileAssociated,
   ProfileView,
@@ -16,14 +15,17 @@ import { XRPCError } from "@sprk/xrpc-server";
 // Helper function to create ProfileViewBasic with stories
 export async function createProfileViewBasic(
   authorDid: string,
-  authorHandle: string,
-  db: Database,
+  ctx: AppContext,
   includeStories: boolean = true,
 ): Promise<ProfileViewBasic> {
   // Get author profile data
-  const profile = await db.models.Profile.findOne({
+  const profile = await ctx.db.models.Profile.findOne({
     authorDid: authorDid,
   }).lean();
+  const actor = await ctx.db.models.Actor.findOne({
+    did: authorDid,
+  }).lean();
+  const authorHandle = actor?.handle ?? "unknown.invalid";
 
   let stories: ComAtprotoRepoStrongRef.Main[] = [];
 
@@ -34,7 +36,7 @@ export async function createProfileViewBasic(
     twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
 
     try {
-      const recentStories = await db.models.Story.find({
+      const recentStories = await ctx.db.models.Story.find({
         authorDid: authorDid,
         indexedAt: { $gte: twentyFourHoursAgo.toISOString() },
       })
@@ -72,7 +74,9 @@ export async function getProfileView(
   const { db, resolver } = ctx;
 
   const profile = await db.models.Profile.findOne({ authorDid: actorDid });
-  const handle = profile?.authorHandle ??
+  const actor = await db.models.Actor.findOne({ did: actorDid });
+
+  const handle = actor?.handle ??
     (await resolver.resolveDidToHandle(actorDid)) ?? "unknown.invalid";
 
   const baseView: ProfileView = {

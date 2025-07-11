@@ -21,7 +21,11 @@ export async function createJetstreamClient(
 ) {
   // Initialize background queue and indexing service
   const background = new BackgroundQueue(db);
-  const indexingSvc = new IndexingService(db, resolver.baseResolver, background);
+  const indexingSvc = new IndexingService(
+    db,
+    resolver.baseResolver,
+    background,
+  );
 
   // Load initial cursor from DB
   let cursorPosition: number | null = await db.getCursorState();
@@ -191,7 +195,7 @@ export async function createJetstreamClient(
         await indexingSvc.deleteRecord(new AtUri(uri));
       } else {
         const isCreate = operation === "create";
-        
+
         await indexingSvc.indexRecord(
           new AtUri(uri),
           CID.parse(cid),
@@ -203,7 +207,6 @@ export async function createJetstreamClient(
 
       // Always update handle
       await indexingSvc.indexHandle(did, timestamp);
-
     } catch (err) {
       // Log the error but don't re-throw to prevent connection from crashing
       const mongoError = err as { code?: number; message?: string };
@@ -213,10 +216,16 @@ export async function createJetstreamClient(
         db.logger.warn(
           {
             err: mongoError.message,
-            operation: event.kind === "commit" ? event.commit.operation : event.kind,
+            operation: event.kind === "commit"
+              ? event.commit.operation
+              : event.kind,
             did: event.did,
-            uri: event.kind === "commit" ? `at://${event.did}/${event.commit.collection}/${event.commit.rkey}` : undefined,
-            collection: event.kind === "commit" ? event.commit.collection : undefined,
+            uri: event.kind === "commit"
+              ? `at://${event.did}/${event.commit.collection}/${event.commit.rkey}`
+              : undefined,
+            collection: event.kind === "commit"
+              ? event.commit.collection
+              : undefined,
           },
           "Duplicate key error - record may have been processed concurrently",
         );
@@ -224,10 +233,12 @@ export async function createJetstreamClient(
       }
 
       db.logger.error(
-        { 
-          err, 
-          operation: event.kind === "commit" ? event.commit.operation : event.kind, 
-          did: event.did 
+        {
+          err,
+          operation: event.kind === "commit"
+            ? event.commit.operation
+            : event.kind,
+          did: event.did,
         },
         "Error processing jetstream event, continuing",
       );

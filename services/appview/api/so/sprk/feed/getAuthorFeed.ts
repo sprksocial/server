@@ -137,7 +137,7 @@ export default function (server: Server, ctx: AppContext) {
           [...pinnedPosts, ...posts].map(async (post) => {
             const postView = await transformPostToPostView(
               post,
-              ctx.db,
+              ctx,
               userDid,
             );
 
