@@ -51,6 +51,9 @@ services:
         - path: ./utils
           action: sync
           target: /app/utils
+        - path: ./data-plane
+          action: sync
+          target: /app/data-plane
         - path: ./main.ts
           action: sync
           target: /app/main.ts

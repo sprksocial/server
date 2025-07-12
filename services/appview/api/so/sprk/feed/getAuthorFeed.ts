@@ -2,6 +2,7 @@ import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { transformPostToPostView } from "../../../../utils/post-transformer.ts";
 import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
+import { OutputSchema } from "../../../../lexicon/types/so/sprk/feed/getAuthorFeed.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.feed.getAuthorFeed({
@@ -23,14 +24,16 @@ export default function (server: Server, ctx: AppContext) {
         throw new Error("Invalid limit: must be between 1 and 100");
       }
 
+      // Resolve DID if handle is provided
+      let resolvedActorDid = actor;
+
       try {
-        // Resolve DID if handle is provided
-        let actorDid = actor;
-        if (!actorDid.startsWith("did:")) {
+        if (!resolvedActorDid.startsWith("did:")) {
           try {
             const didDoc = await ctx.resolver.resolveHandleToDidDoc(actor);
-            actorDid = didDoc.did;
-          } catch {
+            resolvedActorDid = didDoc.did;
+          } catch (error) {
+            console.error("Failed to resolve handle:", error);
             throw new Error("Invalid actor: could not resolve handle");
           }
         }
@@ -38,7 +41,7 @@ export default function (server: Server, ctx: AppContext) {
         // Check if user is blocked or blocking the actor
         if (userDid) {
           const userIsBlocked = await ctx.db.models.Block.findOne({
-            authorDid: actorDid,
+            authorDid: resolvedActorDid,
             subject: userDid,
           });
 
@@ -48,7 +51,7 @@ export default function (server: Server, ctx: AppContext) {
 
           const userIsBlocking = await ctx.db.models.Block.findOne({
             authorDid: userDid,
-            subject: actorDid,
+            subject: resolvedActorDid,
           });
 
           if (userIsBlocking) {
@@ -64,7 +67,7 @@ export default function (server: Server, ctx: AppContext) {
           [key: string]: unknown;
         };
 
-        const query: MongoQuery = { authorDid: actorDid, reply: null };
+        const query: MongoQuery = { authorDid: resolvedActorDid, reply: null };
 
         if (filter === "posts_with_media") {
           query.$or = [
@@ -113,11 +116,11 @@ export default function (server: Server, ctx: AppContext) {
         }
 
         // Include pinned posts if requested
-        const pinnedPosts = [];
+        const pinnedPosts: typeof posts = [];
         if (includePins) {
           // Get profile to find pinned posts
           const profile = await ctx.db.models.Profile.findOne({
-            authorDid: actorDid,
+            authorDid: resolvedActorDid,
           }).lean();
 
           if (profile?.pinnedPost) {
@@ -142,6 +145,7 @@ export default function (server: Server, ctx: AppContext) {
             );
 
             return {
+              $type: "so.sprk.feed.defs#feedViewPost" as const,
               post: postView,
             };
           }),
@@ -156,14 +160,35 @@ export default function (server: Server, ctx: AppContext) {
           );
         }
 
+        const responseBody: OutputSchema = {
+          feed: feedViewPosts,
+        };
+
+        if (nextCursor) {
+          responseBody.cursor = nextCursor;
+        }
+
         return {
-          encoding: "application/json",
-          body: {
-            cursor: nextCursor,
-            feed: feedViewPosts,
-          },
+          encoding: "application/json" as const,
+          body: responseBody,
         };
       } catch (error) {
+        if (error instanceof Error) {
+          if (error.message === "BlockedByActor") {
+            return {
+              status: 400,
+              error: "BlockedByActor",
+              message: "The requesting account is blocked by the actor",
+            };
+          }
+          if (error.message === "BlockedActor") {
+            return {
+              status: 400,
+              error: "BlockedActor",
+              message: "The requesting account has blocked the actor",
+            };
+          }
+        }
         throw error;
       }
     },

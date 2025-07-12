@@ -1,23 +1,19 @@
 import { CID } from "multiformats/cid";
 import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
 import * as lex from "../../../../lexicon/lexicons.ts";
-import * as BskyLike from "../../../../lexicon/types/app/bsky/feed/like.ts";
-import * as SprkLike from "../../../../lexicon/types/so/sprk/feed/like.ts";
+import * as Like from "../../../../lexicon/types/so/sprk/feed/like.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database, LikeDocument } from "../../index.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexIds = [lex.ids.AppBskyFeedLike, lex.ids.SoSprkFeedLike];
-
-// Union type for both like record types
-type LikeRecord = BskyLike.Record | SprkLike.Record;
+const lexIds = [lex.ids.SoSprkFeedLike];
 type IndexedLike = LikeDocument;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
   cid: CID,
-  obj: LikeRecord,
+  obj: Like.Record,
   timestamp: string,
 ): Promise<IndexedLike | null> => {
   // Determine the type based on the collection
@@ -66,7 +62,7 @@ const insertFn = async (
 const findDuplicate = async (
   db: Database,
   uri: AtUri,
-  obj: LikeRecord,
+  obj: Like.Record,
 ): Promise<AtUri | null> => {
   const found = await db.models.Like.findOne({
     authorDid: uri.host,
@@ -159,7 +155,7 @@ const updateAggregates = async (db: Database, like: IndexedLike) => {
   );
 };
 
-export type PluginType = RecordProcessor<LikeRecord, IndexedLike>;
+export type PluginType = RecordProcessor<Like.Record, IndexedLike>;
 
 export const makePlugin = (
   db: Database,

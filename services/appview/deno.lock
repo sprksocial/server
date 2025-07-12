@@ -19,6 +19,7 @@
     "npm:@atproto/lexicon@~0.4.11": "0.4.11",
     "npm:@atproto/lexicon@~0.4.8": "0.4.11",
     "npm:@atproto/repo@~0.8.4": "0.8.4",
+    "npm:@atproto/sync@~0.1.28": "0.1.28",
     "npm:@atproto/syntax@~0.3.4": "0.3.4",
     "npm:@atproto/xrpc-server@~0.7.19": "0.7.19",
     "npm:@atproto/xrpc@0.7": "0.7.0",
@@ -172,6 +173,20 @@
         "zod"
       ]
     },
+    "@atproto/sync@0.1.28": {
+      "integrity": "sha512-faCsOwcYQHxHmNWRPykV0hTccXaG15XoUMZozfmoFOKFSliTgDETTovSAVe05mNSBUvMWUGl8fdEwHRzq1Q8sA==",
+      "dependencies": [
+        "@atproto/common",
+        "@atproto/identity",
+        "@atproto/lexicon",
+        "@atproto/repo",
+        "@atproto/syntax@0.4.0",
+        "@atproto/xrpc-server@0.8.0",
+        "multiformats@9.9.0",
+        "p-queue@6.6.2",
+        "ws"
+      ]
+    },
     "@atproto/syntax@0.3.4": {
       "integrity": "sha512-8CNmi5DipOLaVeSMPggMe7FCksVag0aO6XZy9WflbduTKM4dFZVCs4686UeMLfGRXX+X966XgwECHoLYrovMMg=="
     },
@@ -180,6 +195,23 @@
     },
     "@atproto/xrpc-server@0.7.19": {
       "integrity": "sha512-YSCl/tU2NDykgDYslFSOYCr96esUgDwncFiADKL59/fyIFPLoT0qY8Uq/budpxUh0qPzjow4HHgVWESOaOpUmA==",
+      "dependencies": [
+        "@atproto/common",
+        "@atproto/crypto",
+        "@atproto/lexicon",
+        "@atproto/xrpc@0.7.0",
+        "cbor-x",
+        "express",
+        "http-errors",
+        "mime-types@2.1.35",
+        "rate-limiter-flexible",
+        "uint8arrays@3.0.0",
+        "ws",
+        "zod"
+      ]
+    },
+    "@atproto/xrpc-server@0.8.0": {
+      "integrity": "sha512-jDAEVHVhM4IvC0y491gXBuD4b1D9/XrM3HaEronRneAdNZ0qE0nsiJNqiHfQ6r4BvFdHnABM9KyHV9EQTvmxfg==",
       "dependencies": [
         "@atproto/common",
         "@atproto/crypto",
@@ -541,6 +573,9 @@
     "event-target-shim@5.0.1": {
       "integrity": "sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ=="
     },
+    "eventemitter3@4.0.7": {
+      "integrity": "sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw=="
+    },
     "eventemitter3@5.0.1": {
       "integrity": "sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA=="
     },
@@ -839,11 +874,27 @@
         "ee-first"
       ]
     },
+    "p-finally@1.0.0": {
+      "integrity": "sha512-LICb2p9CB7FS+0eR1oqWnHhp0FljGLZCWBE9aix0Uye9W8LTQPwMTYVGWQWIw9RdQiDg4+epXQODwIYJtSJaow=="
+    },
+    "p-queue@6.6.2": {
+      "integrity": "sha512-RwFpb72c/BhQLEXIZ5K2e+AhgNVmIejGlTgiB9MzZ0e93GRvqZ7uSi0dvRF7/XIXDeNkra2fNHBxTyPDGySpjQ==",
+      "dependencies": [
+        "eventemitter3@4.0.7",
+        "p-timeout@3.2.0"
+      ]
+    },
     "p-queue@8.1.0": {
       "integrity": "sha512-mxLDbbGIBEXTJL0zEx8JIylaj3xQ7Z/7eEVjcF9fJX4DBiH9oqe+oahYnlKKxm0Ci9TlWTyhSHgygxMxjIB2jw==",
       "dependencies": [
-        "eventemitter3",
-        "p-timeout"
+        "eventemitter3@5.0.1",
+        "p-timeout@6.1.4"
+      ]
+    },
+    "p-timeout@3.2.0": {
+      "integrity": "sha512-rhIwUycgwwKcP9yTOOFK/AKsAopjjCakVqLHePO3CC6Mir1Z99xT+R63jZxAT5lFZLa2inS5h+ZS2GvR99/FBg==",
+      "dependencies": [
+        "p-finally"
       ]
     },
     "p-timeout@6.1.4": {
@@ -1194,6 +1245,7 @@
       "npm:@atproto/identity@~0.4.8",
       "npm:@atproto/lexicon@~0.4.8",
       "npm:@atproto/repo@~0.8.4",
+      "npm:@atproto/sync@~0.1.28",
       "npm:@atproto/syntax@~0.3.4",
       "npm:@atproto/xrpc-server@~0.7.19",
       "npm:@atproto/xrpc@0.7",

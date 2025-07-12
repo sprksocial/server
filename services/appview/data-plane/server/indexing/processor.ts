@@ -201,7 +201,7 @@ export class RecordProcessor<T, S> {
     if (inserted) {
       this.aggregateOnCommit(inserted);
       if (!opts?.disableNotifs) {
-        await this.handleNotifs({ inserted });
+        this.handleNotifs({ inserted });
       }
       return;
     }

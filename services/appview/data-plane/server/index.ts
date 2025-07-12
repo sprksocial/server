@@ -392,8 +392,8 @@ export interface PostEmbed {
 
 export interface PostDocument extends Document {
   uri: string;
-  text: string;
-  facets: Facet[];
+  text?: string;
+  facets?: Facet[];
   reply: {
     root: {
       uri: string;
@@ -409,9 +409,9 @@ export interface PostDocument extends Document {
     uri: string;
     cid: string;
   } | null;
-  langs: string[];
+  langs?: string[];
   labels: PostLabel[] | null;
-  tags: string[];
+  tags?: string[];
   authorDid: string;
   createdAt: string;
   indexedAt: string;

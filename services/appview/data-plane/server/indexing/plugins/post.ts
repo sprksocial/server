@@ -69,6 +69,7 @@ const insertFn = async (
   obj: PostRecord,
   timestamp: string,
 ): Promise<IndexedPost | null> => {
+  console.log("DEBUG: Post indexing started");
   // Ensure actor record exists before creating post
   const actorExists = await db.models.Actor.findOne({ did: uri.host }).lean();
   if (!actorExists) {

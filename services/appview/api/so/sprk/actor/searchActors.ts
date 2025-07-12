@@ -82,7 +82,7 @@ export default function (server: Server, ctx: AppContext) {
               ? (p.labels as Label[])
               : undefined;
             const now = new Date().toISOString();
-            await ctx.indexingService.indexHandle(p.authorDid, now);
+            await ctx.sub.indexingSvc.indexHandle(p.authorDid, now);
             const actor = await ctx.db.models.Actor.findOne({
               did: p.authorDid,
             });

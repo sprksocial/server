@@ -74,7 +74,7 @@ export function normalizeEmbed(embed: unknown): unknown {
         const toStringFn = (ref as CidRef).toString;
 
         if (toStringFn && typeof toStringFn === "function") {
-          const cidString = toStringFn();
+          const cidString = toStringFn.call(ref);
           // Return cleaned up structure without 'original' field
           return {
             $type: "so.sprk.embed.video",
@@ -125,7 +125,7 @@ export function normalizeEmbed(embed: unknown): unknown {
             const toStringFn = (ref as CidRef).toString;
 
             if (toStringFn && typeof toStringFn === "function") {
-              const cidString = toStringFn();
+              const cidString = toStringFn.call(ref);
               return {
                 image: {
                   $type: "blob",
@@ -190,7 +190,7 @@ export function normalizeCidRef(
     const toStringFn = ref.toString;
 
     if (toStringFn && typeof toStringFn === "function") {
-      cidString = toStringFn();
+      cidString = toStringFn.call(ref);
     } else {
       console.error("DEBUG: Could not convert CID object to string:", ref);
       return ref as NormalizedCidRef; // Return original if we can't convert
@@ -226,8 +226,9 @@ export function normalizeProfile(profile: unknown): unknown {
         (normalized.avatar as Record<string, unknown>).ref as CidRef,
       );
       if (normalizedRef) {
+        // Return only the MediaRef format: { $type: "blob", ref: { $link: string } }
         normalized.avatar = {
-          ...normalized.avatar,
+          $type: "blob",
           ref: normalizedRef,
         };
       }
@@ -254,8 +255,9 @@ export function normalizeProfile(profile: unknown): unknown {
         (normalized.banner as Record<string, unknown>).ref as CidRef,
       );
       if (normalizedRef) {
+        // Return only the MediaRef format: { $type: "blob", ref: { $link: string } }
         normalized.banner = {
-          ...normalized.banner,
+          $type: "blob",
           ref: normalizedRef,
         };
       }

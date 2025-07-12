@@ -30,7 +30,7 @@ export function transformImagesEmbed(
         fullsize:
           `https://media.sprk.so/img/full/${authorDid}/${img.image.ref.$link}/webp`,
         alt: img.alt ?? "",
-        aspectRatio: img.aspectRatio,
+        aspectRatio: img.aspectRatio || undefined,
       }),
     ),
   } as const;

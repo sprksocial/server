@@ -1,249 +1,314 @@
-import WebSocket from "ws";
-import { AtUri } from "@atproto/syntax";
-import { CID } from "multiformats/cid";
-import { env } from "../../utils/env.ts";
-import type { JetstreamEvent } from "../../utils/events.ts";
-import { Database } from "../../data-plane/server/index.ts";
-import type { BidirectionalResolver } from "../../utils/id-resolver.ts";
-import { IndexingService } from "./indexing/index.ts";
-import { BackgroundQueue } from "./background.ts";
-import { Buffer } from "node:buffer";
+import { IdResolver } from "@atproto/identity";
 import { WriteOpAction } from "@atproto/repo";
+import { Event as FirehoseEvent, Firehose, MemoryRunner } from "@atproto/sync";
+import { BackgroundQueue } from "./background.ts";
+import { Database } from "./index.ts";
+import { IndexingService } from "./indexing/index.ts";
+import pino from "pino";
 
-export interface JetstreamClientOptions {
-  filterCollections?: string[];
-  initialCursor?: number | null;
+// Event counter for logging
+interface EventCounter {
+  // Cumulative totals (never reset)
+  totalCumulative: number;
+  identityCumulative: number;
+  accountCumulative: number;
+  syncCumulative: number;
+  createCumulative: number;
+  updateCumulative: number;
+  deleteCumulative: number;
+  errorsCumulative: number;
+
+  // Per-minute counters (reset every minute)
+  totalLastMinute: number;
+  identityLastMinute: number;
+  accountLastMinute: number;
+  syncLastMinute: number;
+  createLastMinute: number;
+  updateLastMinute: number;
+  deleteLastMinute: number;
+  errorsLastMinute: number;
+
+  lastLogTime: Date;
 }
 
-export async function createJetstreamClient(
-  db: Database,
-  resolver: BidirectionalResolver,
-) {
-  // Initialize background queue and indexing service
-  const background = new BackgroundQueue(db);
-  const indexingSvc = new IndexingService(
-    db,
-    resolver.baseResolver,
-    background,
-  );
+export class RepoSubscription {
+  firehose: Firehose;
+  runner: MemoryRunner;
+  background: BackgroundQueue;
+  indexingSvc: IndexingService;
+  eventCounter: EventCounter;
+  logInterval: number | null = null;
 
-  // Load initial cursor from DB
-  let cursorPosition: number | null = await db.getCursorState();
-  if (cursorPosition) {
-    db.logger.info(
-      {
-        initialCursor: cursorPosition,
-        formattedDate: new Date(Math.floor(cursorPosition / 1000))
-          .toISOString(),
-      },
-      "Loaded initial cursor from DB",
-    );
-  } else {
-    db.logger.info("No initial cursor found in DB, will start from live feed.");
-  }
+  constructor(
+    public opts: { service: string; db: Database; idResolver: IdResolver },
+  ) {
+    const { service, db, idResolver } = opts;
+    this.background = new BackgroundQueue(db);
+    this.indexingSvc = new IndexingService(db, idResolver, this.background);
 
-  let wsConnection: WebSocket | null = null;
-  let heartbeatInterval: number | null = null;
-  let saveCursorInterval: number | null = null; // Added for periodic cursor saving
-  let lastSavedCursorPosition: number | null = cursorPosition;
-
-  function connect(options: JetstreamClientOptions = {}): {
-    close: () => void;
-  } {
-    // Use the loaded cursorPosition as default if no initialCursor is provided in options
-    const {
-      filterCollections = ["so.sprk.*"],
-      initialCursor = cursorPosition,
-    } = options;
-
-    // Update cursorPosition if an initialCursor was explicitly passed in options or from DB
-    if (initialCursor) {
-      cursorPosition = initialCursor;
-    }
-
-    let url = filterCollections.reduce((acc, collection) => {
-      return `${acc}wantedCollections=${collection}&`;
-    }, `${env.JETSTREAM_URL}?`);
-
-    if (cursorPosition) {
-      // Subtract a few seconds (in microseconds) to ensure no gaps
-      const rewindCursor = parseInt(cursorPosition.toString()) - 5000000; // 5 seconds in microseconds
-      url += `cursor=${rewindCursor}`;
-    }
-
-    db.logger.info(`Connecting to Jetstream: ${url}`);
-
-    wsConnection = new WebSocket(url);
-
-    wsConnection.on("open", () => {
-      db.logger.info("Connected to Jetstream");
-      // Start periodic cursor saving only after successful connection
-      startPeriodicCursorSave();
-    });
-
-    wsConnection.on("message", async (data: Buffer) => {
-      try {
-        const event = JSON.parse(data.toString()) as JetstreamEvent;
-
-        // Save cursor position for each event
-        if (event.time_us) {
-          cursorPosition = event.time_us;
-        }
-
-        // Process events
-        await processEvent(event);
-      } catch (error) {
-        db.logger.error({ error }, "Error parsing or processing message");
-      }
-    });
-
-    wsConnection.on("error", (error: Error) => {
-      db.logger.error({ error }, "WebSocket error");
-      handleReconnect(options);
-    });
-
-    wsConnection.on("close", () => {
-      db.logger.info("Connection closed. Attempting to reconnect...");
-      handleReconnect(options);
-    });
-
-    // Setup heartbeat to keep the connection alive
-    heartbeatInterval = setInterval(() => {
-      if (wsConnection && wsConnection.readyState === WebSocket.OPEN) {
-        wsConnection.ping();
-      } else {
-        clearHeartbeatInterval();
-      }
-    }, 30000);
-
-    return {
-      close: () => {
-        clearHeartbeatInterval();
-        clearSaveCursorInterval(); // Clear cursor save interval on close/error
-        if (wsConnection && wsConnection.readyState === WebSocket.OPEN) {
-          wsConnection.close();
-          wsConnection = null;
-        }
-      },
+    // Initialize event counter
+    this.eventCounter = {
+      totalCumulative: 0,
+      identityCumulative: 0,
+      accountCumulative: 0,
+      syncCumulative: 0,
+      createCumulative: 0,
+      updateCumulative: 0,
+      deleteCumulative: 0,
+      errorsCumulative: 0,
+      totalLastMinute: 0,
+      identityLastMinute: 0,
+      accountLastMinute: 0,
+      syncLastMinute: 0,
+      createLastMinute: 0,
+      updateLastMinute: 0,
+      deleteLastMinute: 0,
+      errorsLastMinute: 0,
+      lastLogTime: new Date(),
     };
+
+    const { runner, firehose } = createFirehose({
+      idResolver,
+      service,
+      indexingSvc: this.indexingSvc,
+      logger: this.opts.db.logger,
+      eventCounter: this.eventCounter,
+    });
+    this.runner = runner;
+    this.firehose = firehose;
   }
 
-  function clearHeartbeatInterval() {
-    if (heartbeatInterval) {
-      clearInterval(heartbeatInterval);
-      heartbeatInterval = null;
+  start() {
+    console.log("Starting firehose subscription");
+    this.firehose.start();
+    this.startEventLogging();
+  }
+
+  async restart() {
+    await this.destroy();
+    const { runner, firehose } = createFirehose({
+      idResolver: this.opts.idResolver,
+      service: this.opts.service,
+      indexingSvc: this.indexingSvc,
+      logger: this.opts.db.logger,
+      eventCounter: this.eventCounter,
+    });
+    this.runner = runner;
+    this.firehose = firehose;
+    this.start();
+  }
+
+  async processAll() {
+    await this.runner.processAll();
+    await this.background.processAll();
+  }
+
+  async destroy() {
+    if (this.logInterval !== null) {
+      clearInterval(this.logInterval);
+      this.logInterval = null;
     }
+    await this.firehose.destroy();
+    await this.runner.destroy();
+    await this.background.processAll();
   }
 
-  function clearSaveCursorInterval() {
-    if (saveCursorInterval) {
-      clearInterval(saveCursorInterval);
-      saveCursorInterval = null;
-    }
-  }
+  private startEventLogging() {
+    this.logInterval = setInterval(() => {
+      const now = new Date();
+      const elapsed =
+        (now.getTime() - this.eventCounter.lastLogTime.getTime()) / 1000;
+      const eventsPerMinute = elapsed > 0
+        ? Math.round((this.eventCounter.totalLastMinute * 60) / elapsed)
+        : 0;
 
-  function startPeriodicCursorSave() {
-    clearSaveCursorInterval(); // Clear any existing interval first
-    saveCursorInterval = setInterval(async () => {
-      if (
-        cursorPosition !== null && cursorPosition !== lastSavedCursorPosition
-      ) {
-        try {
-          await db.saveCursorState(cursorPosition);
-          lastSavedCursorPosition = cursorPosition;
-        } catch (error) {
-          db.logger.error(
-            { cursorPosition, error },
-            "Failed to periodically save cursor state",
-          );
-        }
-      }
-    }, 30000); // Save every 30 seconds
-  }
-
-  function handleReconnect(options: JetstreamClientOptions) {
-    clearHeartbeatInterval();
-    clearSaveCursorInterval(); // Clear cursor save interval before reconnecting
-
-    if (wsConnection) {
-      wsConnection = null;
-    }
-
-    // Use setTimeout to avoid immediate reconnection
-    setTimeout(() => connect(options), 5000);
-  }
-
-  async function processEvent(event: JetstreamEvent) {
-    try {
-      // Only process commit events
-      if (event.kind !== "commit") {
-        return;
-      }
-
-      const { did, time_us } = event;
-      const { operation, collection, rkey, record, cid } = event.commit;
-
-      db.logger.trace(
-        `Processing ${operation} operation for DID: ${did}, collection: ${collection}, rkey: ${rkey}`,
-      );
-
-      const uri = `at://${did}/${collection}/${rkey}`;
-      const timestamp = new Date(Math.floor(time_us / 1000)).toISOString();
-
-      // Handle different event types similar to firehose pattern
-      if (operation === "delete") {
-        await indexingSvc.deleteRecord(new AtUri(uri));
-      } else {
-        const isCreate = operation === "create";
-
-        await indexingSvc.indexRecord(
-          new AtUri(uri),
-          CID.parse(cid),
-          record,
-          isCreate ? WriteOpAction.Create : WriteOpAction.Update,
-          timestamp,
-        );
-      }
-
-      // Always update handle
-      await indexingSvc.indexHandle(did, timestamp);
-    } catch (err) {
-      // Log the error but don't re-throw to prevent connection from crashing
-      const mongoError = err as { code?: number; message?: string };
-
-      // Handle MongoDB duplicate key errors specifically
-      if (mongoError.code === 11000) {
-        db.logger.warn(
-          {
-            err: mongoError.message,
-            operation: event.kind === "commit"
-              ? event.commit.operation
-              : event.kind,
-            did: event.did,
-            uri: event.kind === "commit"
-              ? `at://${event.did}/${event.commit.collection}/${event.commit.rkey}`
-              : undefined,
-            collection: event.kind === "commit"
-              ? event.commit.collection
-              : undefined,
-          },
-          "Duplicate key error - record may have been processed concurrently",
-        );
-        return; // Silently skip duplicate key errors
-      }
-
-      db.logger.error(
-        {
-          err,
-          operation: event.kind === "commit"
-            ? event.commit.operation
-            : event.kind,
-          did: event.did,
+      this.opts.db.logger.info({
+        eventsPerMinute,
+        eventsLastMinute: this.eventCounter.totalLastMinute,
+        totalEventsCumulative: this.eventCounter.totalCumulative,
+        lastMinuteBreakdown: {
+          identity: this.eventCounter.identityLastMinute,
+          account: this.eventCounter.accountLastMinute,
+          sync: this.eventCounter.syncLastMinute,
+          create: this.eventCounter.createLastMinute,
+          update: this.eventCounter.updateLastMinute,
+          delete: this.eventCounter.deleteLastMinute,
+          errors: this.eventCounter.errorsLastMinute,
         },
-        "Error processing jetstream event, continuing",
-      );
-    }
-  }
+        cumulativeBreakdown: {
+          identity: this.eventCounter.identityCumulative,
+          account: this.eventCounter.accountCumulative,
+          sync: this.eventCounter.syncCumulative,
+          create: this.eventCounter.createCumulative,
+          update: this.eventCounter.updateCumulative,
+          delete: this.eventCounter.deleteCumulative,
+          errors: this.eventCounter.errorsCumulative,
+        },
+      }, "Firehose activity summary");
 
-  return { connect };
+      // Reset only the per-minute counters
+      this.eventCounter.totalLastMinute = 0;
+      this.eventCounter.identityLastMinute = 0;
+      this.eventCounter.accountLastMinute = 0;
+      this.eventCounter.syncLastMinute = 0;
+      this.eventCounter.createLastMinute = 0;
+      this.eventCounter.updateLastMinute = 0;
+      this.eventCounter.deleteLastMinute = 0;
+      this.eventCounter.errorsLastMinute = 0;
+      this.eventCounter.lastLogTime = now;
+    }, 30000); // Log every 30 seconds
+  }
 }
+
+const createFirehose = (opts: {
+  idResolver: IdResolver;
+  service: string;
+  indexingSvc: IndexingService;
+  logger: pino.Logger;
+  eventCounter: EventCounter;
+}) => {
+  const { idResolver, service, indexingSvc, logger, eventCounter } = opts;
+  const runner = new MemoryRunner({ startCursor: 0 });
+  const firehose = new Firehose({
+    idResolver,
+    service,
+    excludeIdentity: true,
+    excludeAccount: true,
+    excludeSync: true,
+    maxReconnectDelayMs: 30000, // 30 second max delay between reconnects
+    reconnectDelayMs: 1000, // Start with 1 second delay
+    maxReconnectAttempts: -1, // Infinite reconnect attempts
+    onError: (err: Error) => {
+      // Handle network errors more gracefully
+      if (
+        err.message?.includes("peer closed connection") ||
+        err.message?.includes("TLS close_notify") ||
+        err.message?.includes("connection error") ||
+        err.message?.includes("ECONNRESET") ||
+        err.message?.includes("ENOTFOUND")
+      ) {
+        logger.warn(
+          { err: err.message },
+          "Network error in firehose - will retry",
+        );
+      } else {
+        logger.error({ err }, "error in subscription");
+      }
+    },
+    handleEvent: async (evt: FirehoseEvent) => {
+      try {
+        eventCounter.totalCumulative++;
+        eventCounter.totalLastMinute++;
+
+        if (evt.event === "identity") {
+          eventCounter.identityCumulative++;
+          eventCounter.identityLastMinute++;
+          await indexingSvc.indexHandle(evt.did, evt.time, true);
+        } else if (evt.event === "account") {
+          eventCounter.accountCumulative++;
+          eventCounter.accountLastMinute++;
+          if (evt.active === false && evt.status === "deleted") {
+            await indexingSvc.deleteActor(evt.did);
+          } else {
+            await indexingSvc.updateActorStatus(
+              evt.did,
+              evt.active,
+              evt.status,
+            );
+          }
+        } else if (evt.event === "sync") {
+          eventCounter.syncCumulative++;
+          eventCounter.syncLastMinute++;
+          await Promise.all([
+            indexingSvc.setCommitLastSeen(evt.did, evt.cid, evt.rev),
+            indexingSvc.indexHandle(evt.did, evt.time),
+          ]);
+        } else {
+          // Count create, update, delete events
+          if (evt.event === "create") {
+            eventCounter.createCumulative++;
+            eventCounter.createLastMinute++;
+          } else if (evt.event === "update") {
+            eventCounter.updateCumulative++;
+            eventCounter.updateLastMinute++;
+          } else if (evt.event === "delete") {
+            eventCounter.deleteCumulative++;
+            eventCounter.deleteLastMinute++;
+          }
+
+          const indexFn = evt.event === "delete"
+            ? indexingSvc.deleteRecord(evt.uri)
+            : indexingSvc.indexRecord(
+              evt.uri,
+              evt.cid,
+              evt.record,
+              evt.event === "create"
+                ? WriteOpAction.Create
+                : WriteOpAction.Update,
+              evt.time,
+            );
+          await Promise.all([
+            indexFn,
+            indexingSvc.setCommitLastSeen(evt.did, evt.commit, evt.rev),
+            indexingSvc.indexHandle(evt.did, evt.time),
+          ]);
+        }
+      } catch (err) {
+        eventCounter.errorsCumulative++;
+        eventCounter.errorsLastMinute++;
+        // Log the error but don't re-throw to prevent firehose from crashing
+        const mongoError = err as { code?: number; message?: string };
+        const error = err as Error;
+
+        // Handle MongoDB duplicate key errors specifically
+        if (mongoError.code === 11000) {
+          logger.warn(
+            {
+              err: mongoError.message,
+              event: evt.event,
+              did: evt.did,
+              uri: "uri" in evt ? evt.uri?.toString() : undefined,
+              collection: "uri" in evt ? evt.uri?.collection : undefined,
+            },
+            "Duplicate key error - record may have been processed concurrently",
+          );
+          return; // Silently skip duplicate key errors
+        }
+
+        // Handle network/connectivity errors from PLC directory and other external services
+        if (
+          error.message?.includes("peer closed connection") ||
+          error.message?.includes("TLS close_notify") ||
+          error.message?.includes("connection error") ||
+          error.message?.includes("SendRequest") ||
+          error.message?.includes("plc.directory") ||
+          error.name === "FirehoseParseError"
+        ) {
+          logger.warn(
+            {
+              err: error.message,
+              event: evt.event,
+              did: evt.did,
+              uri: "uri" in evt ? evt.uri?.toString() : undefined,
+            },
+            "Network connectivity error - skipping event",
+          );
+          return; // Skip network errors to avoid crashing
+        }
+
+        logger.error(
+          { err, event: evt.event, did: evt.did },
+          "Error processing firehose event, continuing",
+        );
+      }
+    },
+    filterCollections: [
+      "so.sprk.*",
+      "app.bsky.graph.follow",
+      "app.bsky.graph.block",
+      "app.bsky.feed.generator",
+      "app.bsky.feed.repost",
+    ],
+  });
+  return { firehose, runner };
+};

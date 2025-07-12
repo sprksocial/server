@@ -15,12 +15,11 @@ import {
 import { takedownFilterMiddleware } from "./services/takedown-filter.ts";
 import wellKnownRouter from "./utils/well-known.ts";
 import { TakedownService } from "./services/takedown.ts";
-import { IndexingService } from "./services/indexing.ts";
 import { BidirectionalResolver } from "./utils/id-resolver.ts";
 import { DidResolver } from "@atproto/identity";
 import { AuthVerifier } from "./services/auth-verifier.ts";
 import { AuthRequiredError } from "@sprk/xrpc-server";
-import startJetstreamIngester from "./ingester/index.ts";
+import { RepoSubscription } from "./data-plane/server/subscription.ts";
 
 export type AppContext = {
   db: Database;
@@ -29,8 +28,8 @@ export type AppContext = {
   serviceDid: string;
   didResolver: DidResolver;
   takedownService: TakedownService;
-  indexingService: IndexingService;
   authVerifier: AuthVerifier;
+  sub: RepoSubscription;
 };
 
 export type AppEnv = {
@@ -63,8 +62,8 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
     c.env.serviceDid = ctx.serviceDid;
     c.env.didResolver = ctx.didResolver;
     c.env.takedownService = ctx.takedownService;
-    c.env.indexingService = ctx.indexingService;
     c.env.authVerifier = ctx.authVerifier;
+    c.env.sub = ctx.sub;
     await next();
   });
   app.use("*", takedownFilterMiddleware);
@@ -116,13 +115,11 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
 }
 
 // Setup function to create context and app
-export async function setupApp(): Promise<
-  { app: Hono<AppEnv>; ctx: AppContext }
-> {
+export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
   // Setup logger and database
   const appLogger = pino({ name: "server start" });
   const db = new Database();
-  await db.connect();
+  db.connect();
 
   // DID and resolver setup
   const baseIdResolver = createIdResolver();
@@ -130,8 +127,12 @@ export async function setupApp(): Promise<
   const serviceDid = env.SERVICE_DID;
 
   // Services
+  const sub = new RepoSubscription({
+    service: "wss://relay1.us-west.bsky.network",
+    db,
+    idResolver: baseIdResolver,
+  });
   const takedownService = new TakedownService(db);
-  const indexingService = new IndexingService(db, resolver);
   const authVerifier = createAuthVerifier(db, {
     ownDid: serviceDid,
     alternateAudienceDids: [],
@@ -146,8 +147,8 @@ export async function setupApp(): Promise<
     serviceDid,
     didResolver: baseIdResolver.did,
     takedownService,
-    indexingService,
     authVerifier,
+    sub,
   };
 
   const app = createApp(ctx);
@@ -155,14 +156,8 @@ export async function setupApp(): Promise<
 }
 
 // Start server function
-export async function startServer(): Promise<void> {
-  const { app, ctx } = await setupApp();
-
-  // Start Jetstream ingester
-  startJetstreamIngester().catch((err) => {
-    ctx.logger.error({ err }, "Failed to start Jetstream ingester");
-    Deno.exit(1);
-  });
+export function startServer() {
+  const { app, ctx } = setupApp();
 
   // Start server
   const { HOST, PORT } = env;
@@ -174,14 +169,19 @@ export async function startServer(): Promise<void> {
     },
   }, app.fetch);
 
+  // Start jetstream subscription
+  ctx.sub.start();
+
   // Handle shutdown
   Deno.addSignalListener("SIGINT", async () => {
     ctx.logger.info("Shutting down server");
+    await ctx.sub.destroy();
     await ctx.db.disconnect();
     Deno.exit(0);
   });
   Deno.addSignalListener("SIGTERM", async () => {
     ctx.logger.info("Shutting down server");
+    await ctx.sub.destroy();
     await ctx.db.disconnect();
     Deno.exit(0);
   });
@@ -190,9 +190,9 @@ export async function startServer(): Promise<void> {
 // Default export for backward compatibility (creates app without starting services)
 let defaultApp: Hono<AppEnv> | null = null;
 
-export default async function getApp(): Promise<Hono<AppEnv>> {
+export default function getApp(): Hono<AppEnv> {
   if (!defaultApp) {
-    const result = await setupApp();
+    const result = setupApp();
     defaultApp = result.app;
   }
   return defaultApp;
@@ -200,5 +200,5 @@ export default async function getApp(): Promise<Hono<AppEnv>> {
 
 // Start the server if this file is run directly
 if (import.meta.main) {
-  await startServer();
+  startServer();
 }

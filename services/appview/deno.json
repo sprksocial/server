@@ -7,6 +7,7 @@
   },
   "imports": {
     "@atproto/repo": "npm:@atproto/repo@^0.8.4",
+    "@atproto/sync": "npm:@atproto/sync@^0.1.28",
     "@atproto/xrpc": "npm:@atproto/xrpc@^0.7.0",
     "@atproto/xrpc-server": "npm:@atproto/xrpc-server@^0.7.19",
     "dotenv": "npm:dotenv@^17.0.0",

@@ -1,32 +1,23 @@
 import { CID } from "multiformats/cid";
 import { AtUri } from "@atproto/syntax";
 import * as lex from "../../../../lexicon/lexicons.ts";
-import * as BskyProfile from "../../../../lexicon/types/app/bsky/actor/profile.ts";
-import * as SprkProfile from "../../../../lexicon/types/so/sprk/actor/profile.ts";
+import * as Profile from "../../../../lexicon/types/so/sprk/actor/profile.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database, ProfileDocument } from "../../index.ts";
 import { RecordProcessor } from "../processor.ts";
 import { normalizeProfile } from "../../../../utils/embed-normalizer.ts";
 
-const lexIds = [lex.ids.AppBskyActorProfile, lex.ids.SoSprkActorProfile];
-
-// Union type for both profile record types
-type ProfileRecord = BskyProfile.Record | SprkProfile.Record;
+const lexIds = [lex.ids.SoSprkActorProfile];
 type IndexedProfile = ProfileDocument;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
   cid: CID,
-  obj: ProfileRecord,
+  obj: Profile.Record,
   timestamp: string,
 ): Promise<IndexedProfile | null> => {
   if (uri.rkey !== "self") return null;
-
-  // Determine the type based on the collection
-  const profileType = uri.collection === "app.bsky.actor.profile"
-    ? "bsky"
-    : "sprk";
 
   const normalizedProfile = normalizeProfile(obj) as
     | Record<string, unknown>
@@ -49,7 +40,6 @@ const insertFn = async (
     pinnedPost: normalizedProfile?.pinnedPost || null,
     createdAt: normalizedProfile?.createdAt || new Date().toISOString(),
     indexedAt: timestamp,
-    type: profileType as "bsky" | "sprk",
   };
 
   // Use findOneAndUpdate with upsert to handle potential duplicate key errors
@@ -92,7 +82,7 @@ const notifsForDelete = () => {
   return { notifs: [], toDelete: [] };
 };
 
-export type PluginType = RecordProcessor<ProfileRecord, IndexedProfile>;
+export type PluginType = RecordProcessor<Profile.Record, IndexedProfile>;
 
 export const makePlugin = (
   db: Database,
