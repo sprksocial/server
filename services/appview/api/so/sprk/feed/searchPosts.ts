@@ -85,7 +85,7 @@ export default function (server: Server, ctx: AppContext) {
       }
 
       const postViews = await Promise.all(
-        posts.map((post) => transformPostToPostView(post, ctx.db, userDid)),
+        posts.map((post) => transformPostToPostView(post, ctx, userDid)),
       );
 
       const filteredPostViews = postViews.filter(
