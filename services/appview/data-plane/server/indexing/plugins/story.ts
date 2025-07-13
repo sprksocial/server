@@ -3,7 +3,8 @@ import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
 import * as lex from "../../../../lexicon/lexicons.ts";
 import * as Story from "../../../../lexicon/types/so/sprk/feed/story.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { Database, StoryDocument } from "../../index.ts";
+import { Database } from "../../index.ts";
+import { StoryDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 import {
   normalizeEmbed,

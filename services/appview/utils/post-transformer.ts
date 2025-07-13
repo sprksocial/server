@@ -1,4 +1,4 @@
-import { PostDocument } from "../data-plane/server/index.ts";
+import { PostDocument } from "../data-plane/server/models.ts";
 import type { Label } from "../lexicon/types/com/atproto/label/defs.ts";
 import type * as SoSprkFeedDefs from "../lexicon/types/so/sprk/feed/defs.ts";
 import type * as SoSprkFeedPost from "../lexicon/types/so/sprk/feed/post.ts";

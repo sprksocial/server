@@ -14,7 +14,8 @@ import {
   isMention,
 } from "../../../../lexicon/types/so/sprk/richtext/facet.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { Database, PostDocument } from "../../index.ts";
+import { Database } from "../../index.ts";
+import { PostDocument } from "../../models.ts";
 import {
   getAncestorsAndSelf,
   getDescendents,

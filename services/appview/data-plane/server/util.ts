@@ -3,6 +3,9 @@ import {
   ReplyRef,
 } from "../../lexicon/types/so/sprk/feed/post.ts";
 import { Database } from "./index.ts";
+import { DidDocument } from "@atproto/identity";
+import { Buffer } from "node:buffer";
+import { Timestamp } from "npm:@bufbuild/protobuf@1.5.0";
 
 export const getDescendents = async (
   db: Database,
@@ -129,4 +132,37 @@ export const invalidReplyRoot = (
   }
   // replying to a reply: ensure the parent is a reply for the same root post
   return parent.record.reply?.root.uri !== replyRoot;
+};
+
+const getDid = (doc: DidDocument) => doc.id;
+const getHandle = (doc: DidDocument) =>
+  doc.alsoKnownAs?.find((aka) => aka.startsWith("at://"))?.replace("at://", "");
+
+export const getResultFromDoc = (doc: DidDocument) => {
+  const keys: Record<string, { Type: string; PublicKeyMultibase: string }> = {};
+  doc.verificationMethod?.forEach((method) => {
+    const id = method.id.split("#").at(1);
+    if (!id) return;
+    keys[id] = {
+      Type: method.type,
+      PublicKeyMultibase: method.publicKeyMultibase || "",
+    };
+  });
+  const services: Record<string, { Type: string; URL: string }> = {};
+  doc.service?.forEach((service) => {
+    const id = service.id.split("#").at(1);
+    if (!id) return;
+    if (typeof service.serviceEndpoint !== "string") return;
+    services[id] = {
+      Type: service.type,
+      URL: service.serviceEndpoint,
+    };
+  });
+  return {
+    did: getDid(doc),
+    handle: getHandle(doc),
+    keys: Buffer.from(JSON.stringify(keys)),
+    services: Buffer.from(JSON.stringify(services)),
+    updated: Timestamp.fromDate(new Date()),
+  };
 };

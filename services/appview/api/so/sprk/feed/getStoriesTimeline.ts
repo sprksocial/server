@@ -6,7 +6,7 @@ import { RootFilterQuery } from "mongoose";
 import {
   FollowDocument,
   StoryDocument,
-} from "../../../../data-plane/server/index.ts";
+} from "../../../../data-plane/server/models.ts";
 import { Buffer } from "node:buffer";
 import type { ProfileViewBasic } from "../../../../lexicon/types/so/sprk/actor/defs.ts";
 import type * as SoSprkFeedDefs from "../../../../lexicon/types/so/sprk/feed/defs.ts";

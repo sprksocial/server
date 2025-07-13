@@ -2,7 +2,7 @@ import type * as SoSprkFeedDefs from "../../../../lexicon/types/so/sprk/feed/def
 import { OutputSchema as GetStoriesView } from "../../../../lexicon/types/so/sprk/feed/getStories.ts";
 import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { StoryDocument } from "../../../../data-plane/server/index.ts";
+import { StoryDocument } from "../../../../data-plane/server/models.ts";
 import { transformStoryToStoryView } from "../../../../utils/story-transformer.ts";
 
 // Function to fetch stories by URIs

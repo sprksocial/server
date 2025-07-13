@@ -3,7 +3,8 @@ import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
 import * as lex from "../../../../lexicon/lexicons.ts";
 import * as Like from "../../../../lexicon/types/so/sprk/feed/like.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { Database, LikeDocument } from "../../index.ts";
+import { Database } from "../../index.ts";
+import { LikeDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 
 const lexIds = [lex.ids.SoSprkFeedLike];

@@ -3,7 +3,8 @@ import { AtUri } from "@atproto/syntax";
 import * as lex from "../../../../lexicon/lexicons.ts";
 import * as Profile from "../../../../lexicon/types/so/sprk/actor/profile.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { Database, ProfileDocument } from "../../index.ts";
+import { Database } from "../../index.ts";
+import { ProfileDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 import { normalizeProfile } from "../../../../utils/embed-normalizer.ts";
 

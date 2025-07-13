@@ -1,5 +1,5 @@
 import { Server } from "../../../../lexicon/index.ts";
-import { FollowDocument } from "../../../../data-plane/server/index.ts";
+import { FollowDocument } from "../../../../data-plane/server/models.ts";
 import { AppContext } from "../../../../main.ts";
 import { ensureValidDid, isValidHandle } from "@atproto/syntax";
 import { RootFilterQuery } from "mongoose";

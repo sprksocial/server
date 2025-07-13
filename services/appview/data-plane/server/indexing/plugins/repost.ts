@@ -3,7 +3,8 @@ import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
 import * as lex from "../../../../lexicon/lexicons.ts";
 import * as Repost from "../../../../lexicon/types/app/bsky/feed/repost.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { Database, RepostDocument } from "../../index.ts";
+import { Database } from "../../index.ts";
+import { RepostDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 
 const lexIds = [lex.ids.AppBskyFeedRepost];

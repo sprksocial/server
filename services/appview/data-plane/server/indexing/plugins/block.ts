@@ -3,7 +3,8 @@ import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
 import * as lex from "../../../../lexicon/lexicons.ts";
 import * as Block from "../../../../lexicon/types/app/bsky/graph/block.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { BlockDocument, Database } from "../../index.ts";
+import { Database } from "../../index.ts";
+import { BlockDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 
 const lexIds = [lex.ids.AppBskyGraphBlock];

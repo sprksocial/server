@@ -3,7 +3,8 @@ import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
 import * as lex from "../../../../lexicon/lexicons.ts";
 import * as FeedGenerator from "../../../../lexicon/types/app/bsky/feed/generator.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { Database, GeneratorDocument } from "../../index.ts";
+import { Database } from "../../index.ts";
+import { GeneratorDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 import { normalizeObject } from "../../../../utils/embed-normalizer.ts";
 

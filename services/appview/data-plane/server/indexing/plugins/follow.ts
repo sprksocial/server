@@ -4,7 +4,8 @@ import * as lex from "../../../../lexicon/lexicons.ts";
 import * as BskyFollow from "../../../../lexicon/types/app/bsky/graph/follow.ts";
 import * as SprkFollow from "../../../../lexicon/types/so/sprk/graph/follow.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { Database, FollowDocument } from "../../index.ts";
+import { Database } from "../../index.ts";
+import { FollowDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 
 const lexIds = [lex.ids.AppBskyGraphFollow, lex.ids.SoSprkGraphFollow];

@@ -1,6 +1,6 @@
 import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { FollowDocument } from "../../../../data-plane/server/index.ts";
+import { FollowDocument } from "../../../../data-plane/server/models.ts";
 import { ensureValidDid, isValidHandle } from "@atproto/syntax";
 import { RootFilterQuery } from "mongoose";
 import { XRPCError } from "@sprk/xrpc-server";

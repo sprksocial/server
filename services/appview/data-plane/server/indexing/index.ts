@@ -13,7 +13,8 @@ import {
 import { AtUri } from "@atproto/syntax";
 import { retryXrpc } from "../../../utils/retry.ts";
 import { BackgroundQueue } from "../background.ts";
-import { ActorDocument, Database } from "../index.ts";
+import { Database } from "../index.ts";
+import { ActorDocument } from "../models.ts";
 import * as Block from "./plugins/block.ts";
 import * as FeedGenerator from "./plugins/generator.ts";
 import * as Follow from "./plugins/follow.ts";

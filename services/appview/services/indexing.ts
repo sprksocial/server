@@ -7,7 +7,7 @@ import { pino } from "pino";
 import * as Post from "./plugins/post.ts";
 import * as BskyFollow from "./plugins/bskyFollow.ts";
 import { Agent } from "@atproto/api";
-import { ActorDocument } from "../data-plane/server/index.ts";
+import { ActorDocument } from "../data-plane/server/models.ts";
 
 // Generic type for model processors
 type RecordProcessor = {

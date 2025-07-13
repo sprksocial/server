@@ -2,7 +2,7 @@ import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { OutputSchema as GetPostsView } from "../../../../lexicon/types/so/sprk/feed/getPosts.ts";
 import { transformPostToPostView } from "../../../../utils/post-transformer.ts";
-import { PostDocument } from "../../../../data-plane/server/index.ts";
+import { PostDocument } from "../../../../data-plane/server/models.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.feed.getPosts({

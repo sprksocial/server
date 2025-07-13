@@ -3,7 +3,8 @@ import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
 import * as lex from "../../../../lexicon/lexicons.ts";
 import * as Audio from "../../../../lexicon/types/so/sprk/feed/audio.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { AudioDocument, Database } from "../../index.ts";
+import { Database } from "../../index.ts";
+import { AudioDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 import { normalizeObject } from "../../../../utils/embed-normalizer.ts";
 
