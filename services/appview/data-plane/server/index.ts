@@ -7,6 +7,23 @@ import { DidDocument } from "@atproto/identity";
 import { Buffer } from "node:buffer";
 import { Timestamp } from "npm:@bufbuild/protobuf@1.5.0";
 
+// Plugin for adding author DID population to schemas
+function addAuthor(schema: Schema) {
+  // Only add if schema has authorDid field
+  if (schema.paths.authorDid) {
+    schema.virtual("actor", {
+      ref: "Actor",
+      localField: "authorDid",
+      foreignField: "did",
+      justOne: true,
+    });
+
+    // Ensure virtual fields are serialized
+    schema.set("toJSON", { virtuals: true });
+    schema.set("toObject", { virtuals: true });
+  }
+}
+
 const HOUR = 60e3 * 60;
 const DAY = HOUR * 24;
 
@@ -73,6 +90,24 @@ interface Label {
   neg: boolean;
 }
 
+// Base interface for documents with authorDid
+interface AuthoredDocument extends Document {
+  uri: string;
+  cid: string;
+  createdAt: string;
+  indexedAt: string;
+  authorDid: string;
+  actor?: ActorDocument; // Virtual field for populated actor data
+}
+
+export const authoredSchema = {
+  uri: { type: String, required: true, unique: true, index: true },
+  authorDid: { type: String, required: true, index: true },
+  cid: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+};
+
 export interface RecordDocument extends Document {
   uri: string;
   cid: string;
@@ -123,67 +158,41 @@ export const actorSyncSchema = new Schema<ActorSyncDocument>({
   repoRev: { type: String, required: false, default: null },
 });
 
-export interface LikeDocument extends Document {
-  uri: string;
+export interface LikeDocument extends AuthoredDocument {
   subject: string;
   subjectCid: string;
-  authorDid: string;
-  createdAt: string;
-  indexedAt: string;
-  cid: string;
   via?: string | null;
   viaCid?: string | null;
 }
 
 export const likeSchema = new Schema<LikeDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
+  ...authoredSchema,
   subject: { type: String, required: true, index: true },
   subjectCid: { type: String, required: true },
-  authorDid: { type: String, required: true, index: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-  cid: { type: String, required: true },
   via: { type: String, required: false },
   viaCid: { type: String, required: false },
 });
 
-export interface LookDocument extends Document {
-  uri: string;
+export interface LookDocument extends AuthoredDocument {
   subject: string;
   subjectCid: string;
-  authorDid: string;
-  createdAt: string;
-  indexedAt: string;
   cid: string;
 }
 
 export const lookSchema = new Schema<LookDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
+  ...authoredSchema,
   subject: { type: String, required: true, index: true },
   subjectCid: { type: String, required: true },
-  authorDid: { type: String, required: true, index: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-  cid: { type: String, required: true },
 });
 
-export interface FollowDocument extends Document {
-  uri: string;
+export interface FollowDocument extends AuthoredDocument {
   subject: string;
-  authorDid: string;
-  createdAt: string;
-  indexedAt: string;
-  cid: string;
   type: "sprk" | "bsky";
 }
 
 export const followSchema = new Schema<FollowDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
+  ...authoredSchema,
   subject: { type: String, required: true, index: true },
-  authorDid: { type: String, required: true, index: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-  cid: { type: String, required: true },
   type: {
     type: String,
     required: true,
@@ -193,22 +202,13 @@ export const followSchema = new Schema<FollowDocument>({
   },
 });
 
-export interface BlockDocument extends Document {
-  uri: string;
+export interface BlockDocument extends AuthoredDocument {
   subject: string;
-  authorDid: string;
-  createdAt: string;
-  indexedAt: string;
-  cid: string;
 }
 
 export const blockSchema = new Schema<BlockDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
+  ...authoredSchema,
   subject: { type: String, required: true, index: true },
-  authorDid: { type: String, required: true, index: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-  cid: { type: String, required: true },
 });
 
 interface PinnedPost {
@@ -216,32 +216,23 @@ interface PinnedPost {
   cid: string;
 }
 
-export interface ProfileDocument extends Document {
-  uri: string;
+export interface ProfileDocument extends AuthoredDocument {
   displayName?: string;
   description?: string;
   avatar?: MediaRef;
   banner?: MediaRef;
   labels?: Label[];
   pinnedPost?: PinnedPost;
-  authorDid: string;
-  createdAt: string;
-  indexedAt: string;
-  cid: string;
 }
 
 export const profileSchema = new Schema<ProfileDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
+  ...authoredSchema,
   displayName: { type: String, required: false },
   description: { type: String, required: false },
   avatar: { type: Object, required: false },
   banner: { type: Object, required: false },
   labels: { type: Object, required: false },
   pinnedPost: { type: Object, required: false },
-  authorDid: { type: String, required: true, index: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-  cid: { type: String, required: true },
 });
 
 // Add text index for profile search
@@ -260,8 +251,7 @@ export const profileAggSchema = new Schema<ProfileAggDocument>({
   postsCount: { type: Number, required: true, default: 0 },
 });
 
-export interface AudioDocument extends Document {
-  uri: string;
+export interface AudioDocument extends AuthoredDocument {
   sound: string;
   origin: {
     uri: string;
@@ -269,15 +259,11 @@ export interface AudioDocument extends Document {
   };
   title?: string;
   text?: string;
-  labels?: PostLabel[];
-  authorDid: string;
-  createdAt: string;
-  indexedAt: string;
-  cid: string;
+  labels?: Label[];
 }
 
 export const audioSchema = new Schema<AudioDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
+  ...authoredSchema,
   sound: { type: String, required: true },
   origin: {
     uri: { type: String, required: true },
@@ -286,42 +272,28 @@ export const audioSchema = new Schema<AudioDocument>({
   title: { type: String, required: false },
   text: { type: String, required: false },
   labels: { type: Object, required: false },
-  authorDid: { type: String, required: true, index: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-  cid: { type: String, required: true },
 });
 
-export interface RepostDocument extends Document {
-  uri: string;
+export interface RepostDocument extends AuthoredDocument {
   subject: {
     uri: string;
     cid: string;
   };
-  authorDid: string;
-  createdAt: string;
-  indexedAt: string;
-  cid: string;
   via?: string | null;
   viaCid?: string | null;
 }
 
 export const repostSchema = new Schema<RepostDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
+  ...authoredSchema,
   subject: {
     uri: { type: String, required: true },
     cid: { type: String, required: true },
   },
-  authorDid: { type: String, required: true, index: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-  cid: { type: String, required: true },
   via: { type: String, required: false },
   viaCid: { type: String, required: false },
 });
 
-export interface MusicDocument extends Document {
-  uri: string;
+export interface MusicDocument extends AuthoredDocument {
   sound: string;
   title: string;
   author: string;
@@ -332,16 +304,12 @@ export interface MusicDocument extends Document {
   text?: string;
   copyright?: string[];
   facets?: Facet[];
-  labels?: PostLabel[];
+  labels?: Label[];
   tags?: string[];
-  authorDid: string;
-  createdAt: string;
-  indexedAt: string;
-  cid: string;
 }
 
 export const musicSchema = new Schema<MusicDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
+  ...authoredSchema,
   sound: { type: String, required: true },
   title: { type: String, required: true },
   author: { type: String, required: true },
@@ -354,10 +322,6 @@ export const musicSchema = new Schema<MusicDocument>({
   facets: { type: [Object], required: false },
   labels: { type: Object, required: false },
   tags: { type: [String], required: false },
-  authorDid: { type: String, required: true, index: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-  cid: { type: String, required: true },
 });
 
 export interface PostEmbed {
@@ -390,8 +354,7 @@ export interface PostEmbed {
   };
 }
 
-export interface PostDocument extends Document {
-  uri: string;
+export interface PostDocument extends AuthoredDocument {
   text?: string;
   facets?: Facet[];
   reply: {
@@ -410,16 +373,12 @@ export interface PostDocument extends Document {
     cid: string;
   } | null;
   langs?: string[];
-  labels: PostLabel[] | null;
+  labels: Label[] | null;
   tags?: string[];
-  authorDid: string;
-  createdAt: string;
-  indexedAt: string;
-  cid: string;
 }
 
 export const postSchema = new Schema<PostDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
+  ...authoredSchema,
   text: { type: String, required: false },
   facets: { type: [Object], required: false, default: [] },
   reply: {
@@ -448,10 +407,6 @@ export const postSchema = new Schema<PostDocument>({
   langs: { type: [String], required: false, default: [] },
   labels: { type: Object, required: false, default: null },
   tags: { type: [String], required: false, default: [] },
-  authorDid: { type: String, required: true, index: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-  cid: { type: String, required: true },
 });
 
 // Compound indexes for more efficient queries
@@ -468,23 +423,18 @@ export const postAggSchema = new Schema<PostAggDocument>({
   replyCount: { type: Number, required: true, default: 0 },
 });
 
-export interface StoryDocument extends Document {
-  uri: string;
+export interface StoryDocument extends AuthoredDocument {
   media: PostEmbed | null;
   sound: {
     uri: string;
     cid: string;
   } | null;
-  labels: PostLabel[] | null;
+  labels: Label[] | null;
   tags: string[];
-  authorDid: string;
-  createdAt: string;
-  indexedAt: string;
-  cid: string;
 }
 
 export const storySchema = new Schema<StoryDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
+  ...authoredSchema,
   media: { type: Object, required: false, default: null },
   sound: {
     type: {
@@ -496,10 +446,6 @@ export const storySchema = new Schema<StoryDocument>({
   },
   labels: { type: Object, required: false, default: null },
   tags: { type: [String], required: false, default: [] },
-  authorDid: { type: String, required: true, index: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-  cid: { type: String, required: true },
 });
 
 storySchema.index({ authorDid: 1, createdAt: -1 });
@@ -532,33 +478,18 @@ interface Facet {
   }>;
 }
 
-interface PostLabel {
-  src: string;
-  uri: string;
-  cid: string;
-  val: string;
-  neg: boolean;
-}
-
-export interface GeneratorDocument extends Document {
-  uri: string;
-  did: string;
+export interface GeneratorDocument extends AuthoredDocument {
   displayName: string;
   description?: string;
   descriptionFacets?: Facet[];
   avatar?: string;
   acceptsInteractions?: boolean;
-  labels?: PostLabel[];
+  labels?: Label[];
   contentMode?: string;
-  authorDid: string;
-  createdAt: string;
-  indexedAt: string;
-  cid: string;
 }
 
 export const generatorSchema = new Schema<GeneratorDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
-  did: { type: String, required: true, index: true },
+  ...authoredSchema,
   displayName: { type: String, required: true },
   description: { type: String, required: false },
   descriptionFacets: { type: [Object], required: false },
@@ -566,10 +497,6 @@ export const generatorSchema = new Schema<GeneratorDocument>({
   acceptsInteractions: { type: Boolean, required: false },
   labels: { type: Object, required: false },
   contentMode: { type: String, required: false },
-  authorDid: { type: String, required: true, index: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-  cid: { type: String, required: true },
 });
 
 // Add compound indexes for Generator
@@ -650,7 +577,7 @@ export interface ActorDocument extends Document {
 }
 
 export const actorSchema = new Schema<ActorDocument>({
-  did: { type: String, required: true },
+  did: { type: String, required: true, unique: true, index: true },
   handle: { type: String, required: false, index: true },
   indexedAt: { type: String, required: true },
   takedownRef: { type: String, required: false },
@@ -693,6 +620,21 @@ export const cursorStateSchema = new Schema<CursorStateDocument>({
   cursorValue: { type: Number, required: true },
   updatedAt: { type: Date, default: Date.now },
 });
+
+// Apply plugin to schemas that extend AuthoredDocument
+([
+  profileSchema,
+  likeSchema,
+  lookSchema,
+  postSchema,
+  repostSchema,
+  followSchema,
+  blockSchema,
+  generatorSchema,
+  audioSchema,
+  musicSchema,
+  storySchema,
+] as Schema[]).forEach((s) => s.plugin(addAuthor));
 
 export interface DatabaseModels {
   Record: Model<RecordDocument>;
