@@ -1,15 +1,15 @@
 import { assertEquals } from "jsr:@std/assert";
 import { assertMatch } from "jsr:@std/assert/match";
-import { createApp } from "./main.ts";
+import { AppContext, createApp } from "./main.ts";
 import { Database } from "./data-plane/server/index.ts";
 import {
   createBidirectionalResolver,
   createIdResolver,
 } from "./utils/id-resolver.ts";
 import { TakedownService } from "./services/takedown.ts";
-import { IndexingService } from "./services/indexing.ts";
 import { createAuthVerifier } from "./services/auth-verifier.ts";
 import { pino } from "pino";
+import { RepoSubscription } from "./data-plane/server/subscription.ts";
 
 Deno.env.set("SERVICE_DID", "did:web:test");
 Deno.env.set("MOD_SERVICE_DID", "did:web:test");
@@ -20,7 +20,7 @@ Deno.env.set(
 );
 
 // Create a mock context for testing without database
-function createMockContext() {
+function createMockContext(): AppContext {
   const appLogger = pino({ name: "test" });
   const baseIdResolver = createIdResolver();
   const resolver = createBidirectionalResolver(baseIdResolver);
@@ -34,7 +34,11 @@ function createMockContext() {
   } as unknown as Database;
 
   const takedownService = new TakedownService(mockDb);
-  const indexingService = new IndexingService(mockDb, resolver);
+  const sub = new RepoSubscription({
+    service: "wss://relay1.us-west.bsky.network",
+    db: mockDb,
+    idResolver: baseIdResolver,
+  });
   const authVerifier = createAuthVerifier(mockDb, {
     ownDid: serviceDid,
     alternateAudienceDids: [],
@@ -49,7 +53,7 @@ function createMockContext() {
     serviceDid,
     didResolver: baseIdResolver.did,
     takedownService,
-    indexingService,
+    sub,
     authVerifier,
   };
 }

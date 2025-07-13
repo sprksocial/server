@@ -95,7 +95,7 @@ export default function (server: Server, ctx: AppContext) {
         // Transform stories to story views
         const storyViews = await Promise.all(
           stories.map(async (story: StoryDocument) => {
-            return await transformStoryToStoryView(story, ctx.db);
+            return await transformStoryToStoryView(story, ctx);
           }),
         );
 

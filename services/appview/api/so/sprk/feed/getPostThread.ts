@@ -24,7 +24,7 @@ export default function (server: Server, ctx: AppContext) {
         // Convert the post to a post view
         const postView = await transformPostToPostView(
           fullPost,
-          ctx.db,
+          ctx,
           userDid,
         );
 
@@ -94,7 +94,7 @@ export default function (server: Server, ctx: AppContext) {
         // Convert the main post to a PostView
         const mainPostView = await transformPostToPostView(
           mainPost,
-          ctx.db,
+          ctx,
           userDid,
         );
 
@@ -117,7 +117,7 @@ export default function (server: Server, ctx: AppContext) {
 
             const parentPostView = await transformPostToPostView(
               parentPost,
-              ctx.db,
+              ctx,
               userDid,
             );
             parentPosts.unshift(parentPostView); // Add at the beginning so root is first
