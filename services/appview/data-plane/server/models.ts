@@ -17,6 +17,24 @@ function addAuthor(schema: Schema) {
   }
 }
 
+// Base interface for documents with authorDid
+interface AuthoredDocument extends Document {
+  uri: string;
+  cid: string;
+  createdAt: string;
+  indexedAt: string;
+  authorDid: string;
+  actor?: ActorDocument; // Virtual field for populated actor data
+}
+
+export const authoredSchema = {
+  uri: { type: String, required: true, unique: true, index: true },
+  authorDid: { type: String, required: true, index: true },
+  cid: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+};
+
 export interface MediaRef {
   $type: string;
   ref: { $link: string };
@@ -47,23 +65,18 @@ interface Label {
   neg: boolean;
 }
 
-// Base interface for documents with authorDid
-interface AuthoredDocument extends Document {
-  uri: string;
-  cid: string;
-  createdAt: string;
-  indexedAt: string;
-  authorDid: string;
-  actor?: ActorDocument; // Virtual field for populated actor data
+interface Facet {
+  index: {
+    byteStart: number;
+    byteEnd: number;
+  };
+  features: Array<{
+    $type: string;
+    uri?: string;
+    did?: string;
+    tag?: string;
+  }>;
 }
-
-export const authoredSchema = {
-  uri: { type: String, required: true, unique: true, index: true },
-  authorDid: { type: String, required: true, index: true },
-  cid: { type: String, required: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-};
 
 export interface RecordDocument extends Document {
   uri: string;
@@ -372,11 +385,13 @@ postSchema.index({ tags: 1, createdAt: -1 });
 
 export interface PostAggDocument extends Document {
   uri: string;
+  likeCount: number;
   replyCount: number;
 }
 
 export const postAggSchema = new Schema<PostAggDocument>({
   uri: { type: String, required: true, unique: true, index: true },
+  likeCount: { type: Number, required: true, default: 0 },
   replyCount: { type: Number, required: true, default: 0 },
 });
 
@@ -421,19 +436,6 @@ repostSchema.index({ "subject.uri": 1, createdAt: -1 });
 
 musicSchema.index({ authorDid: 1, createdAt: -1 });
 musicSchema.index({ tags: 1, createdAt: -1 });
-
-interface Facet {
-  index: {
-    byteStart: number;
-    byteEnd: number;
-  };
-  features: Array<{
-    $type: string;
-    uri?: string;
-    did?: string;
-    tag?: string;
-  }>;
-}
 
 export interface GeneratorDocument extends AuthoredDocument {
   displayName: string;

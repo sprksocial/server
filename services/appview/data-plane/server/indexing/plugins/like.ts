@@ -151,7 +151,7 @@ const updateAggregates = async (db: Database, like: IndexedLike) => {
 
   await db.models.PostAgg.findOneAndUpdate(
     { uri: like.subject },
-    { likeCount },
+    { $set: { likeCount } },
     { upsert: true, new: true },
   );
 };

@@ -14,11 +14,12 @@ export interface QueryParams {
 export type InputSchema = undefined;
 
 export interface OutputSchema {
-  views: (
-    | $Typed<AppBskyLabelerDefs.LabelerView>
-    | $Typed<AppBskyLabelerDefs.LabelerViewDetailed>
-    | { $type: string }
-  )[];
+  views:
+    (
+      | $Typed<AppBskyLabelerDefs.LabelerView>
+      | $Typed<AppBskyLabelerDefs.LabelerViewDetailed>
+      | { $type: string }
+    )[];
 }
 
 export type HandlerInput = undefined;
