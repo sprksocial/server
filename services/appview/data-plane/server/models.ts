@@ -193,6 +193,9 @@ export interface ProfileDocument extends AuthoredDocument {
   banner?: MediaRef;
   labels?: Label[];
   pinnedPost?: PinnedPost;
+  postsCount: number;
+  followersCount: number;
+  followsCount: number;
 }
 
 export const profileSchema = new Schema<ProfileDocument>({
@@ -203,22 +206,15 @@ export const profileSchema = new Schema<ProfileDocument>({
   banner: { type: Object, required: false },
   labels: { type: Object, required: false },
   pinnedPost: { type: Object, required: false },
+  postsCount: { type: Number, required: true, default: 0 },
+  followersCount: { type: Number, required: true, default: 0 },
+  followsCount: { type: Number, required: true, default: 0 },
 });
 
 // Add text index for profile search
 profileSchema.index({
   displayName: "text",
   description: "text",
-});
-
-export interface ProfileAggDocument extends Document {
-  did: string;
-  postsCount: number;
-}
-
-export const profileAggSchema = new Schema<ProfileAggDocument>({
-  did: { type: String, required: true, unique: true, index: true },
-  postsCount: { type: Number, required: true, default: 0 },
 });
 
 export interface AudioDocument extends AuthoredDocument {
@@ -345,6 +341,9 @@ export interface PostDocument extends AuthoredDocument {
   langs?: string[];
   labels: Label[] | null;
   tags?: string[];
+  likeCount: number;
+  replyCount: number;
+  repostCount: number;
 }
 
 export const postSchema = new Schema<PostDocument>({
@@ -377,23 +376,14 @@ export const postSchema = new Schema<PostDocument>({
   langs: { type: [String], required: false, default: [] },
   labels: { type: Object, required: false, default: null },
   tags: { type: [String], required: false, default: [] },
+  likeCount: { type: Number, required: true, default: 0 },
+  replyCount: { type: Number, required: true, default: 0 },
+  repostCount: { type: Number, required: true, default: 0 },
 });
 
 // Compound indexes for more efficient queries
 postSchema.index({ authorDid: 1, createdAt: -1 });
 postSchema.index({ tags: 1, createdAt: -1 });
-
-export interface PostAggDocument extends Document {
-  uri: string;
-  likeCount: number;
-  replyCount: number;
-}
-
-export const postAggSchema = new Schema<PostAggDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
-  likeCount: { type: Number, required: true, default: 0 },
-  replyCount: { type: Number, required: true, default: 0 },
-});
 
 export interface StoryDocument extends AuthoredDocument {
   media: PostEmbed | null;
@@ -600,12 +590,10 @@ export interface DatabaseModels {
   DuplicateRecord: Model<DuplicateRecordDocument>;
   Like: Model<LikeDocument>;
   Post: Model<PostDocument>;
-  PostAgg: Model<PostAggDocument>;
   Story: Model<StoryDocument>;
   Follow: Model<FollowDocument>;
   Block: Model<BlockDocument>;
   Profile: Model<ProfileDocument>;
-  ProfileAgg: Model<ProfileAggDocument>;
   Audio: Model<AudioDocument>;
   Repost: Model<RepostDocument>;
   Music: Model<MusicDocument>;

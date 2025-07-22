@@ -149,7 +149,7 @@ const updateAggregates = async (db: Database, repost: IndexedRepost) => {
     "subject.uri": repost.subject.uri,
   });
 
-  await db.models.PostAgg.findOneAndUpdate(
+  await db.models.Post.findOneAndUpdate(
     { uri: repost.subject.uri },
     { repostCount },
     { upsert: true, new: true },

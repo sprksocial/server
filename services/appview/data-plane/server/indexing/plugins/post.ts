@@ -361,7 +361,7 @@ const updateAggregates = async (db: Database, postIdx: IndexedPost) => {
       violatesThreadGate: { $ne: true },
     });
 
-    await db.models.PostAgg.findOneAndUpdate(
+    await db.models.Post.findOneAndUpdate(
       { uri: postIdx.post.reply.parent.uri },
       { replyCount },
       { upsert: true, new: true },
@@ -373,7 +373,7 @@ const updateAggregates = async (db: Database, postIdx: IndexedPost) => {
     authorDid: postIdx.post.authorDid,
   });
 
-  await db.models.ProfileAgg.findOneAndUpdate(
+  await db.models.Profile.findOneAndUpdate(
     { did: postIdx.post.authorDid },
     { postsCount },
     { upsert: true, new: true },

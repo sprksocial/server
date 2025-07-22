@@ -74,14 +74,6 @@ export class Database implements DataPlaneClient {
           "Profile",
           models.profileSchema,
         ),
-        ProfileAgg: this.connection.model<models.ProfileAggDocument>(
-          "ProfileAgg",
-          models.profileAggSchema,
-        ),
-        PostAgg: this.connection.model<models.PostAggDocument>(
-          "PostAgg",
-          models.postAggSchema,
-        ),
         Audio: this.connection.model<models.AudioDocument>(
           "Audio",
           models.audioSchema,
