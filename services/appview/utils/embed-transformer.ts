@@ -1,5 +1,9 @@
 import type * as SoSprkEmbedImages from "../lexicon/types/so/sprk/embed/images.ts";
-import { EmbedImage, PostEmbed } from "../data-plane/server/index.ts";
+import {
+  EmbedImage,
+  PostEmbed,
+  VideoMappingDocument,
+} from "../data-plane/server/index.ts";
 
 interface ImageTransformOptions {
   /** If true, only return the first image (useful for stories) */
@@ -40,18 +44,33 @@ export function transformVideoEmbed(
   embed: PostEmbed,
   authorDid: string,
   cid: string,
+  videoMapping?: VideoMappingDocument | null,
 ) {
   if (!embed.video) {
     return undefined;
   }
+
+  let playlist: string;
+  let thumbnail: string;
+
+  if (videoMapping) {
+    playlist =
+      `https://vz-af9bb0fe-73c.b-cdn.net/${videoMapping.bunnyGuid}/playlist.m3u8`;
+    thumbnail =
+      `https://vz-af9bb0fe-73c.b-cdn.net/${videoMapping.bunnyGuid}/thumbnail.jpg`;
+  } else {
+    playlist =
+      `http://hls.sprk.so/watch/${authorDid}/${embed.video.ref.$link}/playlist.m3u8`;
+    thumbnail =
+      `https://thumb.sprk.so/${authorDid}/${embed.video.ref.$link}/thumbnail`;
+  }
+
   return {
     $type: "so.sprk.embed.video#view",
     cid,
     alt: embed.alt,
-    playlist:
-      `https://media.sprk.so/video/${authorDid}/${embed.video.ref.$link}`,
-    thumbnail:
-      `https://thumb.sprk.so/${authorDid}/${embed.video.ref.$link}/thumbnail`,
+    playlist,
+    thumbnail,
   } as const;
 }
 
@@ -59,6 +78,7 @@ export function transformEmbed(
   embed: PostEmbed | null,
   authorDid: string,
   cid: string,
+  videoMapping?: VideoMappingDocument | null,
   options: ImageTransformOptions = {},
 ) {
   if (!embed) {
@@ -70,7 +90,7 @@ export function transformEmbed(
   }
 
   if (embed.$type === "so.sprk.embed.video") {
-    return transformVideoEmbed(embed, authorDid, cid);
+    return transformVideoEmbed(embed, authorDid, cid, videoMapping);
   }
 
   return undefined;

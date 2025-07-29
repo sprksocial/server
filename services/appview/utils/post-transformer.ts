@@ -11,32 +11,45 @@ export async function transformPostToPostView(
   db: Database,
   userDid?: string,
 ): Promise<SoSprkFeedDefs.PostView> {
-  // Get counts in parallel
-  const [likeCount, replyCount, repostCount, lookCount, author] = await Promise
-    .all([
-      // Get like count
-      db.models.Like.countDocuments({ subject: post.uri }),
+  // Get counts and video mapping in parallel
+  const [likeCount, replyCount, repostCount, lookCount, author, videoMapping] =
+    await Promise
+      .all([
+        // Get like count
+        db.models.Like.countDocuments({ subject: post.uri }),
 
-      // Get reply count
-      db.models.Post.countDocuments({
-        "reply.parent.uri": post.uri,
-      }),
+        // Get reply count
+        db.models.Post.countDocuments({
+          "reply.parent.uri": post.uri,
+        }),
 
-      // Get repost count
-      db.models.Repost.countDocuments({
-        "subject.uri": post.uri,
-      }),
+        // Get repost count
+        db.models.Repost.countDocuments({
+          "subject.uri": post.uri,
+        }),
 
-      // Get look count
-      db.models.Look.countDocuments({
-        "subject.uri": post.uri,
-      }),
+        // Get look count
+        db.models.Look.countDocuments({
+          "subject.uri": post.uri,
+        }),
 
-      // Create the author object with stories
-      createProfileViewBasic(post.authorDid, post.authorHandle, db),
-    ]);
+        // Create the author object with stories
+        createProfileViewBasic(post.authorDid, post.authorHandle, db),
 
-  const embed = transformEmbed(post.embed, post.authorDid, post.cid);
+        // Find video mapping if the post is a video
+        post.embed?.$type === "so.sprk.embed.video"
+          ? db.models.VideoMapping.findOne({
+            key: `${post.authorDid}-${post.cid}`,
+          }).lean()
+          : Promise.resolve(null),
+      ]);
+
+  const embed = transformEmbed(
+    post.embed,
+    post.authorDid,
+    post.cid,
+    videoMapping,
+  );
 
   // Convert labels if any
   const labels = post.labels
