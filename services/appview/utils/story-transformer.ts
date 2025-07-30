@@ -15,7 +15,7 @@ export async function transformStoryToStoryView(
     db,
   );
 
-  const embedView = transformEmbed(story.media, story.authorDid, null,{
+  const embedView = transformEmbed(story.media, story.authorDid, null, {
     firstImageOnly: true,
   });
 

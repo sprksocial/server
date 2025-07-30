@@ -57,8 +57,10 @@ export function transformVideoEmbed(
     playlist = `${env.HLS_CDN_URL}/${videoMapping.bunnyGuid}/playlist.m3u8`;
     thumbnail = `${env.HLS_CDN_URL}/${videoMapping.bunnyGuid}/thumbnail.jpg`;
   } else {
-    playlist = `${env.VIDEO_CDN_URL}/watch/${authorDid}/${embed.video.ref.$link}/playlist.m3u8`;
-    thumbnail = `https://thumb.sprk.so/${authorDid}/${embed.video.ref.$link}/thumbnail`;
+    playlist =
+      `${env.VIDEO_CDN_URL}/watch/${authorDid}/${embed.video.ref.$link}/playlist.m3u8`;
+    thumbnail =
+      `https://thumb.sprk.so/${authorDid}/${embed.video.ref.$link}/thumbnail`;
   }
 
   return {
