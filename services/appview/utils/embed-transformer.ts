@@ -4,6 +4,7 @@ import {
   PostEmbed,
   VideoMappingDocument,
 } from "../data-plane/server/index.ts";
+import { env } from "./env.ts";
 
 interface ImageTransformOptions {
   /** If true, only return the first image (useful for stories) */
@@ -53,15 +54,11 @@ export function transformVideoEmbed(
   let thumbnail: string;
 
   if (videoMapping) {
-    playlist =
-      `https://vz-af9bb0fe-73c.b-cdn.net/${videoMapping.bunnyGuid}/playlist.m3u8`;
-    thumbnail =
-      `https://vz-af9bb0fe-73c.b-cdn.net/${videoMapping.bunnyGuid}/thumbnail.jpg`;
+    playlist = `${env.HLS_CDN_URL}/${videoMapping.bunnyGuid}/playlist.m3u8`;
+    thumbnail = `${env.HLS_CDN_URL}/${videoMapping.bunnyGuid}/thumbnail.jpg`;
   } else {
-    playlist =
-      `http://hls.sprk.so/watch/${authorDid}/${embed.video.ref.$link}/playlist.m3u8`;
-    thumbnail =
-      `https://thumb.sprk.so/${authorDid}/${embed.video.ref.$link}/thumbnail`;
+    playlist = `${env.VIDEO_CDN_URL}/${authorDid}/${embed.video.ref.$link}/playlist.m3u8`;
+    thumbnail = `https://thumb.sprk.so/${authorDid}/${embed.video.ref.$link}/thumbnail`;
   }
 
   return {
