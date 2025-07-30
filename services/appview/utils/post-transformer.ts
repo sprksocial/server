@@ -56,7 +56,7 @@ export async function transformPostsToPostViews(
           .lean();
         return createProfileViewBasic(
           did,
-          (author)?.authorHandle || "unknown.invalid",
+          author?.authorHandle || "unknown.invalid",
           db,
         );
       }),
@@ -124,7 +124,9 @@ export async function transformPostsToPostViews(
 
   return posts.map((post) => {
     const videoMapping = post.embed?.$type === "so.sprk.embed.video"
-      ? videoMappingsMap.get(`${post.authorDid}-${post.embed.video?.ref.$link}`) || null
+      ? videoMappingsMap.get(
+        `${post.authorDid}-${post.embed.video?.ref.$link}`,
+      ) || null
       : null;
 
     const embed = transformEmbed(
