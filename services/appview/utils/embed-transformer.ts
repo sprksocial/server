@@ -43,7 +43,6 @@ export function transformImagesEmbed(
 export function transformVideoEmbed(
   embed: PostEmbed,
   authorDid: string,
-  cid: string,
   videoMapping?: VideoMappingDocument | null,
 ) {
   if (!embed.video) {
@@ -67,7 +66,7 @@ export function transformVideoEmbed(
 
   return {
     $type: "so.sprk.embed.video#view",
-    cid,
+    cid: embed.video.ref.$link,
     alt: embed.alt,
     playlist,
     thumbnail,
@@ -77,7 +76,6 @@ export function transformVideoEmbed(
 export function transformEmbed(
   embed: PostEmbed | null,
   authorDid: string,
-  cid: string,
   videoMapping?: VideoMappingDocument | null,
   options: ImageTransformOptions = {},
 ) {
@@ -90,7 +88,7 @@ export function transformEmbed(
   }
 
   if (embed.$type === "so.sprk.embed.video") {
-    return transformVideoEmbed(embed, authorDid, cid, videoMapping);
+    return transformVideoEmbed(embed, authorDid, videoMapping);
   }
 
   return undefined;

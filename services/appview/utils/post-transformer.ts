@@ -130,7 +130,6 @@ export async function transformPostsToPostViews(
     const embed = transformEmbed(
       post.embed,
       post.authorDid,
-      post.cid,
       videoMapping,
     );
 
