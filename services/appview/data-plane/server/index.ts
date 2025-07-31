@@ -639,6 +639,18 @@ export const cursorStateSchema = new Schema<CursorStateDocument>({
   updatedAt: { type: Date, default: Date.now },
 });
 
+export interface VideoMappingDocument extends Document {
+  key: string; // did-cid
+  bunnyGuid: string;
+  postMongoId: string;
+}
+
+export const videoMappingSchema = new Schema<VideoMappingDocument>({
+  key: { type: String, required: true, unique: true, index: true },
+  bunnyGuid: { type: String, required: true, index: true },
+  postMongoId: { type: String, required: true, index: true },
+});
+
 export interface DatabaseModels {
   Like: Model<LikeDocument>;
   Post: Model<PostDocument>;
@@ -657,6 +669,7 @@ export interface DatabaseModels {
   Actor: Model<ActorDocument>;
   UserPreference: Model<UserPreferenceDocument>;
   CursorState: Model<CursorStateDocument>;
+  VideoMapping: Model<VideoMappingDocument>;
 }
 
 export class Database implements DataPlaneClient {
@@ -700,6 +713,10 @@ export class Database implements DataPlaneClient {
         Profile: this.connection.model<ProfileDocument>(
           "Profile",
           profileSchema,
+        ),
+        VideoMapping: this.connection.model<VideoMappingDocument>(
+          "VideoMapping",
+          videoMappingSchema,
         ),
         Audio: this.connection.model<AudioDocument>("Audio", audioSchema),
         Repost: this.connection.model<RepostDocument>("Repost", repostSchema),
