@@ -31,39 +31,36 @@ export async function transformPostsToPostViews(
     viewerLooks,
   ] = await Promise.all([
     // Get like counts
-    db.models.Like.aggregate([
+    ctx.db.models.Like.aggregate([
       { $match: { subject: { $in: postUris } } },
       { $group: { _id: "$subject", count: { $sum: 1 } } },
     ]),
     // Get reply counts
-    db.models.Post.aggregate([
+    ctx.db.models.Post.aggregate([
       { $match: { "reply.parent.uri": { $in: postUris } } },
       { $group: { _id: "$reply.parent.uri", count: { $sum: 1 } } },
     ]),
     // Get repost counts
-    db.models.Repost.aggregate([
+    ctx.db.models.Repost.aggregate([
       { $match: { "subject.uri": { $in: postUris } } },
       { $group: { _id: "$subject.uri", count: { $sum: 1 } } },
     ]),
     // Get look counts
-    db.models.Look.aggregate([
+    ctx.db.models.Look.aggregate([
       { $match: { "subject.uri": { $in: postUris } } },
       { $group: { _id: "$subject.uri", count: { $sum: 1 } } },
     ]),
     // Get authors
     Promise.all(
-      authorDids.map(async (did) => {
-        const author = await db.models.Profile.findOne({ authorDid: did })
-          .lean();
+      authorDids.map((did) => {
         return createProfileViewBasic(
           did,
-          author?.authorHandle || "unknown.invalid",
-          db,
+          ctx,
         );
       }),
     ),
     // Get video mappings
-    db.models.VideoMapping.find({
+    ctx.db.models.VideoMapping.find({
       key: {
         $in: posts
           .filter((p) => p.embed?.$type === "so.sprk.embed.video")
@@ -72,19 +69,22 @@ export async function transformPostsToPostViews(
     }).lean(),
     // Get viewer likes
     userDid
-      ? db.models.Like.find({ subject: { $in: postUris }, authorDid: userDid })
+      ? ctx.db.models.Like.find({
+        subject: { $in: postUris },
+        authorDid: userDid,
+      })
         .lean()
       : Promise.resolve([]),
     // Get viewer reposts
     userDid
-      ? db.models.Repost.find({
+      ? ctx.db.models.Repost.find({
         "subject.uri": { $in: postUris },
         authorDid: userDid,
       }).lean()
       : Promise.resolve([]),
     // Get viewer looks
     userDid
-      ? db.models.Look.find({
+      ? ctx.db.models.Look.find({
         "subject.uri": { $in: postUris },
         authorDid: userDid,
       }).lean()
@@ -175,9 +175,9 @@ export async function transformPostsToPostViews(
 // Transform DB post to PostView format
 export async function transformPostToPostView(
   post: PostDocument,
-  db: Database,
+  ctx: AppContext,
   userDid?: string,
 ): Promise<SoSprkFeedDefs.PostView> {
-  const postViews = await transformPostsToPostViews([post], db, userDid);
+  const postViews = await transformPostsToPostViews([post], ctx, userDid);
   return postViews[0];
 }

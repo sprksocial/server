@@ -204,7 +204,7 @@ export const profileSchema = new Schema<ProfileDocument>({
   description: { type: String, required: false },
   avatar: { type: Object, required: false },
   banner: { type: Object, required: false },
-  labels: { type: Object, required: false },
+  labels: { type: [Object], required: false },
   pinnedPost: { type: Object, required: false },
   postsCount: { type: Number, required: true, default: 0 },
   followersCount: { type: Number, required: true, default: 0 },
@@ -237,7 +237,7 @@ export const audioSchema = new Schema<AudioDocument>({
   },
   title: { type: String, required: false },
   text: { type: String, required: false },
-  labels: { type: Object, required: false },
+  labels: { type: [Object], required: false },
 });
 
 export interface RepostDocument extends AuthoredDocument {
@@ -286,7 +286,7 @@ export const musicSchema = new Schema<MusicDocument>({
   text: { type: String, required: false },
   copyright: { type: [String], required: false },
   facets: { type: [Object], required: false },
-  labels: { type: Object, required: false },
+  labels: { type: [Object], required: false },
   tags: { type: [String], required: false },
 });
 
@@ -374,7 +374,7 @@ export const postSchema = new Schema<PostDocument>({
     default: null,
   },
   langs: { type: [String], required: false, default: [] },
-  labels: { type: Object, required: false, default: null },
+  labels: { type: [Object], required: false, default: null },
   tags: { type: [String], required: false, default: [] },
   likeCount: { type: Number, required: true, default: 0 },
   replyCount: { type: Number, required: true, default: 0 },
@@ -406,7 +406,7 @@ export const storySchema = new Schema<StoryDocument>({
     required: false,
     default: null,
   },
-  labels: { type: Object, required: false, default: null },
+  labels: { type: [Object], required: false, default: null },
   tags: { type: [String], required: false, default: [] },
 });
 
@@ -444,7 +444,7 @@ export const generatorSchema = new Schema<GeneratorDocument>({
   descriptionFacets: { type: [Object], required: false },
   avatar: { type: String, required: false },
   acceptsInteractions: { type: Boolean, required: false },
-  labels: { type: Object, required: false },
+  labels: { type: [Object], required: false },
   contentMode: { type: String, required: false },
 });
 
@@ -570,6 +570,18 @@ export const cursorStateSchema = new Schema<CursorStateDocument>({
   updatedAt: { type: Date, default: Date.now },
 });
 
+export interface VideoMappingDocument extends Document {
+  key: string; // did-cid
+  bunnyGuid: string;
+  postMongoId: string;
+}
+
+export const videoMappingSchema = new Schema<VideoMappingDocument>({
+  key: { type: String, required: true, unique: true, index: true },
+  bunnyGuid: { type: String, required: true, index: true },
+  postMongoId: { type: String, required: true, index: true },
+});
+
 // Apply plugin to schemas that extend AuthoredDocument
 ([
   profileSchema,
@@ -606,4 +618,5 @@ export interface DatabaseModels {
   ActorSync: Model<ActorSyncDocument>;
   UserPreference: Model<UserPreferenceDocument>;
   CursorState: Model<CursorStateDocument>;
+  VideoMapping: Model<VideoMappingDocument>;
 }

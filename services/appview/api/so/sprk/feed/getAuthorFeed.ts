@@ -152,7 +152,7 @@ export default function (server: Server, ctx: AppContext) {
         }
 
         const responseBody: OutputSchema = {
-          feed: feedViewPosts,
+          feed: feedViewPosts.map((post) => ({ post })),
         };
 
         if (nextCursor) {
