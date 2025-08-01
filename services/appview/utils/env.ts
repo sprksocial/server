@@ -14,6 +14,8 @@ export const env = {
   ADMIN_PASSWORD: envStr("ADMIN_PASSWORD") ?? "admin-token",
   JETSTREAM_URL: envStr("JETSTREAM_URL") ??
     "wss://jetstream2.us-east.bsky.network/subscribe",
+  HLS_CDN_URL: envStr("HLS_CDN_URL") ?? "https://vz-fb7436e9-c53.b-cdn.net",
+  VIDEO_CDN_URL: envStr("VIDEO_CDN_URL") ?? "https://hls.sprk.so",
 
   DB_URI: envStr("DB_URI"),
   DB_NAME: envStr("DB_NAME") ?? "dev",

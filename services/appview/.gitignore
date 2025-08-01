@@ -17,3 +17,4 @@
 **/*.log
 **/*.bun
 /devdb
+mongo-keyfile

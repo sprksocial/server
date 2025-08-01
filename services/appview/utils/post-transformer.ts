@@ -6,122 +6,178 @@ import { AppContext } from "../main.ts";
 import { transformEmbed } from "./embed-transformer.ts";
 import { createProfileViewBasic } from "./profile-helper.ts";
 
+// Transform DB posts to PostView format
+export async function transformPostsToPostViews(
+  posts: PostDocument[],
+  ctx: AppContext,
+  userDid?: string,
+): Promise<SoSprkFeedDefs.PostView[]> {
+  if (posts.length === 0) {
+    return [];
+  }
+
+  const postUris = posts.map((p) => p.uri);
+  const authorDids = [...new Set(posts.map((p) => p.authorDid))];
+
+  const [
+    likeCounts,
+    replyCounts,
+    repostCounts,
+    lookCounts,
+    authors,
+    videoMappings,
+    viewerLikes,
+    viewerReposts,
+    viewerLooks,
+  ] = await Promise.all([
+    // Get like counts
+    db.models.Like.aggregate([
+      { $match: { subject: { $in: postUris } } },
+      { $group: { _id: "$subject", count: { $sum: 1 } } },
+    ]),
+    // Get reply counts
+    db.models.Post.aggregate([
+      { $match: { "reply.parent.uri": { $in: postUris } } },
+      { $group: { _id: "$reply.parent.uri", count: { $sum: 1 } } },
+    ]),
+    // Get repost counts
+    db.models.Repost.aggregate([
+      { $match: { "subject.uri": { $in: postUris } } },
+      { $group: { _id: "$subject.uri", count: { $sum: 1 } } },
+    ]),
+    // Get look counts
+    db.models.Look.aggregate([
+      { $match: { "subject.uri": { $in: postUris } } },
+      { $group: { _id: "$subject.uri", count: { $sum: 1 } } },
+    ]),
+    // Get authors
+    Promise.all(
+      authorDids.map(async (did) => {
+        const author = await db.models.Profile.findOne({ authorDid: did })
+          .lean();
+        return createProfileViewBasic(
+          did,
+          author?.authorHandle || "unknown.invalid",
+          db,
+        );
+      }),
+    ),
+    // Get video mappings
+    db.models.VideoMapping.find({
+      key: {
+        $in: posts
+          .filter((p) => p.embed?.$type === "so.sprk.embed.video")
+          .map((p) => `${p.authorDid}-${p.embed?.video?.ref.$link}`),
+      },
+    }).lean(),
+    // Get viewer likes
+    userDid
+      ? db.models.Like.find({ subject: { $in: postUris }, authorDid: userDid })
+        .lean()
+      : Promise.resolve([]),
+    // Get viewer reposts
+    userDid
+      ? db.models.Repost.find({
+        "subject.uri": { $in: postUris },
+        authorDid: userDid,
+      }).lean()
+      : Promise.resolve([]),
+    // Get viewer looks
+    userDid
+      ? db.models.Look.find({
+        "subject.uri": { $in: postUris },
+        authorDid: userDid,
+      }).lean()
+      : Promise.resolve([]),
+  ]);
+
+  const likeCountsMap = new Map(
+    likeCounts.map((item) => [item._id, item.count]),
+  );
+  const replyCountsMap = new Map(
+    replyCounts.map((item) => [item._id, item.count]),
+  );
+  const repostCountsMap = new Map(
+    repostCounts.map((item) => [item._id, item.count]),
+  );
+  const lookCountsMap = new Map(
+    lookCounts.map((item) => [item._id, item.count]),
+  );
+  const authorsMap = new Map(authors.map((author) => [author.did, author]));
+  const videoMappingsMap = new Map(
+    videoMappings.map((item) => [item.key, item]),
+  );
+  const viewerLikesMap = new Map(
+    viewerLikes.map((like) => [like.subject, like.uri]),
+  );
+  const viewerRepostsMap = new Map(
+    viewerReposts.map((repost: { subject: { uri: string }; uri: string }) => [
+      repost.subject.uri,
+      repost.uri,
+    ]),
+  );
+  const viewerLooksMap = new Map(
+    viewerLooks.map((look: { subject: string; uri: string }) => [
+      look.subject,
+      look.uri,
+    ]),
+  );
+
+  return posts.map((post) => {
+    const videoMapping = post.embed?.$type === "so.sprk.embed.video"
+      ? videoMappingsMap.get(
+        `${post.authorDid}-${post.embed.video?.ref.$link}`,
+      ) || null
+      : null;
+
+    const embed = transformEmbed(
+      post.embed,
+      post.authorDid,
+      videoMapping,
+    );
+
+    const labels = post.labels
+      ? Array.isArray(post.labels) ? (post.labels as Label[]) : undefined
+      : undefined;
+
+    const viewer: SoSprkFeedDefs.ViewerState = {};
+    if (userDid) {
+      viewer.like = viewerLikesMap.get(post.uri);
+      viewer.repost = viewerRepostsMap.get(post.uri);
+      viewer.look = viewerLooksMap.get(post.uri);
+    }
+
+    return {
+      uri: post.uri,
+      cid: post.cid,
+      author: authorsMap.get(post.authorDid)!,
+      record: {
+        $type: "so.sprk.feed.post",
+        text: post.text,
+        embed: post.embed as SoSprkFeedPost.MainRecord["embed"],
+        facets: post.facets,
+        langs: post.langs,
+        tags: post.tags,
+        createdAt: post.createdAt,
+      } satisfies SoSprkFeedPost.MainRecord,
+      embed: embed,
+      viewer,
+      replyCount: replyCountsMap.get(post.uri) || 0,
+      repostCount: repostCountsMap.get(post.uri) || 0,
+      likeCount: likeCountsMap.get(post.uri) || 0,
+      lookCount: lookCountsMap.get(post.uri) || 0,
+      indexedAt: post.indexedAt,
+      labels,
+    };
+  });
+}
+
 // Transform DB post to PostView format
 export async function transformPostToPostView(
   post: PostDocument,
-  ctx: AppContext,
+  db: Database,
   userDid?: string,
 ): Promise<SoSprkFeedDefs.PostView> {
-  // Get counts in parallel
-  const authorActor = await ctx.db.models.Actor.findOne({
-    did: post.authorDid,
-  });
-
-  if (!authorActor) {
-    throw new Error(`Author actor not found for DID: ${post.authorDid}`);
-  }
-
-  const [likeCount, replyCount, repostCount, lookCount, author] = await Promise
-    .all([
-      // Get like count
-      ctx.db.models.Like.countDocuments({ subject: post.uri }).catch(() => 0),
-
-      // Get reply count
-      ctx.db.models.Post.countDocuments({
-        "reply.parent.uri": post.uri,
-      }).catch(() => 0),
-
-      // Get repost count
-      ctx.db.models.Repost.countDocuments({
-        "subject.uri": post.uri,
-      }).catch(() => 0),
-
-      // Get look count
-      ctx.db.models.Look.countDocuments({
-        "subject.uri": post.uri,
-      }).catch(() => 0),
-
-      // Create the author object with stories
-      createProfileViewBasic(
-        post.authorDid,
-        ctx,
-      ).catch(() => {
-        return {
-          did: post.authorDid,
-          handle: "unknown",
-          displayName: "Unknown User",
-        };
-      }),
-    ]);
-
-  const embed = post.embed
-    ? transformEmbed(post.embed, post.authorDid, post.cid)
-    : undefined;
-
-  // Convert labels if any
-  const labels = post.labels
-    ? Array.isArray(post.labels) ? (post.labels as Label[]) : undefined
-    : undefined;
-
-  // Build viewer state with information about the current user's interactions with the post
-  const viewer: SoSprkFeedDefs.ViewerState = {};
-
-  // Only check user interactions if a userDid is provided
-  if (userDid) {
-    try {
-      // Check if the user has liked this post
-      const like = await ctx.db.models.Like.findOne({
-        subject: post.uri,
-        authorDid: userDid,
-      });
-      if (like) {
-        viewer.like = like.uri;
-      }
-
-      // Check if the user has reposted this post
-      const repost = await ctx.db.models.Repost.findOne({
-        "subject.uri": post.uri,
-        authorDid: userDid,
-      });
-      if (repost) {
-        viewer.repost = repost.uri;
-      }
-
-      // Check if the user has looked at this post
-      const look = await ctx.db.models.Look.findOne({
-        "subject.uri": post.uri,
-        authorDid: userDid,
-      });
-      if (look) {
-        viewer.look = look.uri;
-      }
-    } catch (error) {
-      console.error("Error checking user interactions", error);
-    }
-  }
-
-  const result = {
-    uri: post.uri,
-    cid: post.cid,
-    author,
-    record: {
-      $type: "so.sprk.feed.post",
-      text: post.text || "",
-      embed: post.embed as SoSprkFeedPost.MainRecord["embed"],
-      facets: post.facets || [],
-      langs: post.langs || [],
-      tags: post.tags || [],
-      createdAt: post.createdAt,
-    } satisfies SoSprkFeedPost.MainRecord,
-    embed: embed,
-    viewer: viewer && Object.keys(viewer).length > 0 ? viewer : undefined,
-    replyCount: replyCount || 0,
-    repostCount: repostCount || 0,
-    likeCount: likeCount || 0,
-    lookCount: lookCount || 0,
-    indexedAt: post.indexedAt,
-    labels,
-  };
-
-  return result;
+  const postViews = await transformPostsToPostViews([post], db, userDid);
+  return postViews[0];
 }

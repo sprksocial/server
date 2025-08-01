@@ -1,6 +1,6 @@
 import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { transformPostToPostView } from "../../../../utils/post-transformer.ts";
+import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts";
 import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
 import { OutputSchema } from "../../../../lexicon/types/so/sprk/feed/getAuthorFeed.ts";
 
@@ -136,19 +136,10 @@ export default function (server: Server, ctx: AppContext) {
         }
 
         // Transform posts to feed view posts
-        const feedViewPosts = await Promise.all(
-          [...pinnedPosts, ...posts].map(async (post) => {
-            const postView = await transformPostToPostView(
-              post,
-              ctx,
-              userDid,
-            );
-
-            return {
-              $type: "so.sprk.feed.defs#feedViewPost" as const,
-              post: postView,
-            };
-          }),
+        const feedViewPosts = await transformPostsToPostViews(
+          [...pinnedPosts, ...posts],
+          ctx,
+          userDid,
         );
 
         // Generate next cursor if there are more results
@@ -169,8 +160,11 @@ export default function (server: Server, ctx: AppContext) {
         }
 
         return {
-          encoding: "application/json" as const,
-          body: responseBody,
+          encoding: "application/json",
+          body: {
+            cursor: nextCursor,
+            feed: feedViewPosts.map((post) => ({ post })),
+          },
         };
       } catch (error) {
         if (error instanceof Error) {
