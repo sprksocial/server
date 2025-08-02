@@ -104,27 +104,48 @@ const notifsForDelete = (
 };
 
 const updateAggregates = async (db: Database, follow: IndexedFollow) => {
-  // Update followers count for the subject (count both types)
-  const followersCount = await db.models.Follow.countDocuments({
-    subject: follow.subject,
-  });
+  try {
+    // Update followers count for the subject (count both types)
+    const followersCount = await db.models.Follow.countDocuments({
+      subject: follow.subject,
+    });
 
-  await db.models.Profile.findOneAndUpdate(
-    { authorDid: follow.subject },
-    { followersCount },
-    { upsert: true, new: true },
-  );
+    // First check if profile exists to avoid creating one with null URI
+    const existingSubjectProfile = await db.models.Profile.findOne({
+      authorDid: follow.subject,
+    });
 
-  // Update follows count for the author (count both types)
-  const followsCount = await db.models.Follow.countDocuments({
-    authorDid: follow.authorDid,
-  });
+    if (existingSubjectProfile) {
+      // Only update existing profiles
+      await db.models.Profile.findOneAndUpdate(
+        { authorDid: follow.subject },
+        { followersCount },
+        { new: true },
+      );
+    }
 
-  await db.models.Profile.findOneAndUpdate(
-    { authorDid: follow.authorDid },
-    { followsCount },
-    { upsert: true, new: true },
-  );
+    // Update follows count for the author (count both types)
+    const followsCount = await db.models.Follow.countDocuments({
+      authorDid: follow.authorDid,
+    });
+
+    // First check if profile exists to avoid creating one with null URI
+    const existingAuthorProfile = await db.models.Profile.findOne({
+      authorDid: follow.authorDid,
+    });
+
+    if (existingAuthorProfile) {
+      // Only update existing profiles
+      await db.models.Profile.findOneAndUpdate(
+        { authorDid: follow.authorDid },
+        { followsCount },
+        { new: true },
+      );
+    }
+  } catch (error) {
+    console.error("Error updating follow aggregates:", error);
+    // Don't throw - allow processing to continue even if aggregates update fails
+  }
 };
 
 export type PluginType = RecordProcessor<FollowRecord, IndexedFollow>;

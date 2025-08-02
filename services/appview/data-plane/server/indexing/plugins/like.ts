@@ -144,16 +144,30 @@ const notifsForDelete = (
 };
 
 const updateAggregates = async (db: Database, like: IndexedLike) => {
-  // Update like count for the subject (count both types)
-  const likeCount = await db.models.Like.countDocuments({
-    subject: like.subject,
-  });
+  try {
+    // Update like count for the subject (count both types)
+    const likeCount = await db.models.Like.countDocuments({
+      subject: like.subject,
+    });
 
-  await db.models.Post.findOneAndUpdate(
-    { uri: like.subject },
-    { $set: { likeCount } },
-    { upsert: true, new: true },
-  );
+    // First check if post exists to avoid creating one with missing fields
+    const existingPost = await db.models.Post.findOne({
+      uri: like.subject,
+    });
+
+    if (existingPost) {
+      // Only update existing posts
+      await db.models.Post.findOneAndUpdate(
+        { uri: like.subject },
+        { $set: { likeCount } },
+        { new: true },
+      );
+    }
+    // We don't create a post if it doesn't exist, as we might lack required fields
+  } catch (error) {
+    console.error("Error updating like aggregates:", error);
+    // Don't throw - allow processing to continue even if aggregates update fails
+  }
 };
 
 export type PluginType = RecordProcessor<Like.Record, IndexedLike>;

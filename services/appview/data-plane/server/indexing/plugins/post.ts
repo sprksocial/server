@@ -368,16 +368,29 @@ const updateAggregates = async (db: Database, postIdx: IndexedPost) => {
     );
   }
 
-  // Update posts count for author
-  const postsCount = await db.models.Post.countDocuments({
-    authorDid: postIdx.post.authorDid,
-  });
+  try {
+    // Update posts count for author
+    const postsCount = await db.models.Post.countDocuments({
+      authorDid: postIdx.post.authorDid,
+    });
 
-  await db.models.Profile.findOneAndUpdate(
-    { authorDid: postIdx.post.authorDid },
-    { postsCount },
-    { upsert: true, new: true },
-  );
+    // First check if profile exists to avoid creating one with null URI
+    const existingProfile = await db.models.Profile.findOne({
+      authorDid: postIdx.post.authorDid,
+    });
+
+    if (existingProfile) {
+      // Only update existing profiles
+      await db.models.Profile.findOneAndUpdate(
+        { authorDid: postIdx.post.authorDid },
+        { postsCount },
+        { new: true },
+      );
+    }
+  } catch (error) {
+    console.error("Error updating post aggregates:", error);
+    // Don't throw - allow processing to continue even if aggregates update fails
+  }
 };
 
 export type PluginType = RecordProcessor<PostRecord, IndexedPost>;

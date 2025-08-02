@@ -450,7 +450,6 @@ export const generatorSchema = new Schema<GeneratorDocument>({
 
 // Add compound indexes for Generator
 generatorSchema.index({ authorDid: 1, createdAt: -1 });
-generatorSchema.index({ did: 1, createdAt: -1 });
 
 export interface TakedownDocument extends Document {
   targetUri: string;
@@ -534,10 +533,6 @@ export const actorSchema = new Schema<ActorDocument>({
   keys: { type: [String], required: true },
   services: { type: String, required: true },
 });
-
-// Add compound indexes for Actor
-actorSchema.index({ handle: "text" });
-actorSchema.index({ did: 1 }, { unique: true });
 
 export interface UserPreferenceDocument extends Document {
   userDid: string;
