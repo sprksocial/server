@@ -374,7 +374,7 @@ const updateAggregates = async (db: Database, postIdx: IndexedPost) => {
   });
 
   await db.models.Profile.findOneAndUpdate(
-    { did: postIdx.post.authorDid },
+    { authorDid: postIdx.post.authorDid },
     { postsCount },
     { upsert: true, new: true },
   );

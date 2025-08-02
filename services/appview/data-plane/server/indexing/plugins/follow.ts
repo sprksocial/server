@@ -110,7 +110,7 @@ const updateAggregates = async (db: Database, follow: IndexedFollow) => {
   });
 
   await db.models.Profile.findOneAndUpdate(
-    { did: follow.subject },
+    { authorDid: follow.subject },
     { followersCount },
     { upsert: true, new: true },
   );
@@ -121,7 +121,7 @@ const updateAggregates = async (db: Database, follow: IndexedFollow) => {
   });
 
   await db.models.Profile.findOneAndUpdate(
-    { did: follow.authorDid },
+    { authorDid: follow.authorDid },
     { followsCount },
     { upsert: true, new: true },
   );
