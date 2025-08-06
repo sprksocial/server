@@ -45,22 +45,21 @@ export class RecordProcessor<T, S> {
   db: Database;
 
   /**
-   * RecordProcessor with enhanced multi-collection validation support.
+   * RecordProcessor for handling multiple AT Protocol collections.
    *
-   * This processor can handle multiple lexIds and will:
-   * 1. Try to validate against the collection-specific lexId first (e.g., "follow" for "app.bsky.graph.follow")
-   * 2. Fall back to the first lexId if no collection-specific match is found
-   * 3. If validation fails and multiple lexIds are available, try all lexIds as fallbacks
-   * 4. Provide helpful error messages when validation fails
+   * This processor can handle multiple lexIds for similar record types:
+   * - Validates records directly against their URI collection (e.g., "app.bsky.graph.follow")
+   * - Uses lexIds list for routing to determine which processor handles which collections
+   * - Provides shared logic for similar concepts across different AT Protocol namespaces
    *
    * Example usage:
    * ```typescript
    * const processor = new RecordProcessor(db, background, {
-   *   lexIds: ["app.bsky.graph.follow", "app.bsky.graph.block"],
+   *   lexIds: ["app.bsky.graph.follow", "so.sprk.graph.follow"],
    *   // ... other params
    * });
    *
-   * // This will validate against "app.bsky.graph.follow" for "follow" collection
+   * // This will validate against "app.bsky.graph.follow" directly
    * await processor.insertRecord(uri, cid, obj, timestamp);
    * ```
    */
@@ -73,98 +72,30 @@ export class RecordProcessor<T, S> {
     this.collections = this.params.lexIds;
   }
 
-  matchesSchema(obj: unknown, collection?: string): obj is T {
-    let lexId: string | undefined;
-
-    if (collection) {
-      lexId = this.getLexIdForCollection(collection);
-    }
-
-    // If no collection-specific lexId found, use the first one
-    if (!lexId) {
-      lexId = this.params.lexIds[0];
-    }
-
-    // Try the primary lexId first
+  matchesSchema(obj: unknown, collection: string): obj is T {
+    // The collection IS the lexId - direct validation
     try {
-      lexicons.assertValidRecord(lexId, obj);
+      lexicons.assertValidRecord(collection, obj);
       return true;
     } catch {
-      // If collection-specific validation failed and we have multiple lexIds, try others
-      if (collection && this.params.lexIds.length > 1) {
-        for (const fallbackLexId of this.params.lexIds) {
-          if (fallbackLexId === lexId) continue; // Skip the one we already tried
-          try {
-            lexicons.assertValidRecord(fallbackLexId, obj);
-            return true;
-          } catch {
-            // Continue to next lexId
-          }
-        }
-      }
       return false;
     }
   }
 
-  assertValidRecord(obj: unknown, collection?: string): asserts obj is T {
-    let lexId: string | undefined;
-
-    if (collection) {
-      lexId = this.getLexIdForCollection(collection);
-    }
-
-    // If no collection-specific lexId found, or if validation fails, try all lexIds
-    if (!lexId) {
-      lexId = this.params.lexIds[0];
-    }
-
-    // Try the primary lexId first
+  assertValidRecord(obj: unknown, collection: string): asserts obj is T {
+    // The collection IS the lexId - direct validation
     try {
-      lexicons.assertValidRecord(lexId, obj);
-      return;
-    } catch {
-      // If collection-specific validation failed and we have multiple lexIds, try others
-      if (collection && this.params.lexIds.length > 1) {
-        for (const fallbackLexId of this.params.lexIds) {
-          if (fallbackLexId === lexId) continue; // Skip the one we already tried
-          try {
-            lexicons.assertValidRecord(fallbackLexId, obj);
-            return;
-          } catch {
-            // Continue to next lexId
-          }
-        }
-      }
-      // If we get here, none of the lexIds worked
+      lexicons.assertValidRecord(collection, obj);
+    } catch (err) {
       throw new Error(
-        `Record validation failed for collection: ${
-          collection || "unknown"
-        }. Tried lexIds: ${this.params.lexIds.join(", ")}`,
+        `Record validation failed for collection: ${collection}. Error: ${err}`,
       );
     }
-  }
-
-  // Helper method to get the appropriate lexid for a collection
-  private getLexIdForCollection(collection: string): string | undefined {
-    return this.params.lexIds.find((lexId) => {
-      // Extract collection from lexid (e.g., "follow" from "app.bsky.graph.follow")
-      const lexIdParts = lexId.split(".");
-      const lexIdCollection = lexIdParts[lexIdParts.length - 1]; // Get the last part as collection name
-      return lexIdCollection === collection;
-    });
   }
 
   // Helper method to get all available lexIds for debugging
   getAvailableLexIds(): string[] {
     return [...this.params.lexIds];
-  }
-
-  // Helper method to get available collections from lexIds
-  getAvailableCollections(): string[] {
-    return this.params.lexIds.map((lexId) => {
-      const lexIdParts = lexId.split(".");
-      return lexIdParts[lexIdParts.length - 1];
-    });
   }
 
   async insertRecord(
