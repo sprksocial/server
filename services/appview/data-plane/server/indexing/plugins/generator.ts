@@ -6,7 +6,6 @@ import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../index.ts";
 import { GeneratorDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
-import { normalizeObject } from "../../../../utils/embed-normalizer.ts";
 
 const lexIds = [lex.ids.AppBskyFeedGenerator];
 type IndexedFeedGenerator = GeneratorDocument;
@@ -18,6 +17,14 @@ const insertFn = async (
   obj: FeedGenerator.Record,
   timestamp: string,
 ): Promise<IndexedFeedGenerator | null> => {
+  // Extract and clean avatar to ensure it matches MediaRef format
+  const avatar = obj.avatar
+    ? {
+      $type: "blob",
+      ref: (obj.avatar as unknown as Record<string, unknown>)?.ref || null,
+    }
+    : null;
+
   const generator = {
     uri: uri.toString(),
     cid: cid.toString(),
@@ -26,7 +33,7 @@ const insertFn = async (
     displayName: obj.displayName,
     description: obj.description || null,
     descriptionFacets: obj.descriptionFacets || null,
-    avatar: normalizeObject(obj.avatar) || null,
+    avatar,
     acceptsInteractions: obj.acceptsInteractions || null,
     labels: null, // Will be populated by label processing
     contentMode: null, // Not used in Bluesky

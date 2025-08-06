@@ -431,7 +431,7 @@ export interface GeneratorDocument extends AuthoredDocument {
   displayName: string;
   description?: string;
   descriptionFacets?: Facet[];
-  avatar?: string;
+  avatar?: MediaRef;
   acceptsInteractions?: boolean;
   labels?: Label[];
   contentMode?: string;
@@ -442,7 +442,7 @@ export const generatorSchema = new Schema<GeneratorDocument>({
   displayName: { type: String, required: true },
   description: { type: String, required: false },
   descriptionFacets: { type: [Object], required: false },
-  avatar: { type: String, required: false },
+  avatar: { type: Object, required: false },
   acceptsInteractions: { type: Boolean, required: false },
   labels: { type: [Object], required: false },
   contentMode: { type: String, required: false },

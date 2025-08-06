@@ -21,7 +21,6 @@ const insertFn = async (
   obj: FollowRecord,
   timestamp: string,
 ): Promise<IndexedFollow | null> => {
-  // Determine the type based on the collection
   const followType = uri.collection === "app.bsky.graph.follow"
     ? "bsky"
     : "sprk";
@@ -49,7 +48,6 @@ const insertFn = async (
     );
     return insertedFollow;
   } catch (err) {
-    // Handle duplicate key errors gracefully
     const mongoError = err as { code?: number };
     if (mongoError.code === 11000) {
       return null; // Silently skip duplicates
@@ -67,7 +65,7 @@ const findDuplicate = async (
     authorDid: uri.host,
     subject: obj.subject,
     type: uri.collection === "app.bsky.graph.follow" ? "bsky" : "sprk",
-  }).lean();
+  }).select("uri").lean();
   return found ? new AtUri(found.uri) : null;
 };
 

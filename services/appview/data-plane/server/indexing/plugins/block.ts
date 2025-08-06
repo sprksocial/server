@@ -59,7 +59,7 @@ const findDuplicate = async (
   const found = await db.models.Block.findOne({
     authorDid: uri.host,
     subject: obj.subject,
-  }).lean();
+  }).select("uri").lean();
   return found ? new AtUri(found.uri) : null;
 };
 

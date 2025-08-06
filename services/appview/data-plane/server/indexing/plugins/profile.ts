@@ -24,12 +24,6 @@ const insertFn = async (
     | Record<string, unknown>
     | null;
 
-  console.log("DEBUG: Original profile obj:", JSON.stringify(obj, null, 2));
-  console.log(
-    "DEBUG: Normalized profile:",
-    JSON.stringify(normalizedProfile, null, 2),
-  );
-
   const profile = {
     uri: uri.toString(),
     cid: cid.toString(),

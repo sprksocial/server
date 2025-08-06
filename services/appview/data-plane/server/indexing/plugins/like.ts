@@ -17,9 +17,6 @@ const insertFn = async (
   obj: Like.Record,
   timestamp: string,
 ): Promise<IndexedLike | null> => {
-  // Determine the type based on the collection
-  const likeType = uri.collection === "app.bsky.feed.like" ? "bsky" : "sprk";
-
   // Handle via property safely with type assertion
   const viaObj = obj.via as { uri: string; cid: string } | undefined;
   const via = viaObj?.uri || null;
@@ -35,7 +32,6 @@ const insertFn = async (
     viaCid,
     createdAt: normalizeDatetimeAlways(obj.createdAt),
     indexedAt: timestamp,
-    type: likeType as "bsky" | "sprk",
   };
 
   // Use findOneAndUpdate with upsert on the compound key to handle potential duplicate key errors
@@ -44,7 +40,6 @@ const insertFn = async (
       {
         authorDid: like.authorDid,
         subject: like.subject,
-        type: like.type,
       },
       like,
       { upsert: true, new: true },
@@ -68,7 +63,6 @@ const findDuplicate = async (
   const found = await db.models.Like.findOne({
     authorDid: uri.host,
     subject: obj.subject.uri,
-    type: uri.collection === "app.bsky.feed.like" ? "bsky" : "sprk",
   }).lean();
   return found ? new AtUri(found.uri) : null;
 };

@@ -16,7 +16,7 @@ import { BackgroundQueue } from "../background.ts";
 import { Database } from "../index.ts";
 import { ActorDocument } from "../models.ts";
 import * as Block from "./plugins/block.ts";
-import * as FeedGenerator from "./plugins/generator.ts";
+import * as Generator from "./plugins/generator.ts";
 import * as Follow from "./plugins/follow.ts";
 import * as Like from "./plugins/like.ts";
 import * as Post from "./plugins/post.ts";
@@ -35,7 +35,7 @@ export class IndexingService {
     follow: Follow.PluginType;
     profile: Profile.PluginType;
     block: Block.PluginType;
-    feedGenerator: FeedGenerator.PluginType;
+    generator: Generator.PluginType;
     story: Story.PluginType;
     audio: Audio.PluginType;
     music: Music.PluginType;
@@ -53,7 +53,7 @@ export class IndexingService {
       follow: Follow.makePlugin(this.db, this.background),
       profile: Profile.makePlugin(this.db, this.background),
       block: Block.makePlugin(this.db, this.background),
-      feedGenerator: FeedGenerator.makePlugin(this.db, this.background),
+      generator: Generator.makePlugin(this.db, this.background),
       story: Story.makePlugin(this.db, this.background),
       audio: Audio.makePlugin(this.db, this.background),
       music: Music.makePlugin(this.db, this.background),
