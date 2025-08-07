@@ -195,10 +195,6 @@ export async function getProfiles(
 
       const actorDid = actorDidDoc.did;
 
-      // Index the actor
-      console.log(`Indexing actor ${actorDid}`);
-      await ctx.sub.indexingSvc.indexHandle(actorDid, now);
-
       // Fetch actor and profile documents in parallel
       const [actorDoc, profile] = await Promise.all([
         ctx.db.models.Actor.findOne({ did: actorDid }),
@@ -212,8 +208,8 @@ export async function getProfiles(
       if (!actorDoc) {
         try {
           ctx.logger.info(
-            { did: actorDid },
             "No actor found, attempting to index",
+            { did: actorDid },
           );
           await ctx.sub.indexingSvc.indexHandle(actorDid, now, true);
 
@@ -226,7 +222,7 @@ export async function getProfiles(
           finalActorDoc = refetchedActor;
           finalProfile = refetchedProfile;
         } catch (error) {
-          ctx.logger.error({ error, did: actorDid }, "Failed to index handle");
+          ctx.logger.error("Failed to index handle", { error, did: actorDid });
           return null;
         }
       }
@@ -238,8 +234,8 @@ export async function getProfiles(
       // Handle case where actor exists but profile doesn't
       if (!finalProfile) {
         ctx.logger.info(
-          { did: actorDid },
           "Actor found but no profile record, creating basic profile view",
+          { did: actorDid },
         );
 
         // Get handle
@@ -287,8 +283,8 @@ export async function getProfiles(
           .lean()
           .catch((error: Error) => {
             ctx.logger.warn(
-              { error, actorDid },
               "Failed to fetch stories for profile",
+              { error, actorDid },
             );
             return [];
           }),
@@ -446,7 +442,7 @@ export async function getProfiles(
 
       return profileView;
     } catch (error) {
-      ctx.logger.error({ error, actorParam }, "Failed to get profile");
+      ctx.logger.error("Failed to get profile", { error, actorParam });
       return null;
     }
   };

@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno run --allow-net --allow-env --env-file --allow-sys --allow-read --allow-ffi --inspect --watch main.ts",
+    "dev": "deno run -A --watch main.ts",
     "codegen": "deno run -A jsr:@sprk/lex-cli@^0.1.7 gen-server --hono-import hono --yes ./lexicon ../../lexicons",
     "start": "deno run --allow-net --allow-env --env-file --allow-sys --allow-read --allow-ffi main.ts",
     "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
@@ -10,6 +10,8 @@
     "@atproto/sync": "npm:@atproto/sync@^0.1.28",
     "@atproto/xrpc": "npm:@atproto/xrpc@^0.7.0",
     "@atproto/xrpc-server": "npm:@atproto/xrpc-server@^0.7.19",
+    "@logtape/logtape": "jsr:@logtape/logtape@^1.0.4",
+    "@logtape/pretty": "jsr:@logtape/pretty@^1.0.4",
     "dotenv": "npm:dotenv@^17.0.0",
     "hono": "jsr:@hono/hono@^4.7.10",
     "@std/encoding": "jsr:@std/encoding@1",
@@ -27,6 +29,7 @@
     "multiformats": "npm:multiformats@^9.9.0",
     "p-queue": "npm:p-queue@^8.1.0",
     "pino": "npm:pino@^8.19.0",
+    "pino-pretty": "npm:pino-pretty@^13.1.1",
     "ws": "npm:ws@^8.18.0"
   },
   "compilerOptions": {

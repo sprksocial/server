@@ -1,36 +1,44 @@
 import { IdResolver } from "@atproto/identity";
 import { WriteOpAction } from "@atproto/repo";
-import { Event as FirehoseEvent, Firehose, MemoryRunner } from "@atproto/sync";
+import { Event as FirehoseEvent, Firehose } from "@atproto/sync";
+import { MemoryRunner } from "../../utils/memory-runner.ts";
 import { BackgroundQueue } from "./background.ts";
 import { Database } from "./index.ts";
 import { IndexingService } from "./indexing/index.ts";
-import pino from "pino";
+import { getLogger, Logger } from "@logtape/logtape";
 
 export class RepoSubscription {
   firehose: Firehose;
   runner: MemoryRunner;
   background: BackgroundQueue;
   indexingSvc: IndexingService;
+  logger: Logger;
 
   constructor(
     public opts: { service: string; db: Database; idResolver: IdResolver },
   ) {
     const { service, db, idResolver } = opts;
-    this.background = new BackgroundQueue(db);
-    this.indexingSvc = new IndexingService(db, idResolver, this.background);
+    this.logger = getLogger(["appview", "subscription"]);
+    this.background = new BackgroundQueue(db, this.logger);
+    this.indexingSvc = new IndexingService(
+      db,
+      idResolver,
+      this.background,
+      this.logger,
+    );
 
     const { runner, firehose } = createFirehose({
       idResolver,
       service,
       indexingSvc: this.indexingSvc,
-      logger: this.opts.db.logger,
+      logger: this.logger,
     });
     this.runner = runner;
     this.firehose = firehose;
   }
 
   start() {
-    console.log("Starting firehose subscription");
+    this.logger.info("Starting firehose subscription");
     this.firehose.start();
   }
 
@@ -40,7 +48,7 @@ export class RepoSubscription {
       idResolver: this.opts.idResolver,
       service: this.opts.service,
       indexingSvc: this.indexingSvc,
-      logger: this.opts.db.logger,
+      logger: this.logger,
     });
     this.runner = runner;
     this.firehose = firehose;
@@ -53,9 +61,26 @@ export class RepoSubscription {
   }
 
   async destroy() {
-    await this.firehose.destroy();
-    await this.runner.destroy();
-    await this.background.processAll();
+    this.logger.info("Starting subscription destroy...");
+
+    try {
+      this.logger.info("Destroying firehose...");
+      await this.firehose.destroy();
+      this.logger.info("Firehose destroyed");
+
+      this.logger.info("Destroying runner...");
+      await this.runner.destroy();
+      this.logger.info("Runner destroyed");
+
+      this.logger.info("Processing remaining background tasks...");
+      await this.background.processAll();
+      this.logger.info("Background tasks processed");
+
+      this.logger.info("Subscription destroy completed");
+    } catch (error) {
+      this.logger.error("Error during subscription destroy", { error });
+      throw error;
+    }
   }
 }
 
@@ -63,7 +88,7 @@ const createFirehose = (opts: {
   idResolver: IdResolver;
   service: string;
   indexingSvc: IndexingService;
-  logger: pino.Logger;
+  logger: Logger;
 }) => {
   const { idResolver, service, indexingSvc, logger } = opts;
   const runner = new MemoryRunner();
@@ -71,7 +96,7 @@ const createFirehose = (opts: {
     idResolver,
     runner,
     service,
-    onError: (err: Error) => logger.error({ err }, "error in subscription"),
+    onError: (err: Error) => logger.error("error in subscription", { err }),
     handleEvent: async (evt: FirehoseEvent) => {
       if (evt.event === "identity") {
         await indexingSvc.indexHandle(evt.did, evt.time, true);

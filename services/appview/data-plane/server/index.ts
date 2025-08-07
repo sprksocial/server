@@ -1,10 +1,10 @@
 import mongoose, { Connection } from "mongoose";
-import { pino } from "pino";
 import { IdResolver, MemoryCache } from "@atproto/identity";
 import { env } from "../../utils/env.ts";
 import { DataPlaneClient, GetIdentityByDidResponse } from "../client/index.ts";
 import * as models from "./models.ts";
 import { getResultFromDoc } from "./util.ts";
+import { getLogger } from "@logtape/logtape";
 
 const HOUR = 60 * 60 * 1000;
 const DAY = HOUR * 24;
@@ -12,7 +12,7 @@ const DAY = HOUR * 24;
 export class Database implements DataPlaneClient {
   private connection!: Connection;
   public models!: models.DatabaseModels;
-  public logger = pino({ name: "database" });
+  public logger = getLogger(["appview", "database"]);
   public idResolver: IdResolver;
 
   constructor() {
@@ -130,7 +130,7 @@ export class Database implements DataPlaneClient {
 
       this.logger.info("Connected to MongoDB");
     } catch (error) {
-      this.logger.error(error, "Failed to connect to MongoDB");
+      this.logger.error("Failed to connect to MongoDB", { error });
       throw error;
     }
   }
@@ -147,7 +147,7 @@ export class Database implements DataPlaneClient {
     try {
       return await this.idResolver.handle.resolve(handle);
     } catch (err) {
-      this.logger.error({ err, handle }, "Failed to resolve handle");
+      this.logger.error("Failed to resolve handle", { err, handle });
       return undefined;
     }
   }
@@ -162,7 +162,7 @@ export class Database implements DataPlaneClient {
         handle: data.handle,
       };
     } catch (err) {
-      this.logger.error({ err, did }, "Failed to resolve DID");
+      this.logger.error("Failed to resolve DID", { err, did });
       return undefined;
     }
   }
@@ -185,7 +185,7 @@ export class Database implements DataPlaneClient {
       });
       return cursorState?.cursorValue || null;
     } catch (error) {
-      this.logger.error({ error }, "Failed to get cursor state");
+      this.logger.error("Failed to get cursor state", { error });
       return null;
     }
   }
@@ -202,8 +202,8 @@ export class Database implements DataPlaneClient {
       );
     } catch (error) {
       this.logger.error(
-        { error, cursorPosition },
         "Failed to save cursor state",
+        { error, cursorPosition },
       );
     }
   }

@@ -1,10 +1,10 @@
 import { AtUri } from "@atproto/syntax";
 import { CID } from "multiformats/cid";
-import { pino } from "pino";
 import { Database } from "../../data-plane/server/index.ts";
 import { PostDocument } from "../../data-plane/server/models.ts";
+import { getLogger } from "@logtape/logtape";
 
-const logger = pino({ name: "post-processor" });
+const logger = getLogger(["appview", "indexing"]);
 
 export type PostRecord = {
   text: string;
@@ -58,8 +58,8 @@ export function makePlugin(db: Database): PostPluginType {
         const actor = await db.models.Actor.findOne({ did: uri.hostname });
         if (!actor) {
           logger.warn(
-            { did: uri.hostname },
             "Actor not found when indexing post",
+            { did: uri.hostname },
           );
           return null;
         }
@@ -96,8 +96,8 @@ export function makePlugin(db: Database): PostPluginType {
         return post;
       } catch (error) {
         logger.error(
-          { error, uri: uri.toString(), cid: cid.toString() },
           "Error inserting post record",
+          { error, uri: uri.toString(), cid: cid.toString() },
         );
         return null;
       }
@@ -117,8 +117,8 @@ export function makePlugin(db: Database): PostPluginType {
         const actor = await db.models.Actor.findOne({ did: uri.hostname });
         if (!actor) {
           logger.warn(
-            { did: uri.hostname },
             "Actor not found when updating post",
+            { did: uri.hostname },
           );
           return null;
         }
@@ -148,8 +148,8 @@ export function makePlugin(db: Database): PostPluginType {
         return post;
       } catch (error) {
         logger.error(
-          { error, uri: uri.toString(), cid: cid.toString() },
           "Error updating post record",
+          { error, uri: uri.toString(), cid: cid.toString() },
         );
         return null;
       }
@@ -160,7 +160,7 @@ export function makePlugin(db: Database): PostPluginType {
         // Get the post to check author
         const post = await db.models.Post.findOne({ uri: uri.toString() });
         if (!post) {
-          logger.warn({ uri: uri.toString() }, "Post not found for deletion");
+          logger.warn("Post not found for deletion", { uri: uri.toString() });
           return;
         }
 
@@ -178,8 +178,8 @@ export function makePlugin(db: Database): PostPluginType {
         }
       } catch (error) {
         logger.error(
-          { error, uri: uri.toString() },
           "Error deleting post record",
+          { error, uri: uri.toString() },
         );
       }
     },

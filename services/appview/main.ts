@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
-import { pino } from "pino";
 import { Database } from "./data-plane/server/index.ts";
 import { env } from "./utils/env.ts";
 import { createAuthVerifier } from "./services/auth-verifier.ts";
@@ -20,10 +19,19 @@ import { DidResolver } from "@atproto/identity";
 import { AuthVerifier } from "./services/auth-verifier.ts";
 import { AuthRequiredError } from "@sprk/xrpc-server";
 import { RepoSubscription } from "./data-plane/server/subscription.ts";
+import { configure, getConsoleSink, getLogger, Logger } from "@logtape/logtape";
+import { prettyFormatter } from "@logtape/pretty";
+
+await configure({
+  sinks: { console: getConsoleSink({ formatter: prettyFormatter }) },
+  loggers: [
+    { category: "appview", lowestLevel: "info", sinks: ["console"] },
+  ],
+});
 
 export type AppContext = {
   db: Database;
-  logger: pino.Logger;
+  logger: Logger;
   resolver: BidirectionalResolver;
   serviceDid: string;
   didResolver: DidResolver;
@@ -47,7 +55,7 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
   app.use("*", async (c, next) => {
     await next();
     if (c.res.status === 500) {
-      ctx.logger.error(`Internal server error`, c.error);
+      ctx.logger.error(c.error?.message!);
       console.log(c.error);
     }
   });
@@ -104,7 +112,7 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
       }, 401);
     }
 
-    ctx.logger.error({ err }, "Server error");
+    ctx.logger.error({ err });
     return c.json({
       error: "Internal Server Error",
       message: "An unexpected error occurred",
@@ -117,7 +125,7 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
 // Setup function to create context and app
 export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
   // Setup logger and database
-  const appLogger = pino({ name: "server start" });
+  const appLogger = getLogger(["appview"]);
   const db = new Database();
   db.connect();
 

@@ -163,7 +163,7 @@ export default function (server: Server, ctx: AppContext) {
         if (error instanceof InvalidRequestError) {
           throw error;
         }
-        ctx.logger.error("Error fetching stories timeline:", error);
+        ctx.logger.error("Error fetching stories timeline:", { error });
         throw new InvalidRequestError("Failed to fetch stories timeline");
       }
     },

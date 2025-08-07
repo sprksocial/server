@@ -5,10 +5,7 @@ import { imageHandler } from "./imageHandler";
 import { videoHandler } from "./videoHandler";
 
 const logger = pino({
-  name: "cdn",
-  transport: {
-    target: "pino-pretty",
-  },
+  name: "cdn"
 });
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;

@@ -8,8 +8,15 @@ import {
 } from "./utils/id-resolver.ts";
 import { TakedownService } from "./services/takedown.ts";
 import { createAuthVerifier } from "./services/auth-verifier.ts";
-import { pino } from "pino";
 import { RepoSubscription } from "./data-plane/server/subscription.ts";
+import { configure, getConsoleSink, getLogger } from "@logtape/logtape";
+
+await configure({
+  sinks: { console: getConsoleSink() },
+  loggers: [
+    { category: "appview", lowestLevel: "debug", sinks: ["console"] },
+  ],
+});
 
 Deno.env.set("SERVICE_DID", "did:web:test");
 Deno.env.set("MOD_SERVICE_DID", "did:web:test");
@@ -21,7 +28,7 @@ Deno.env.set(
 
 // Create a mock context for testing without database
 function createMockContext(): AppContext {
-  const appLogger = pino({ name: "test" });
+  const appLogger = getLogger(["appview"]);
   const baseIdResolver = createIdResolver();
   const resolver = createBidirectionalResolver(baseIdResolver);
   const serviceDid = "did:web:test";

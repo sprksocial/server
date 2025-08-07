@@ -29,8 +29,8 @@ export default function (server: Server, ctx: AppContext) {
           actorDid = actor;
         } catch (error) {
           ctx.logger.warn(
-            { did: actor, error: (error as Error).message },
             "Failed to ensure valid DID",
+            { did: actor, error: (error as Error).message },
           );
           throw new XRPCError(400, "Invalid actor DID");
         }

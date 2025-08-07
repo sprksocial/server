@@ -26,6 +26,7 @@ import * as Story from "./plugins/story.ts";
 import * as Audio from "./plugins/audio.ts";
 import * as Music from "./plugins/music.ts";
 import { RecordProcessor } from "./processor.ts";
+import { Logger } from "@logtape/logtape";
 
 export class IndexingService {
   records: {
@@ -45,6 +46,7 @@ export class IndexingService {
     public db: Database,
     public idResolver: IdResolver,
     public background: BackgroundQueue,
+    public logger: Logger,
   ) {
     this.records = {
       post: Post.makePlugin(this.db, this.background),
@@ -61,7 +63,12 @@ export class IndexingService {
   }
 
   transact(txn: Database) {
-    return new IndexingService(txn, this.idResolver, this.background);
+    return new IndexingService(
+      txn,
+      this.idResolver,
+      this.background,
+      this.logger,
+    );
   }
 
   async indexRecord(
@@ -122,9 +129,9 @@ export class IndexingService {
       );
     } catch (err) {
       // Log the error but don't throw - this prevents the firehose from crashing
-      this.db.logger.warn(
-        { err, did, timestamp },
+      this.logger.warn(
         "Failed to index handle, skipping",
+        { err, did, timestamp },
       );
 
       // Still update the actor record with null handle to prevent repeated attempts
@@ -137,9 +144,9 @@ export class IndexingService {
           { upsert: true, new: true },
         );
       } catch (dbErr) {
-        this.db.logger.error(
-          { err: dbErr, did },
+        this.logger.error(
           "Failed to update actor record after handle resolution failure",
+          { err: dbErr, did },
         );
       }
     }
@@ -192,14 +199,14 @@ export class IndexingService {
           }
         } catch (err) {
           if (err instanceof ValidationError) {
-            this.db.logger.warn(
-              { did, commit, uri: uri.toString(), cid: cid.toString() },
+            this.logger.warn(
               "skipping indexing of invalid record",
+              { did, commit, uri: uri.toString(), cid: cid.toString() },
             );
           } else {
-            this.db.logger.error(
-              { err, did, commit, uri: uri.toString(), cid: cid.toString() },
+            this.logger.error(
               "skipping indexing due to error processing record",
+              { err, did, commit, uri: uri.toString(), cid: cid.toString() },
             );
           }
         }
@@ -284,9 +291,9 @@ export class IndexingService {
         return null;
       }
     } catch (err) {
-      this.db.logger.warn(
-        { err, did },
+      this.logger.warn(
         "Failed to check if actor is hosted, assuming not hosted",
+        { err, did },
       );
       return false;
     }
