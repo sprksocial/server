@@ -38,6 +38,18 @@ export class Database implements DataPlaneClient {
         autoIndex: true,
         autoCreate: true,
         dbName: DB_NAME,
+        maxPoolSize: env.MONGO_MAX_POOL_SIZE,
+      });
+
+      // Attach basic listeners for visibility
+      this.connection.on("connected", () => {
+        this.logger.info("MongoDB connection established");
+      });
+      this.connection.on("disconnected", () => {
+        this.logger.warn("MongoDB connection disconnected");
+      });
+      this.connection.on("error", (err) => {
+        this.logger.error("MongoDB connection error", { err });
       });
 
       // Initialize models
@@ -133,6 +145,23 @@ export class Database implements DataPlaneClient {
       this.logger.error("Failed to connect to MongoDB", { error });
       throw error;
     }
+  }
+
+  isConnected(): boolean {
+    return !!this.connection && this.connection.readyState === 1; // 1 = connected
+  }
+
+  async waitForConnection(timeoutMs = 30000, pollMs = 250): Promise<boolean> {
+    if (this.isConnected()) return true;
+    const start = Date.now();
+    return await new Promise((resolve) => {
+      const check = () => {
+        if (this.isConnected()) return resolve(true);
+        if (Date.now() - start >= timeoutMs) return resolve(false);
+        setTimeout(check, pollMs);
+      };
+      check();
+    });
   }
 
   async disconnect(): Promise<void> {

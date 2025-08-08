@@ -5,7 +5,10 @@ import type { BidirectionalResolver } from "./id-resolver";
 
 // Get logger instance from parent
 const logger = pino({
-  name: "cdn:image"
+  name: "cdn:image",
+  transport: {
+    target: "pino-pretty",
+  },
 });
 
 // Size dimensions for different size options

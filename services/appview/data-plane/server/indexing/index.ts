@@ -28,6 +28,10 @@ import * as Music from "./plugins/music.ts";
 import { RecordProcessor } from "./processor.ts";
 import { Logger } from "@logtape/logtape";
 
+const HANDLE_DEBOUNCE_MS = 60_000;
+const handleIndexDebounce = new Map<string, number>();
+const handleIndexInFlight = new Map<string, Promise<void>>();
+
 export class IndexingService {
   records: {
     post: Post.PluginType;
@@ -95,60 +99,88 @@ export class IndexingService {
   }
 
   async indexHandle(did: string, timestamp: string, force = false) {
-    const actor = await this.db.models.Actor.findOne({ did }).lean();
-    if (!force && !needsHandleReindex(actor, timestamp)) {
-      return;
+    const now = Date.now();
+
+    if (!force) {
+      // Coalesce concurrent calls for the same DID
+      const inflight = handleIndexInFlight.get(did);
+      if (inflight) {
+        await inflight;
+        return;
+      }
+      // Debounce frequent calls within a short window
+      const last = handleIndexDebounce.get(did) ?? 0;
+      if (now - last < HANDLE_DEBOUNCE_MS) {
+        return;
+      }
+      handleIndexDebounce.set(did, now);
     }
 
-    try {
-      const atpData = await this.idResolver.did.resolveAtprotoData(did, true);
-      const handleToDid = await this.idResolver.handle.resolve(atpData.handle);
-
-      const handle: string | null = did === handleToDid
-        ? atpData.handle.toLowerCase()
-        : null;
-
-      const actorWithHandle = handle !== null
-        ? await this.db.models.Actor.findOne({ handle }).lean()
-        : null;
-
-      // handle contention
-      if (handle && actorWithHandle && did !== actorWithHandle.did) {
-        await this.db.models.Actor.updateOne(
-          { did: actorWithHandle.did },
-          { handle: null },
-        );
+    const work = (async () => {
+      const actor = await this.db.models.Actor.findOne({ did }).lean();
+      if (!force && !needsHandleReindex(actor, timestamp)) {
+        return;
       }
 
-      const uri = `at://${did}/so.sprk.actor.profile`;
-      const actorInfo = { uri, handle, indexedAt: timestamp };
-      await this.db.models.Actor.findOneAndUpdate(
-        { did },
-        { did, ...actorInfo },
-        { upsert: true, new: true },
-      );
-    } catch (err) {
-      // Log the error but don't throw - this prevents the firehose from crashing
-      this.logger.warn(
-        "Failed to index handle, skipping",
-        { err, did, timestamp },
-      );
-
-      // Still update the actor record with null handle to prevent repeated attempts
-      const uri = `at://${did}/so.sprk.actor.profile`;
-      const actorInfo = { uri, handle: null, indexedAt: timestamp };
       try {
+        const atpData = await this.idResolver.did.resolveAtprotoData(did, true);
+        const handleToDid = await this.idResolver.handle.resolve(
+          atpData.handle,
+        );
+
+        const handle: string | null = did === handleToDid
+          ? atpData.handle.toLowerCase()
+          : null;
+
+        const actorWithHandle = handle !== null
+          ? await this.db.models.Actor.findOne({ handle }).lean()
+          : null;
+
+        // handle contention
+        if (handle && actorWithHandle && did !== actorWithHandle.did) {
+          await this.db.models.Actor.updateOne(
+            { did: actorWithHandle.did },
+            { handle: null },
+          );
+        }
+
+        const uri = `at://${did}/so.sprk.actor.profile`;
+        const actorInfo = { uri, handle, indexedAt: timestamp };
         await this.db.models.Actor.findOneAndUpdate(
           { did },
           { did, ...actorInfo },
           { upsert: true, new: true },
         );
-      } catch (dbErr) {
-        this.logger.error(
-          "Failed to update actor record after handle resolution failure",
-          { err: dbErr, did },
+      } catch (err) {
+        // Log the error but don't throw - this prevents the firehose from crashing
+        this.logger.warn(
+          "Failed to index handle, skipping",
+          { err, did, timestamp },
         );
+
+        // Still update the actor record with null handle to prevent repeated attempts
+        const uri = `at://${did}/so.sprk.actor.profile`;
+        const actorInfo = { uri, handle: null, indexedAt: timestamp };
+        try {
+          await this.db.models.Actor.findOneAndUpdate(
+            { did },
+            { did, ...actorInfo },
+            { upsert: true, new: true },
+          );
+        } catch (dbErr) {
+          this.logger.error(
+            "Failed to update actor record after handle resolution failure",
+            { err: dbErr, did },
+          );
+        }
       }
+    })();
+
+    handleIndexInFlight.set(did, work);
+    try {
+      await work;
+    } finally {
+      handleIndexInFlight.delete(did);
     }
   }
 

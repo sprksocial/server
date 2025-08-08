@@ -167,7 +167,7 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
 export function startServer() {
   const { app, ctx } = setupApp();
 
-  // Start server
+  // Start HTTP server immediately
   const { HOST, PORT } = env;
   Deno.serve({
     hostname: HOST,
@@ -177,22 +177,70 @@ export function startServer() {
     },
   }, app.fetch);
 
-  // Start jetstream subscription
-  ctx.sub.start();
+  // Start subscription only after DB is connected
+  let stopStartLoop = false;
+  let retryTimeoutId: number | undefined;
+  let retryResolve: (() => void) | null = null;
+  const startSubWhenReady = async () => {
+    ctx.logger.info(
+      "Waiting for MongoDB connection before starting subscription...",
+    );
+    let attempt = 0;
+    while (!stopStartLoop) {
+      attempt++;
+      const connected = await ctx.db.waitForConnection(30000);
+      if (connected) {
+        ctx.logger.info("MongoDB connected; starting firehose subscription");
+        ctx.sub.start();
+        break;
+      } else {
+        ctx.logger.error(
+          `MongoDB not connected after timeout (attempt ${attempt}); retrying in 5s...`,
+        );
+        await new Promise<void>((resolve) => {
+          retryResolve = () => {
+            resolve();
+            retryResolve = null;
+          };
+          retryTimeoutId = setTimeout(() => {
+            retryResolve = null;
+            resolve();
+          }, 5000);
+        });
+        retryTimeoutId = undefined;
+      }
+    }
+  };
+  startSubWhenReady(); // fire and forget
 
   // Handle shutdown
-  Deno.addSignalListener("SIGINT", async () => {
-    ctx.logger.info("Shutting down server");
-    await ctx.sub.destroy();
-    await ctx.db.disconnect();
+  const shutdown = async (signal: string) => {
+    ctx.logger.info(`Received ${signal}; shutting down...`);
+    stopStartLoop = true;
+    if (retryTimeoutId !== undefined) {
+      clearTimeout(retryTimeoutId);
+      retryTimeoutId = undefined;
+    }
+    if (retryResolve) {
+      retryResolve();
+      retryResolve = null;
+    }
+    try {
+      await ctx.sub.destroy();
+    } catch (e) {
+      ctx.logger.error("Error destroying subscription during shutdown", { e });
+    }
+    try {
+      await ctx.db.disconnect();
+    } catch (e) {
+      ctx.logger.error("Error disconnecting database during shutdown", { e });
+    }
+    ctx.logger.info("Shutdown complete");
     Deno.exit(0);
-  });
-  Deno.addSignalListener("SIGTERM", async () => {
-    ctx.logger.info("Shutting down server");
-    await ctx.sub.destroy();
-    await ctx.db.disconnect();
-    Deno.exit(0);
-  });
+  };
+
+  Deno.addSignalListener("SIGINT", () => shutdown("SIGINT"));
+  Deno.addSignalListener("SIGTERM", () => shutdown("SIGTERM"));
 }
 
 // Default export for backward compatibility (creates app without starting services)

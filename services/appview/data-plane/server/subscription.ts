@@ -6,6 +6,22 @@ import { BackgroundQueue } from "./background.ts";
 import { Database } from "./index.ts";
 import { IndexingService } from "./indexing/index.ts";
 import { getLogger, Logger } from "@logtape/logtape";
+import { env } from "../../utils/env.ts";
+
+const createErrorThrottler = (logger: Logger, intervalMs = 5000) => {
+  let lastLog = 0;
+  let suppressed = 0;
+  return (err: Error) => {
+    const now = Date.now();
+    if (now - lastLog > intervalMs) {
+      logger.error("error in subscription", { err, suppressed });
+      lastLog = now;
+      suppressed = 0;
+    } else {
+      suppressed++;
+    }
+  };
+};
 
 export class RepoSubscription {
   firehose: Firehose;
@@ -13,6 +29,7 @@ export class RepoSubscription {
   background: BackgroundQueue;
   indexingSvc: IndexingService;
   logger: Logger;
+  private firehoseRunning = false;
 
   constructor(
     public opts: { service: string; db: Database; idResolver: IdResolver },
@@ -37,13 +54,26 @@ export class RepoSubscription {
     this.firehose = firehose;
   }
 
-  start() {
+  async start() {
+    const connected = await this.indexingSvc.db.waitForConnection(30000);
+    if (!connected) {
+      throw new Error(
+        "Failed to connect to database during subscription restart",
+      );
+    }
     this.logger.info("Starting firehose subscription");
+    this.firehoseRunning = true;
     this.firehose.start();
   }
 
   async restart() {
     await this.destroy();
+    const connected = await this.indexingSvc.db.waitForConnection(30000);
+    if (!connected) {
+      throw new Error(
+        "Failed to connect to database during subscription restart",
+      );
+    }
     const { runner, firehose } = createFirehose({
       idResolver: this.opts.idResolver,
       service: this.opts.service,
@@ -52,7 +82,7 @@ export class RepoSubscription {
     });
     this.runner = runner;
     this.firehose = firehose;
-    this.start();
+    await this.start();
   }
 
   async processAll() {
@@ -61,22 +91,58 @@ export class RepoSubscription {
   }
 
   async destroy() {
-    this.logger.info("Starting subscription destroy...");
-
     try {
-      this.logger.info("Destroying firehose...");
-      await this.firehose.destroy();
-      this.logger.info("Firehose destroyed");
-
-      this.logger.info("Destroying runner...");
-      await this.runner.destroy();
-      this.logger.info("Runner destroyed");
-
-      this.logger.info("Processing remaining background tasks...");
-      await this.background.processAll();
-      this.logger.info("Background tasks processed");
-
-      this.logger.info("Subscription destroy completed");
+      if (this.firehoseRunning) {
+        await this.firehose.destroy();
+        this.firehoseRunning = false;
+      }
+      this.logger.info("Processing remaining runner tasks...");
+      if (env.NODE_ENV === "development") {
+        const timeoutMs = 10000;
+        // Runner destroy with timeout and proper timer cleanup
+        let destroyTimeoutId: number | undefined;
+        try {
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            destroyTimeoutId = setTimeout(
+              () => reject(new Error(`Timeout after ${timeoutMs}ms`)),
+              timeoutMs,
+            );
+          });
+          await Promise.race([this.runner.destroy(), timeoutPromise]);
+        } catch (e) {
+          this.logger.warn("Runner destroy timed out; continuing shutdown", {
+            e,
+          });
+        } finally {
+          if (destroyTimeoutId !== undefined) {
+            clearTimeout(destroyTimeoutId);
+            destroyTimeoutId = undefined;
+          }
+        }
+        // Background drain with timeout and proper timer cleanup
+        let bgTimeoutId: number | undefined;
+        try {
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            bgTimeoutId = setTimeout(
+              () => reject(new Error(`Timeout after ${timeoutMs}ms`)),
+              timeoutMs,
+            );
+          });
+          await Promise.race([this.background.processAll(), timeoutPromise]);
+        } catch (e) {
+          this.logger.warn("Runner destroy timed out; continuing shutdown", {
+            e,
+          });
+        } finally {
+          if (bgTimeoutId !== undefined) {
+            clearTimeout(bgTimeoutId);
+            bgTimeoutId = undefined;
+          }
+        }
+      } else {
+        await this.runner.processAll();
+        await this.background.processAll();
+      }
     } catch (error) {
       this.logger.error("Error during subscription destroy", { error });
       throw error;
@@ -84,19 +150,21 @@ export class RepoSubscription {
   }
 }
 
-const createFirehose = (opts: {
+function createFirehose(opts: {
   idResolver: IdResolver;
   service: string;
   indexingSvc: IndexingService;
   logger: Logger;
-}) => {
+}): { firehose: Firehose; runner: MemoryRunner } {
   const { idResolver, service, indexingSvc, logger } = opts;
-  const runner = new MemoryRunner();
+  logger.info("Creating firehose subscription", { service });
+  const runner = new MemoryRunner({ concurrency: env.RUNNER_CONCURRENCY });
+  const onError = createErrorThrottler(logger);
   const firehose = new Firehose({
     idResolver,
     runner,
     service,
-    onError: (err: Error) => logger.error("error in subscription", { err }),
+    onError,
     handleEvent: async (evt: FirehoseEvent) => {
       if (evt.event === "identity") {
         await indexingSvc.indexHandle(evt.did, evt.time, true);
@@ -153,4 +221,4 @@ const createFirehose = (opts: {
     ],
   });
   return { firehose, runner };
-};
+}

@@ -1,11 +1,12 @@
 import PQueue from "p-queue";
 import { Database } from "./index.ts";
 import { Logger } from "@logtape/logtape";
+import { env } from "../../utils/env.ts";
 
 // A simple queue for in-process, out-of-band/backgrounded work
 
 export class BackgroundQueue {
-  queue = new PQueue();
+  queue = new PQueue({ concurrency: env.BACKGROUND_CONCURRENCY });
   destroyed = false;
   private processAllInterval: number | null = null;
   private isProcessingAll = false;
@@ -47,53 +48,29 @@ export class BackgroundQueue {
   async processAll() {
     this.isProcessingAll = true;
 
-    // Log immediately when starting processAll
-    const initialPending = this.queue.size;
-    const initialRunning = this.queue.pending;
-    this.logger.info("Background queue starting processAll", {
-      pending: initialPending,
-      running: initialRunning,
-      total: initialPending + initialRunning,
-      mode: "processAll",
-      action: "starting",
-    });
-
     // Start logging queue progress every 10 seconds
     this.processAllInterval = setInterval(() => {
       if (!this.destroyed && this.isProcessingAll) {
         const pending = this.queue.size;
         const running = this.queue.pending;
 
-        this.logger.info("Background queue processing progress", {
-          pending,
-          running,
-          total: pending + running,
-          mode: "processAll",
-        });
-
         // Stop logging if queue is empty
         if (pending === 0 && running === 0) {
-          this.logger.info("Background queue processing completed", {
-            pending: 0,
-            running: 0,
-            total: 0,
-            mode: "processAll",
-            action: "completed",
-          });
           this.stopProcessAllLogging();
         }
       }
     }, 10000); // Log every 10 seconds
 
+    let timeoutId: number | undefined;
     try {
       // Add timeout protection to prevent hanging
       const processPromise = this.queue.onIdle();
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(
           () => reject(new Error("Background queue processing timeout")),
           30000,
-        )
-      );
+        );
+      });
 
       await Promise.race([processPromise, timeoutPromise]);
     } catch (error) {
@@ -104,6 +81,10 @@ export class BackgroundQueue {
       throw error;
     } finally {
       this.stopProcessAllLogging();
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId);
+        timeoutId = undefined;
+      }
     }
   }
 

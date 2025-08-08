@@ -68,7 +68,7 @@ export default function (server: Server, ctx: AppContext) {
         if (!record || (cid && record.cid !== cid)) {
           // For admins, provide more detailed information about what we tried to query
           if (includeTakedowns) {
-            ctx.logger.info({
+            ctx.logger.info("Admin record lookup failed", {
               uri,
               collection,
               did,
@@ -76,7 +76,7 @@ export default function (server: Server, ctx: AppContext) {
               cid,
               foundRecord: !!record,
               cidMatch: record ? (cid ? record.cid === cid : true) : false,
-            }, "Admin record lookup failed");
+            });
           }
           throw new InvalidRequestError(`Could not locate record: ${uri}`);
         }
