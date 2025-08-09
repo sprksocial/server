@@ -9,14 +9,7 @@ import {
 import { TakedownService } from "./services/takedown.ts";
 import { createAuthVerifier } from "./services/auth-verifier.ts";
 import { RepoSubscription } from "./data-plane/server/subscription.ts";
-import { configure, getConsoleSink, getLogger } from "@logtape/logtape";
-
-await configure({
-  sinks: { console: getConsoleSink() },
-  loggers: [
-    { category: "appview", lowestLevel: "debug", sinks: ["console"] },
-  ],
-});
+import { getLogger } from "@logtape/logtape";
 
 Deno.env.set("SERVICE_DID", "did:web:test");
 Deno.env.set("MOD_SERVICE_DID", "did:web:test");
