@@ -183,10 +183,7 @@ function createFirehose(opts: {
           indexingSvc.setCommitLastSeen(evt.did, evt.cid, evt.rev),
           indexingSvc.indexHandle(evt.did, evt.time),
         ]);
-      } else if (
-        evt.event === "create" || evt.event === "update" ||
-        evt.event === "delete"
-      ) {
+      } else {
         const indexFn = evt.event === "delete"
           ? indexingSvc.deleteRecord(evt.uri)
           : indexingSvc.indexRecord(
