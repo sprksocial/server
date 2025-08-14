@@ -3,186 +3,281 @@ import { AppContext } from "../../../../main.ts";
 import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts";
 import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
 import { OutputSchema } from "../../../../lexicon/types/so/sprk/feed/getAuthorFeed.ts";
+import { PostDocument } from "../../../../data-plane/server/models.ts";
+
+interface CursorData {
+  createdAt: string;
+  id: string;
+}
+
+interface BlockCheckResult {
+  isBlocked: boolean;
+  isBlocking: boolean;
+}
+
+// Helper function to parse cursor
+function parseCursor(cursor: string): CursorData {
+  try {
+    const decodedCursor = new TextDecoder().decode(decodeBase64(cursor));
+    const [timestamp, id] = decodedCursor.split("::");
+
+    if (!timestamp || !id) {
+      throw new Error("Invalid cursor format");
+    }
+
+    return { createdAt: timestamp, id };
+  } catch {
+    throw new Error("Invalid cursor format");
+  }
+}
+
+// Helper function to generate cursor
+function generateCursor(createdAt: string, id: string): string {
+  return encodeBase64(
+    new TextEncoder().encode(`${createdAt}::${id}`),
+  );
+}
+
+// Helper function to check block status
+async function checkBlockStatus(
+  ctx: AppContext,
+  userDid: string,
+  actorDid: string,
+): Promise<BlockCheckResult> {
+  const [userIsBlocked, userIsBlocking] = await Promise.all([
+    ctx.db.models.Block.findOne({
+      authorDid: actorDid,
+      subject: userDid,
+    }).lean(),
+    ctx.db.models.Block.findOne({
+      authorDid: userDid,
+      subject: actorDid,
+    }).lean(),
+  ]);
+
+  return {
+    isBlocked: !!userIsBlocked,
+    isBlocking: !!userIsBlocking,
+  };
+}
+
+// Helper function to build post query
+function buildPostQuery(
+  actorDid: string,
+  filter?: string,
+  cursor?: CursorData,
+): Record<string, unknown> {
+  const query: Record<string, unknown> = {
+    authorDid: actorDid,
+    reply: null,
+  };
+
+  // Add filter conditions
+  if (filter === "posts_with_media") {
+    query.$or = [
+      { "embed.$type": "so.sprk.embed.images" },
+      { "embed.$type": "so.sprk.embed.video" },
+    ];
+  } else if (filter === "posts_with_video") {
+    query["embed.$type"] = "so.sprk.embed.video";
+  }
+
+  // Add cursor-based pagination
+  if (cursor) {
+    const paginationConditions = [
+      { createdAt: { $lt: cursor.createdAt } },
+      { createdAt: cursor.createdAt, _id: { $lt: cursor.id } },
+    ];
+
+    if (query.$or) {
+      // If filter already uses $or, wrap everything in $and
+      query.$and = [
+        { $or: query.$or },
+        { $or: paginationConditions },
+      ];
+      delete query.$or;
+    } else {
+      query.$or = paginationConditions;
+    }
+  }
+
+  return query;
+}
+
+// Helper function to get pinned posts
+async function getPinnedPosts(
+  ctx: AppContext,
+  actorDid: string,
+): Promise<PostDocument[]> {
+  const profile = await ctx.db.models.Profile.findOne({
+    authorDid: actorDid,
+  }).lean();
+
+  if (!profile?.pinnedPost?.uri) {
+    return [];
+  }
+
+  const pinnedPost = await ctx.db.models.Post.findOne({
+    uri: profile.pinnedPost.uri,
+  }).lean();
+
+  return pinnedPost ? [pinnedPost] : [];
+}
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.feed.getAuthorFeed({
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth }) => {
-      // Get query parameters
-      const { actor, limit, cursor, filter, includePins } = params;
-      const userDid = auth.credentials.type === "standard"
-        ? auth.credentials.iss
-        : undefined;
-
-      // Validate required parameters
-      if (!actor) {
-        throw new Error("Actor is required");
-      }
-
-      // Validate limit
-      if (limit < 1 || limit > 100) {
-        throw new Error("Invalid limit: must be between 1 and 100");
-      }
-
-      // Resolve DID if handle is provided
-      let resolvedActorDid = actor;
-
       try {
-        if (!resolvedActorDid.startsWith("did:")) {
+        // Extract and validate parameters
+        const { actor, limit = 50, cursor, filter, includePins = false } =
+          params;
+        const userDid = auth.credentials.type === "standard"
+          ? auth.credentials.iss
+          : undefined;
+
+        // Validate required parameters
+        if (!actor) {
+          throw new Error("Actor parameter is required");
+        }
+
+        // Validate limit
+        if (limit < 1 || limit > 100) {
+          throw new Error("Limit must be between 1 and 100");
+        }
+
+        // Resolve actor DID
+        let resolvedActorDid = actor;
+        if (!actor.startsWith("did:")) {
           try {
             const didDoc = await ctx.resolver.resolveHandleToDidDoc(actor);
             resolvedActorDid = didDoc.did;
           } catch (error) {
             console.error("Failed to resolve handle:", error);
-            throw new Error("Invalid actor: could not resolve handle");
+            throw new Error("Could not resolve actor handle");
           }
         }
 
-        // Check if user is blocked or blocking the actor
+        // Check block status if user is authenticated
         if (userDid) {
-          const userIsBlocked = await ctx.db.models.Block.findOne({
-            authorDid: resolvedActorDid,
-            subject: userDid,
-          });
+          const { isBlocked, isBlocking } = await checkBlockStatus(
+            ctx,
+            userDid,
+            resolvedActorDid,
+          );
 
-          if (userIsBlocked) {
-            throw new Error("BlockedByActor");
+          if (isBlocked) {
+            return {
+              status: 400,
+              error: "BlockedByActor" as const,
+              message: "The requesting account is blocked by the actor",
+            };
           }
 
-          const userIsBlocking = await ctx.db.models.Block.findOne({
-            authorDid: userDid,
-            subject: resolvedActorDid,
-          });
-
-          if (userIsBlocking) {
-            throw new Error("BlockedActor");
+          if (isBlocking) {
+            return {
+              status: 400,
+              error: "BlockedActor" as const,
+              message: "The requesting account has blocked the actor",
+            };
           }
-        }
-
-        // Build query based on filter
-        type MongoQuery = {
-          authorDid: string;
-          reply: null;
-          $or?: Array<{ [key: string]: unknown }>;
-          [key: string]: unknown;
-        };
-
-        const query: MongoQuery = { authorDid: resolvedActorDid, reply: null };
-
-        if (filter === "posts_with_media") {
-          query.$or = [
-            { "embed.$type": "so.sprk.embed.images" },
-            { "embed.$type": "so.sprk.embed.video" },
-          ];
-        } else if (filter === "posts_with_video") {
-          query["embed.$type"] = "so.sprk.embed.video";
         }
 
         // Parse cursor if provided
-        let createdAtCursor;
-        let idCursor;
-
+        let cursorData: CursorData | undefined;
         if (cursor) {
-          try {
-            const decodedCursor = new TextDecoder().decode(
-              decodeBase64(cursor),
-            );
-            const [timestamp, id] = decodedCursor.split("::");
-            createdAtCursor = timestamp;
-            idCursor = id;
-          } catch {
-            throw new Error("Invalid cursor format");
-          }
+          cursorData = parseCursor(cursor);
         }
 
-        // Add cursor-based pagination
-        if (createdAtCursor && idCursor) {
-          query.$or = [
-            { createdAt: { $lt: createdAtCursor } },
-            { createdAt: createdAtCursor, _id: { $lt: idCursor } },
-          ];
-        }
-
-        // Get posts from database
+        // Build and execute query
+        const query = buildPostQuery(resolvedActorDid, filter, cursorData);
         const posts = await ctx.db.models.Post.find(query)
           .sort({ createdAt: -1, _id: -1 })
-          .limit(limit + 1) // Get one extra for cursor
+          .limit(limit + 1) // Get one extra for hasMore check
           .lean();
 
-        // Check if we have more results (for cursor)
+        // Check if there are more results
         const hasMore = posts.length > limit;
         if (hasMore) {
           posts.pop(); // Remove the extra item
         }
 
-        // Include pinned posts if requested
-        const pinnedPosts: typeof posts = [];
-        if (includePins) {
-          // Get profile to find pinned posts
-          const profile = await ctx.db.models.Profile.findOne({
-            authorDid: resolvedActorDid,
-          }).lean();
-
-          if (profile?.pinnedPost) {
-            const pinnedPostUri = profile.pinnedPost.uri;
-            const pinnedPost = await ctx.db.models.Post.findOne({
-              uri: pinnedPostUri,
-            }).lean();
-
-            if (pinnedPost) {
-              pinnedPosts.push(pinnedPost);
-            }
-          }
+        // Get pinned posts if requested (only on first page)
+        let pinnedPosts: PostDocument[] = [];
+        if (includePins && !cursor) {
+          pinnedPosts = await getPinnedPosts(ctx, resolvedActorDid);
         }
 
         // Transform posts to feed view posts
+        const allPosts = [...pinnedPosts, ...posts];
         const feedViewPosts = await transformPostsToPostViews(
-          [...pinnedPosts, ...posts],
+          allPosts,
           ctx,
           userDid,
         );
 
         // Generate next cursor if there are more results
-        let nextCursor;
+        let nextCursor: string | undefined;
         if (hasMore && posts.length > 0) {
           const lastPost = posts[posts.length - 1];
-          nextCursor = encodeBase64(
-            new TextEncoder().encode(`${lastPost.createdAt}::${lastPost._id}`),
+          nextCursor = generateCursor(
+            String(lastPost.createdAt),
+            String(lastPost._id),
           );
         }
 
-        const responseBody: OutputSchema = {
+        // Prepare response
+        const response: OutputSchema = {
           feed: feedViewPosts.map((post) => ({ post })),
         };
 
         if (nextCursor) {
-          responseBody.cursor = nextCursor;
+          response.cursor = nextCursor;
         }
 
         return {
           encoding: "application/json",
-          body: {
-            cursor: nextCursor,
-            feed: feedViewPosts.map((post) => ({ post })),
-          },
+          body: response,
         };
       } catch (error) {
+        // Handle specific error cases
         if (error instanceof Error) {
-          if (error.message === "BlockedByActor") {
+          const message = error.message;
+
+          if (message === "BlockedByActor" || message === "BlockedActor") {
             return {
               status: 400,
-              error: "BlockedByActor",
-              message: "The requesting account is blocked by the actor",
+              error: message as "BlockedByActor" | "BlockedActor",
+              message: message === "BlockedByActor"
+                ? "The requesting account is blocked by the actor"
+                : "The requesting account has blocked the actor",
             };
           }
-          if (error.message === "BlockedActor") {
+
+          if (message.includes("cursor") || message.includes("Cursor")) {
             return {
               status: 400,
-              error: "BlockedActor",
-              message: "The requesting account has blocked the actor",
+              message: "The provided cursor is invalid",
+            };
+          }
+
+          if (message.includes("limit") || message.includes("Limit")) {
+            return {
+              status: 400,
+              message: "Limit must be between 1 and 100",
+            };
+          }
+
+          if (message.includes("Actor") || message.includes("actor")) {
+            return {
+              status: 400,
+              message: "Invalid actor parameter or could not resolve handle",
             };
           }
         }
+
+        // Log unexpected errors and rethrow
+        console.error("Unexpected error in getAuthorFeed:", error);
         throw error;
       }
     },

@@ -1,58 +1,281 @@
-import type * as SoSprkFeedDefs from "../../../../lexicon/types/so/sprk/feed/defs.ts";
-import { OutputSchema as GetStoriesView } from "../../../../lexicon/types/so/sprk/feed/getStories.ts";
 import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
+import { OutputSchema } from "../../../../lexicon/types/so/sprk/feed/getStories.ts";
+import { transformStoriesToStoryViews } from "../../../../utils/story-transformer.ts";
 import { StoryDocument } from "../../../../data-plane/server/models.ts";
-import { transformStoryToStoryView } from "../../../../utils/story-transformer.ts";
 
-// Function to fetch stories by URIs
-async function getStories(
-  uris: string | string[],
+// Constants
+const MAX_STORIES_LIMIT = 25;
+const MAX_URI_LENGTH = 3000;
+
+// Helper function to validate URIs
+function validateUris(uris: string[]): { valid: string[]; invalid: string[] } {
+  const valid: string[] = [];
+  const invalid: string[] = [];
+
+  for (const uri of uris) {
+    if (typeof uri !== "string" || uri.length === 0) {
+      invalid.push(uri);
+      continue;
+    }
+
+    if (uri.length > MAX_URI_LENGTH) {
+      invalid.push(uri);
+      continue;
+    }
+
+    // Basic AT-URI validation
+    if (!uri.startsWith("at://")) {
+      invalid.push(uri);
+      continue;
+    }
+
+    valid.push(uri);
+  }
+
+  return { valid, invalid };
+}
+
+// Helper function to deduplicate URIs while preserving order
+function deduplicateUris(uris: string[]): string[] {
+  const seen = new Set<string>();
+  return uris.filter((uri) => {
+    if (seen.has(uri)) {
+      return false;
+    }
+    seen.add(uri);
+    return true;
+  });
+}
+
+// Helper function to check for blocked relationships
+async function checkBlockedStories(
   ctx: AppContext,
-): Promise<SoSprkFeedDefs.StoryView[]> {
-  if (!uris) {
-    return [];
+  stories: StoryDocument[],
+  userDid?: string,
+): Promise<Set<string>> {
+  if (!userDid || stories.length === 0) {
+    return new Set();
   }
 
-  const uriArray = Array.isArray(uris) ? uris : [uris];
+  const authorDids = [...new Set(stories.map((s) => s.authorDid))];
 
-  if (uriArray.length === 0) {
-    return [];
-  }
+  // Check if user is blocking any of the authors or is blocked by them
+  const [userBlocking, userBlocked] = await Promise.all([
+    ctx.db.models.Block.find({
+      authorDid: userDid,
+      subject: { $in: authorDids },
+    }).lean(),
+    ctx.db.models.Block.find({
+      authorDid: { $in: authorDids },
+      subject: userDid,
+    }).lean(),
+  ]);
 
-  const dbStories = await ctx.db.models.Story.find({
-    uri: { $in: uriArray },
-  }).lean();
+  const blockedAuthorDids = new Set([
+    ...userBlocking.map((b) => b.subject),
+    ...userBlocked.map((b) => b.authorDid),
+  ]);
 
-  // Transform each story to StoryView format
-  const storyViews = await Promise.all(
-    dbStories.map((story: StoryDocument) =>
-      transformStoryToStoryView(story, ctx)
-    ),
+  // Return URIs of stories from blocked authors
+  return new Set(
+    stories
+      .filter((s) => blockedAuthorDids.has(s.authorDid))
+      .map((s) => s.uri),
   );
+}
 
-  return storyViews;
+// Helper function to sort stories by original URI order
+function sortStoriesByUriOrder(
+  stories: StoryDocument[],
+  originalUris: string[],
+): StoryDocument[] {
+  const storyMap = new Map(stories.map((story) => [story.uri, story]));
+  const sortedStories: StoryDocument[] = [];
+
+  for (const uri of originalUris) {
+    const story = storyMap.get(uri);
+    if (story) {
+      sortedStories.push(story);
+    }
+  }
+
+  return sortedStories;
+}
+
+// Check if stories are expired (24 hours old)
+function filterExpiredStories(stories: StoryDocument[]): StoryDocument[] {
+  const twentyFourHoursAgo = new Date();
+  twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
+
+  return stories.filter((story) => {
+    const storyDate = new Date(story.indexedAt);
+    return storyDate >= twentyFourHoursAgo;
+  });
 }
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.feed.getStories({
     auth: ctx.authVerifier.standardOptional,
-    handler: async ({ params }) => {
-      const { uris } = params;
+    handler: async ({ params, auth }) => {
+      try {
+        const { uris } = params;
+        const userDid = auth.credentials.type === "standard"
+          ? auth.credentials.iss
+          : undefined;
 
-      if (!uris || uris.length === 0) {
+        // Validate input
+        if (!uris) {
+          return {
+            status: 400,
+            message: "URIs parameter is required",
+          };
+        }
+
+        // Ensure uris is an array
+        const uriArray = Array.isArray(uris) ? uris : [uris];
+
+        // Check if empty array
+        if (uriArray.length === 0) {
+          return {
+            encoding: "application/json",
+            body: { stories: [] } as OutputSchema,
+          };
+        }
+
+        // Enforce maximum limit
+        if (uriArray.length > MAX_STORIES_LIMIT) {
+          return {
+            status: 400,
+            message: `Too many URIs requested. Maximum is ${MAX_STORIES_LIMIT}`,
+          };
+        }
+
+        // Validate URIs
+        const { valid: validUris, invalid: invalidUris } = validateUris(
+          uriArray,
+        );
+
+        if (invalidUris.length > 0) {
+          console.warn(
+            `Invalid story URIs provided: ${
+              invalidUris.slice(0, 5).join(", ")
+            }${invalidUris.length > 5 ? "..." : ""}`,
+          );
+        }
+
+        if (validUris.length === 0) {
+          return {
+            encoding: "application/json",
+            body: { stories: [] } as OutputSchema,
+          };
+        }
+
+        // Deduplicate URIs while preserving order
+        const uniqueUris = deduplicateUris(validUris);
+
+        // Fetch stories from database with optimized query
+        const dbStories = await ctx.db.models.Story.find({
+          uri: { $in: uniqueUris },
+        })
+          .lean()
+          .exec();
+
+        if (dbStories.length === 0) {
+          return {
+            encoding: "application/json",
+            body: { stories: [] } as OutputSchema,
+          };
+        }
+
+        // Filter out expired stories (older than 24 hours)
+        const activeStories = filterExpiredStories(dbStories);
+
+        if (activeStories.length === 0) {
+          return {
+            encoding: "application/json",
+            body: { stories: [] } as OutputSchema,
+          };
+        }
+
+        // Check for blocked relationships
+        const blockedStoryUris = await checkBlockedStories(
+          ctx,
+          activeStories,
+          userDid,
+        );
+
+        // Filter out blocked stories
+        const accessibleStories = activeStories.filter((story) =>
+          !blockedStoryUris.has(story.uri)
+        );
+
+        if (accessibleStories.length === 0) {
+          return {
+            encoding: "application/json",
+            body: { stories: [] } as OutputSchema,
+          };
+        }
+
+        // Sort stories to match the original URI order
+        const sortedStories = sortStoriesByUriOrder(
+          accessibleStories,
+          uniqueUris,
+        );
+
+        // Transform stories to StoryView format using batch transformer
+        const storyViews = await transformStoriesToStoryViews(
+          sortedStories,
+          ctx,
+        );
+
+        const response: OutputSchema = {
+          stories: storyViews,
+        };
+
         return {
           encoding: "application/json",
-          body: { stories: [] } as GetStoriesView,
+          body: response,
+        };
+      } catch (error) {
+        // Log error for debugging
+        console.error("Error in getStories:", error);
+
+        // Handle specific error cases
+        if (error instanceof Error) {
+          const message = error.message;
+
+          // MongoDB connection errors
+          if (message.includes("connection") || message.includes("timeout")) {
+            return {
+              status: 503,
+              message: "Database temporarily unavailable",
+            };
+          }
+
+          // Validation errors
+          if (message.includes("validation") || message.includes("invalid")) {
+            return {
+              status: 400,
+              message: "Invalid request parameters",
+            };
+          }
+
+          // Rate limiting or resource errors
+          if (message.includes("limit") || message.includes("quota")) {
+            return {
+              status: 429,
+              message: "Rate limit exceeded",
+            };
+          }
+        }
+
+        // Generic server error for unexpected cases
+        return {
+          status: 500,
+          message: "Internal server error",
         };
       }
-
-      const stories = await getStories(uris, ctx);
-
-      return {
-        encoding: "application/json",
-        body: { stories } as GetStoriesView,
-      };
     },
   });
 }

@@ -135,6 +135,101 @@ export async function getProfileView(
 }
 
 /**
+ * Batch version of getProfileView for better performance
+ * Gets multiple profile views efficiently with minimal database calls
+ */
+export async function getProfileViews(
+  ctx: AppContext,
+  actorDids: string[],
+  viewerDid?: string,
+): Promise<ProfileView[]> {
+  if (!actorDids || actorDids.length === 0) {
+    return [];
+  }
+
+  const { db } = ctx;
+
+  // Batch fetch all profiles and actors
+  const [profiles, actors] = await Promise.all([
+    db.models.Profile.find({ authorDid: { $in: actorDids } }).lean(),
+    db.models.Actor.find({ did: { $in: actorDids } }).lean(),
+  ]);
+
+  // Create maps for efficient lookup
+  const profileMap = new Map(profiles.map((p) => [p.authorDid, p]));
+  const actorMap = new Map(actors.map((a) => [a.did, a]));
+
+  let followingMap = new Map();
+  let followedByMap = new Map();
+
+  // Batch fetch viewer state if viewerDid is provided
+  if (viewerDid) {
+    const [followingDocs, followedByDocs] = await Promise.all([
+      db.models.Follow.find({
+        authorDid: viewerDid,
+        subject: { $in: actorDids },
+      }).select("subject uri").lean(),
+      db.models.Follow.find({
+        authorDid: { $in: actorDids },
+        subject: viewerDid,
+      }).select("authorDid uri").lean(),
+    ]);
+
+    followingMap = new Map(followingDocs.map((f) => [f.subject, f.uri]));
+    followedByMap = new Map(followedByDocs.map((f) => [f.authorDid, f.uri]));
+  }
+
+  // Build profile views
+  const profileViews = await Promise.all(
+    actorDids.map(async (actorDid) => {
+      const profile = profileMap.get(actorDid);
+      const actor = actorMap.get(actorDid);
+
+      const handle = actor?.handle ??
+        (await ctx.resolver.resolveDidToHandle(actorDid)) ?? "unknown.invalid";
+
+      const baseView: ProfileView = {
+        $type: "so.sprk.actor.defs#profileView",
+        did: actorDid,
+        handle: handle,
+      };
+
+      if (viewerDid) {
+        const following = followingMap.get(actorDid);
+        const followedBy = followedByMap.get(actorDid);
+
+        if (following || followedBy) {
+          baseView.viewer = {
+            $type: "so.sprk.actor.defs#viewerState",
+            following,
+            followedBy,
+          };
+        }
+      }
+
+      if (profile) {
+        const avatarUrl = profile.avatar?.ref?.$link
+          ? `https://media.sprk.so/avatar/tiny/${profile.authorDid}/${profile.avatar.ref.$link}/webp`
+          : undefined;
+
+        return {
+          ...baseView,
+          displayName: profile.displayName,
+          description: profile.description,
+          avatar: avatarUrl,
+          indexedAt: profile.indexedAt,
+          createdAt: profile.createdAt,
+        };
+      }
+
+      return baseView;
+    }),
+  );
+
+  return profileViews;
+}
+
+/**
  * Get a single profile by actor identifier (handle or DID)
  */
 export async function getProfile(

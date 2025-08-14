@@ -20,10 +20,16 @@ import { AuthVerifier } from "./services/auth-verifier.ts";
 import { AuthRequiredError } from "@sprk/xrpc-server";
 import { RepoSubscription } from "./data-plane/server/subscription.ts";
 import { configure, getConsoleSink, getLogger, Logger } from "@logtape/logtape";
-import { prettyFormatter } from "@logtape/pretty";
+import { getPrettyFormatter } from "@logtape/pretty";
 
 await configure({
-  sinks: { console: getConsoleSink({ formatter: prettyFormatter }) },
+  sinks: {
+    console: getConsoleSink({
+      formatter: getPrettyFormatter({
+        properties: true,
+      }),
+    }),
+  },
   loggers: [
     { category: "appview", lowestLevel: "info", sinks: ["console"] },
   ],

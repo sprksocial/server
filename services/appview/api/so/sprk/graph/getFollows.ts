@@ -5,7 +5,10 @@ import { ensureValidDid, isValidHandle } from "@atproto/syntax";
 import { RootFilterQuery } from "mongoose";
 import { XRPCError } from "@sprk/xrpc-server";
 import { OutputSchema } from "../../../../lexicon/types/so/sprk/graph/getFollows.ts";
-import { getProfileView } from "../../../../utils/profile-helper.ts";
+import {
+  getProfileView,
+  getProfileViews,
+} from "../../../../utils/profile-helper.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.graph.getFollows({
@@ -51,26 +54,29 @@ export default function (server: Server, ctx: AppContext) {
         query._id = { $gt: cursor };
       }
 
-      // Get follows with pagination
-      const follows = await ctx.db.models.Follow.find(query)
-        .sort({ _id: 1 })
-        .limit(limit)
-        .lean();
+      // Get follows with pagination and subject profile concurrently
+      const [follows, subjectProfileView] = await Promise.all([
+        ctx.db.models.Follow.find(query)
+          .sort({ _id: 1 })
+          .limit(limit)
+          .lean(),
+        getProfileView(ctx, actorDid, viewerDid),
+      ]);
 
       // Get next cursor
       const nextCursor = follows.length === limit
         ? follows[follows.length - 1]._id.toString()
         : undefined;
 
-      // Get profile views for each follow
-      const profileViews = await Promise.all(
-        follows.map((follow: FollowDocument) =>
-          getProfileView(ctx, follow.subject, viewerDid)
-        ),
+      // Extract follow subject DIDs and batch fetch profile views
+      const followSubjectDids = follows.map((follow: FollowDocument) =>
+        follow.subject
       );
-
-      // Get subject profile if it exists
-      const subjectProfileView = await getProfileView(ctx, actorDid, viewerDid);
+      const profileViews = await getProfileViews(
+        ctx,
+        followSubjectDids,
+        viewerDid,
+      );
 
       const res = {
         encoding: "application/json",

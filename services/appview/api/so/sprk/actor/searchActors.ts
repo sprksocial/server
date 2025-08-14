@@ -1,8 +1,7 @@
 import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
-import type { Label } from "../../../../lexicon/types/com/atproto/label/defs.ts";
-import type * as SoSprkActorDefs from "../../../../lexicon/types/so/sprk/actor/defs.ts";
 import type * as SoSprkActorSearch from "../../../../lexicon/types/so/sprk/actor/searchActors.ts";
+import { getProfileViews } from "../../../../utils/profile-helper.ts";
 
 // Helper to escape user input for safe RegExp usage
 function escapeRegExp(str: string): string {
@@ -38,105 +37,89 @@ export default function (server: Server, ctx: AppContext) {
         }
       }
 
-      const filter: Record<string, unknown> = {};
-      const sort: { createdAt: -1 } = { createdAt: -1 };
-
       const escaped = escapeRegExp(q.trim());
       const regex = new RegExp(escaped, "i");
-      filter.$or = [
-        { displayName: regex },
-        { description: regex },
-        { handle: regex },
-      ];
 
-      const profiles = await ctx.db.models.Profile.find(filter)
-        .sort(sort)
-        .skip(skip)
-        .limit(limit)
-        .lean();
+      // Build aggregation pipeline to search both profiles and actors efficiently
+      const profilesPromise = ctx.db.models.Profile.aggregate([
+        {
+          $match: {
+            $or: [
+              { displayName: regex },
+              { description: regex },
+            ],
+          },
+        },
+        {
+          $lookup: {
+            from: "actors",
+            localField: "authorDid",
+            foreignField: "did",
+            as: "actor",
+          },
+        },
+        {
+          $match: {
+            "actor.0": { $exists: true }, // Only include profiles with valid actors
+          },
+        },
+        { $sort: { createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit },
+      ]);
 
-      // For handle search, exclude DIDs already found
-      const foundDids = profiles.map((p: { authorDid: string }) => p.authorDid);
-      const handleFilter = { ...filter, did: { $nin: foundDids } };
-      const handles = await ctx.db.models.Actor.find(handleFilter)
-        .sort(sort)
-        .skip(skip)
-        .limit(limit)
-        .lean();
+      // Also search by handle in actors
+      const actorsPromise = ctx.db.models.Actor.aggregate([
+        {
+          $match: {
+            handle: regex,
+          },
+        },
+        {
+          $lookup: {
+            from: "profiles",
+            localField: "did",
+            foreignField: "authorDid",
+            as: "profile",
+          },
+        },
+        { $sort: { createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit },
+      ]);
 
-      const handleProfiles = await ctx.db.models.Profile.find({
-        authorDid: { $in: handles.map((h: { did: string }) => h.did) },
-      }).lean();
+      const [profileResults, actorResults] = await Promise.all([
+        profilesPromise,
+        actorsPromise,
+      ]);
 
-      const fullProfiles = [...profiles, ...handleProfiles];
+      // Combine and deduplicate results
+      const seenDids = new Set<string>();
+      const allCandidates: string[] = [];
 
-      const actors: SoSprkActorDefs.ProfileView[] = (
-        await Promise.all(
-          fullProfiles.map(async (p) => {
-            const avatar = p.avatar
-              ? `https://media.sprk.so/avatar/tiny/${p.authorDid}/${
-                (p.avatar as { ref: { $link: string } }).ref.$link
-              }/webp`
-              : undefined;
-            const labels = Array.isArray(p.labels)
-              ? (p.labels as Label[])
-              : undefined;
-            const now = new Date().toISOString();
-            await ctx.sub.indexingSvc.indexHandle(p.authorDid, now);
-            const actor = await ctx.db.models.Actor.findOne({
-              did: p.authorDid,
-            });
-            if (!actor || !actor.handle) {
-              return undefined;
-            }
+      // Add profiles from profile search
+      for (const result of profileResults) {
+        if (!seenDids.has(result.authorDid)) {
+          seenDids.add(result.authorDid);
+          allCandidates.push(result.authorDid);
+        }
+      }
 
-            let viewer: SoSprkActorDefs.ViewerState | undefined = undefined;
-            if (userDid) {
-              const [follow, followedBy, block, blockedBy] = await Promise.all([
-                ctx.db.models.Follow.findOne({
-                  subject: p.authorDid,
-                  authorDid: userDid,
-                }),
-                ctx.db.models.Follow.findOne({
-                  subject: userDid,
-                  authorDid: p.authorDid,
-                }),
-                ctx.db.models.Block.findOne({
-                  subject: p.authorDid,
-                  authorDid: userDid,
-                }),
-                ctx.db.models.Block.findOne({
-                  subject: userDid,
-                  authorDid: p.authorDid,
-                }),
-              ]);
-              viewer = {};
-              if (follow) viewer.following = follow.uri;
-              if (followedBy) viewer.followedBy = followedBy.uri;
-              if (block) viewer.blocking = block.uri;
-              if (blockedBy) viewer.blockedBy = true;
-              if (Object.keys(viewer).length === 0) viewer = undefined;
-            }
+      // Add profiles from actor search
+      for (const result of actorResults) {
+        if (!seenDids.has(result.did) && result.profile?.[0]) {
+          seenDids.add(result.did);
+          allCandidates.push(result.did);
+        }
+      }
 
-            return {
-              $type: "so.sprk.actor.defs#profileView",
-              did: p.authorDid,
-              handle: actor.handle,
-              displayName: p.displayName,
-              description: p.description,
-              avatar,
-              indexedAt: p.indexedAt,
-              createdAt: p.createdAt,
-              labels,
-              viewer,
-            } as SoSprkActorDefs.ProfileView;
-          }),
-        )
-      ).filter(
-        (actor): actor is SoSprkActorDefs.ProfileView => actor !== undefined,
-      );
+      // Limit final results
+      const finalDids = allCandidates.slice(0, limit);
 
-      const nextCursor = profiles.length === limit
+      // Batch fetch profile views using the optimized function
+      const actors = await getProfileViews(ctx, finalDids, userDid);
+
+      const nextCursor = allCandidates.length === limit
         ? String(skip + limit)
         : undefined;
 

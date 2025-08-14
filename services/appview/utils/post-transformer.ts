@@ -23,12 +23,10 @@ export async function transformPostsToPostViews(
     likeCounts,
     replyCounts,
     repostCounts,
-    lookCounts,
     authors,
     videoMappings,
     viewerLikes,
     viewerReposts,
-    viewerLooks,
   ] = await Promise.all([
     // Get like counts
     ctx.db.models.Like.aggregate([
@@ -45,11 +43,7 @@ export async function transformPostsToPostViews(
       { $match: { "subject.uri": { $in: postUris } } },
       { $group: { _id: "$subject.uri", count: { $sum: 1 } } },
     ]),
-    // Get look counts
-    ctx.db.models.Look.aggregate([
-      { $match: { "subject.uri": { $in: postUris } } },
-      { $group: { _id: "$subject.uri", count: { $sum: 1 } } },
-    ]),
+
     // Get authors
     Promise.all(
       authorDids.map((did) => {
@@ -82,13 +76,6 @@ export async function transformPostsToPostViews(
         authorDid: userDid,
       }).lean()
       : Promise.resolve([]),
-    // Get viewer looks
-    userDid
-      ? ctx.db.models.Look.find({
-        "subject.uri": { $in: postUris },
-        authorDid: userDid,
-      }).lean()
-      : Promise.resolve([]),
   ]);
 
   const likeCountsMap = new Map(
@@ -100,9 +87,7 @@ export async function transformPostsToPostViews(
   const repostCountsMap = new Map(
     repostCounts.map((item) => [item._id, item.count]),
   );
-  const lookCountsMap = new Map(
-    lookCounts.map((item) => [item._id, item.count]),
-  );
+
   const authorsMap = new Map(authors.map((author) => [author.did, author]));
   const videoMappingsMap = new Map(
     videoMappings.map((item) => [item.key, item]),
@@ -114,12 +99,6 @@ export async function transformPostsToPostViews(
     viewerReposts.map((repost: { subject: { uri: string }; uri: string }) => [
       repost.subject.uri,
       repost.uri,
-    ]),
-  );
-  const viewerLooksMap = new Map(
-    viewerLooks.map((look: { subject: string; uri: string }) => [
-      look.subject,
-      look.uri,
     ]),
   );
 
@@ -144,7 +123,6 @@ export async function transformPostsToPostViews(
     if (userDid) {
       viewer.like = viewerLikesMap.get(post.uri);
       viewer.repost = viewerRepostsMap.get(post.uri);
-      viewer.look = viewerLooksMap.get(post.uri);
     }
 
     return {
@@ -165,7 +143,6 @@ export async function transformPostsToPostViews(
       replyCount: replyCountsMap.get(post.uri) || 0,
       repostCount: repostCountsMap.get(post.uri) || 0,
       likeCount: likeCountsMap.get(post.uri) || 0,
-      lookCount: lookCountsMap.get(post.uri) || 0,
       indexedAt: post.indexedAt,
       labels,
     };

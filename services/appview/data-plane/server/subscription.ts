@@ -8,21 +8,6 @@ import { IndexingService } from "./indexing/index.ts";
 import { getLogger, Logger } from "@logtape/logtape";
 import { env } from "../../utils/env.ts";
 
-const createErrorThrottler = (logger: Logger, intervalMs = 5000) => {
-  let lastLog = 0;
-  let suppressed = 0;
-  return (err: Error) => {
-    const now = Date.now();
-    if (now - lastLog > intervalMs) {
-      logger.error("error in subscription", { err, suppressed });
-      lastLog = now;
-      suppressed = 0;
-    } else {
-      suppressed++;
-    }
-  };
-};
-
 export class RepoSubscription {
   firehose: Firehose;
   runner: MemoryRunner;
@@ -159,12 +144,11 @@ function createFirehose(opts: {
   const { idResolver, service, indexingSvc, logger } = opts;
   logger.info("Creating firehose subscription", { service });
   const runner = new MemoryRunner({ concurrency: env.RUNNER_CONCURRENCY });
-  const onError = createErrorThrottler(logger);
   const firehose = new Firehose({
     idResolver,
     runner,
     service,
-    onError,
+    onError: (err: Error) => logger.error("error in subscription", { err }),
     handleEvent: async (evt: FirehoseEvent) => {
       if (evt.event === "identity") {
         await indexingSvc.indexHandle(evt.did, evt.time, true);

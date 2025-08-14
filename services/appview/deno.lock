@@ -1,71 +1,75 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@hono/hono@^4.7.10": "4.8.5",
+    "jsr:@hono/hono@^4.7.10": "4.9.1",
+    "jsr:@hono/hono@^4.9.1": "4.9.1",
     "jsr:@logtape/logtape@^1.0.4": "1.0.4",
-    "jsr:@logtape/pretty@^1.0.4": "1.0.4",
+    "jsr:@logtape/logtape@^1.1.0-dev.333+b25e634b": "1.1.0-dev.333+b25e634b",
+    "jsr:@logtape/pretty@^1.1.0-dev.333+b25e634b": "1.1.0-dev.333+b25e634b",
     "jsr:@sprk/xrpc-server@~0.1.5": "0.1.5",
-    "jsr:@std/assert@*": "1.0.13",
     "jsr:@std/encoding@*": "1.0.10",
-    "jsr:@std/encoding@1": "1.0.10",
-    "jsr:@std/internal@^1.0.6": "1.0.10",
-    "npm:@atproto/api@~0.14.9": "0.14.22",
+    "jsr:@std/encoding@^1.0.10": "1.0.10",
+    "jsr:@std/text@*": "1.0.16",
+    "npm:@atproto/api@~0.14.22": "0.14.22",
     "npm:@atproto/common@~0.4.11": "0.4.11",
-    "npm:@atproto/common@~0.4.8": "0.4.11",
     "npm:@atproto/crypto@~0.4.4": "0.4.4",
     "npm:@atproto/identity@~0.4.8": "0.4.8",
     "npm:@atproto/lexicon@~0.4.11": "0.4.12",
-    "npm:@atproto/lexicon@~0.4.8": "0.4.12",
-    "npm:@atproto/repo@~0.8.4": "0.8.5",
-    "npm:@atproto/sync@~0.1.28": "0.1.29",
+    "npm:@atproto/lexicon@~0.4.12": "0.4.12",
+    "npm:@atproto/repo@~0.8.5": "0.8.5",
+    "npm:@atproto/sync@*": "0.1.30",
+    "npm:@atproto/sync@~0.1.30": "0.1.30",
     "npm:@atproto/syntax@~0.3.4": "0.3.4",
-    "npm:@atproto/xrpc-server@~0.7.19": "0.7.19",
     "npm:@atproto/xrpc@0.7": "0.7.1",
+    "npm:@atproto/xrpc@~0.7.1": "0.7.1",
     "npm:@bufbuild/protobuf@1.5.0": "1.5.0",
-    "npm:@types/node@*": "22.15.15",
+    "npm:@types/node@*": "24.0.7",
     "npm:@types/node@24.0.7": "24.0.7",
-    "npm:dotenv@*": "17.2.0",
-    "npm:dotenv@17": "17.2.0",
+    "npm:dotenv@*": "17.2.1",
+    "npm:dotenv@^17.2.1": "17.2.1",
     "npm:express@^4.21.2": "4.21.2",
     "npm:http-errors@2": "2.0.0",
     "npm:jose@*": "6.0.12",
-    "npm:jose@^6.0.11": "6.0.12",
+    "npm:jose@^6.0.12": "6.0.12",
     "npm:key-encoder@^2.0.3": "2.0.3",
     "npm:lodash@*": "4.17.21",
-    "npm:mongoose@^8.12.1": "8.16.4",
+    "npm:mongoose@^8.17.1": "8.17.1",
     "npm:multiformats@^9.9.0": "9.9.0",
     "npm:p-queue@^8.1.0": "8.1.0",
     "npm:pino-pretty@^13.1.1": "13.1.1",
-    "npm:pino@^8.19.0": "8.21.0",
+    "npm:pino@^8.21.0": "8.21.0",
     "npm:rate-limiter-flexible@^2.4.1": "2.4.2",
     "npm:uint8arrays@*": "3.0.0",
     "npm:uint8arrays@3.0.0": "3.0.0",
     "npm:ws@^8.12.0": "8.18.3",
-    "npm:ws@^8.18.0": "8.18.3",
+    "npm:ws@^8.18.3": "8.18.3",
     "npm:zod@^3.23.8": "3.25.76"
   },
   "jsr": {
-    "@hono/hono@4.8.5": {
-      "integrity": "78f72e532f378e379915a7e1ae7bd8a171b02324bd37b70877fd35375e8c2d6b"
+    "@hono/hono@4.9.1": {
+      "integrity": "d8ad3b296b65eab1a6b34f8701bcbd425246aa3f0e3024029ccb89cbb727fabd"
     },
     "@logtape/logtape@1.0.4": {
       "integrity": "6ada87764d995b1033c352a17fd9e20b217f3672083bc2d8debe356eac03fe10"
     },
-    "@logtape/pretty@1.0.4": {
-      "integrity": "2c131a2135414df79d896ef6943f3643b335fb68e1857985fca89699d7580479",
+    "@logtape/logtape@1.1.0-dev.333+b25e634b": {
+      "integrity": "482814e7de5a3470cd614182681bc3e64435b56f424de34badee259503a40273"
+    },
+    "@logtape/pretty@1.1.0-dev.333+b25e634b": {
+      "integrity": "f9579c0ca9658c6424758024c26a6bd841b60c57ca0fe69dd6fda0289b6f3afe",
       "dependencies": [
-        "jsr:@logtape/logtape",
+        "jsr:@logtape/logtape@^1.1.0-dev.333+b25e634b",
         "npm:@types/node@24.0.7"
       ]
     },
     "@sprk/xrpc-server@0.1.5": {
       "integrity": "2ad3f3a8b8de8ef576280d522a33b65b1c444f692ffce2e5c9c1aefb39e62d90",
       "dependencies": [
-        "jsr:@hono/hono",
-        "npm:@atproto/common@~0.4.11",
+        "jsr:@hono/hono@^4.7.10",
+        "npm:@atproto/common",
         "npm:@atproto/crypto",
         "npm:@atproto/lexicon@~0.4.11",
-        "npm:@atproto/xrpc",
+        "npm:@atproto/xrpc@0.7",
         "npm:http-errors",
         "npm:rate-limiter-flexible",
         "npm:uint8arrays@3.0.0",
@@ -73,17 +77,11 @@
         "npm:zod"
       ]
     },
-    "@std/assert@1.0.13": {
-      "integrity": "ae0d31e41919b12c656c742b22522c32fb26ed0cba32975cb0de2a273cb68b29",
-      "dependencies": [
-        "jsr:@std/internal"
-      ]
-    },
     "@std/encoding@1.0.10": {
       "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
     },
-    "@std/internal@1.0.10": {
-      "integrity": "e3be62ce42cab0e177c27698e5d9800122f67b766a0bea6ca4867886cbde8cf7"
+    "@std/text@1.0.16": {
+      "integrity": "ddb9853b75119a2473857d691cf1ec02ad90793a2e8b4a4ac49d7354281a0cf8"
     }
   },
   "npm": {
@@ -159,15 +157,15 @@
         "zod"
       ]
     },
-    "@atproto/sync@0.1.29": {
-      "integrity": "sha512-tKIhbY4rfCCfinBapnGf7X276dron9A7NT7VFB1Wa9NqODjoJPGDBaRG8s9WmeeIknMgJquhRJOrYu0hQUupTQ==",
+    "@atproto/sync@0.1.30": {
+      "integrity": "sha512-IbMT/4dklCKy0pVMlrJff4CTdaX/sWwcUrMIxv/kurCzpSQXaC0JtiA0DRfZCIc9n7FMSX+/96vfUNgZttEbOA==",
       "dependencies": [
         "@atproto/common",
         "@atproto/identity",
         "@atproto/lexicon",
         "@atproto/repo",
         "@atproto/syntax@0.4.0",
-        "@atproto/xrpc-server@0.9.0",
+        "@atproto/xrpc-server",
         "multiformats",
         "p-queue@6.6.2",
         "ws"
@@ -179,25 +177,8 @@
     "@atproto/syntax@0.4.0": {
       "integrity": "sha512-b9y5ceHS8YKOfP3mdKmwAx5yVj9294UN7FG2XzP6V5aKUdFazEYRnR9m5n5ZQFKa3GNvz7de9guZCJ/sUTcOAA=="
     },
-    "@atproto/xrpc-server@0.7.19": {
-      "integrity": "sha512-YSCl/tU2NDykgDYslFSOYCr96esUgDwncFiADKL59/fyIFPLoT0qY8Uq/budpxUh0qPzjow4HHgVWESOaOpUmA==",
-      "dependencies": [
-        "@atproto/common",
-        "@atproto/crypto",
-        "@atproto/lexicon",
-        "@atproto/xrpc@0.7.1",
-        "cbor-x",
-        "express",
-        "http-errors",
-        "mime-types",
-        "rate-limiter-flexible",
-        "uint8arrays",
-        "ws",
-        "zod"
-      ]
-    },
-    "@atproto/xrpc-server@0.9.0": {
-      "integrity": "sha512-vREyUFx4EiOtPYfPHVF8x6vQThi/72ZkGSwxfFkFpUZp5PXCjagk3vFw0NH8GbbtQeSAPfdgrcZunfJJgLt4SQ==",
+    "@atproto/xrpc-server@0.9.1": {
+      "integrity": "sha512-AJfxsKrZgKL/5362Rc0oUEjlgpDCmY/soeyLHHjid8J6clbErAdJVCuFwW4T40aHGFY1J13a29ucwbSfOROx6w==",
       "dependencies": [
         "@atproto/common",
         "@atproto/crypto",
@@ -285,7 +266,7 @@
     "@types/bn.js@5.2.0": {
       "integrity": "sha512-DLbJ1BPqxvQhIGbeu8VbUC1DiAiahHtAYvA0ZEAa4P31F7IaArc8z3C3BRQdWX4mtLQuABG4yzp76ZrS02Ui1Q==",
       "dependencies": [
-        "@types/node@22.15.15"
+        "@types/node"
       ]
     },
     "@types/elliptic@6.4.18": {
@@ -294,16 +275,10 @@
         "@types/bn.js"
       ]
     },
-    "@types/node@22.15.15": {
-      "integrity": "sha512-R5muMcZob3/Jjchn5LcO8jdKwSCbzqmPB6ruBxMcf9kbxtniZHP327s6C37iOfuw8mbKK3cAQa7sEl7afLrQ8A==",
-      "dependencies": [
-        "undici-types@6.21.0"
-      ]
-    },
     "@types/node@24.0.7": {
       "integrity": "sha512-YIEUUr4yf8q8oQoXPpSlnvKNVKDQlPMWrmOcgzoduo7kvA2UF0/BwJ/eMKFTiTtkNL17I0M6Xe2tvwFU7be6iw==",
       "dependencies": [
-        "undici-types@7.8.0"
+        "undici-types"
       ]
     },
     "@types/webidl-conversions@7.0.3": {
@@ -467,8 +442,8 @@
     "detect-libc@2.0.4": {
       "integrity": "sha512-3UDv+G9CsCKO1WKMGw9fwq/SWJYbI0c5Y7LU1AXYoDdbhE2AHQ6N6Nb34sG8Fj7T5APy8qXDCKuuIHd1BR0tVA=="
     },
-    "dotenv@17.2.0": {
-      "integrity": "sha512-Q4sgBT60gzd0BB0lSyYD3xM4YxrXA9y4uBDof1JNYGzOXrQdQ6yX+7XIAqoFOGQFOTK1D3Hts5OllpxMDZFONQ=="
+    "dotenv@17.2.1": {
+      "integrity": "sha512-kQhDYKZecqnM0fCnzI5eIv5L4cAe/iRI+HqMbO/hbRdTAeXDG+M9FjipUxNfbARuEg4iHIbhnhs78BCHNbSxEQ=="
     },
     "dunder-proto@1.0.1": {
       "integrity": "sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==",
@@ -749,16 +724,16 @@
         "whatwg-url"
       ]
     },
-    "mongodb@6.17.0": {
-      "integrity": "sha512-neerUzg/8U26cgruLysKEjJvoNSXhyID3RvzvdcpsIi2COYM3FS3o9nlH7fxFtefTb942dX3W9i37oPfCVj4wA==",
+    "mongodb@6.18.0": {
+      "integrity": "sha512-fO5ttN9VC8P0F5fqtQmclAkgXZxbIkYRTUi1j8JO6IYwvamkhtYDilJr35jOPELR49zqCJgXZWwCtW7B+TM8vQ==",
       "dependencies": [
         "@mongodb-js/saslprep",
         "bson",
         "mongodb-connection-string-url"
       ]
     },
-    "mongoose@8.16.4": {
-      "integrity": "sha512-jslgdQ8pY2vcNSKPv3Dbi5ogo/NT8zcvf6kPDyD8Sdsjsa1at3AFAF0F5PT+jySPGSPbvlNaQ49nT9h+Kx2UDA==",
+    "mongoose@8.17.1": {
+      "integrity": "sha512-aodS4cacux5caoxB5ErEwRmrafIUsVRJxHnvP7URnSUnTenr32j1qBVV+KjYxryyLSisQkxglAFF69TNLeZTLg==",
       "dependencies": [
         "bson",
         "kareem",
@@ -1070,8 +1045,8 @@
         "safe-buffer"
       ]
     },
-    "strip-json-comments@5.0.2": {
-      "integrity": "sha512-4X2FR3UwhNUE9G49aIsJW5hRRR3GXGTBTZRMfv568O60ojM8HcWjV/VxAxCDW3SUND33O6ZY66ZuRcdkj73q2g=="
+    "strip-json-comments@5.0.3": {
+      "integrity": "sha512-1tB5mhVo7U+ETBKNf92xT4hrQa3pm0MZ0PQvuDnWgAAGHDsfp4lPSpiS6psrSiet87wyGPh9ft6wmhOMQ0hDiw=="
     },
     "thread-stream@2.7.0": {
       "integrity": "sha512-qQiRWsU/wvNolI6tbbCKd9iKaTnCXsTwVxhhKM6nctPdujTyztjlbUkUTUymidWcMnZ5pWR0ej4a0tjsW021vw==",
@@ -1104,9 +1079,6 @@
       "dependencies": [
         "multiformats"
       ]
-    },
-    "undici-types@6.21.0": {
-      "integrity": "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="
     },
     "undici-types@7.8.0": {
       "integrity": "sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw=="
@@ -1145,31 +1117,30 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@hono/hono@^4.7.10",
+      "jsr:@hono/hono@^4.9.1",
       "jsr:@logtape/logtape@^1.0.4",
-      "jsr:@logtape/pretty@^1.0.4",
+      "jsr:@logtape/pretty@^1.1.0-dev.333+b25e634b",
       "jsr:@sprk/xrpc-server@~0.1.5",
-      "jsr:@std/encoding@1",
-      "npm:@atproto/api@~0.14.9",
-      "npm:@atproto/common@~0.4.8",
+      "jsr:@std/encoding@^1.0.10",
+      "npm:@atproto/api@~0.14.22",
+      "npm:@atproto/common@~0.4.11",
       "npm:@atproto/crypto@~0.4.4",
       "npm:@atproto/identity@~0.4.8",
-      "npm:@atproto/lexicon@~0.4.8",
-      "npm:@atproto/repo@~0.8.4",
-      "npm:@atproto/sync@~0.1.28",
+      "npm:@atproto/lexicon@~0.4.12",
+      "npm:@atproto/repo@~0.8.5",
+      "npm:@atproto/sync@~0.1.30",
       "npm:@atproto/syntax@~0.3.4",
-      "npm:@atproto/xrpc-server@~0.7.19",
-      "npm:@atproto/xrpc@0.7",
-      "npm:dotenv@17",
+      "npm:@atproto/xrpc@~0.7.1",
+      "npm:dotenv@^17.2.1",
       "npm:express@^4.21.2",
-      "npm:jose@^6.0.11",
+      "npm:jose@^6.0.12",
       "npm:key-encoder@^2.0.3",
-      "npm:mongoose@^8.12.1",
+      "npm:mongoose@^8.17.1",
       "npm:multiformats@^9.9.0",
       "npm:p-queue@^8.1.0",
       "npm:pino-pretty@^13.1.1",
-      "npm:pino@^8.19.0",
-      "npm:ws@^8.18.0"
+      "npm:pino@^8.21.0",
+      "npm:ws@^8.18.3"
     ]
   }
 }

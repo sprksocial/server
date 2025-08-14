@@ -34,3 +34,48 @@ export async function transformStoryToStoryView(
     indexedAt: story.indexedAt,
   };
 }
+
+// Batch transform DB stories to StoryView format for optimal performance
+export async function transformStoriesToStoryViews(
+  stories: StoryDocument[],
+  ctx: AppContext,
+): Promise<SoSprkFeedDefs.StoryView[]> {
+  if (stories.length === 0) {
+    return [];
+  }
+
+  // Get unique author DIDs
+  const authorDids = [...new Set(stories.map((s) => s.authorDid))];
+
+  // Batch fetch all author profiles
+  const authors = await Promise.all(
+    authorDids.map((did) => createProfileViewBasic(did, ctx)),
+  );
+
+  // Create author map for quick lookup
+  const authorsMap = new Map(authors.map((author) => [author.did, author]));
+
+  // Transform all stories in parallel
+  return stories.map((story) => {
+    const authorView = authorsMap.get(story.authorDid)!;
+
+    const embedView = transformEmbed(story.media, story.authorDid, null, {
+      firstImageOnly: true,
+    });
+
+    return {
+      uri: story.uri,
+      cid: story.cid,
+      author: authorView,
+      media: embedView,
+      record: {
+        media: story.media,
+        sound: story.sound,
+        labels: story.labels,
+        tags: story.tags,
+        createdAt: story.createdAt,
+      },
+      indexedAt: story.indexedAt,
+    };
+  });
+}
