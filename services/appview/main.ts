@@ -142,7 +142,7 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
 
   // Services
   const sub = new RepoSubscription({
-    service: "wss://relay1.us-east.bsky.network",
+    service: env.RELAY_URL,
     db,
     idResolver: baseIdResolver,
   });

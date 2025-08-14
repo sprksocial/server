@@ -142,8 +142,12 @@ function createFirehose(opts: {
   logger: Logger;
 }): { firehose: Firehose; runner: MemoryRunner } {
   const { idResolver, service, indexingSvc, logger } = opts;
+  const startCursor = env.NODE_ENV === "production" ? 0 : undefined;
   logger.info("Creating firehose subscription", { service });
-  const runner = new MemoryRunner({ concurrency: env.RUNNER_CONCURRENCY });
+  const runner = new MemoryRunner({
+    startCursor,
+    concurrency: env.RUNNER_CONCURRENCY,
+  });
   const firehose = new Firehose({
     idResolver,
     runner,
