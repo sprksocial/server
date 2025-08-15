@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
-import { pino } from "pino";
 import { Database } from "./data-plane/server/index.ts";
 import { env } from "./utils/env.ts";
 import { createAuthVerifier } from "./services/auth-verifier.ts";
@@ -15,22 +14,41 @@ import {
 import { takedownFilterMiddleware } from "./services/takedown-filter.ts";
 import wellKnownRouter from "./utils/well-known.ts";
 import { TakedownService } from "./services/takedown.ts";
-import { IndexingService } from "./services/indexing.ts";
 import { BidirectionalResolver } from "./utils/id-resolver.ts";
 import { DidResolver } from "@atproto/identity";
 import { AuthVerifier } from "./services/auth-verifier.ts";
 import { AuthRequiredError } from "@sprk/xrpc-server";
-import startJetstreamIngester from "./ingester/index.ts";
+import { RepoSubscription } from "./data-plane/server/subscription.ts";
+import { configure, getConsoleSink, getLogger, Logger } from "@logtape/logtape";
+import { getPrettyFormatter } from "@logtape/pretty";
+
+await configure({
+  sinks: {
+    console: getConsoleSink({
+      formatter: getPrettyFormatter({
+        properties: true,
+        categoryStyle: "underline",
+        messageColor: "rgb(255, 255, 255)",
+        categoryColor: "rgb(255, 255, 255)",
+        messageStyle: "reset",
+      }),
+    }),
+  },
+  loggers: [
+    { category: "appview", lowestLevel: "info", sinks: ["console"] },
+    { category: ["logtape", "meta"], lowestLevel: "error", sinks: ["console"] },
+  ],
+});
 
 export type AppContext = {
   db: Database;
-  logger: pino.Logger;
+  logger: Logger;
   resolver: BidirectionalResolver;
   serviceDid: string;
   didResolver: DidResolver;
   takedownService: TakedownService;
-  indexingService: IndexingService;
   authVerifier: AuthVerifier;
+  sub: RepoSubscription;
 };
 
 export type AppEnv = {
@@ -48,7 +66,7 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
   app.use("*", async (c, next) => {
     await next();
     if (c.res.status === 500) {
-      ctx.logger.error(`Internal server error`, c.error);
+      ctx.logger.error(c.error?.message!);
       console.log(c.error);
     }
   });
@@ -63,8 +81,8 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
     c.env.serviceDid = ctx.serviceDid;
     c.env.didResolver = ctx.didResolver;
     c.env.takedownService = ctx.takedownService;
-    c.env.indexingService = ctx.indexingService;
     c.env.authVerifier = ctx.authVerifier;
+    c.env.sub = ctx.sub;
     await next();
   });
   app.use("*", takedownFilterMiddleware);
@@ -105,7 +123,7 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
       }, 401);
     }
 
-    ctx.logger.error({ err }, "Server error");
+    ctx.logger.error({ err });
     return c.json({
       error: "Internal Server Error",
       message: "An unexpected error occurred",
@@ -116,13 +134,11 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
 }
 
 // Setup function to create context and app
-export async function setupApp(): Promise<
-  { app: Hono<AppEnv>; ctx: AppContext }
-> {
+export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
   // Setup logger and database
-  const appLogger = pino({ name: "server start" });
+  const appLogger = getLogger(["appview"]);
   const db = new Database();
-  await db.connect();
+  db.connect();
 
   // DID and resolver setup
   const baseIdResolver = createIdResolver();
@@ -130,8 +146,12 @@ export async function setupApp(): Promise<
   const serviceDid = env.SERVICE_DID;
 
   // Services
+  const sub = new RepoSubscription({
+    service: env.RELAY_URL,
+    db,
+    idResolver: baseIdResolver,
+  });
   const takedownService = new TakedownService(db);
-  const indexingService = new IndexingService(db, resolver);
   const authVerifier = createAuthVerifier(db, {
     ownDid: serviceDid,
     alternateAudienceDids: [],
@@ -146,8 +166,8 @@ export async function setupApp(): Promise<
     serviceDid,
     didResolver: baseIdResolver.did,
     takedownService,
-    indexingService,
     authVerifier,
+    sub,
   };
 
   const app = createApp(ctx);
@@ -155,16 +175,10 @@ export async function setupApp(): Promise<
 }
 
 // Start server function
-export async function startServer(): Promise<void> {
-  const { app, ctx } = await setupApp();
+export function startServer() {
+  const { app, ctx } = setupApp();
 
-  // Start Jetstream ingester
-  startJetstreamIngester().catch((err) => {
-    ctx.logger.error({ err }, "Failed to start Jetstream ingester");
-    Deno.exit(1);
-  });
-
-  // Start server
+  // Start HTTP server immediately
   const { HOST, PORT } = env;
   Deno.serve({
     hostname: HOST,
@@ -174,25 +188,78 @@ export async function startServer(): Promise<void> {
     },
   }, app.fetch);
 
+  // Start subscription only after DB is connected
+  let stopStartLoop = false;
+  let retryTimeoutId: number | undefined;
+  let retryResolve: (() => void) | null = null;
+  const startSubWhenReady = async () => {
+    ctx.logger.info(
+      "Waiting for MongoDB connection before starting subscription...",
+    );
+    let attempt = 0;
+    while (!stopStartLoop) {
+      attempt++;
+      const connected = await ctx.db.waitForConnection(30000);
+      if (connected) {
+        ctx.logger.info("MongoDB connected; starting firehose subscription");
+        ctx.sub.start();
+        break;
+      } else {
+        ctx.logger.error(
+          `MongoDB not connected after timeout (attempt ${attempt}); retrying in 5s...`,
+        );
+        await new Promise<void>((resolve) => {
+          retryResolve = () => {
+            resolve();
+            retryResolve = null;
+          };
+          retryTimeoutId = setTimeout(() => {
+            retryResolve = null;
+            resolve();
+          }, 5000);
+        });
+        retryTimeoutId = undefined;
+      }
+    }
+  };
+  startSubWhenReady(); // fire and forget
+
   // Handle shutdown
-  Deno.addSignalListener("SIGINT", async () => {
-    ctx.logger.info("Shutting down server");
-    await ctx.db.disconnect();
+  const shutdown = async (signal: string) => {
+    ctx.logger.info(`Received ${signal}; shutting down...`);
+    stopStartLoop = true;
+    if (retryTimeoutId !== undefined) {
+      clearTimeout(retryTimeoutId);
+      retryTimeoutId = undefined;
+    }
+    if (retryResolve) {
+      retryResolve();
+      retryResolve = null;
+    }
+    try {
+      await ctx.sub.destroy();
+    } catch (e) {
+      ctx.logger.error("Error destroying subscription during shutdown", { e });
+    }
+    try {
+      await ctx.db.disconnect();
+    } catch (e) {
+      ctx.logger.error("Error disconnecting database during shutdown", { e });
+    }
+    ctx.logger.info("Shutdown complete");
     Deno.exit(0);
-  });
-  Deno.addSignalListener("SIGTERM", async () => {
-    ctx.logger.info("Shutting down server");
-    await ctx.db.disconnect();
-    Deno.exit(0);
-  });
+  };
+
+  Deno.addSignalListener("SIGINT", () => shutdown("SIGINT"));
+  Deno.addSignalListener("SIGTERM", () => shutdown("SIGTERM"));
 }
 
 // Default export for backward compatibility (creates app without starting services)
 let defaultApp: Hono<AppEnv> | null = null;
 
-export default async function getApp(): Promise<Hono<AppEnv>> {
+export default function getApp(): Hono<AppEnv> {
   if (!defaultApp) {
-    const result = await setupApp();
+    const result = setupApp();
     defaultApp = result.app;
   }
   return defaultApp;
@@ -200,5 +267,5 @@ export default async function getApp(): Promise<Hono<AppEnv>> {
 
 // Start the server if this file is run directly
 if (import.meta.main) {
-  await startServer();
+  startServer();
 }

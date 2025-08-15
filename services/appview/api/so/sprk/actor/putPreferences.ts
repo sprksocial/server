@@ -36,14 +36,14 @@ export default function (server: Server, ctx: AppContext) {
 
         // Queue indexing of Bsky follows if switched to bsky mode
         if (body.followMode === "bsky" && oldMode !== "bsky") {
-          ctx.indexingService.indexBSkyFollows(userDid).catch((error) =>
-            ctx.logger.error({ error, userDid }, "Failed to index bsky follows")
+          ctx.sub.indexingSvc.indexRepo(userDid).catch((error) =>
+            ctx.logger.error("Failed to index repo", { error, userDid })
           );
         }
 
         return;
       } catch (error) {
-        ctx.logger.error({ error, userDid }, "Failed to put preferences");
+        ctx.logger.error("Failed to put preferences", { error, userDid });
         throw error;
       }
     },

@@ -3,11 +3,11 @@ import { CID } from "multiformats/cid";
 import { Document } from "mongoose";
 import { BidirectionalResolver } from "../utils/id-resolver.ts";
 import { Database } from "../data-plane/server/index.ts";
-import { pino } from "pino";
 import * as Post from "./plugins/post.ts";
 import * as BskyFollow from "./plugins/bskyFollow.ts";
 import { Agent } from "@atproto/api";
-import { ActorDocument } from "../data-plane/server/index.ts";
+import { ActorDocument } from "../data-plane/server/models.ts";
+import { getLogger } from "@logtape/logtape";
 
 // Generic type for model processors
 type RecordProcessor = {
@@ -33,10 +33,7 @@ type RecordProcessor = {
  */
 export class IndexingService {
   private records: Record<string, RecordProcessor> = {};
-  private logger = pino({
-    name: "indexing-service",
-    level: Deno.env.get("NODE_ENV") === "development" ? "debug" : "info",
-  });
+  private logger = getLogger(["appview", "indexing"]);
 
   constructor(
     private db: Database,
@@ -75,8 +72,8 @@ export class IndexingService {
       const indexer = this.findIndexerForCollection(uri.collection);
       if (!indexer) {
         this.logger.debug(
-          { collection: uri.collection },
           "No indexer found for collection",
+          { collection: uri.collection },
         );
         return;
       }
@@ -88,8 +85,8 @@ export class IndexingService {
       }
     } catch (error) {
       this.logger.error(
-        { error, uri: uri.toString(), cid: cid.toString(), action },
         "Error indexing record",
+        { error, uri: uri.toString(), cid: cid.toString(), action },
       );
     }
   }
@@ -105,8 +102,8 @@ export class IndexingService {
       const indexer = this.findIndexerForCollection(uri.collection);
       if (!indexer) {
         this.logger.debug(
-          { collection: uri.collection },
           "No indexer found for collection",
+          { collection: uri.collection },
         );
         return;
       }
@@ -114,8 +111,8 @@ export class IndexingService {
       await indexer.deleteRecord(uri, cascading);
     } catch (error) {
       this.logger.error(
-        { error, uri: uri.toString() },
         "Error deleting record",
+        { error, uri: uri.toString() },
       );
     }
   }
@@ -178,7 +175,7 @@ export class IndexingService {
         { upsert: true },
       );
     } catch (error) {
-      this.logger.error({ error, did }, "Error indexing handle");
+      this.logger.error("Error indexing handle", { error, did });
     }
   }
 
@@ -196,7 +193,7 @@ export class IndexingService {
 
       // Validate that PDS endpoint exists and is a valid URL
       if (!didData.pds) {
-        this.logger.warn({ did }, "No PDS endpoint found in DID document");
+        this.logger.warn("No PDS endpoint found in DID document", { did });
         return;
       }
 
@@ -205,8 +202,8 @@ export class IndexingService {
         pdsUrl = new URL(didData.pds);
       } catch (urlError) {
         this.logger.error(
-          { did, pds: didData.pds, error: urlError },
           "Invalid PDS URL in DID document",
+          { did, pds: didData.pds, error: urlError },
         );
         return;
       }
@@ -214,13 +211,13 @@ export class IndexingService {
       const agent = new Agent(pdsUrl);
 
       // Debug: starting follow indexing
-      this.logger.debug({ did, pds: didData.pds }, "Starting indexBSkyFollows");
+      this.logger.debug("Starting indexBSkyFollows", { did, pds: didData.pds });
 
       const collection = "app.bsky.graph.follow";
       let cursor: string | undefined = undefined;
 
       do {
-        this.logger.debug({ cursor }, "Listing bsky follow records");
+        this.logger.debug("Listing bsky follow records", { cursor });
         const res = await agent.com.atproto.repo.listRecords({
           repo: did,
           collection,
@@ -229,13 +226,13 @@ export class IndexingService {
         });
         const { records, cursor: nextCursor } = res.data;
         this.logger.debug(
-          { count: records.length, nextCursor },
           "Fetched bsky follow records page",
+          { count: records.length, nextCursor },
         );
         for (const rec of records) {
           this.logger.debug(
-            { uri: rec.uri, cid: rec.cid },
             "Indexing bsky follow record",
+            { uri: rec.uri, cid: rec.cid },
           );
 
           const uri = new AtUri(rec.uri);
@@ -246,8 +243,8 @@ export class IndexingService {
       } while (cursor);
     } catch (error) {
       this.logger.error(
-        { error, did },
         "Error indexing BSky follows",
+        { error, did },
       );
     }
   }

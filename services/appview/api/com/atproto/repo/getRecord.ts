@@ -43,32 +43,13 @@ export default function (server: Server, ctx: AppContext) {
       // Create the URI
       const uri = AtUri.make(did, collection, rkey).toString();
 
-      // Get the record based on the collection type
       try {
-        let record = null;
-
-        // Check which collection to query based on the NSID
-        if (collection.includes("post") || collection.endsWith("post")) {
-          record = await ctx.db.models.Post.findOne({ uri }).lean();
-        } else if (collection.includes("repost")) {
-          record = await ctx.db.models.Repost.findOne({ uri }).lean();
-        } else if (collection.includes("like")) {
-          record = await ctx.db.models.Like.findOne({ uri }).lean();
-        } else if (collection.includes("look")) {
-          record = await ctx.db.models.Look.findOne({ uri }).lean();
-        } else if (collection.includes("profile")) {
-          record = await ctx.db.models.Profile.findOne({ authorDid: did })
-            .lean();
-        } else if (collection.includes("follow")) {
-          record = await ctx.db.models.Follow.findOne({ uri }).lean();
-        } else if (collection.includes("block")) {
-          record = await ctx.db.models.Block.findOne({ uri }).lean();
-        }
+        const record = await ctx.db.models.Record.findOne({ uri }).lean();
 
         if (!record || (cid && record.cid !== cid)) {
           // For admins, provide more detailed information about what we tried to query
           if (includeTakedowns) {
-            ctx.logger.info({
+            ctx.logger.info("Admin record lookup failed", {
               uri,
               collection,
               did,
@@ -76,9 +57,17 @@ export default function (server: Server, ctx: AppContext) {
               cid,
               foundRecord: !!record,
               cidMatch: record ? (cid ? record.cid === cid : true) : false,
-            }, "Admin record lookup failed");
+            });
           }
           throw new InvalidRequestError(`Could not locate record: ${uri}`);
+        }
+
+        // Parse the original record JSON
+        let recordValue;
+        try {
+          recordValue = record.json ? JSON.parse(record.json) : record;
+        } catch {
+          throw new InvalidRequestError(`Invalid record JSON: ${uri}`);
         }
 
         // Check if the record is subject to a takedown
@@ -93,7 +82,7 @@ export default function (server: Server, ctx: AppContext) {
         const response: OutputSchema & { takedown?: TakedownInfo } = {
           uri: uri,
           cid: record.cid,
-          value: record,
+          value: recordValue,
         };
 
         // Include takedown info for admins

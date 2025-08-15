@@ -3,7 +3,7 @@ import {
   EmbedImage,
   PostEmbed,
   VideoMappingDocument,
-} from "../data-plane/server/index.ts";
+} from "../data-plane/server/models.ts";
 import { env } from "./env.ts";
 
 interface ImageTransformOptions {
@@ -35,7 +35,7 @@ export function transformImagesEmbed(
         fullsize:
           `https://media.sprk.so/img/full/${authorDid}/${img.image.ref.$link}/webp`,
         alt: img.alt ?? "",
-        aspectRatio: img.aspectRatio,
+        aspectRatio: img.aspectRatio || undefined,
       }),
     ),
   } as const;

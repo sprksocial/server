@@ -32,6 +32,7 @@ PUBLIC_URL=http://localhost:3000
 SERVICE_DID=did:web:localhost
 
 # Keys, generate these with openssl ecparam --name secp256k1 --genkey --noout --outform DER | tail --bytes=+8 | head --bytes=32 | xxd --plain --cols 32
+# On Mac: openssl ecparam -name secp256k1 -genkey -noout -outform DER | tail --bytes=+8 | head --bytes=32 | xxd --plain --cols 32
 APPVIEW_K256_PRIVATE_KEY_HEX=keyhex
 ADMIN_PASSWORD=password
 ```

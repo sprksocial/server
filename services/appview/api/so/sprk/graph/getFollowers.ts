@@ -1,11 +1,14 @@
 import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { FollowDocument } from "../../../../data-plane/server/index.ts";
+import { FollowDocument } from "../../../../data-plane/server/models.ts";
 import { ensureValidDid, isValidHandle } from "@atproto/syntax";
 import { RootFilterQuery } from "mongoose";
 import { XRPCError } from "@sprk/xrpc-server";
 import { OutputSchema } from "../../../../lexicon/types/so/sprk/graph/getFollowers.ts";
-import { getProfileView } from "../../../../utils/profile-helper.ts";
+import {
+  getProfileView,
+  getProfileViews,
+} from "../../../../utils/profile-helper.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.graph.getFollowers({
@@ -29,8 +32,8 @@ export default function (server: Server, ctx: AppContext) {
           actorDid = actor;
         } catch (error) {
           ctx.logger.warn(
-            { did: actor, error: (error as Error).message },
             "Failed to ensure valid DID",
+            { did: actor, error: (error as Error).message },
           );
           throw new XRPCError(400, "Invalid actor DID");
         }
@@ -51,26 +54,25 @@ export default function (server: Server, ctx: AppContext) {
         query._id = { $gt: cursor };
       }
 
-      // Get followers with pagination
-      const followers = await ctx.db.models.Follow.find(query)
-        .sort({ _id: 1 })
-        .limit(limit)
-        .lean();
-
-      // Get profile views for each follower
-      const profileViews = await Promise.all(
-        followers.map((follow: FollowDocument) =>
-          getProfileView(ctx, follow.authorDid, viewerDid)
-        ),
-      );
+      // Get followers with pagination and subject profile concurrently
+      const [followers, subjectProfileView] = await Promise.all([
+        ctx.db.models.Follow.find(query)
+          .sort({ _id: 1 })
+          .limit(limit)
+          .lean(),
+        getProfileView(ctx, actorDid, viewerDid),
+      ]);
 
       // Get next cursor
       const nextCursor = followers.length === limit
         ? followers[followers.length - 1]._id.toString()
         : undefined;
 
-      // Get subject profile if it exists
-      const subjectProfileView = await getProfileView(ctx, actorDid, viewerDid);
+      // Extract follower DIDs and batch fetch profile views
+      const followerDids = followers.map((follow: FollowDocument) =>
+        follow.authorDid
+      );
+      const profileViews = await getProfileViews(ctx, followerDids, viewerDid);
 
       const res = {
         encoding: "application/json",

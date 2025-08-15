@@ -1,10 +1,10 @@
 import { Server } from "../../../../lexicon/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { transformPostToPostView } from "../../../../utils/post-transformer.ts";
+import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts";
 import * as SoSprkFeedDefs from "../../../../lexicon/types/so/sprk/feed/defs.ts";
 import { OutputSchema } from "../../../../lexicon/types/so/sprk/feed/searchPosts.ts";
 import { RootFilterQuery } from "mongoose";
-import { PostDocument } from "../../../../data-plane/server/index.ts";
+import { PostDocument } from "../../../../data-plane/server/models.ts";
 
 // Helper to escape user input for safe RegExp usage
 function escapeRegExp(str: string): string {
@@ -52,6 +52,9 @@ export default function (server: Server, ctx: AppContext) {
               localField: "uri",
               foreignField: "subject",
               as: "likes",
+              pipeline: [
+                { $project: { _id: 1 } }, // Only fetch _id for counting
+              ],
             },
           },
           {
@@ -84,9 +87,7 @@ export default function (server: Server, ctx: AppContext) {
           .lean();
       }
 
-      const postViews = await Promise.all(
-        posts.map((post) => transformPostToPostView(post, ctx.db, userDid)),
-      );
+      const postViews = await transformPostsToPostViews(posts, ctx, userDid);
 
       const filteredPostViews = postViews.filter(
         (v: SoSprkFeedDefs.PostView | null): v is SoSprkFeedDefs.PostView =>

@@ -10,6 +10,7 @@ export function createIdResolver() {
 }
 
 export interface BidirectionalResolver {
+  baseResolver: IdResolver;
   resolveDidToHandle(did: string): Promise<string>;
   resolveDidToDidDoc(did: string): Promise<AtprotoData>;
   resolveHandleToDidDoc(handle: string): Promise<AtprotoData>;
@@ -18,6 +19,8 @@ export interface BidirectionalResolver {
 
 export function createBidirectionalResolver(resolver: IdResolver) {
   return {
+    baseResolver: resolver,
+
     async resolveDidToHandle(did: string): Promise<string> {
       const didDoc = await resolver.did.resolveAtprotoData(did);
       const resolvedDid = await resolver.handle.resolve(didDoc.handle);

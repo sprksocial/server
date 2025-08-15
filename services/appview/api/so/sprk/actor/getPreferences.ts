@@ -19,7 +19,7 @@ export default function (server: Server, ctx: AppContext) {
           },
         };
       } catch (error) {
-        ctx.logger.error({ error, userDid }, "Failed to get preferences");
+        ctx.logger.error("Failed to get preferences", { error, userDid });
         throw error;
       }
     },
