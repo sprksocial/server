@@ -36,7 +36,7 @@ await configure({
   },
   loggers: [
     { category: "appview", lowestLevel: "info", sinks: ["console"] },
-    { category: ["logtape", "meta"], lowestLevel: "error", sinks: ["console"] }
+    { category: ["logtape", "meta"], lowestLevel: "error", sinks: ["console"] },
   ],
 });
 
