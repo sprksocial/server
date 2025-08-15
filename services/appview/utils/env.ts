@@ -1,7 +1,7 @@
 import * as dotenv from "npm:dotenv";
 import { envInt, envStr } from "@atproto/common";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 export const env = {
   NODE_ENV: envStr("NODE_ENV") ?? "development",
