@@ -1,7 +1,7 @@
 {
   "tasks": {
     "dev": "deno run -A --watch main.ts",
-    "codegen": "deno run -A jsr:@sprk/lex-cli@^0.2.0 gen-server --hono-import hono --yes ./lexicon ../../lexicons",
+    "codegen": "deno run -A jsr:@sprk/lex-cli@^0.2.1 gen-server --yes ./lexicon ../../lexicons",
     "start": "deno run --allow-net --allow-env --env-file --allow-sys --allow-read --allow-ffi main.ts",
     "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
   },

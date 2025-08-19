@@ -11,12 +11,11 @@ export type QueryParams = {
 export type InputSchema = undefined;
 
 export interface OutputSchema {
-  views:
-    (
-      | $Typed<SoSprkLabelerDefs.LabelerView>
-      | $Typed<SoSprkLabelerDefs.LabelerViewDetailed>
-      | { $type: string }
-    )[];
+  views: (
+    | $Typed<SoSprkLabelerDefs.LabelerView>
+    | $Typed<SoSprkLabelerDefs.LabelerViewDetailed>
+    | { $type: string }
+  )[];
 }
 
 export type HandlerInput = void;

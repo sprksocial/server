@@ -13,12 +13,11 @@ export type InputSchema = undefined;
 
 export interface OutputSchema {
   cursor?: string;
-  messages:
-    (
-      | $Typed<ChatBskyConvoDefs.MessageView>
-      | $Typed<ChatBskyConvoDefs.DeletedMessageView>
-      | { $type: string }
-    )[];
+  messages: (
+    | $Typed<ChatBskyConvoDefs.MessageView>
+    | $Typed<ChatBskyConvoDefs.DeletedMessageView>
+    | { $type: string }
+  )[];
 }
 
 export type HandlerInput = void;

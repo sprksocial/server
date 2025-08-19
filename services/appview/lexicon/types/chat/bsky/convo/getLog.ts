@@ -11,15 +11,14 @@ export type InputSchema = undefined;
 
 export interface OutputSchema {
   cursor?: string;
-  logs:
-    (
-      | $Typed<ChatBskyConvoDefs.LogBeginConvo>
-      | $Typed<ChatBskyConvoDefs.LogAcceptConvo>
-      | $Typed<ChatBskyConvoDefs.LogLeaveConvo>
-      | $Typed<ChatBskyConvoDefs.LogCreateMessage>
-      | $Typed<ChatBskyConvoDefs.LogDeleteMessage>
-      | { $type: string }
-    )[];
+  logs: (
+    | $Typed<ChatBskyConvoDefs.LogBeginConvo>
+    | $Typed<ChatBskyConvoDefs.LogAcceptConvo>
+    | $Typed<ChatBskyConvoDefs.LogLeaveConvo>
+    | $Typed<ChatBskyConvoDefs.LogCreateMessage>
+    | $Typed<ChatBskyConvoDefs.LogDeleteMessage>
+    | { $type: string }
+  )[];
 }
 
 export type HandlerInput = void;

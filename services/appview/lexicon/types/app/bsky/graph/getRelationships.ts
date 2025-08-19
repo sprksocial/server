@@ -14,12 +14,11 @@ export type InputSchema = undefined;
 
 export interface OutputSchema {
   actor?: string;
-  relationships:
-    (
-      | $Typed<AppBskyGraphDefs.Relationship>
-      | $Typed<AppBskyGraphDefs.NotFoundActor>
-      | { $type: string }
-    )[];
+  relationships: (
+    | $Typed<AppBskyGraphDefs.Relationship>
+    | $Typed<AppBskyGraphDefs.NotFoundActor>
+    | { $type: string }
+  )[];
 }
 
 export type HandlerInput = void;
