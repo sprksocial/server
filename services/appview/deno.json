@@ -1,7 +1,7 @@
 {
   "tasks": {
     "dev": "deno run -A --watch main.ts",
-    "codegen": "deno run -A jsr:@sprk/lex-cli@^0.1.7 gen-server --hono-import hono --yes ./lexicon ../../lexicons",
+    "codegen": "deno run -A jsr:@sprk/lex-cli@^0.2.1 gen-server --yes ./lexicon ../../lexicons",
     "start": "deno run --allow-net --allow-env --env-file --allow-sys --allow-read --allow-ffi main.ts",
     "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
   },
@@ -20,16 +20,11 @@
     "@atproto/identity": "npm:@atproto/identity@^0.4.8",
     "@atproto/lexicon": "npm:@atproto/lexicon@^0.4.12",
     "@atproto/syntax": "npm:@atproto/syntax@^0.3.4",
-    "@sprk/xrpc-server": "jsr:@sprk/xrpc-server@^0.1.5",
-    "express": "npm:express@^4.21.2",
+    "@sprk/xrpc-server": "jsr:@sprk/xrpc-server@^0.2.0",
     "jose": "npm:jose@^6.0.12",
-    "key-encoder": "npm:key-encoder@^2.0.3",
     "mongoose": "npm:mongoose@^8.17.1",
     "multiformats": "npm:multiformats@^9.9.0",
-    "p-queue": "npm:p-queue@^8.1.0",
-    "pino": "npm:pino@^8.21.0",
-    "pino-pretty": "npm:pino-pretty@^13.1.1",
-    "ws": "npm:ws@^8.18.3"
+    "p-queue": "npm:p-queue@^8.1.0"
   },
   "compilerOptions": {
     "jsx": "precompile",

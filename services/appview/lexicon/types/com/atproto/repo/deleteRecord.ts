@@ -1,11 +1,9 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type HonoRequest } from "hono";
-import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
 import type * as ComAtprotoRepoDefs from "./defs.ts";
 
-export type QueryParams = Record<never, never>;
+export type QueryParams = globalThis.Record<PropertyKey, never>;
 
 export interface InputSchema {
   /** The handle or DID of the repo (aka, current account). */
@@ -41,14 +39,4 @@ export interface HandlerError {
   error?: "InvalidSwap";
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough;
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA;
-  params: QueryParams;
-  input: HandlerInput;
-  req: HonoRequest;
-  resetRouteRateLimits: () => Promise<void>;
-};
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput;
+export type HandlerOutput = HandlerError | HandlerSuccess;

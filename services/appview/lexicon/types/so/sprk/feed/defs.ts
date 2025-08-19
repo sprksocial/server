@@ -319,7 +319,7 @@ export interface GeneratorView {
   contentMode?:
     | "so.sprk.feed.defs#contentModeUnspecified"
     | "so.sprk.feed.defs#contentModeVideo"
-    | (string & { __brand?: never });
+    | (string & globalThis.Record<PropertyKey, never>);
   indexedAt: string;
 }
 
@@ -432,7 +432,7 @@ export interface Interaction {
     | "so.sprk.feed.defs#interactionReply"
     | "so.sprk.feed.defs#interactionQuote"
     | "so.sprk.feed.defs#interactionShare"
-    | (string & { __brand?: never });
+    | (string & globalThis.Record<PropertyKey, never>);
   /** Context on a feed item that was originally supplied by the feed generator on getFeedSkeleton. */
   feedContext?: string;
 }

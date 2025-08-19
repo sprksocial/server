@@ -1,21 +1,18 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type HonoRequest } from "hono";
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
-import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "com.atproto.sync.listReposByCollection";
 
-export interface QueryParams {
+export type QueryParams = {
   collection: string;
   /** Maximum size of response set. Recommend setting a large maximum (1000+) when enumerating large DID lists. */
   limit: number;
   cursor?: string;
-}
-
+};
 export type InputSchema = undefined;
 
 export interface OutputSchema {
@@ -23,7 +20,7 @@ export interface OutputSchema {
   repos: (Repo)[];
 }
 
-export type HandlerInput = undefined;
+export type HandlerInput = void;
 
 export interface HandlerSuccess {
   encoding: "application/json";
@@ -36,17 +33,7 @@ export interface HandlerError {
   message?: string;
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough;
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA;
-  params: QueryParams;
-  input: HandlerInput;
-  req: HonoRequest;
-  resetRouteRateLimits: () => Promise<void>;
-};
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput;
+export type HandlerOutput = HandlerError | HandlerSuccess;
 
 export interface Repo {
   $type?: "com.atproto.sync.listReposByCollection#repo";

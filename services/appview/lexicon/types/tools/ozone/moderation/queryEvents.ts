@@ -1,11 +1,9 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type HonoRequest } from "hono";
-import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
 import type * as ToolsOzoneModerationDefs from "./defs.ts";
 
-export interface QueryParams {
+export type QueryParams = {
   /** The types of events (fully qualified string in the format of tools.ozone.moderation.defs#modEvent<name>) to filter by. If not specified, all events are returned. */
   types?: string[];
   createdBy?: string;
@@ -19,7 +17,10 @@ export interface QueryParams {
   /** If specified, only events where the subject belongs to the given collections will be returned. When subjectType is set to 'account', this will be ignored. */
   collections?: string[];
   /** If specified, only events where the subject is of the given type (account or record) will be returned. When this is set to 'account' the 'collections' parameter will be ignored. When includeAllUserRecords or subject is set, this will be ignored. */
-  subjectType?: "account" | "record" | (string & { __brand?: never });
+  subjectType?:
+    | "account"
+    | "record"
+    | (string & globalThis.Record<PropertyKey, never>);
   /** If true, events on all record types (posts, lists, profile etc.) or records from given 'collections' param, owned by the did are returned. */
   includeAllUserRecords: boolean;
   limit: number;
@@ -38,8 +39,7 @@ export interface QueryParams {
   reportTypes?: string[];
   policies?: string[];
   cursor?: string;
-}
-
+};
 export type InputSchema = undefined;
 
 export interface OutputSchema {
@@ -47,7 +47,7 @@ export interface OutputSchema {
   events: (ToolsOzoneModerationDefs.ModEventView)[];
 }
 
-export type HandlerInput = undefined;
+export type HandlerInput = void;
 
 export interface HandlerSuccess {
   encoding: "application/json";
@@ -60,14 +60,4 @@ export interface HandlerError {
   message?: string;
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough;
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA;
-  params: QueryParams;
-  input: HandlerInput;
-  req: HonoRequest;
-  resetRouteRateLimits: () => Promise<void>;
-};
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput;
+export type HandlerOutput = HandlerError | HandlerSuccess;

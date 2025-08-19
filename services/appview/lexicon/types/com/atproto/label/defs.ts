@@ -79,11 +79,23 @@ export interface LabelValueDefinition {
   /** The value of the label being defined. Must only include lowercase ascii and the '-' character ([a-z-]+). */
   identifier: string;
   /** How should a client visually convey this label? 'inform' means neutral and informational; 'alert' means negative and warning; 'none' means show nothing. */
-  severity: "inform" | "alert" | "none" | (string & { __brand?: never });
+  severity:
+    | "inform"
+    | "alert"
+    | "none"
+    | (string & globalThis.Record<PropertyKey, never>);
   /** What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing. */
-  blurs: "content" | "media" | "none" | (string & { __brand?: never });
+  blurs:
+    | "content"
+    | "media"
+    | "none"
+    | (string & globalThis.Record<PropertyKey, never>);
   /** The default setting for this label. */
-  defaultSetting: "ignore" | "warn" | "hide" | (string & { __brand?: never });
+  defaultSetting:
+    | "ignore"
+    | "warn"
+    | "hide"
+    | (string & globalThis.Record<PropertyKey, never>);
   /** Does the user need to have adult content enabled in order to configure this label? */
   adultOnly?: boolean;
   locales: (LabelValueDefinitionStrings)[];
@@ -136,4 +148,4 @@ export type LabelValue =
   | "nudity"
   | "nsfl"
   | "gore"
-  | (string & { __brand?: never });
+  | (string & globalThis.Record<PropertyKey, never>);

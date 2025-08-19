@@ -1,20 +1,17 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type HonoRequest } from "hono";
 import { type $Typed } from "../../../../util.ts";
-import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
 import type * as AppBskyFeedDefs from "./defs.ts";
 
-export interface QueryParams {
+export type QueryParams = {
   /** Reference (AT-URI) to post record. */
   uri: string;
   /** How many levels of reply depth should be included in response. */
   depth: number;
   /** How many levels of parent (and grandparent, etc) post to include. */
   parentHeight: number;
-}
-
+};
 export type InputSchema = undefined;
 
 export interface OutputSchema {
@@ -26,7 +23,7 @@ export interface OutputSchema {
   threadgate?: AppBskyFeedDefs.ThreadgateView;
 }
 
-export type HandlerInput = undefined;
+export type HandlerInput = void;
 
 export interface HandlerSuccess {
   encoding: "application/json";
@@ -40,14 +37,4 @@ export interface HandlerError {
   error?: "NotFound";
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough;
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA;
-  params: QueryParams;
-  input: HandlerInput;
-  req: HonoRequest;
-  resetRouteRateLimits: () => Promise<void>;
-};
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput;
+export type HandlerOutput = HandlerError | HandlerSuccess;

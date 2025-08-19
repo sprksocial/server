@@ -113,7 +113,11 @@ export function validateProfileAssociated<V>(v: V) {
 
 export interface ProfileAssociatedChat {
   $type?: "so.sprk.actor.defs#profileAssociatedChat";
-  allowIncoming: "all" | "none" | "following" | (string & { __brand?: never });
+  allowIncoming:
+    | "all"
+    | "none"
+    | "following"
+    | (string & globalThis.Record<PropertyKey, never>);
 }
 
 const hashProfileAssociatedChat = "profileAssociatedChat";
@@ -207,7 +211,7 @@ export interface ContentLabelPref {
     | "show"
     | "warn"
     | "hide"
-    | (string & { __brand?: never });
+    | (string & globalThis.Record<PropertyKey, never>);
 }
 
 const hashContentLabelPref = "contentLabelPref";
@@ -223,7 +227,11 @@ export function validateContentLabelPref<V>(v: V) {
 export interface SavedFeed {
   $type?: "so.sprk.actor.defs#savedFeed";
   id: string;
-  type: "feed" | "list" | "timeline" | (string & { __brand?: never });
+  type:
+    | "feed"
+    | "list"
+    | "timeline"
+    | (string & globalThis.Record<PropertyKey, never>);
   value: string;
   pinned: boolean;
 }
@@ -324,7 +332,7 @@ export interface ThreadViewPref {
     | "most-looks"
     | "random"
     | "hotness"
-    | (string & { __brand?: never });
+    | (string & globalThis.Record<PropertyKey, never>);
   /** Show followed users at the top of all replies. */
   prioritizeFollowedUsers?: boolean;
 }
@@ -358,7 +366,7 @@ export function validateInterestsPref<V>(v: V) {
 export type MutedWordTarget =
   | "content"
   | "tag"
-  | (string & { __brand?: never });
+  | (string & globalThis.Record<PropertyKey, never>);
 
 /** A word that the account owner has muted. */
 export interface MutedWord {
@@ -369,7 +377,10 @@ export interface MutedWord {
   /** The intended targets of the muted word. */
   targets: (MutedWordTarget)[];
   /** Groups of users to apply the muted word to. If undefined, applies to all users. */
-  actorTarget: "all" | "exclude-following" | (string & { __brand?: never });
+  actorTarget:
+    | "all"
+    | "exclude-following"
+    | (string & globalThis.Record<PropertyKey, never>);
   /** The date and time at which the muted word will expire and no longer be applied. */
   expiresAt?: string;
 }

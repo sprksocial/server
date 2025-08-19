@@ -12,7 +12,7 @@ import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 const is$typed = _is$typed, validate = _validate;
 const id = "app.bsky.graph.list";
 
-export interface MainRecord {
+export interface Record {
   $type: "app.bsky.graph.list";
   purpose: AppBskyGraphDefs.ListPurpose;
   /** Display name for list; can not be empty. */
@@ -25,14 +25,12 @@ export interface MainRecord {
   [k: string]: unknown;
 }
 
-export type Record = MainRecord;
+const hashRecord = "main";
 
-const hashMainRecord = "main";
-
-export function isMainRecord<V>(v: V) {
-  return is$typed(v, id, hashMainRecord);
+export function isRecord<V>(v: V) {
+  return is$typed(v, id, hashRecord);
 }
 
-export function validateMainRecord<V>(v: V) {
-  return validate<MainRecord & V>(v, id, hashMainRecord, true);
+export function validateRecord<V>(v: V) {
+  return validate<Record & V>(v, id, hashRecord, true);
 }

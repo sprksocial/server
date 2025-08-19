@@ -211,7 +211,7 @@ export type SubjectReviewState =
   | "lex:tools.ozone.moderation.defs#reviewEscalated"
   | "lex:tools.ozone.moderation.defs#reviewClosed"
   | "lex:tools.ozone.moderation.defs#reviewNone"
-  | (string & { __brand?: never });
+  | (string & globalThis.Record<PropertyKey, never>);
 
 /** Moderator review status of a subject: Open. Indicates that the subject needs to be reviewed by a moderator */
 export const REVIEWOPEN = `${id}#reviewOpen`;
@@ -533,7 +533,7 @@ export interface AccountEvent {
     | "takendown"
     | "suspended"
     | "tombstoned"
-    | (string & { __brand?: never });
+    | (string & globalThis.Record<PropertyKey, never>);
   timestamp: string;
 }
 
@@ -571,7 +571,11 @@ export function validateIdentityEvent<V>(v: V) {
 export interface RecordEvent {
   $type?: "tools.ozone.moderation.defs#recordEvent";
   comment?: string;
-  op: "create" | "update" | "delete" | (string & { __brand?: never });
+  op:
+    | "create"
+    | "update"
+    | "delete"
+    | (string & globalThis.Record<PropertyKey, never>);
   cid?: string;
   timestamp: string;
 }
@@ -803,7 +807,7 @@ export interface AccountHosting {
     | "deleted"
     | "deactivated"
     | "unknown"
-    | (string & { __brand?: never });
+    | (string & globalThis.Record<PropertyKey, never>);
   updatedAt?: string;
   createdAt?: string;
   deletedAt?: string;
@@ -823,7 +827,10 @@ export function validateAccountHosting<V>(v: V) {
 
 export interface RecordHosting {
   $type?: "tools.ozone.moderation.defs#recordHosting";
-  status: "deleted" | "unknown" | (string & { __brand?: never });
+  status:
+    | "deleted"
+    | "unknown"
+    | (string & globalThis.Record<PropertyKey, never>);
   updatedAt?: string;
   createdAt?: string;
   deletedAt?: string;

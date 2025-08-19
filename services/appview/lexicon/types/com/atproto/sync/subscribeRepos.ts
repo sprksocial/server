@@ -5,17 +5,15 @@ import { CID } from "multiformats/cid";
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import { type $Typed } from "../../../../util.ts";
-import { ErrorFrame, HandlerAuth } from "@sprk/xrpc-server";
-import { IncomingMessage } from "node:http";
+import { ErrorFrame } from "@sprk/xrpc-server";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "com.atproto.sync.subscribeRepos";
 
-export interface QueryParams {
+export type QueryParams = {
   /** The last known event seq number to backfill from. */
   cursor?: number;
-}
-
+};
 export type OutputSchema =
   | $Typed<Commit>
   | $Typed<Identity>
@@ -27,15 +25,6 @@ export type OutputSchema =
   | { $type: string };
 export type HandlerError = ErrorFrame<"FutureCursor" | "ConsumerTooSlow">;
 export type HandlerOutput = HandlerError | OutputSchema;
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA;
-  params: QueryParams;
-  req: IncomingMessage;
-  signal: AbortSignal;
-};
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => AsyncIterable<HandlerOutput>;
 
 /** Represents an update of repository state. Note that empty commits are allowed, which include no repo data changes, but an update to rev and signature. */
 export interface Commit {
@@ -108,7 +97,7 @@ export interface Account {
     | "suspended"
     | "deleted"
     | "deactivated"
-    | (string & { __brand?: never });
+    | (string & globalThis.Record<PropertyKey, never>);
 }
 
 const hashAccount = "account";
@@ -179,7 +168,7 @@ export function validateTombstone<V>(v: V) {
 
 export interface Info {
   $type?: "com.atproto.sync.subscribeRepos#info";
-  name: "OutdatedCursor" | (string & { __brand?: never });
+  name: "OutdatedCursor" | (string & globalThis.Record<PropertyKey, never>);
   message?: string;
 }
 
@@ -196,7 +185,11 @@ export function validateInfo<V>(v: V) {
 /** A repo operation, ie a mutation of a single record. */
 export interface RepoOp {
   $type?: "com.atproto.sync.subscribeRepos#repoOp";
-  action: "create" | "update" | "delete" | (string & { __brand?: never });
+  action:
+    | "create"
+    | "update"
+    | "delete"
+    | (string & globalThis.Record<PropertyKey, never>);
   path: string;
   /** For creates and updates, the new record CID. For deletions, null. */
   cid: CID | null;

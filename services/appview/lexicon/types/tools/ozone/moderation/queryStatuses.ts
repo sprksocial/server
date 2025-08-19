@@ -1,11 +1,9 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type HonoRequest } from "hono";
-import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
 import type * as ToolsOzoneModerationDefs from "./defs.ts";
 
-export interface QueryParams {
+export type QueryParams = {
   /** Number of queues being used by moderators. Subjects will be split among all queues. */
   queueCount?: number;
   /** Index of the queue to fetch subjects from. Works only when queueCount value is specified. */
@@ -63,7 +61,10 @@ export interface QueryParams {
   /** If specified, subjects belonging to the given collections will be returned. When subjectType is set to 'account', this will be ignored. */
   collections?: string[];
   /** If specified, subjects of the given type (account or record) will be returned. When this is set to 'account' the 'collections' parameter will be ignored. When includeAllUserRecords or subject is set, this will be ignored. */
-  subjectType?: "account" | "record" | (string & { __brand?: never });
+  subjectType?:
+    | "account"
+    | "record"
+    | (string & globalThis.Record<PropertyKey, never>);
   /** If specified, only subjects that belong to an account that has at least this many suspensions will be returned. */
   minAccountSuspendCount?: number;
   /** If specified, only subjects that belong to an account that has at least this many reported records will be returned. */
@@ -72,8 +73,7 @@ export interface QueryParams {
   minTakendownRecordsCount?: number;
   /** If specified, only subjects that have priority score value above the given value will be returned. */
   minPriorityScore?: number;
-}
-
+};
 export type InputSchema = undefined;
 
 export interface OutputSchema {
@@ -81,7 +81,7 @@ export interface OutputSchema {
   subjectStatuses: (ToolsOzoneModerationDefs.SubjectStatusView)[];
 }
 
-export type HandlerInput = undefined;
+export type HandlerInput = void;
 
 export interface HandlerSuccess {
   encoding: "application/json";
@@ -94,14 +94,4 @@ export interface HandlerError {
   message?: string;
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough;
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA;
-  params: QueryParams;
-  input: HandlerInput;
-  req: HonoRequest;
-  resetRouteRateLimits: () => Promise<void>;
-};
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput;
+export type HandlerOutput = HandlerError | HandlerSuccess;

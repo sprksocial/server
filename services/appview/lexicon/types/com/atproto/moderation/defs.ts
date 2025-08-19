@@ -11,7 +11,7 @@ export type ReasonType =
   | "com.atproto.moderation.defs#reasonRude"
   | "com.atproto.moderation.defs#reasonOther"
   | "com.atproto.moderation.defs#reasonAppeal"
-  | (string & { __brand?: never });
+  | (string & globalThis.Record<PropertyKey, never>);
 
 /** Spam: frequent unwanted promotion, replies, mentions */
 export const REASONSPAM = `${id}#reasonSpam`;
@@ -33,4 +33,4 @@ export type SubjectType =
   | "account"
   | "record"
   | "chat"
-  | (string & { __brand?: never });
+  | (string & globalThis.Record<PropertyKey, never>);

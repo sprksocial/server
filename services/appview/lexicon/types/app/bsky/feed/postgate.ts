@@ -8,7 +8,7 @@ import { type $Typed } from "../../../../util.ts";
 const is$typed = _is$typed, validate = _validate;
 const id = "app.bsky.feed.postgate";
 
-export interface MainRecord {
+export interface Record {
   $type: "app.bsky.feed.postgate";
   createdAt: string;
   /** Reference (AT-URI) to the post record. */
@@ -20,16 +20,14 @@ export interface MainRecord {
   [k: string]: unknown;
 }
 
-export type Record = MainRecord;
+const hashRecord = "main";
 
-const hashMainRecord = "main";
-
-export function isMainRecord<V>(v: V) {
-  return is$typed(v, id, hashMainRecord);
+export function isRecord<V>(v: V) {
+  return is$typed(v, id, hashRecord);
 }
 
-export function validateMainRecord<V>(v: V) {
-  return validate<MainRecord & V>(v, id, hashMainRecord, true);
+export function validateRecord<V>(v: V) {
+  return validate<Record & V>(v, id, hashRecord, true);
 }
 
 /** Disables embedding of this post. */

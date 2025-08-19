@@ -128,7 +128,7 @@ export type ListPurpose =
   | "so.sprk.graph.defs#modlist"
   | "so.sprk.graph.defs#curatelist"
   | "so.sprk.graph.defs#referencelist"
-  | (string & { __brand?: never });
+  | (string & globalThis.Record<PropertyKey, never>);
 
 /** A list of actors to apply an aggregate moderation action (mute/block) on. */
 export const MODLIST = `${id}#modlist`;

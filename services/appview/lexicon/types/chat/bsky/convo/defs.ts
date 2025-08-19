@@ -110,7 +110,10 @@ export interface ConvoView {
     $type: string;
   };
   muted: boolean;
-  status?: "request" | "accepted" | (string & { __brand?: never });
+  status?:
+    | "request"
+    | "accepted"
+    | (string & globalThis.Record<PropertyKey, never>);
   unreadCount: number;
 }
 
