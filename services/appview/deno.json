@@ -22,13 +22,9 @@
     "@atproto/syntax": "npm:@atproto/syntax@^0.3.4",
     "@sprk/xrpc-server": "jsr:@sprk/xrpc-server@^0.2.0",
     "jose": "npm:jose@^6.0.12",
-    "key-encoder": "npm:key-encoder@^2.0.3",
     "mongoose": "npm:mongoose@^8.17.1",
     "multiformats": "npm:multiformats@^9.9.0",
-    "p-queue": "npm:p-queue@^8.1.0",
-    "pino": "npm:pino@^8.21.0",
-    "pino-pretty": "npm:pino-pretty@^13.1.1",
-    "ws": "npm:ws@^8.18.3"
+    "p-queue": "npm:p-queue@^8.1.0"
   },
   "compilerOptions": {
     "jsx": "precompile",
