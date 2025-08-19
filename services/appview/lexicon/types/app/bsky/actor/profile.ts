@@ -11,7 +11,7 @@ import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongR
 const is$typed = _is$typed, validate = _validate;
 const id = "app.bsky.actor.profile";
 
-export interface MainRecord {
+export interface Record {
   $type: "app.bsky.actor.profile";
   displayName?: string;
   /** Free-form profile description text. */
@@ -27,14 +27,12 @@ export interface MainRecord {
   [k: string]: unknown;
 }
 
-export type Record = MainRecord;
+const hashRecord = "main";
 
-const hashMainRecord = "main";
-
-export function isMainRecord<V>(v: V) {
-  return is$typed(v, id, hashMainRecord);
+export function isRecord<V>(v: V) {
+  return is$typed(v, id, hashRecord);
 }
 
-export function validateMainRecord<V>(v: V) {
-  return validate<MainRecord & V>(v, id, hashMainRecord, true);
+export function validateRecord<V>(v: V) {
+  return validate<Record & V>(v, id, hashRecord, true);
 }

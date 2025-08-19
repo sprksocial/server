@@ -1,25 +1,22 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type HonoRequest } from "hono";
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
-import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
 import type * as AppBskyActorDefs from "../actor/defs.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "app.bsky.notification.listNotifications";
 
-export interface QueryParams {
+export type QueryParams = {
   /** Notification reasons to include in response. */
   reasons?: string[];
   limit: number;
   priority?: boolean;
   cursor?: string;
   seenAt?: string;
-}
-
+};
 export type InputSchema = undefined;
 
 export interface OutputSchema {
@@ -29,7 +26,7 @@ export interface OutputSchema {
   seenAt?: string;
 }
 
-export type HandlerInput = undefined;
+export type HandlerInput = void;
 
 export interface HandlerSuccess {
   encoding: "application/json";
@@ -42,17 +39,7 @@ export interface HandlerError {
   message?: string;
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough;
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA;
-  params: QueryParams;
-  input: HandlerInput;
-  req: HonoRequest;
-  resetRouteRateLimits: () => Promise<void>;
-};
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput;
+export type HandlerOutput = HandlerError | HandlerSuccess;
 
 export interface Notification {
   $type?: "app.bsky.notification.listNotifications#notification";
@@ -68,7 +55,7 @@ export interface Notification {
     | "reply"
     | "quote"
     | "starterpack-joined"
-    | (string & { __brand?: never });
+    | (string & globalThis.Record<PropertyKey, never>);
   reasonSubject?: string;
   record: { [_ in string]: unknown };
   isRead: boolean;

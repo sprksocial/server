@@ -8,34 +8,33 @@ import { type $Typed } from "../../../../util.ts";
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.feed.threadgate";
 
-export interface MainRecord {
+export interface Record {
   $type: "so.sprk.feed.threadgate";
   /** Reference (AT-URI) to the post record. */
   post: string;
   /** List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply. */
-  allow?: (
-    | $Typed<MentionRule>
-    | $Typed<FollowerRule>
-    | $Typed<FollowingRule>
-    | $Typed<ListRule>
-    | { $type: string }
-  )[];
+  allow?:
+    (
+      | $Typed<MentionRule>
+      | $Typed<FollowerRule>
+      | $Typed<FollowingRule>
+      | $Typed<ListRule>
+      | { $type: string }
+    )[];
   createdAt: string;
   /** List of hidden reply URIs. */
   hiddenReplies?: (string)[];
   [k: string]: unknown;
 }
 
-export type Record = MainRecord;
+const hashRecord = "main";
 
-const hashMainRecord = "main";
-
-export function isMainRecord<V>(v: V) {
-  return is$typed(v, id, hashMainRecord);
+export function isRecord<V>(v: V) {
+  return is$typed(v, id, hashRecord);
 }
 
-export function validateMainRecord<V>(v: V) {
-  return validate<MainRecord & V>(v, id, hashMainRecord, true);
+export function validateRecord<V>(v: V) {
+  return validate<Record & V>(v, id, hashRecord, true);
 }
 
 /** Allow replies from actors mentioned in your post. */

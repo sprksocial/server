@@ -7,20 +7,22 @@ import { is$typed as _is$typed } from "../../../../util.ts";
 const is$typed = _is$typed, validate = _validate;
 const id = "chat.bsky.actor.declaration";
 
-export interface MainRecord {
+export interface Record {
   $type: "chat.bsky.actor.declaration";
-  allowIncoming: "all" | "none" | "following" | (string & { __brand?: never });
+  allowIncoming:
+    | "all"
+    | "none"
+    | "following"
+    | (string & globalThis.Record<PropertyKey, never>);
   [k: string]: unknown;
 }
 
-export type Record = MainRecord;
+const hashRecord = "main";
 
-const hashMainRecord = "main";
-
-export function isMainRecord<V>(v: V) {
-  return is$typed(v, id, hashMainRecord);
+export function isRecord<V>(v: V) {
+  return is$typed(v, id, hashRecord);
 }
 
-export function validateMainRecord<V>(v: V) {
-  return validate<MainRecord & V>(v, id, hashMainRecord, true);
+export function validateRecord<V>(v: V) {
+  return validate<Record & V>(v, id, hashRecord, true);
 }

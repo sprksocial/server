@@ -1,11 +1,11 @@
 import { KeyObject } from "node:crypto";
 import { IncomingHttpHeaders } from "node:http";
 import * as ui8 from "npm:uint8arrays";
-import * as jose from "npm:jose";
+import * as jose from "jose";
 import {
-  AuthOutput,
   AuthRequiredError,
-  AuthVerifierContext,
+  AuthResult,
+  MethodAuthContext,
   parseReqNsid,
   verifyJwt,
 } from "@sprk/xrpc-server";
@@ -17,7 +17,6 @@ import {
   isDataplaneError,
   unpackIdentityKeys,
 } from "../data-plane/client/index.ts";
-import { HonoRequest } from "hono";
 
 interface MinimalRequest {
   url?: string;
@@ -88,16 +87,16 @@ export type AuthVerifierOpts = {
 
 export interface ExtendedAuthVerifier {
   optionalStandardOrRole: (
-    ctx: AuthVerifierContext,
+    ctx: MethodAuthContext,
   ) => Promise<StandardOutput | RoleOutput | NullOutput>;
   standardOrRole: (
-    ctx: AuthVerifierContext,
+    ctx: MethodAuthContext,
   ) => Promise<StandardOutput | RoleOutput>;
-  standard: (ctx: AuthVerifierContext) => Promise<StandardOutput>;
-  role: (ctx: AuthVerifierContext) => RoleOutput;
-  modService: (ctx: AuthVerifierContext) => Promise<ModServiceOutput>;
+  standard: (ctx: MethodAuthContext) => Promise<StandardOutput>;
+  role: (ctx: MethodAuthContext) => RoleOutput;
+  modService: (ctx: MethodAuthContext) => Promise<ModServiceOutput>;
   roleOrModService: (
-    ctx: AuthVerifierContext,
+    ctx: MethodAuthContext,
   ) => Promise<RoleOutput | ModServiceOutput>;
   parseCreds: (
     auth: StandardOutput | RoleOutput | NullOutput | ModServiceOutput,
@@ -108,19 +107,19 @@ export interface ExtendedAuthVerifier {
     canPerformTakedown: boolean;
   };
   standardOptional: (
-    ctx: AuthVerifierContext,
+    ctx: MethodAuthContext,
   ) => Promise<StandardOutput | NullOutput>;
   standardOptionalParameterized: (opts: StandardAuthOpts) => (
-    ctx: AuthVerifierContext,
+    ctx: MethodAuthContext,
   ) => Promise<StandardOutput | NullOutput>;
-  entrywaySession: (reqCtx: AuthVerifierContext) => Promise<StandardOutput>;
-  parseRoleCreds: (req: MinimalRequest) => {
+  entrywaySession: (reqCtx: MethodAuthContext) => Promise<StandardOutput>;
+  parseRoleCreds: (req: Request) => {
     status: RoleStatus;
     admin: boolean;
     type?: "role";
   };
   verifyServiceJwt: (
-    reqCtx: AuthVerifierContext,
+    reqCtx: MethodAuthContext,
     opts: {
       iss: string[] | null;
       aud: string | null;
@@ -132,7 +131,7 @@ export interface ExtendedAuthVerifier {
 }
 
 export interface AuthVerifier extends ExtendedAuthVerifier {
-  (ctx: AuthVerifierContext): Promise<AuthOutput>;
+  (ctx: MethodAuthContext): Promise<AuthResult>;
   ownDid: string;
   standardAudienceDids: Set<string>;
   modServiceDid: string;
@@ -147,9 +146,7 @@ export function createAuthVerifier(
   const impl = new AuthVerifierImpl(dataplane, opts);
 
   // Create the callable function
-  const verifier = ((
-    ctx: AuthVerifierContext,
-  ): Promise<StandardOutput | RoleOutput | NullOutput> => {
+  const verifier = ((ctx: MethodAuthContext): Promise<AuthResult> => {
     return impl.optionalStandardOrRole(ctx);
   }) as unknown as AuthVerifier;
 
@@ -164,11 +161,11 @@ export function createAuthVerifier(
   verifier.entrywayJwtPublicKey = opts.entrywayJwtPublicKey;
 
   // Add all methods from impl
-  verifier.optionalStandardOrRole = (ctx: AuthVerifierContext) => {
+  verifier.optionalStandardOrRole = (ctx: MethodAuthContext) => {
     if ("c" in ctx) {
       return impl.optionalStandardOrRole(ctx);
     }
-    return impl.optionalStandardOrRole(ctx as AuthVerifierContext);
+    return impl.optionalStandardOrRole(ctx as MethodAuthContext);
   };
   verifier.standardOrRole = impl.standardOrRole;
   verifier.standard = impl.standard;
@@ -212,10 +209,10 @@ class AuthVerifierImpl {
   // verifiers (arrow fns to preserve scope)
   standardOptionalParameterized =
     (opts: StandardAuthOpts) =>
-    async (ctx: AuthVerifierContext): Promise<StandardOutput | NullOutput> => {
+    async (ctx: MethodAuthContext): Promise<StandardOutput | NullOutput> => {
       if (isBasicToken(ctx.req)) {
         const aud = this.ownDid;
-        const iss = ctx.req.header("appview-as-did");
+        const iss = ctx.req.headers.get("appview-as-did");
         if (typeof iss !== "string" || !iss.startsWith("did:")) {
           throw new AuthRequiredError("bad issuer");
         }
@@ -261,11 +258,11 @@ class AuthVerifierImpl {
     };
 
   standardOptional: (
-    ctx: AuthVerifierContext,
+    ctx: MethodAuthContext,
   ) => Promise<StandardOutput | NullOutput> = this
     .standardOptionalParameterized({});
 
-  standard = async (ctx: AuthVerifierContext): Promise<StandardOutput> => {
+  standard = async (ctx: MethodAuthContext): Promise<StandardOutput> => {
     const output = await this.standardOptional(ctx);
     if (output.credentials.type === "none") {
       throw new AuthRequiredError(undefined, "AuthMissing");
@@ -273,7 +270,7 @@ class AuthVerifierImpl {
     return output as StandardOutput;
   };
 
-  role = (ctx: AuthVerifierContext): RoleOutput => {
+  role = (ctx: MethodAuthContext): RoleOutput => {
     const creds = this.parseRoleCreds(ctx.req);
     if (creds.status !== RoleStatus.Valid) {
       throw new AuthRequiredError();
@@ -288,7 +285,7 @@ class AuthVerifierImpl {
   };
 
   standardOrRole = async (
-    ctx: AuthVerifierContext,
+    ctx: MethodAuthContext,
   ): Promise<StandardOutput | RoleOutput> => {
     if (isBearerToken(ctx.req)) {
       return await this.standard(ctx);
@@ -308,7 +305,7 @@ class AuthVerifierImpl {
   };
 
   optionalStandardOrRole = async (
-    ctx: AuthVerifierContext,
+    ctx: MethodAuthContext,
   ): Promise<StandardOutput | RoleOutput | NullOutput> => {
     if (isBearerToken(ctx.req)) {
       return await this.standard(ctx);
@@ -334,7 +331,7 @@ class AuthVerifierImpl {
   // this is a short term fix to remove proxy load from Bluesky's PDS and in line with possible
   // future plans to have the client talk directly with the appview
   entrywaySession = async (
-    ctx: AuthVerifierContext,
+    ctx: MethodAuthContext,
   ): Promise<StandardOutput> => {
     const token = bearerTokenFromReq(ctx.req);
     if (!token) {
@@ -380,7 +377,7 @@ class AuthVerifierImpl {
     };
   };
 
-  modService = async (ctx: AuthVerifierContext): Promise<ModServiceOutput> => {
+  modService = async (ctx: MethodAuthContext): Promise<ModServiceOutput> => {
     const { iss, aud } = await this.verifyServiceJwt(ctx, {
       aud: this.ownDid,
       iss: [this.modServiceDid, `${this.modServiceDid}#atproto_labeler`],
@@ -392,7 +389,7 @@ class AuthVerifierImpl {
   };
 
   roleOrModService = async (
-    reqCtx: AuthVerifierContext,
+    reqCtx: MethodAuthContext,
   ): Promise<RoleOutput | ModServiceOutput> => {
     if (isBearerToken(reqCtx.req)) {
       return await this.modService(reqCtx);
@@ -412,9 +409,9 @@ class AuthVerifierImpl {
   };
 
   parseRoleCreds(
-    req: MinimalRequest | HonoRequest,
+    req: Request,
   ): { status: RoleStatus; admin: boolean; type?: "role" } {
-    const parsed = parseBasicAuth(req.header("Authorization") || "");
+    const parsed = parseBasicAuth(req.headers.get("Authorization") || "");
     const { Missing, Valid, Invalid } = RoleStatus;
     if (!parsed) {
       return { status: Missing, admin: false };
@@ -429,7 +426,7 @@ class AuthVerifierImpl {
   // @NOTE this is not currently used, but is here for future use when we support mod services in future
   // and potentially for payment providers
   async verifyServiceJwt(
-    reqCtx: AuthVerifierContext,
+    reqCtx: MethodAuthContext,
     opts: {
       iss: string[] | null;
       aud: string | null;
@@ -541,16 +538,16 @@ class AuthVerifierImpl {
 const BEARER = "Bearer ";
 const BASIC = "Basic ";
 
-const isBearerToken = (req: MinimalRequest | HonoRequest): boolean => {
-  return req.header("Authorization")?.startsWith(BEARER) ?? false;
+const isBearerToken = (req: Request): boolean => {
+  return req.headers.get("Authorization")?.startsWith(BEARER) ?? false;
 };
 
-const isBasicToken = (req: MinimalRequest | HonoRequest): boolean => {
-  return req.header("Authorization")?.startsWith(BASIC) ?? false;
+const isBasicToken = (req: Request): boolean => {
+  return req.headers.get("Authorization")?.startsWith(BASIC) ?? false;
 };
 
-const bearerTokenFromReq = (req: MinimalRequest | HonoRequest) => {
-  const header = req.header("Authorization") || "";
+const bearerTokenFromReq = (req: Request) => {
+  const header = req.headers.get("Authorization") || "";
   if (!header.startsWith(BEARER)) return null;
   return header.slice(BEARER.length).trim();
 };

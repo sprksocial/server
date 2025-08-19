@@ -1,19 +1,18 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type HonoRequest } from "hono";
-import { HandlerAuth } from "@sprk/xrpc-server";
-
-export type QueryParams = Record<never, never>;
+export type QueryParams = globalThis.Record<PropertyKey, never>;
 
 export interface InputSchema {
   serviceDid: string;
   token: string;
-  platform: "ios" | "android" | "web" | (string & { __brand?: never });
+  platform:
+    | "ios"
+    | "android"
+    | "web"
+    | (string & globalThis.Record<PropertyKey, never>);
   appId: string;
 }
-
-export type OutputSchema = undefined;
 
 export interface HandlerInput {
   encoding: "application/json";
@@ -26,13 +25,3 @@ export interface HandlerError {
 }
 
 export type HandlerOutput = HandlerError | void;
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA;
-  params: QueryParams;
-  input: HandlerInput;
-  req: HonoRequest;
-  resetRouteRateLimits: () => Promise<void>;
-};
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput;

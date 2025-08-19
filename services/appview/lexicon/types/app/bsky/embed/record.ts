@@ -69,14 +69,15 @@ export interface ViewRecord {
   repostCount?: number;
   likeCount?: number;
   quoteCount?: number;
-  embeds?: (
-    | $Typed<AppBskyEmbedImages.View>
-    | $Typed<AppBskyEmbedVideo.View>
-    | $Typed<AppBskyEmbedExternal.View>
-    | $Typed<View>
-    | $Typed<AppBskyEmbedRecordWithMedia.View>
-    | { $type: string }
-  )[];
+  embeds?:
+    (
+      | $Typed<AppBskyEmbedImages.View>
+      | $Typed<AppBskyEmbedVideo.View>
+      | $Typed<AppBskyEmbedExternal.View>
+      | $Typed<View>
+      | $Typed<AppBskyEmbedRecordWithMedia.View>
+      | { $type: string }
+    )[];
   indexedAt: string;
 }
 

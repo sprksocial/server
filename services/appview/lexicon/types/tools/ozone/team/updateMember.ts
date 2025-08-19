@@ -1,11 +1,9 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type HonoRequest } from "hono";
-import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
 import type * as ToolsOzoneTeamDefs from "./defs.ts";
 
-export type QueryParams = Record<never, never>;
+export type QueryParams = globalThis.Record<PropertyKey, never>;
 
 export interface InputSchema {
   did: string;
@@ -14,7 +12,7 @@ export interface InputSchema {
     | "tools.ozone.team.defs#roleAdmin"
     | "tools.ozone.team.defs#roleModerator"
     | "tools.ozone.team.defs#roleTriage"
-    | (string & { __brand?: never });
+    | (string & globalThis.Record<PropertyKey, never>);
 }
 
 export type OutputSchema = ToolsOzoneTeamDefs.Member;
@@ -36,14 +34,4 @@ export interface HandlerError {
   error?: "MemberNotFound";
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough;
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA;
-  params: QueryParams;
-  input: HandlerInput;
-  req: HonoRequest;
-  resetRouteRateLimits: () => Promise<void>;
-};
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput;
+export type HandlerOutput = HandlerError | HandlerSuccess;

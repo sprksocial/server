@@ -1,17 +1,15 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type HonoRequest } from "hono";
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import { type $Typed } from "../../../../util.ts";
-import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
 import type * as ComAtprotoRepoDefs from "./defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "com.atproto.repo.applyWrites";
 
-export type QueryParams = Record<never, never>;
+export type QueryParams = globalThis.Record<PropertyKey, never>;
 
 export interface InputSchema {
   /** The handle or DID of the repo (aka, current account). */
@@ -46,17 +44,7 @@ export interface HandlerError {
   error?: "InvalidSwap";
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough;
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA;
-  params: QueryParams;
-  input: HandlerInput;
-  req: HonoRequest;
-  resetRouteRateLimits: () => Promise<void>;
-};
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput;
+export type HandlerOutput = HandlerError | HandlerSuccess;
 
 /** Operation which creates a new record. */
 export interface Create {
@@ -115,7 +103,10 @@ export interface CreateResult {
   $type?: "com.atproto.repo.applyWrites#createResult";
   uri: string;
   cid: string;
-  validationStatus?: "valid" | "unknown" | (string & { __brand?: never });
+  validationStatus?:
+    | "valid"
+    | "unknown"
+    | (string & globalThis.Record<PropertyKey, never>);
 }
 
 const hashCreateResult = "createResult";
@@ -132,7 +123,10 @@ export interface UpdateResult {
   $type?: "com.atproto.repo.applyWrites#updateResult";
   uri: string;
   cid: string;
-  validationStatus?: "valid" | "unknown" | (string & { __brand?: never });
+  validationStatus?:
+    | "valid"
+    | "unknown"
+    | (string & globalThis.Record<PropertyKey, never>);
 }
 
 const hashUpdateResult = "updateResult";

@@ -92,7 +92,7 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
   API(lexServer, ctx);
 
   app.route("/", wellKnownRouter());
-  app.route("/", lexServer.xrpc.routes);
+  app.route("/", lexServer.xrpc.app);
 
   // Root route
   app.get("/", (c) => {

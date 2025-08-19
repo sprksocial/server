@@ -1,14 +1,12 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type HonoRequest } from "hono";
 import { type $Typed } from "../../../../util.ts";
-import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
 import type * as ToolsOzoneModerationDefs from "./defs.ts";
 import type * as ComAtprotoAdminDefs from "../../../com/atproto/admin/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef.ts";
 
-export type QueryParams = Record<never, never>;
+export type QueryParams = globalThis.Record<PropertyKey, never>;
 
 export interface InputSchema {
   event:
@@ -59,14 +57,4 @@ export interface HandlerError {
   error?: "SubjectHasAction";
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough;
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA;
-  params: QueryParams;
-  input: HandlerInput;
-  req: HonoRequest;
-  resetRouteRateLimits: () => Promise<void>;
-};
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput;
+export type HandlerOutput = HandlerError | HandlerSuccess;

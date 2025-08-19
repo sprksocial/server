@@ -1,15 +1,13 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type HonoRequest } from "hono";
-import { HandlerAuth, HandlerPipeThrough } from "@sprk/xrpc-server";
 import type * as SoSprkUnspeccedDefs from "./defs.ts";
 
-export interface QueryParams {
+export type QueryParams = {
   /** Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended. */
   q: string;
   /** Specifies the ranking order of results. */
-  sort: "top" | "latest" | (string & { __brand?: never });
+  sort: "top" | "latest" | (string & globalThis.Record<PropertyKey, never>);
   /** Filter results for posts after the indicated datetime (inclusive). Expected to use 'sortAt' timestamp, which may not match 'createdAt'. Can be a datetime, or just an ISO date (YYYY-MM-DD). */
   since?: string;
   /** Filter results for posts before the indicated datetime (not inclusive). Expected to use 'sortAt' timestamp, which may not match 'createdAt'. Can be a datetime, or just an ISO date (YYY-MM-DD). */
@@ -31,8 +29,7 @@ export interface QueryParams {
   limit: number;
   /** Optional pagination mechanism; may not necessarily allow scrolling through entire result set. */
   cursor?: string;
-}
-
+};
 export type InputSchema = undefined;
 
 export interface OutputSchema {
@@ -42,7 +39,7 @@ export interface OutputSchema {
   posts: (SoSprkUnspeccedDefs.SkeletonSearchPost)[];
 }
 
-export type HandlerInput = undefined;
+export type HandlerInput = void;
 
 export interface HandlerSuccess {
   encoding: "application/json";
@@ -56,14 +53,4 @@ export interface HandlerError {
   error?: "BadQueryString";
 }
 
-export type HandlerOutput = HandlerError | HandlerSuccess | HandlerPipeThrough;
-export type HandlerReqCtx<HA extends HandlerAuth = never> = {
-  auth: HA;
-  params: QueryParams;
-  input: HandlerInput;
-  req: HonoRequest;
-  resetRouteRateLimits: () => Promise<void>;
-};
-export type Handler<HA extends HandlerAuth = never> = (
-  ctx: HandlerReqCtx<HA>,
-) => Promise<HandlerOutput> | HandlerOutput;
+export type HandlerOutput = HandlerError | HandlerSuccess;
