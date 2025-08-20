@@ -1,4 +1,4 @@
-name: Deno AppView Service Check
+name: PR Checks
 
 on:
   pull_request:
@@ -18,11 +18,11 @@ jobs:
         uses: tj-actions/changed-files@v46
         with:
           files: |
-            services/appview/**/*.ts
-            services/appview/**/*.js
-            services/appview/**/*.json
-            services/appview/**/deno.json
-            services/appview/**/deno.lock
+            **/*.ts
+            **/*.js
+            **/*.json
+            deno.json
+            deno.lock
 
       - uses: denoland/setup-deno@v2
         if: steps.changed_files.outputs.all_changed_files != ''
@@ -46,11 +46,11 @@ jobs:
         uses: tj-actions/changed-files@v46
         with:
           files: |
-            services/appview/**/*.ts
-            services/appview/**/*.js
-            services/appview/**/*.json
-            services/appview/**/deno.json
-            services/appview/**/deno.lock
+            **/*.ts
+            **/*.js
+            **/*.json
+            deno.json
+            deno.lock
 
       - uses: denoland/setup-deno@v2
         if: steps.changed_files.outputs.all_changed_files != ''
@@ -60,7 +60,6 @@ jobs:
 
       - name: Lint
         if: steps.changed_files.outputs.all_changed_files != ''
-        working-directory: services/appview
         run: deno lint
 
   test:
@@ -75,11 +74,11 @@ jobs:
         uses: tj-actions/changed-files@v46
         with:
           files: |
-            services/appview/**/*.ts
-            services/appview/**/*.js
-            services/appview/**/*.json
-            services/appview/**/deno.json
-            services/appview/**/deno.lock
+            **/*.ts
+            **/*.js
+            **/*.json
+            deno.json
+            deno.lock
 
       - uses: denoland/setup-deno@v2
         if: steps.changed_files.outputs.all_changed_files != ''
@@ -89,5 +88,4 @@ jobs:
 
       - name: Test
         if: steps.changed_files.outputs.all_changed_files != ''
-        working-directory: services/appview
         run: deno test --allow-all
