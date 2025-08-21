@@ -1,6 +1,8 @@
-# Appview
+# Spark AppView
 
-## Running
+This AppView provides a view of AT Protocol that encompasses all Spark lexicon and aims to interop with Bluesky lexicon.
+
+## Development
 
 To run with Docker Compose (includes database and appview):
 `deno task docker-dev`. This will start both the database and appview services

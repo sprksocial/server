@@ -3,8 +3,8 @@ name: Build and Push AppView Image
 # Trigger only for tags starting with 'appview/v'
 on:
   push:
-    tags:
-      - "*"
+    branches:
+      - main
 
 jobs:
   build-and-push-appview:
