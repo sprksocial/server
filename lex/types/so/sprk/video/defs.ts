@@ -4,6 +4,7 @@
 import { BlobRef } from "@atproto/lexicon";
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
+import type * as SoSprkFeedDefs from "../feed/defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.video.defs";
@@ -16,10 +17,13 @@ export interface JobStatus {
   state:
     | "JOB_STATE_COMPLETED"
     | "JOB_STATE_FAILED"
+    | "JOB_STATE_QUEUED"
+    | "JOB_STATE_PROCESSING"
     | (string & globalThis.Record<PropertyKey, never>);
   /** Progress within the current processing state. */
   progress?: number;
   blob?: BlobRef;
+  audio?: ExtractedAudio;
   error?: string;
   message?: string;
 }
@@ -32,4 +36,21 @@ export function isJobStatus<V>(v: V) {
 
 export function validateJobStatus<V>(v: V) {
   return validate<JobStatus & V>(v, id, hashJobStatus);
+}
+
+/** Audio extracted from the uploaded video for client-side record creation. */
+export interface ExtractedAudio {
+  $type?: "so.sprk.video.defs#extractedAudio";
+  details?: SoSprkFeedDefs.AudioDetails;
+  blob: BlobRef;
+}
+
+const hashExtractedAudio = "extractedAudio";
+
+export function isExtractedAudio<V>(v: V) {
+  return is$typed(v, id, hashExtractedAudio);
+}
+
+export function validateExtractedAudio<V>(v: V) {
+  return validate<ExtractedAudio & V>(v, id, hashExtractedAudio);
 }

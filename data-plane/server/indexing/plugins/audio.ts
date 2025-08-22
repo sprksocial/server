@@ -18,18 +18,15 @@ const insertFn = async (
   obj: Audio.Record,
   timestamp: string,
 ): Promise<IndexedAudio | null> => {
-  const audio = {
+  const audio: Record<string, unknown> = {
     uri: uri.toString(),
     cid: cid.toString(),
     authorDid: uri.host,
-    sound: normalizeObject(obj.sound?.ref) || null,
-    origin: {
-      uri: obj.origin.uri,
-      cid: obj.origin.cid,
-    },
-    title: obj.title || null,
-    text: obj.text || null,
+    sound: normalizeObject(obj.sound) || null,
+    origin: obj.origin ? { uri: obj.origin.uri, cid: obj.origin.cid } : null,
+    title: obj.title,
     labels: obj.labels || null,
+    details: obj.details || null,
     createdAt: normalizeDatetimeAlways(obj.createdAt),
     indexedAt: timestamp,
   };

@@ -18,6 +18,7 @@ import getStories from "./so/sprk/feed/getStories.ts";
 import getStoriesTimeline from "./so/sprk/feed/getStoriesTimeline.ts";
 import getProfiles from "./so/sprk/actor/getProfiles.ts";
 import searchPosts from "./so/sprk/feed/searchPosts.ts";
+import getActorAudios from "./so/sprk/feed/getActorAudios.ts"
 
 export default function (server: Server, ctx: AppContext) {
   getAccountInfos(server, ctx);
@@ -38,4 +39,5 @@ export default function (server: Server, ctx: AppContext) {
   getStories(server, ctx);
   getStoriesTimeline(server, ctx);
   searchPosts(server, ctx);
+  getActorAudios(server, ctx);
 }

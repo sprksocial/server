@@ -35,7 +35,7 @@
           "type": "union",
           "refs": ["so.sprk.embed.images#view", "so.sprk.embed.video#view"]
         },
-        "sound": { "type": "ref", "ref": "#soundView" },
+        "sound": { "type": "ref", "ref": "#audioView" },
         "replyCount": { "type": "integer" },
         "repostCount": { "type": "integer" },
         "likeCount": { "type": "integer" },
@@ -49,9 +49,17 @@
         "threadgate": { "type": "ref", "ref": "#threadgateView" }
       }
     },
-    "soundView": {
+    "audioDetails": {
       "type": "object",
-      "required": ["uri", "cid", "author", "record", "indexedAt"],
+      "description": "Metadata about the audio content.",
+      "properties": {
+        "artist": { "type": "string" },
+        "title": { "type": "string" }
+      }
+    },
+    "audioView": {
+      "type": "object",
+      "required": ["uri", "cid", "author", "title", "coverArt", "record", "indexedAt"],
       "properties": {
         "uri": { "type": "string", "format": "at-uri" },
         "cid": { "type": "string", "format": "cid" },
@@ -61,7 +69,9 @@
         },
         "record": { "type": "unknown" },
         "useCount": { "type": "integer" },
-        "likeCount": { "type": "integer" },
+        "title": { "type": "string" },
+        "coverArt": { "type": "string" },
+        "details": { "type": "ref", "ref": "#audioDetails" },
         "indexedAt": { "type": "string", "format": "datetime" },
         "labels": {
           "type": "array",
