@@ -8462,6 +8462,110 @@ export const schemaDict = {
       },
     },
   },
+  "SoSprkFeedGetAudios": {
+    "lexicon": 1,
+    "id": "so.sprk.feed.getAudios",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Gets audio views for a specified list of audios (by AT-URI).",
+        "parameters": {
+          "type": "params",
+          "required": [
+            "uris",
+          ],
+          "properties": {
+            "uris": {
+              "type": "array",
+              "description": "List of audio AT-URIs to return views for.",
+              "items": {
+                "type": "string",
+                "format": "at-uri",
+              },
+              "maxLength": 25,
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "audios",
+            ],
+            "properties": {
+              "audios": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.feed.defs#audioView",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkFeedGetPostsByAudio": {
+    "lexicon": 1,
+    "id": "so.sprk.feed.getPostsByAudio",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Get a list of posts that use a given audio (by AT-URI).",
+        "parameters": {
+          "type": "params",
+          "required": [
+            "uri",
+          ],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "Audio AT-URI to find referencing posts for.",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+            },
+            "cursor": {
+              "type": "string",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "posts",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "posts": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.feed.defs#postView",
+                },
+              },
+              "audio": {
+                "type": "ref",
+                "ref": "lex:so.sprk.feed.defs#audioView",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   "SoSprkGraphBlock": {
     "lexicon": 1,
     "id": "so.sprk.graph.block",
@@ -22499,6 +22603,8 @@ export const ids = {
   SoSprkFeedAudio: "so.sprk.feed.audio",
   SoSprkFeedDefs: "so.sprk.feed.defs",
   SoSprkFeedGetActorAudios: "so.sprk.feed.getActorAudios",
+  SoSprkFeedGetAudios: "so.sprk.feed.getAudios",
+  SoSprkFeedGetPostsByAudio: "so.sprk.feed.getPostsByAudio",
   SoSprkGraphBlock: "so.sprk.graph.block",
   SoSprkGraphDefs: "so.sprk.graph.defs",
   SoSprkGraphFollow: "so.sprk.graph.follow",

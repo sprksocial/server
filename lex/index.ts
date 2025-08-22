@@ -116,6 +116,8 @@ import * as SoSprkFeedGetStories from "./types/so/sprk/feed/getStories.ts";
 import * as SoSprkFeedGetStoriesTimeline from "./types/so/sprk/feed/getStoriesTimeline.ts";
 import * as SoSprkFeedSearchPosts from "./types/so/sprk/feed/searchPosts.ts";
 import * as SoSprkFeedGetActorAudios from "./types/so/sprk/feed/getActorAudios.ts";
+import * as SoSprkFeedGetAudios from "./types/so/sprk/feed/getAudios.ts";
+import * as SoSprkFeedGetPostsByAudio from "./types/so/sprk/feed/getPostsByAudio.ts";
 import * as SoSprkGraphGetActorStarterPacks from "./types/so/sprk/graph/getActorStarterPacks.ts";
 import * as SoSprkGraphGetBlocks from "./types/so/sprk/graph/getBlocks.ts";
 import * as SoSprkGraphGetFollowers from "./types/so/sprk/graph/getFollowers.ts";
@@ -1788,6 +1790,30 @@ export class SoSprkFeedNS {
     >,
   ) {
     const nsid = "so.sprk.feed.getActorAudios"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getAudios<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      SoSprkFeedGetAudios.QueryParams,
+      SoSprkFeedGetAudios.HandlerInput,
+      SoSprkFeedGetAudios.HandlerOutput
+    >,
+  ) {
+    const nsid = "so.sprk.feed.getAudios"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getPostsByAudio<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      SoSprkFeedGetPostsByAudio.QueryParams,
+      SoSprkFeedGetPostsByAudio.HandlerInput,
+      SoSprkFeedGetPostsByAudio.HandlerOutput
+    >,
+  ) {
+    const nsid = "so.sprk.feed.getPostsByAudio"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
     return this._server.xrpc.method(nsid, cfg);
   }
 }
