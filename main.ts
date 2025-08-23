@@ -134,11 +134,25 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
 }
 
 // Setup function to create context and app
-export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
+export async function setupApp(): Promise<
+  { app: Hono<AppEnv>; ctx: AppContext }
+> {
   // Setup logger and database
   const appLogger = getLogger(["appview"]);
   const db = new Database();
   db.connect();
+
+  // Wait for database connection
+  const connected = await db.waitForConnection(30000);
+  if (!connected) {
+    throw new Error("Failed to connect to database during startup");
+  }
+
+  // Read cursor from database
+  const savedCursor = await db.getCursorState();
+  const startCursor = savedCursor !== null ? savedCursor : undefined;
+
+  appLogger.info("Database cursor loaded", { cursor: startCursor });
 
   // DID and resolver setup
   const baseIdResolver = createIdResolver();
@@ -150,6 +164,7 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
     service: env.RELAY_URL,
     db,
     idResolver: baseIdResolver,
+    startCursor,
   });
   const takedownService = new TakedownService(db);
   const authVerifier = createAuthVerifier(db, {
@@ -175,8 +190,8 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
 }
 
 // Start server function
-export function startServer() {
-  const { app, ctx } = setupApp();
+export async function startServer() {
+  const { app, ctx } = await setupApp();
 
   // Start HTTP server immediately
   const { HOST, PORT } = env;
@@ -257,9 +272,9 @@ export function startServer() {
 // Default export for backward compatibility (creates app without starting services)
 let defaultApp: Hono<AppEnv> | null = null;
 
-export default function getApp(): Hono<AppEnv> {
+export default async function getApp(): Promise<Hono<AppEnv>> {
   if (!defaultApp) {
-    const result = setupApp();
+    const result = await setupApp();
     defaultApp = result.app;
   }
   return defaultApp;
@@ -267,5 +282,5 @@ export default function getApp(): Hono<AppEnv> {
 
 // Start the server if this file is run directly
 if (import.meta.main) {
-  startServer();
+  await startServer();
 }
