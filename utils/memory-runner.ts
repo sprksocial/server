@@ -2,9 +2,10 @@ import PQueue from "p-queue";
 import { ConsecutiveList, EventRunner } from "@atproto/sync";
 
 export type MemoryRunnerOptions = {
-  setCursor?: (cursor: number) => Promise<void>;
+  setCursor?: (cursor: number) => Promise<void> | void;
   concurrency?: number;
   startCursor?: number;
+  cursorSaveIntervalMs?: number;
 };
 
 // A queue with arbitrarily many partitions, each processing work sequentially.
@@ -14,6 +15,9 @@ export class MemoryRunner implements EventRunner {
   mainQueue: PQueue;
   partitions = new Map<string, PQueue>();
   cursor: number | undefined;
+  private lastSaveTime = 0;
+  private lastCursor: number | undefined;
+  private saveTimeout: number | undefined;
 
   constructor(public opts: MemoryRunnerOptions = {}) {
     this.mainQueue = new PQueue({ concurrency: opts.concurrency ?? Infinity });
@@ -50,7 +54,7 @@ export class MemoryRunner implements EventRunner {
       if (latest !== undefined) {
         this.cursor = latest;
         if (this.opts.setCursor) {
-          await this.opts.setCursor(this.cursor);
+          await this.throttledSaveCursor(this.cursor);
         }
       }
     });
@@ -65,5 +69,44 @@ export class MemoryRunner implements EventRunner {
     await this.mainQueue.onIdle();
     this.mainQueue.clear();
     this.partitions.forEach((p) => p.clear());
+
+    // Force save the latest cursor before shutdown
+    await this.forceSaveCursor();
+  }
+
+  private async throttledSaveCursor(cursor: number): Promise<void> {
+    if (!this.opts.setCursor) return;
+
+    this.lastCursor = cursor;
+    const now = Date.now();
+    const saveInterval = this.opts.cursorSaveIntervalMs ?? 30000;
+
+    // If we haven't saved recently, save immediately
+    if (now - this.lastSaveTime >= saveInterval) {
+      this.lastSaveTime = now;
+      await this.opts.setCursor(cursor);
+    } else {
+      // Schedule a save for later if not already scheduled
+      if (this.saveTimeout === undefined) {
+        const timeUntilNextSave = saveInterval - (now - this.lastSaveTime);
+        this.saveTimeout = setTimeout(async () => {
+          if (this.lastCursor !== undefined && this.opts.setCursor) {
+            this.lastSaveTime = Date.now();
+            await this.opts.setCursor(this.lastCursor);
+          }
+          this.saveTimeout = undefined;
+        }, timeUntilNextSave);
+      }
+    }
+  }
+
+  async forceSaveCursor(): Promise<void> {
+    if (this.saveTimeout !== undefined) {
+      clearTimeout(this.saveTimeout);
+      this.saveTimeout = undefined;
+    }
+    if (this.lastCursor !== undefined && this.opts.setCursor) {
+      await this.opts.setCursor(this.lastCursor);
+    }
   }
 }

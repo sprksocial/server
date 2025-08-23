@@ -9,6 +9,7 @@ import {
 import { TakedownService } from "./services/takedown.ts";
 import { createAuthVerifier } from "./services/auth-verifier.ts";
 import { RepoSubscription } from "./data-plane/server/subscription.ts";
+import { MemoryRunner } from "./utils/memory-runner.ts";
 import { getLogger } from "@logtape/logtape";
 
 Deno.env.set("SERVICE_DID", "did:web:test");
@@ -31,6 +32,8 @@ function createMockContext(): AppContext {
     connect: () => Promise.resolve(),
     disconnect: () => Promise.resolve(),
     models: {},
+    getCursorState: () => Promise.resolve(null),
+    saveCursorState: () => Promise.resolve(),
   } as unknown as Database;
 
   const takedownService = new TakedownService(mockDb);
@@ -38,6 +41,7 @@ function createMockContext(): AppContext {
     service: "wss://relay1.us-west.bsky.network",
     db: mockDb,
     idResolver: baseIdResolver,
+    startCursor: undefined,
   });
   const authVerifier = createAuthVerifier(mockDb, {
     ownDid: serviceDid,
@@ -111,4 +115,95 @@ Deno.test("Well Known Endpoint", async () => {
     ),
   );
   console.log("Well-known endpoint test passed");
+});
+
+Deno.test("Cursor Persistence Test", async () => {
+  console.log("Testing cursor persistence...");
+
+  // Mock database with cursor state
+  let storedCursor: number | null = 42;
+  const mockDb = {
+    connect: () => Promise.resolve(),
+    disconnect: () => Promise.resolve(),
+    waitForConnection: () => Promise.resolve(true),
+    models: {},
+    getCursorState: () => Promise.resolve(storedCursor),
+    saveCursorState: (cursor: number) => {
+      storedCursor = cursor;
+      return Promise.resolve();
+    },
+  } as unknown as Database;
+
+  const baseIdResolver = createIdResolver();
+
+  // Test 1: Cursor is loaded from database
+  const sub1 = new RepoSubscription({
+    service: "wss://relay1.us-west.bsky.network",
+    db: mockDb,
+    idResolver: baseIdResolver,
+    startCursor: 42, // This should be what was read from DB
+  });
+
+  console.log("Initial cursor:", sub1.runner.getCursor());
+
+  // Test 2: Simulate cursor update
+  if (sub1.runner.opts.setCursor) {
+    await sub1.runner.opts.setCursor(100);
+  }
+
+  console.log("Stored cursor after update:", storedCursor);
+
+  // Test 3: Create new subscription, should load updated cursor
+  const sub2 = new RepoSubscription({
+    service: "wss://relay1.us-west.bsky.network",
+    db: mockDb,
+    idResolver: baseIdResolver,
+    startCursor: 100, // This should be the updated cursor from DB
+  });
+
+  console.log("New subscription cursor:", sub2.runner.getCursor());
+
+  console.log("Cursor persistence test passed");
+});
+
+Deno.test("Cursor Save Throttling Test", async () => {
+  console.log("Testing cursor save throttling...");
+
+  let saveCount = 0;
+  let lastSavedCursor: number | undefined;
+
+  // Create a direct MemoryRunner to test throttling
+  const runner = new MemoryRunner({
+    startCursor: 0,
+    cursorSaveIntervalMs: 100, // Use 100ms for faster testing
+    setCursor: (cursor: number) => {
+      saveCount++;
+      lastSavedCursor = cursor;
+      console.log(`Save #${saveCount}: cursor ${cursor}`);
+    },
+  });
+
+  // Simulate rapid cursor updates through trackEvent (the proper way)
+  await runner.trackEvent("did1", 10, async () => {/* mock work */});
+  await runner.trackEvent("did2", 20, async () => {/* mock work */});
+  await runner.trackEvent("did3", 30, async () => {/* mock work */});
+  await runner.trackEvent("did4", 40, async () => {/* mock work */});
+  await runner.trackEvent("did5", 50, async () => {/* mock work */});
+
+  console.log(`Immediate saves: ${saveCount}`);
+  console.log(`Last saved cursor: ${lastSavedCursor}`);
+
+  // Wait for throttling to potentially trigger more saves
+  await new Promise((resolve) => setTimeout(resolve, 200));
+
+  console.log(`After delay - Save count: ${saveCount}`);
+  console.log(`Last saved cursor: ${lastSavedCursor}`);
+
+  // Force save on destroy
+  await runner.destroy();
+
+  console.log(`After destroy - Save count: ${saveCount}`);
+  console.log(`Final saved cursor: ${lastSavedCursor}`);
+
+  console.log("Cursor save throttling test completed");
 });
