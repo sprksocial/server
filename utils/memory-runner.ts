@@ -90,9 +90,13 @@ export class MemoryRunner implements EventRunner {
       if (this.saveTimeout === undefined) {
         const timeUntilNextSave = saveInterval - (now - this.lastSaveTime);
         this.saveTimeout = setTimeout(async () => {
-          if (this.lastCursor !== undefined && this.opts.setCursor) {
-            this.lastSaveTime = Date.now();
-            await this.opts.setCursor(this.lastCursor);
+          try {
+            if (this.lastCursor !== undefined && this.opts.setCursor) {
+              this.lastSaveTime = Date.now();
+              await this.opts.setCursor(this.lastCursor);
+            }
+          } catch (err) {
+            console.error("Error saving cursor in setTimeout:", err);
           }
           this.saveTimeout = undefined;
         }, timeUntilNextSave);
