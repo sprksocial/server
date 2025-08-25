@@ -1,5 +1,4 @@
 import { CID } from "multiformats/cid";
-import { jsonStringToLex } from "@atproto/lexicon";
 import { AtUri } from "@atproto/syntax";
 import * as lex from "../../../../lex/lexicons.ts";
 import { isMain as isEmbedImage } from "../../../../lex/types/so/sprk/embed/images.ts";
@@ -26,6 +25,7 @@ import {
   normalizeEmbed,
   normalizeObject,
 } from "../../../../utils/embed-normalizer.ts";
+import { jsonToLex } from "@atproto/api";
 
 type PostAncestor = {
   uri: string;
@@ -447,14 +447,14 @@ async function getReplyRefs(db: Database, reply: ReplyRef) {
       ? {
         uri: root.uri,
         invalidReplyRoot: root.invalidReplyRoot ?? null,
-        record: jsonStringToLex(root.json) as PostRecord,
+        record: jsonToLex(root.json) as PostRecord,
       }
       : null,
     parent: parent && parent.json
       ? {
         uri: parent.uri,
         invalidReplyRoot: parent.invalidReplyRoot ?? null,
-        record: jsonStringToLex(parent.json) as PostRecord,
+        record: jsonToLex(parent.json) as PostRecord,
       }
       : null,
   };

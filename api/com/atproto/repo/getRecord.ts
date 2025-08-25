@@ -65,7 +65,7 @@ export default function (server: Server, ctx: AppContext) {
         // Parse the original record JSON
         let recordValue;
         try {
-          recordValue = record.json ? JSON.parse(record.json) : record;
+          recordValue = record.json;
         } catch {
           throw new InvalidRequestError(`Invalid record JSON: ${uri}`);
         }

@@ -39,7 +39,6 @@
         "replyCount": { "type": "integer" },
         "repostCount": { "type": "integer" },
         "likeCount": { "type": "integer" },
-        "lookCount": { "type": "integer" },
         "indexedAt": { "type": "string", "format": "datetime" },
         "viewer": { "type": "ref", "ref": "#viewerState" },
         "labels": {
@@ -75,7 +74,6 @@
       "properties": {
         "repost": { "type": "string", "format": "at-uri" },
         "like": { "type": "string", "format": "at-uri" },
-        "look": { "type": "string", "format": "at-uri" },
         "threadMuted": { "type": "boolean" },
         "replyDisabled": { "type": "boolean" },
         "embeddingDisabled": { "type": "boolean" },
@@ -219,28 +217,19 @@
         },
         "avatar": { "type": "string", "format": "uri" },
         "likeCount": { "type": "integer", "minimum": 0 },
-        "lookCount": { "type": "integer", "minimum": 0 },
         "acceptsInteractions": { "type": "boolean" },
         "labels": {
           "type": "array",
           "items": { "type": "ref", "ref": "com.atproto.label.defs#label" }
         },
         "viewer": { "type": "ref", "ref": "#generatorViewerState" },
-        "contentMode": {
-          "type": "string",
-          "knownValues": [
-            "so.sprk.feed.defs#contentModeUnspecified",
-            "so.sprk.feed.defs#contentModeVideo"
-          ]
-        },
         "indexedAt": { "type": "string", "format": "datetime" }
       }
     },
     "generatorViewerState": {
       "type": "object",
       "properties": {
-        "like": { "type": "string", "format": "at-uri" },
-        "look": { "type": "string", "format": "at-uri" }
+        "like": { "type": "string", "format": "at-uri" }
       }
     },
     "skeletonFeedPost": {

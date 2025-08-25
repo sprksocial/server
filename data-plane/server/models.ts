@@ -86,8 +86,10 @@ export interface RecordDocument extends Document {
   rkey: string;
   createdAt: string;
   indexedAt: string;
-  json?: string;
+  json: JSON;
   invalidReplyRoot?: boolean;
+  takenDown: boolean;
+  takedownRef: string;
 }
 
 export const recordSchema = new Schema<RecordDocument>({
@@ -98,8 +100,10 @@ export const recordSchema = new Schema<RecordDocument>({
   rkey: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
-  json: { type: String, required: false },
+  json: { type: JSON, required: false },
   invalidReplyRoot: { type: Boolean, required: false },
+  takenDown: { type: Boolean, required: false },
+  takedownRef: { type: String, required: false },
 });
 
 export interface DuplicateRecordDocument extends Document {
@@ -434,7 +438,7 @@ export interface GeneratorDocument extends AuthoredDocument {
   avatar?: MediaRef;
   acceptsInteractions?: boolean;
   labels?: Label[];
-  contentMode?: string;
+  likeCount: number;
 }
 
 export const generatorSchema = new Schema<GeneratorDocument>({
@@ -445,7 +449,7 @@ export const generatorSchema = new Schema<GeneratorDocument>({
   avatar: { type: Object, required: false },
   acceptsInteractions: { type: Boolean, required: false },
   labels: { type: [Object], required: false },
-  contentMode: { type: String, required: false },
+  likeCount: { type: Number, required: false, default: 0 },
 });
 
 // Add compound indexes for Generator

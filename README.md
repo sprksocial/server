@@ -1,6 +1,7 @@
 # Spark AppView
 
-This AppView provides a view of AT Protocol that encompasses all Spark lexicon and aims to interop with Bluesky lexicon.
+This AppView provides a view of AT Protocol that encompasses all Spark lexicon
+and aims to interop with Bluesky lexicon.
 
 ## Development
 

@@ -69,9 +69,7 @@ export class RepoSubscription {
 
     // Read fresh cursor from database
     const savedCursor = await this.opts.db.getCursorState();
-    const startCursor = savedCursor !== null
-      ? savedCursor
-      : (env.NODE_ENV === "production" ? 0 : undefined);
+    const startCursor = savedCursor !== null ? savedCursor : undefined;
 
     const { runner, firehose } = createFirehose({
       idResolver: this.opts.idResolver,
@@ -169,7 +167,7 @@ function createFirehose(opts: {
     cursorSaveIntervalMs: 30000, // Save cursor every 30 seconds
     setCursor: async (cursor: number) => {
       await db.saveCursorState(cursor);
-      logger.debug("Cursor saved to database", { cursor });
+      logger.info("Cursor saved to database", { cursor });
     },
   });
   const firehose = new Firehose({
