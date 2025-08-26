@@ -331,14 +331,16 @@ export class TakedownService {
 
     if (takenDown && takedownRef) {
       updateData.takedownRef = takedownRef;
+      await this.db.models.Record.updateOne(
+        { uri },
+        { $set: updateData },
+      );
     } else if (!takenDown) {
-      updateData.takedownRef = "";
+      await this.db.models.Record.updateOne(
+        { uri },
+        { $set: { takenDown }, $unset: { takedownRef: "" } },
+      );
     }
-
-    await this.db.models.Record.updateOne(
-      { uri },
-      { $set: updateData },
-    );
   }
 
   /**
