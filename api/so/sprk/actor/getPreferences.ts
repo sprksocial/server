@@ -1,5 +1,6 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
+import { Preferences } from "../../../../lex/types/so/sprk/actor/defs.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.actor.getPreferences({
@@ -15,7 +16,10 @@ export default function (server: Server, ctx: AppContext) {
         return {
           encoding: "application/json",
           body: {
-            followMode: (userPref?.followMode || "sprk") as "sprk" | "bsky",
+            preferences: [{
+              $type: "so.sprk.actor.defs#savedFeedsPref",
+              items: (userPref?.savedFeeds ?? []),
+            }] as Preferences,
           },
         };
       } catch (error) {

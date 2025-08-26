@@ -1,6 +1,9 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { GeneratorDocument } from "../../../../data-plane/server/models.ts";
+import {
+  BskyGeneratorDocument,
+  SprkGeneratorDocument,
+} from "../../../../data-plane/server/models.ts";
 import { getProfileView } from "../../../../utils/profile-helper.ts";
 import type * as SoSprkFeedDefs from "../../../../lex/types/so/sprk/feed/defs.ts";
 import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
@@ -40,7 +43,7 @@ function generateCursor(likeCount: number, id: string): string {
 
 // Transform GeneratorDocument to GeneratorView
 async function transformGeneratorToView(
-  generator: GeneratorDocument,
+  generator: BskyGeneratorDocument | SprkGeneratorDocument,
   ctx: AppContext,
   viewerDid?: string,
 ): Promise<SoSprkFeedDefs.GeneratorView> {
@@ -113,11 +116,30 @@ export default function (server: Server, ctx: AppContext) {
           ];
         }
 
-        // Get generators sorted by like count (descending) then by _id for consistent pagination
-        const generators = await ctx.db.models.Generator.find(query)
-          .sort({ likeCount: -1, _id: -1 })
-          .limit(limit + 1) // Get one extra for hasMore check
-          .lean();
+        // Get both BskyGenerator and SprkGenerator documents
+        const [bskyGenerators, sprkGenerators] = await Promise.all([
+          ctx.db.models.BskyGenerator.find(query)
+            .sort({ likeCount: -1, _id: -1 })
+            .lean(),
+          ctx.db.models.SprkGenerator.find(query)
+            .sort({ likeCount: -1, _id: -1 })
+            .lean(),
+        ]);
+
+        // Combine and sort all generators by like count
+        const allGenerators = [...bskyGenerators, ...sprkGenerators]
+          .sort((a, b) => {
+            const aLikes = a.likeCount || 0;
+            const bLikes = b.likeCount || 0;
+            if (aLikes !== bLikes) {
+              return bLikes - aLikes; // Sort by like count descending
+            }
+            // If like counts are equal, sort by _id descending for consistency
+            return String(b._id).localeCompare(String(a._id));
+          });
+
+        // Apply limit and check for more results
+        const generators = allGenerators.slice(0, limit + 1);
 
         // Check if there are more results
         const hasMore = generators.length > limit;

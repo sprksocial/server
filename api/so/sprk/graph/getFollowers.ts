@@ -39,15 +39,8 @@ export default function (server: Server, ctx: AppContext) {
         }
       }
 
-      const actorPref = await ctx.db.models.UserPreference.findOne({
-        userDid: actorDid,
-      });
-      const actorFollowMode = actorPref?.followMode || "sprk";
-
-      // Build query
       const query: RootFilterQuery<FollowDocument> = {
         subject: actorDid,
-        type: actorFollowMode,
       };
 
       if (cursor) {

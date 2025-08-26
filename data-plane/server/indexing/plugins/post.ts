@@ -59,7 +59,7 @@ type IndexedPost = {
   threadgate?: GateRecord;
 };
 
-const lexIds = [lex.ids.SoSprkFeedPost];
+const lexId = lex.ids.SoSprkFeedPost;
 
 const REPLY_NOTIF_DEPTH = 5;
 
@@ -400,7 +400,7 @@ export const makePlugin = (
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexIds,
+    lexId,
     insertFn,
     findDuplicate,
     deleteFn,

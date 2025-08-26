@@ -9,7 +9,7 @@ import { jsonToLex } from "@atproto/api";
 // @NOTE re: insertions and deletions. Due to how record updates are handled,
 // (insertFn) should have the same effect as (insertFn -> deleteFn -> insertFn).
 type RecordProcessorParams<T, S> = {
-  lexIds: string[];
+  lexId: string;
   insertFn: (
     db: Database,
     uri: AtUri,
@@ -42,25 +42,25 @@ type Notif = {
 };
 
 export class RecordProcessor<T, S> {
-  collections: string[];
+  collection: string;
   db: Database;
 
   /**
-   * RecordProcessor for handling multiple AT Protocol collections.
+   * RecordProcessor for handling a single AT Protocol collection.
    *
-   * This processor can handle multiple lexIds for similar record types:
-   * - Validates records directly against their URI collection (e.g., "app.bsky.graph.follow")
-   * - Uses lexIds list for routing to determine which processor handles which collections
-   * - Provides shared logic for similar concepts across different AT Protocol namespaces
+   * This processor handles exactly one lexId:
+   * - Validates records against the specific lexId (e.g., "app.bsky.graph.follow")
+   * - Only processes records that match the exact collection NSID
+   * - Rejects records from other collections, even similar ones
    *
    * Example usage:
    * ```typescript
    * const processor = new RecordProcessor(db, background, {
-   *   lexIds: ["app.bsky.graph.follow", "so.sprk.graph.follow"],
+   *   lexId: "app.bsky.graph.follow",
    *   // ... other params
    * });
    *
-   * // This will validate against "app.bsky.graph.follow" directly
+   * // This will only process records with collection "app.bsky.graph.follow"
    * await processor.insertRecord(uri, cid, obj, timestamp);
    * ```
    */
@@ -70,33 +70,40 @@ export class RecordProcessor<T, S> {
     private params: RecordProcessorParams<T, S>,
   ) {
     this.db = appDb;
-    this.collections = this.params.lexIds;
+    this.collection = this.params.lexId;
   }
 
-  matchesSchema(obj: unknown, collection: string): obj is T {
-    // The collection IS the lexId - direct validation
+  matchesCollection(uri: AtUri): boolean {
+    return uri.collection === this.collection;
+  }
+
+  matchesSchema(obj: unknown): obj is T {
     try {
-      lexicons.assertValidRecord(collection, obj);
+      lexicons.assertValidRecord(this.collection, obj);
       return true;
     } catch {
       return false;
     }
   }
 
-  assertValidRecord(obj: unknown, collection: string): asserts obj is T {
-    // The collection IS the lexId - direct validation
+  assertValidRecord(obj: unknown, uri: AtUri): asserts obj is T {
+    if (!this.matchesCollection(uri)) {
+      throw new Error(
+        `Record collection mismatch: expected ${this.collection}, got ${uri.collection}`,
+      );
+    }
     try {
-      lexicons.assertValidRecord(collection, obj);
+      lexicons.assertValidRecord(this.collection, obj);
     } catch (err) {
       throw new Error(
-        `Record validation failed for collection: ${collection}. Error: ${err}`,
+        `Record validation failed for collection: ${this.collection}. Error: ${err}`,
       );
     }
   }
 
-  // Helper method to get all available lexIds for debugging
-  getAvailableLexIds(): string[] {
-    return [...this.params.lexIds];
+  // Helper method to get the lexId this processor handles
+  getLexId(): string {
+    return this.collection;
   }
 
   async insertRecord(
@@ -106,7 +113,7 @@ export class RecordProcessor<T, S> {
     timestamp: string,
     opts?: { disableNotifs?: boolean },
   ) {
-    this.assertValidRecord(obj, uri.collection);
+    this.assertValidRecord(obj, uri);
 
     // Insert or update record
     await this.db.models.Record.findOneAndUpdate(
@@ -164,7 +171,7 @@ export class RecordProcessor<T, S> {
     timestamp: string,
     opts?: { disableNotifs?: boolean },
   ) {
-    this.assertValidRecord(obj, uri.collection);
+    this.assertValidRecord(obj, uri);
 
     // Update record
     await this.db.models.Record.findOneAndUpdate(
@@ -213,7 +220,7 @@ export class RecordProcessor<T, S> {
     }
     this.aggregateOnCommit(inserted);
     if (!opts?.disableNotifs) {
-      await this.handleNotifs({ inserted, deleted });
+      this.handleNotifs({ inserted, deleted });
     }
   }
 
@@ -248,14 +255,19 @@ export class RecordProcessor<T, S> {
         return this.handleNotifs({ deleted });
       }
 
+      const foundUri = new AtUri(found.uri);
+      if (!this.matchesCollection(foundUri)) {
+        return this.handleNotifs({ deleted });
+      }
+
       const record = jsonToLex(recordDoc.json);
-      if (!this.matchesSchema(record, new AtUri(found.uri).collection)) {
+      if (!this.matchesSchema(record)) {
         return this.handleNotifs({ deleted });
       }
 
       const inserted = await this.params.insertFn(
         this.db,
-        new AtUri(found.uri),
+        foundUri,
         CID.parse(found.cid),
         record,
         found.indexedAt,
@@ -263,7 +275,7 @@ export class RecordProcessor<T, S> {
       if (inserted) {
         this.aggregateOnCommit(inserted);
       }
-      await this.handleNotifs({ deleted, inserted: inserted ?? undefined });
+      this.handleNotifs({ deleted, inserted: inserted ?? undefined });
     }
   }
 

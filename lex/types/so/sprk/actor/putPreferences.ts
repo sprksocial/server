@@ -1,13 +1,12 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
+import type * as SoSprkActorDefs from "./defs.ts";
+
 export type QueryParams = globalThis.Record<PropertyKey, never>;
 
 export interface InputSchema {
-  followMode?:
-    | "bsky"
-    | "sprk"
-    | (string & globalThis.Record<PropertyKey, never>);
+  preferences: SoSprkActorDefs.Preferences;
 }
 
 export interface HandlerInput {

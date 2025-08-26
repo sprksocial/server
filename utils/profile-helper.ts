@@ -260,16 +260,6 @@ export async function getProfiles(
 
   const now = new Date().toISOString();
 
-  // Get viewer preferences once for all profiles if viewer is authenticated
-  let viewerFollowMode = "sprk";
-
-  if (viewerDid) {
-    const viewerPref = await ctx.db.models.UserPreference.findOne({
-      userDid: viewerDid,
-    });
-    viewerFollowMode = viewerPref?.followMode || "sprk";
-  }
-
   // Helper function to get a single profile data
   const getProfileData = async (
     actorParam: string,
@@ -348,11 +338,6 @@ export async function getProfiles(
       const handle = finalActorDoc.handle ||
         (await ctx.resolver.resolveDidToHandle(actorDid));
 
-      const actorPref = await ctx.db.models.UserPreference.findOne({
-        userDid: actorDid,
-      });
-      const actorFollowMode = actorPref?.followMode || "sprk";
-
       // Twenty-four hours ago for recent stories
       const twentyFourHoursAgo = new Date();
       twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
@@ -387,13 +372,11 @@ export async function getProfiles(
         // Count followers based on actor's follow mode preference
         ctx.db.models.Follow.countDocuments({
           subject: actorDid,
-          type: actorFollowMode,
         }),
 
         // Count follows based on actor's follow mode preference
         ctx.db.models.Follow.countDocuments({
           authorDid: actorDid,
-          type: actorFollowMode,
         }),
 
         // Count posts
@@ -402,15 +385,18 @@ export async function getProfiles(
           reply: null,
         }),
 
-        // Check for feed generators
+        // Check for feed generators (bsky + sprk combined)
         (async () => {
           try {
-            if (ctx.db.models.Generator) {
-              return await ctx.db.models.Generator.countDocuments({
+            const [bskyCount, sprkCount] = await Promise.all([
+              ctx.db.models.BskyGenerator.countDocuments({
                 authorDid: actorDid,
-              });
-            }
-            return 0;
+              }),
+              ctx.db.models.SprkGenerator.countDocuments({
+                authorDid: actorDid,
+              }),
+            ]);
+            return bskyCount + sprkCount;
           } catch (_error) {
             return 0;
           }
@@ -421,7 +407,6 @@ export async function getProfiles(
           ? ctx.db.models.Follow.findOne({
             subject: actorDid,
             authorDid: viewerDid,
-            type: viewerFollowMode,
           })
           : Promise.resolve(null),
 
@@ -429,7 +414,6 @@ export async function getProfiles(
           ? ctx.db.models.Follow.findOne({
             subject: viewerDid,
             authorDid: actorDid,
-            type: actorFollowMode,
           })
           : Promise.resolve(null),
 

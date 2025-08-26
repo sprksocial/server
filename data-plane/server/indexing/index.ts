@@ -16,7 +16,7 @@ import { BackgroundQueue } from "../background.ts";
 import { Database } from "../index.ts";
 import { ActorDocument } from "../models.ts";
 import * as Block from "./plugins/block.ts";
-import * as Generator from "./plugins/generator.ts";
+import * as Generator from "./plugins/generator/index.ts";
 import * as Follow from "./plugins/follow.ts";
 import * as Like from "./plugins/like.ts";
 import * as Post from "./plugins/post.ts";
@@ -36,7 +36,8 @@ export class IndexingService {
     follow: Follow.PluginType;
     profile: Profile.PluginType;
     block: Block.PluginType;
-    generator: Generator.PluginType;
+    bskyGenerator: Generator.Bsky.PluginType;
+    sprkGenerator: Generator.Sprk.PluginType;
     story: Story.PluginType;
     audio: Audio.PluginType;
     music: Music.PluginType;
@@ -55,7 +56,8 @@ export class IndexingService {
       follow: Follow.makePlugin(this.db, this.background),
       profile: Profile.makePlugin(this.db, this.background),
       block: Block.makePlugin(this.db, this.background),
-      generator: Generator.makePlugin(this.db, this.background),
+      bskyGenerator: Generator.Bsky.makePlugin(this.db, this.background),
+      sprkGenerator: Generator.Sprk.makePlugin(this.db, this.background),
       story: Story.makePlugin(this.db, this.background),
       audio: Audio.makePlugin(this.db, this.background),
       music: Music.makePlugin(this.db, this.background),
@@ -245,7 +247,7 @@ export class IndexingService {
     const indexers = Object.values(
       this.records as Record<string, RecordProcessor<unknown, unknown>>,
     );
-    return indexers.find((indexer) => indexer.collections.includes(collection));
+    return indexers.find((indexer) => indexer.collection === collection);
   }
 
   async updateActorStatus(did: string, active: boolean, status: string = "") {
@@ -301,7 +303,8 @@ export class IndexingService {
     await this.db.models.Follow.deleteMany({ authorDid: did });
     await this.db.models.Repost.deleteMany({ authorDid: did });
     await this.db.models.Like.deleteMany({ authorDid: did });
-    await this.db.models.Generator.deleteMany({ authorDid: did });
+    await this.db.models.BskyGenerator.deleteMany({ authorDid: did });
+    await this.db.models.SprkGenerator.deleteMany({ authorDid: did });
     await this.db.models.Story.deleteMany({ authorDid: did });
     await this.db.models.Audio.deleteMany({ authorDid: did });
     await this.db.models.Music.deleteMany({ authorDid: did });

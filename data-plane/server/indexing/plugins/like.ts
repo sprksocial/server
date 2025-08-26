@@ -7,7 +7,7 @@ import { Database } from "../../index.ts";
 import { LikeDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexIds = [lex.ids.SoSprkFeedLike];
+const lexId = lex.ids.SoSprkFeedLike;
 type IndexedLike = LikeDocument;
 
 const insertFn = async (
@@ -148,12 +148,24 @@ const updateAggregates = async (db: Database, like: IndexedLike) => {
 
     // Check if this is a feed generator
     if (subjectUri.collection === "app.bsky.feed.generator") {
-      const existingGenerator = await db.models.Generator.findOne({
+      const existingGenerator = await db.models.BskyGenerator.findOne({
         uri: like.subject,
       });
 
       if (existingGenerator) {
-        await db.models.Generator.findOneAndUpdate(
+        await db.models.BskyGenerator.findOneAndUpdate(
+          { uri: like.subject },
+          { $set: { likeCount } },
+          { new: true },
+        );
+      }
+    } else if (subjectUri.collection === "so.sprk.feed.generator") {
+      const existingSprkGenerator = await db.models.SprkGenerator.findOne({
+        uri: like.subject,
+      });
+
+      if (existingSprkGenerator) {
+        await db.models.SprkGenerator.findOneAndUpdate(
           { uri: like.subject },
           { $set: { likeCount } },
           { new: true },
@@ -188,7 +200,7 @@ export const makePlugin = (
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexIds,
+    lexId,
     insertFn,
     findDuplicate,
     deleteFn,

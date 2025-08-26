@@ -16570,7 +16570,6 @@ export const schemaDict = {
             "lex:so.sprk.actor.defs#adultContentPref",
             "lex:so.sprk.actor.defs#contentLabelPref",
             "lex:so.sprk.actor.defs#savedFeedsPref",
-            "lex:so.sprk.actor.defs#savedFeedsPrefV2",
             "lex:so.sprk.actor.defs#personalDetailsPref",
             "lex:so.sprk.actor.defs#feedViewPref",
             "lex:so.sprk.actor.defs#threadViewPref",
@@ -16649,7 +16648,7 @@ export const schemaDict = {
           },
         },
       },
-      "savedFeedsPrefV2": {
+      "savedFeedsPref": {
         "type": "object",
         "required": [
           "items",
@@ -16661,32 +16660,6 @@ export const schemaDict = {
               "type": "ref",
               "ref": "lex:so.sprk.actor.defs#savedFeed",
             },
-          },
-        },
-      },
-      "savedFeedsPref": {
-        "type": "object",
-        "required": [
-          "pinned",
-          "saved",
-        ],
-        "properties": {
-          "pinned": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "at-uri",
-            },
-          },
-          "saved": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "at-uri",
-            },
-          },
-          "timelineIndex": {
-            "type": "integer",
           },
         },
       },
@@ -16929,13 +16902,13 @@ export const schemaDict = {
           "encoding": "application/json",
           "schema": {
             "type": "object",
+            "required": [
+              "preferences",
+            ],
             "properties": {
-              "followMode": {
-                "type": "string",
-                "knownValues": [
-                  "bsky",
-                  "sprk",
-                ],
+              "preferences": {
+                "type": "ref",
+                "ref": "lex:so.sprk.actor.defs#preferences",
               },
             },
           },
@@ -17136,13 +17109,13 @@ export const schemaDict = {
           "encoding": "application/json",
           "schema": {
             "type": "object",
+            "required": [
+              "preferences",
+            ],
             "properties": {
-              "followMode": {
-                "type": "string",
-                "knownValues": [
-                  "bsky",
-                  "sprk",
-                ],
+              "preferences": {
+                "type": "ref",
+                "ref": "lex:so.sprk.actor.defs#preferences",
               },
             },
           },
