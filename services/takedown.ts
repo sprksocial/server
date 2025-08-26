@@ -354,19 +354,21 @@ export class TakedownService {
     takenDown: boolean,
     takedownRef?: string,
   ): Promise<void> {
-    const updateData: { takenDown: boolean; takedownRef?: string } = {
-      takenDown,
-    };
-
     if (takenDown && takedownRef) {
-      updateData.takedownRef = takedownRef;
+      await this.db.models.Record.updateMany(
+        { did },
+        { $set: { takenDown, takedownRef } },
+      );
     } else if (!takenDown) {
-      updateData.takedownRef = "";
+      await this.db.models.Record.updateMany(
+        { did },
+        { $set: { takenDown }, $unset: { takedownRef: "" } },
+      );
+    } else {
+      await this.db.models.Record.updateMany(
+        { did },
+        { $set: { takenDown } },
+      );
     }
-
-    await this.db.models.Record.updateMany(
-      { did },
-      { $set: updateData },
-    );
   }
 }
