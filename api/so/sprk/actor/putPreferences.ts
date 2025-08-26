@@ -22,7 +22,7 @@ export default function (server: Server, ctx: AppContext) {
             if (!userPref) {
               userPref = await ctx.db.models.UserPreference.create({
                 userDid,
-                savedFeeds: { $each: savedFeeds },
+                savedFeeds: savedFeeds,
                 createdAt: now,
                 updatedAt: now,
               });
