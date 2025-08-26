@@ -100,7 +100,7 @@ export const recordSchema = new Schema<RecordDocument>({
   rkey: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
-  json: { type: JSON, required: false },
+  json: { type: JSON, required: true },
   invalidReplyRoot: { type: Boolean, required: false },
   takenDown: { type: Boolean, required: false },
   takedownRef: { type: String, required: false },
