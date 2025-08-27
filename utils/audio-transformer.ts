@@ -80,19 +80,9 @@ export async function transformAudiosToAudioViews(
       : undefined;
 
     const details = audio.details ? { ...audio.details } : undefined;
-    const isMusic = !!details;
-    const musicTitle = details?.title;
-    const musicArtist = details?.artist;
-    const baseTitle = isMusic ? audio.title : "Original Audio";
-    const musicSuffix = isMusic
-      ? ` contains music of ${musicTitle ?? "Unknown"} - ${
-        musicArtist ?? "Unknown"
-      }`
-      : "";
-    const computedTitle = `${baseTitle}${musicSuffix}`;
 
     const record = {
-      title: computedTitle,
+      title: audio.title,
       origin: audio.origin ?? undefined,
       sound: audio.sound ?? undefined,
       labels: audio.labels ?? undefined,
@@ -106,7 +96,7 @@ export async function transformAudiosToAudioViews(
       uri: audio.uri,
       cid: audio.cid,
       author: authorsMap.get(audio.authorDid)!,
-      title: computedTitle,
+      title: audio.title,
       coverArt,
       record,
       useCount: usageMap.get(audio.uri) ?? 0,
