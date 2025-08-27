@@ -8566,6 +8566,53 @@ export const schemaDict = {
       },
     },
   },
+  "SoSprkFeedGetTrendingAudios": {
+    "lexicon": 1,
+    "id": "so.sprk.feed.getTrendingAudios",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Return trending audios ranked by popularity, delivering AudioView objects.",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25,
+            },
+            "cursor": {
+              "type": "string",
+              "description": "Opaque cursor for pagination",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "audios",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "audios": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.feed.defs#audioView",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   "SoSprkGraphBlock": {
     "lexicon": 1,
     "id": "so.sprk.graph.block",
@@ -22605,6 +22652,7 @@ export const ids = {
   SoSprkFeedGetActorAudios: "so.sprk.feed.getActorAudios",
   SoSprkFeedGetAudios: "so.sprk.feed.getAudios",
   SoSprkFeedGetPostsByAudio: "so.sprk.feed.getPostsByAudio",
+  SoSprkFeedGetTrendingAudios: "so.sprk.feed.getTrendingAudios",
   SoSprkGraphBlock: "so.sprk.graph.block",
   SoSprkGraphDefs: "so.sprk.graph.defs",
   SoSprkGraphFollow: "so.sprk.graph.follow",

@@ -229,6 +229,7 @@ export interface AudioDocument extends AuthoredDocument {
     title?: string;
   };
   labels?: Label[];
+  useCount: number;
 }
 
 export const audioSchema = new Schema<AudioDocument>({
@@ -241,6 +242,7 @@ export const audioSchema = new Schema<AudioDocument>({
   title: { type: String, required: true },
   details: { type: Object, required: false },
   labels: { type: [Object], required: false },
+  useCount: { type: Number, required: true, default: 0 },
 });
 
 export interface RepostDocument extends AuthoredDocument {
@@ -424,6 +426,7 @@ blockSchema.index({ authorDid: 1, subject: 1 }, { unique: true });
 blockSchema.index({ subject: 1, createdAt: -1 });
 
 audioSchema.index({ authorDid: 1, createdAt: -1 });
+audioSchema.index({ useCount: -1, createdAt: -1 });
 repostSchema.index({ authorDid: 1, createdAt: -1 });
 repostSchema.index({ "subject.uri": 1, createdAt: -1 });
 
