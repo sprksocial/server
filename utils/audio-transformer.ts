@@ -90,7 +90,7 @@ export async function transformAudiosToAudioViews(
       createdAt: audio.createdAt,
     } satisfies Record<string, unknown>;
 
-    const coverArt = (authorsMap.get(audio.authorDid)?.avatar ?? "");
+    const coverArt = authorsMap.get(audio.authorDid)?.avatar ?? "";
 
     return {
       uri: audio.uri,
