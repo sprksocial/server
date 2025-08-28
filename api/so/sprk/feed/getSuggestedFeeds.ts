@@ -75,7 +75,9 @@ async function transformGeneratorToView(
     displayName: generator.displayName,
     description: generator.description || undefined,
     descriptionFacets: generator.descriptionFacets || undefined,
-    avatar: generator.avatar?.ref ? `${generator.avatar.ref}` : undefined,
+    avatar: generator.avatar?.ref?.$link
+      ? `https://media.sprk.so/avatar/tiny/${generator.authorDid}/${generator.avatar.ref.$link}/webp`
+      : undefined,
     likeCount: generator.likeCount || 0,
     acceptsInteractions: generator.acceptsInteractions || undefined,
     labels: undefined, // Labels will be handled separately if needed
