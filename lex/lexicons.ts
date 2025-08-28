@@ -13800,13 +13800,6 @@ export const schemaDict = {
                 "lex:com.atproto.label.defs#selfLabels",
               ],
             },
-            "contentMode": {
-              "type": "string",
-              "knownValues": [
-                "so.sprk.feed.defs#contentModeUnspecified",
-                "so.sprk.feed.defs#contentModeVideo",
-              ],
-            },
             "createdAt": {
               "type": "string",
               "format": "datetime",
@@ -14055,9 +14048,6 @@ export const schemaDict = {
           "likeCount": {
             "type": "integer",
           },
-          "lookCount": {
-            "type": "integer",
-          },
           "indexedAt": {
             "type": "string",
             "format": "datetime",
@@ -14133,10 +14123,6 @@ export const schemaDict = {
             "format": "at-uri",
           },
           "like": {
-            "type": "string",
-            "format": "at-uri",
-          },
-          "look": {
             "type": "string",
             "format": "at-uri",
           },
@@ -14418,10 +14404,6 @@ export const schemaDict = {
             "type": "integer",
             "minimum": 0,
           },
-          "lookCount": {
-            "type": "integer",
-            "minimum": 0,
-          },
           "acceptsInteractions": {
             "type": "boolean",
           },
@@ -14436,13 +14418,6 @@ export const schemaDict = {
             "type": "ref",
             "ref": "lex:so.sprk.feed.defs#generatorViewerState",
           },
-          "contentMode": {
-            "type": "string",
-            "knownValues": [
-              "so.sprk.feed.defs#contentModeUnspecified",
-              "so.sprk.feed.defs#contentModeVideo",
-            ],
-          },
           "indexedAt": {
             "type": "string",
             "format": "datetime",
@@ -14453,10 +14428,6 @@ export const schemaDict = {
         "type": "object",
         "properties": {
           "like": {
-            "type": "string",
-            "format": "at-uri",
-          },
-          "look": {
             "type": "string",
             "format": "at-uri",
           },
@@ -14935,67 +14906,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkFeedGetActorLooks": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.getActorLooks",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Get a list of posts looked by an actor. Requires auth, actor must be the requesting account.",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "actor",
-          ],
-          "properties": {
-            "actor": {
-              "type": "string",
-              "format": "at-identifier",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "feed",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "feed": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.defs#feedViewPost",
-                },
-              },
-            },
-          },
-        },
-        "errors": [
-          {
-            "name": "BlockedActor",
-          },
-          {
-            "name": "BlockedByActor",
-          },
-        ],
-      },
-    },
-  },
   "SoSprkFeedPostgate": {
     "lexicon": 1,
     "id": "so.sprk.feed.postgate",
@@ -15200,97 +15110,6 @@ export const schemaDict = {
             "name": "NotFound",
           },
         ],
-      },
-    },
-  },
-  "SoSprkFeedGetLooks": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.getLooks",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Get look records which reference a subject (by AT-URI and CID).",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "uri",
-          ],
-          "properties": {
-            "uri": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "AT-URI of the subject (eg, a post record).",
-            },
-            "cid": {
-              "type": "string",
-              "format": "cid",
-              "description":
-                "CID of the subject record (aka, specific version of record), to filter looks.",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "uri",
-              "looks",
-            ],
-            "properties": {
-              "uri": {
-                "type": "string",
-                "format": "at-uri",
-              },
-              "cid": {
-                "type": "string",
-                "format": "cid",
-              },
-              "cursor": {
-                "type": "string",
-              },
-              "looks": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.getLooks#look",
-                },
-              },
-            },
-          },
-        },
-      },
-      "look": {
-        "type": "object",
-        "required": [
-          "indexedAt",
-          "createdAt",
-          "actor",
-        ],
-        "properties": {
-          "indexedAt": {
-            "type": "string",
-            "format": "datetime",
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "datetime",
-          },
-          "actor": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileView",
-          },
-        },
       },
     },
   },
@@ -15877,35 +15696,6 @@ export const schemaDict = {
               "format": "datetime",
               "description":
                 "Client-declared timestamp when this post was originally created.",
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkFeedLook": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.look",
-    "defs": {
-      "main": {
-        "type": "record",
-        "description":
-          "Record declaring a 'look' of a piece of subject content. Equivalent to a 'view'",
-        "key": "tid",
-        "record": {
-          "type": "object",
-          "required": [
-            "subject",
-            "createdAt",
-          ],
-          "properties": {
-            "subject": {
-              "type": "ref",
-              "ref": "lex:com.atproto.repo.strongRef",
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "datetime",
             },
           },
         },
@@ -16780,7 +16570,6 @@ export const schemaDict = {
             "lex:so.sprk.actor.defs#adultContentPref",
             "lex:so.sprk.actor.defs#contentLabelPref",
             "lex:so.sprk.actor.defs#savedFeedsPref",
-            "lex:so.sprk.actor.defs#savedFeedsPrefV2",
             "lex:so.sprk.actor.defs#personalDetailsPref",
             "lex:so.sprk.actor.defs#feedViewPref",
             "lex:so.sprk.actor.defs#threadViewPref",
@@ -16859,7 +16648,7 @@ export const schemaDict = {
           },
         },
       },
-      "savedFeedsPrefV2": {
+      "savedFeedsPref": {
         "type": "object",
         "required": [
           "items",
@@ -16871,32 +16660,6 @@ export const schemaDict = {
               "type": "ref",
               "ref": "lex:so.sprk.actor.defs#savedFeed",
             },
-          },
-        },
-      },
-      "savedFeedsPref": {
-        "type": "object",
-        "required": [
-          "pinned",
-          "saved",
-        ],
-        "properties": {
-          "pinned": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "at-uri",
-            },
-          },
-          "saved": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "at-uri",
-            },
-          },
-          "timelineIndex": {
-            "type": "integer",
           },
         },
       },
@@ -17139,13 +16902,13 @@ export const schemaDict = {
           "encoding": "application/json",
           "schema": {
             "type": "object",
+            "required": [
+              "preferences",
+            ],
             "properties": {
-              "followMode": {
-                "type": "string",
-                "knownValues": [
-                  "bsky",
-                  "sprk",
-                ],
+              "preferences": {
+                "type": "ref",
+                "ref": "lex:so.sprk.actor.defs#preferences",
               },
             },
           },
@@ -17346,13 +17109,13 @@ export const schemaDict = {
           "encoding": "application/json",
           "schema": {
             "type": "object",
+            "required": [
+              "preferences",
+            ],
             "properties": {
-              "followMode": {
-                "type": "string",
-                "knownValues": [
-                  "bsky",
-                  "sprk",
-                ],
+              "preferences": {
+                "type": "ref",
+                "ref": "lex:so.sprk.actor.defs#preferences",
               },
             },
           },
@@ -22491,11 +22254,9 @@ export const ids = {
   SoSprkFeedGetFeedGenerator: "so.sprk.feed.getFeedGenerator",
   SoSprkFeedGetAuthorFeed: "so.sprk.feed.getAuthorFeed",
   SoSprkFeedGetLikes: "so.sprk.feed.getLikes",
-  SoSprkFeedGetActorLooks: "so.sprk.feed.getActorLooks",
   SoSprkFeedPostgate: "so.sprk.feed.postgate",
   SoSprkFeedThreadgate: "so.sprk.feed.threadgate",
   SoSprkFeedGetPostThread: "so.sprk.feed.getPostThread",
-  SoSprkFeedGetLooks: "so.sprk.feed.getLooks",
   SoSprkFeedGetActorLikes: "so.sprk.feed.getActorLikes",
   SoSprkFeedLike: "so.sprk.feed.like",
   SoSprkFeedGetRepostedBy: "so.sprk.feed.getRepostedBy",
@@ -22507,7 +22268,6 @@ export const ids = {
   SoSprkFeedGetFeed: "so.sprk.feed.getFeed",
   SoSprkFeedGetStories: "so.sprk.feed.getStories",
   SoSprkFeedAudio: "so.sprk.feed.audio",
-  SoSprkFeedLook: "so.sprk.feed.look",
   SoSprkFeedGetQuotes: "so.sprk.feed.getQuotes",
   SoSprkFeedGetStoriesTimeline: "so.sprk.feed.getStoriesTimeline",
   SoSprkFeedGetFeedSkeleton: "so.sprk.feed.getFeedSkeleton",

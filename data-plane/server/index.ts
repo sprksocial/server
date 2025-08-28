@@ -102,13 +102,13 @@ export class Database implements DataPlaneClient {
           "Music",
           models.musicSchema,
         ),
-        Look: this.connection.model<models.LookDocument>(
-          "Look",
-          models.lookSchema,
-        ),
-        Generator: this.connection.model<models.GeneratorDocument>(
+        BskyGenerator: this.connection.model<models.BskyGeneratorDocument>(
           "Generator",
-          models.generatorSchema,
+          models.bskyGeneratorSchema,
+        ),
+        SprkGenerator: this.connection.model<models.SprkGeneratorDocument>(
+          "SprkGenerator",
+          models.sprkGeneratorSchema,
         ),
         Takedown: this.connection.model<models.TakedownDocument>(
           "Takedown",

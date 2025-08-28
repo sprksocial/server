@@ -21,10 +21,6 @@ export interface Record {
   /** Declaration that a feed accepts feedback interactions from a client through so.sprk.feed.sendInteractions */
   acceptsInteractions?: boolean;
   labels?: $Typed<ComAtprotoLabelDefs.SelfLabels> | { $type: string };
-  contentMode?:
-    | "so.sprk.feed.defs#contentModeUnspecified"
-    | "so.sprk.feed.defs#contentModeVideo"
-    | (string & globalThis.Record<PropertyKey, never>);
   createdAt: string;
   [k: string]: unknown;
 }

@@ -7,7 +7,7 @@ import { Database } from "../../index.ts";
 import { BlockDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexIds = [lex.ids.AppBskyGraphBlock];
+const lexId = lex.ids.AppBskyGraphBlock;
 type IndexedBlock = BlockDocument;
 
 const insertFn = async (
@@ -94,7 +94,7 @@ export const makePlugin = (
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexIds,
+    lexId,
     insertFn,
     findDuplicate,
     deleteFn,

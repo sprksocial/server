@@ -39,7 +39,7 @@ export default function (server: Server, ctx: AppContext) {
             });
             await ctx.takedownService.updateRepoTakedownApplied(
               repoRef.did,
-              takedown.applied,
+              true,
             );
           } else {
             await ctx.takedownService.removeRepoTakedown(repoRef.did);
@@ -60,10 +60,11 @@ export default function (server: Server, ctx: AppContext) {
               adminDid: auth.credentials.type === "standard"
                 ? auth.credentials.iss
                 : "admin",
+              ref: takedown.ref,
             });
             await ctx.takedownService.updateTakedownApplied(
               recordRef.uri,
-              takedown.applied,
+              true,
             );
           } else {
             await ctx.takedownService.removeTakedown(recordRef.uri);
@@ -89,7 +90,7 @@ export default function (server: Server, ctx: AppContext) {
             await ctx.takedownService.updateBlobTakedownApplied(
               repoBlobRef.did,
               repoBlobRef.cid,
-              takedown.applied,
+              true,
             );
           } else {
             await ctx.takedownService.removeBlobTakedown(

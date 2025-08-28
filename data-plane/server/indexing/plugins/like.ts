@@ -7,7 +7,7 @@ import { Database } from "../../index.ts";
 import { LikeDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexIds = [lex.ids.SoSprkFeedLike];
+const lexId = lex.ids.SoSprkFeedLike;
 type IndexedLike = LikeDocument;
 
 const insertFn = async (
@@ -139,25 +139,54 @@ const notifsForDelete = (
 
 const updateAggregates = async (db: Database, like: IndexedLike) => {
   try {
-    // Update like count for the subject (count both types)
+    // Update like count for the subject
     const likeCount = await db.models.Like.countDocuments({
       subject: like.subject,
     });
 
-    // First check if post exists to avoid creating one with missing fields
-    const existingPost = await db.models.Post.findOne({
-      uri: like.subject,
-    });
+    const subjectUri = new AtUri(like.subject);
 
-    if (existingPost) {
-      // Only update existing posts
-      await db.models.Post.findOneAndUpdate(
-        { uri: like.subject },
-        { $set: { likeCount } },
-        { new: true },
-      );
+    // Check if this is a feed generator
+    if (subjectUri.collection === "app.bsky.feed.generator") {
+      const existingGenerator = await db.models.BskyGenerator.findOne({
+        uri: like.subject,
+      });
+
+      if (existingGenerator) {
+        await db.models.BskyGenerator.findOneAndUpdate(
+          { uri: like.subject },
+          { $set: { likeCount } },
+          { new: true },
+        );
+      }
+    } else if (subjectUri.collection === "so.sprk.feed.generator") {
+      const existingSprkGenerator = await db.models.SprkGenerator.findOne({
+        uri: like.subject,
+      });
+
+      if (existingSprkGenerator) {
+        await db.models.SprkGenerator.findOneAndUpdate(
+          { uri: like.subject },
+          { $set: { likeCount } },
+          { new: true },
+        );
+      }
+    } else {
+      // Handle posts and other content types
+      const existingPost = await db.models.Post.findOne({
+        uri: like.subject,
+      });
+
+      if (existingPost) {
+        // Only update existing posts
+        await db.models.Post.findOneAndUpdate(
+          { uri: like.subject },
+          { $set: { likeCount } },
+          { new: true },
+        );
+      }
+      // We don't create a post if it doesn't exist, as we might lack required fields
     }
-    // We don't create a post if it doesn't exist, as we might lack required fields
   } catch (error) {
     console.error("Error updating like aggregates:", error);
     // Don't throw - allow processing to continue even if aggregates update fails
@@ -171,7 +200,7 @@ export const makePlugin = (
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexIds,
+    lexId,
     insertFn,
     findDuplicate,
     deleteFn,

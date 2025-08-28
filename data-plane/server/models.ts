@@ -86,8 +86,10 @@ export interface RecordDocument extends Document {
   rkey: string;
   createdAt: string;
   indexedAt: string;
-  json?: string;
+  json: JSON;
   invalidReplyRoot?: boolean;
+  takenDown: boolean;
+  takedownRef: string;
 }
 
 export const recordSchema = new Schema<RecordDocument>({
@@ -98,8 +100,10 @@ export const recordSchema = new Schema<RecordDocument>({
   rkey: { type: String, required: true },
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
-  json: { type: String, required: false },
+  json: { type: JSON, required: true },
   invalidReplyRoot: { type: Boolean, required: false },
+  takenDown: { type: Boolean, required: false },
+  takedownRef: { type: String, required: false },
 });
 
 export interface DuplicateRecordDocument extends Document {
@@ -143,33 +147,13 @@ export const likeSchema = new Schema<LikeDocument>({
   viaCid: { type: String, required: false },
 });
 
-export interface LookDocument extends AuthoredDocument {
-  subject: string;
-  subjectCid: string;
-  cid: string;
-}
-
-export const lookSchema = new Schema<LookDocument>({
-  ...authoredSchema,
-  subject: { type: String, required: true, index: true },
-  subjectCid: { type: String, required: true },
-});
-
 export interface FollowDocument extends AuthoredDocument {
   subject: string;
-  type: "sprk" | "bsky";
 }
 
 export const followSchema = new Schema<FollowDocument>({
   ...authoredSchema,
   subject: { type: String, required: true, index: true },
-  type: {
-    type: String,
-    required: true,
-    enum: ["sprk", "bsky"],
-    index: true,
-    default: "sprk",
-  },
 });
 
 export interface BlockDocument extends AuthoredDocument {
@@ -427,17 +411,51 @@ repostSchema.index({ "subject.uri": 1, createdAt: -1 });
 musicSchema.index({ authorDid: 1, createdAt: -1 });
 musicSchema.index({ tags: 1, createdAt: -1 });
 
-export interface GeneratorDocument extends AuthoredDocument {
+export interface BskyGeneratorDocument extends AuthoredDocument {
+  displayName: string;
+  description?: string;
+  descriptionFacets?: Facet[];
+  avatar?: MediaRef;
+  acceptsInteractions?: boolean;
+  contentMode?: "video" | "unspecified";
+  labels?: Label[];
+  likeCount: number;
+}
+
+export const bskyGeneratorSchema = new Schema<BskyGeneratorDocument>({
+  ...authoredSchema,
+  displayName: { type: String, required: true },
+  description: { type: String, required: false },
+  descriptionFacets: { type: [Object], required: false },
+  avatar: { type: Object, required: false },
+  acceptsInteractions: { type: Boolean, required: false },
+  contentMode: {
+    type: String,
+    enum: ["video", "unspecified"],
+    required: false,
+  },
+  labels: { type: [Object], required: false },
+  likeCount: { type: Number, required: false, default: 0 },
+});
+
+// Add compound indexes for Generator
+bskyGeneratorSchema.index({ authorDid: 1, createdAt: -1 });
+
+// @TODO: Currently this is almost identical to bskyGeneratorSchema but
+// as we make the feed lex meaningfully different from Bsky's feed lex,
+// we will add more fields and different behavior such as feed modes &
+// custom user values.
+export interface SprkGeneratorDocument extends AuthoredDocument {
   displayName: string;
   description?: string;
   descriptionFacets?: Facet[];
   avatar?: MediaRef;
   acceptsInteractions?: boolean;
   labels?: Label[];
-  contentMode?: string;
+  likeCount: number;
 }
 
-export const generatorSchema = new Schema<GeneratorDocument>({
+export const sprkGeneratorSchema = new Schema<SprkGeneratorDocument>({
   ...authoredSchema,
   displayName: { type: String, required: true },
   description: { type: String, required: false },
@@ -445,11 +463,11 @@ export const generatorSchema = new Schema<GeneratorDocument>({
   avatar: { type: Object, required: false },
   acceptsInteractions: { type: Boolean, required: false },
   labels: { type: [Object], required: false },
-  contentMode: { type: String, required: false },
+  likeCount: { type: Number, required: false, default: 0 },
 });
 
 // Add compound indexes for Generator
-generatorSchema.index({ authorDid: 1, createdAt: -1 });
+sprkGeneratorSchema.index({ authorDid: 1, createdAt: -1 });
 
 export interface TakedownDocument extends Document {
   targetUri: string;
@@ -534,21 +552,23 @@ export const actorSchema = new Schema<ActorDocument>({
   services: { type: String, required: true },
 });
 
+type SavedFeed = {
+  id: string;
+  type: "feed" | "list" | "timeline";
+  value: string;
+  pinned: boolean;
+};
+
 export interface UserPreferenceDocument extends Document {
   userDid: string;
-  followMode: string;
+  savedFeeds: SavedFeed[];
   createdAt: string;
   updatedAt: string;
 }
 
 export const userPreferenceSchema = new Schema<UserPreferenceDocument>({
   userDid: { type: String, required: true, unique: true, index: true },
-  followMode: {
-    type: String,
-    required: true,
-    enum: ["bsky", "sprk"],
-    default: "sprk",
-  },
+  savedFeeds: { type: [Object], required: true },
   createdAt: { type: String, required: true },
   updatedAt: { type: String, required: true },
 });
@@ -581,12 +601,12 @@ export const videoMappingSchema = new Schema<VideoMappingDocument>({
 ([
   profileSchema,
   likeSchema,
-  lookSchema,
   postSchema,
   repostSchema,
   followSchema,
   blockSchema,
-  generatorSchema,
+  bskyGeneratorSchema,
+  sprkGeneratorSchema,
   audioSchema,
   musicSchema,
   storySchema,
@@ -604,8 +624,8 @@ export interface DatabaseModels {
   Audio: Model<AudioDocument>;
   Repost: Model<RepostDocument>;
   Music: Model<MusicDocument>;
-  Look: Model<LookDocument>;
-  Generator: Model<GeneratorDocument>;
+  BskyGenerator: Model<BskyGeneratorDocument>;
+  SprkGenerator: Model<SprkGeneratorDocument>;
   Takedown: Model<TakedownDocument>;
   RepoTakedown: Model<RepoTakedownDocument>;
   BlobTakedown: Model<BlobTakedownDocument>;

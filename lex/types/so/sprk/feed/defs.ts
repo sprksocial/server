@@ -49,7 +49,6 @@ export interface PostView {
   replyCount?: number;
   repostCount?: number;
   likeCount?: number;
-  lookCount?: number;
   indexedAt: string;
   viewer?: ViewerState;
   labels?: (ComAtprotoLabelDefs.Label)[];
@@ -93,7 +92,6 @@ export interface ViewerState {
   $type?: "so.sprk.feed.defs#viewerState";
   repost?: string;
   like?: string;
-  look?: string;
   threadMuted?: boolean;
   replyDisabled?: boolean;
   embeddingDisabled?: boolean;
@@ -312,14 +310,9 @@ export interface GeneratorView {
   descriptionFacets?: (SoSprkRichtextFacet.Main)[];
   avatar?: string;
   likeCount?: number;
-  lookCount?: number;
   acceptsInteractions?: boolean;
   labels?: (ComAtprotoLabelDefs.Label)[];
   viewer?: GeneratorViewerState;
-  contentMode?:
-    | "so.sprk.feed.defs#contentModeUnspecified"
-    | "so.sprk.feed.defs#contentModeVideo"
-    | (string & globalThis.Record<PropertyKey, never>);
   indexedAt: string;
 }
 
@@ -336,7 +329,6 @@ export function validateGeneratorView<V>(v: V) {
 export interface GeneratorViewerState {
   $type?: "so.sprk.feed.defs#generatorViewerState";
   like?: string;
-  look?: string;
 }
 
 const hashGeneratorViewerState = "generatorViewerState";

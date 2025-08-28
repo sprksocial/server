@@ -167,9 +167,7 @@ import * as SoSprkFeedGetTimeline from "./types/so/sprk/feed/getTimeline.ts";
 import * as SoSprkFeedGetFeedGenerator from "./types/so/sprk/feed/getFeedGenerator.ts";
 import * as SoSprkFeedGetAuthorFeed from "./types/so/sprk/feed/getAuthorFeed.ts";
 import * as SoSprkFeedGetLikes from "./types/so/sprk/feed/getLikes.ts";
-import * as SoSprkFeedGetActorLooks from "./types/so/sprk/feed/getActorLooks.ts";
 import * as SoSprkFeedGetPostThread from "./types/so/sprk/feed/getPostThread.ts";
-import * as SoSprkFeedGetLooks from "./types/so/sprk/feed/getLooks.ts";
 import * as SoSprkFeedGetActorLikes from "./types/so/sprk/feed/getActorLikes.ts";
 import * as SoSprkFeedGetRepostedBy from "./types/so/sprk/feed/getRepostedBy.ts";
 import * as SoSprkFeedDescribeFeedGenerator from "./types/so/sprk/feed/describeFeedGenerator.ts";
@@ -2564,18 +2562,6 @@ export class SoSprkFeedNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
-  getActorLooks<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkFeedGetActorLooks.QueryParams,
-      SoSprkFeedGetActorLooks.HandlerInput,
-      SoSprkFeedGetActorLooks.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.feed.getActorLooks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
   getPostThread<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -2585,18 +2571,6 @@ export class SoSprkFeedNS {
     >,
   ) {
     const nsid = "so.sprk.feed.getPostThread"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
-  getLooks<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkFeedGetLooks.QueryParams,
-      SoSprkFeedGetLooks.HandlerInput,
-      SoSprkFeedGetLooks.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.feed.getLooks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
     return this._server.xrpc.method(nsid, cfg);
   }
 

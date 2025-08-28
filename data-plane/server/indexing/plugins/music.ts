@@ -8,7 +8,7 @@ import { MusicDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 import { normalizeObject } from "../../../../utils/embed-normalizer.ts";
 
-const lexIds = [lex.ids.SoSprkFeedMusic];
+const lexId = lex.ids.SoSprkFeedMusic;
 type IndexedMusic = MusicDocument;
 
 const insertFn = async (
@@ -85,7 +85,7 @@ export const makePlugin = (
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexIds,
+    lexId,
     insertFn,
     findDuplicate,
     deleteFn,
