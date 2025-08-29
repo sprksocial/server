@@ -7,7 +7,7 @@ import { Database } from "../../index.ts";
 import { RepostDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexIds = [lex.ids.AppBskyFeedRepost];
+const lexId = lex.ids.AppBskyFeedRepost;
 type IndexedRepost = RepostDocument;
 
 const insertFn = async (
@@ -219,7 +219,7 @@ export const makePlugin = (
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexIds,
+    lexId,
     insertFn,
     findDuplicate,
     deleteFn,

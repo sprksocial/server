@@ -182,7 +182,6 @@
           "#adultContentPref",
           "#contentLabelPref",
           "#savedFeedsPref",
-          "#savedFeedsPrefV2",
           "#personalDetailsPref",
           "#feedViewPref",
           "#threadViewPref",
@@ -236,7 +235,7 @@
         }
       }
     },
-    "savedFeedsPrefV2": {
+    "savedFeedsPref": {
       "type": "object",
       "required": ["items"],
       "properties": {
@@ -246,29 +245,6 @@
             "type": "ref",
             "ref": "so.sprk.actor.defs#savedFeed"
           }
-        }
-      }
-    },
-    "savedFeedsPref": {
-      "type": "object",
-      "required": ["pinned", "saved"],
-      "properties": {
-        "pinned": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "at-uri"
-          }
-        },
-        "saved": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "at-uri"
-          }
-        },
-        "timelineIndex": {
-          "type": "integer"
         }
       }
     },

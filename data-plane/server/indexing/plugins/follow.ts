@@ -1,30 +1,22 @@
 import { CID } from "multiformats/cid";
 import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
 import * as lex from "../../../../lex/lexicons.ts";
-import * as BskyFollow from "../../../../lex/types/app/bsky/graph/follow.ts";
-import * as SprkFollow from "../../../../lex/types/so/sprk/graph/follow.ts";
+import * as Follow from "../../../../lex/types/app/bsky/graph/follow.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../index.ts";
 import { FollowDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexIds = [lex.ids.AppBskyGraphFollow, lex.ids.SoSprkGraphFollow];
+const lexId = lex.ids.AppBskyGraphFollow;
 type IndexedFollow = FollowDocument;
-
-// Union type for both follow record types
-type FollowRecord = BskyFollow.Record | SprkFollow.Record;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
   cid: CID,
-  obj: FollowRecord,
+  obj: Follow.Record,
   timestamp: string,
 ): Promise<IndexedFollow | null> => {
-  const followType = uri.collection === "app.bsky.graph.follow"
-    ? "bsky"
-    : "sprk";
-
   const follow = {
     uri: uri.toString(),
     cid: cid.toString(),
@@ -32,7 +24,6 @@ const insertFn = async (
     subject: obj.subject,
     createdAt: normalizeDatetimeAlways(obj.createdAt),
     indexedAt: timestamp,
-    type: followType as "bsky" | "sprk",
   };
 
   // Use findOneAndUpdate with upsert on the compound key to handle potential duplicate key errors
@@ -41,7 +32,6 @@ const insertFn = async (
       {
         authorDid: follow.authorDid,
         subject: follow.subject,
-        type: follow.type,
       },
       follow,
       { upsert: true, new: true },
@@ -59,12 +49,11 @@ const insertFn = async (
 const findDuplicate = async (
   db: Database,
   uri: AtUri,
-  obj: FollowRecord,
+  obj: Follow.Record,
 ): Promise<AtUri | null> => {
   const found = await db.models.Follow.findOne({
     authorDid: uri.host,
     subject: obj.subject,
-    type: uri.collection === "app.bsky.graph.follow" ? "bsky" : "sprk",
   }).select("uri").lean();
   return found ? new AtUri(found.uri) : null;
 };
@@ -146,14 +135,14 @@ const updateAggregates = async (db: Database, follow: IndexedFollow) => {
   }
 };
 
-export type PluginType = RecordProcessor<FollowRecord, IndexedFollow>;
+export type PluginType = RecordProcessor<Follow.Record, IndexedFollow>;
 
 export const makePlugin = (
   db: Database,
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexIds,
+    lexId,
     insertFn,
     findDuplicate,
     deleteFn,

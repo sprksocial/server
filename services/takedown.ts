@@ -13,8 +13,9 @@ export class TakedownService {
     targetCid: string;
     reason: string;
     adminDid: string;
+    ref?: string;
   }): Promise<void> {
-    const { targetUri, targetCid, reason, adminDid } = params;
+    const { targetUri, targetCid, reason, adminDid, ref } = params;
 
     // Create a takedown record
     await this.db.models.Takedown.create({
@@ -23,8 +24,16 @@ export class TakedownService {
       reason,
       takenDownBy: adminDid,
       takenDownAt: new Date().toISOString(),
+      ref: ref || null,
       applied: true,
     });
+
+    // Update the record document with takedown status
+    await this.updateRecordTakedownStatus(
+      targetUri,
+      true,
+      ref || "BSKY-TAKEDOWN-UNKNOWN",
+    );
   }
 
   // Add a method to handle user repo takedowns
@@ -45,6 +54,13 @@ export class TakedownService {
       ref: ref || null,
       applied: false,
     });
+
+    // Update all records from this DID with takedown status
+    await this.updateAllRecordsTakedownStatusByDid(
+      did,
+      true,
+      ref || "BSKY-TAKEDOWN-UNKNOWN",
+    );
   }
 
   // Add a method to handle blob takedowns
@@ -108,12 +124,24 @@ export class TakedownService {
 
   async removeTakedown(targetUri: string): Promise<boolean> {
     const result = await this.db.models.Takedown.deleteOne({ targetUri });
+
+    // Update the record document to remove takedown status
+    if (result.deletedCount > 0) {
+      await this.updateRecordTakedownStatus(targetUri, false);
+    }
+
     return result.deletedCount > 0;
   }
 
   // Add a method to remove repo takedown
   async removeRepoTakedown(did: string): Promise<boolean> {
     const result = await this.db.models.RepoTakedown.deleteOne({ did });
+
+    // Update all records from this DID to remove takedown status
+    if (result.deletedCount > 0) {
+      await this.updateAllRecordsTakedownStatusByDid(did, false);
+    }
+
     return result.deletedCount > 0;
   }
 
@@ -284,5 +312,63 @@ export class TakedownService {
     const takedown = await this.db.models.BlobTakedown.findOne({ did, cid })
       .lean();
     return takedown;
+  }
+
+  /**
+   * Update the takenDown and takedownRef properties on a RecordDocument
+   * @param uri The URI of the record to update
+   * @param takenDown Whether the record is taken down
+   * @param takedownRef Optional reference for the takedown
+   */
+  async updateRecordTakedownStatus(
+    uri: string,
+    takenDown: boolean,
+    takedownRef?: string,
+  ): Promise<void> {
+    const updateData: { takenDown: boolean; takedownRef?: string } = {
+      takenDown,
+    };
+
+    if (takenDown && takedownRef) {
+      updateData.takedownRef = takedownRef;
+      await this.db.models.Record.updateOne(
+        { uri },
+        { $set: updateData },
+      );
+    } else if (!takenDown) {
+      await this.db.models.Record.updateOne(
+        { uri },
+        { $set: { takenDown }, $unset: { takedownRef: "" } },
+      );
+    }
+  }
+
+  /**
+   * Update the takenDown and takedownRef properties on all RecordDocuments for a specific DID
+   * @param did The DID of the user whose records should be updated
+   * @param takenDown Whether the records are taken down
+   * @param takedownRef Optional reference for the takedown
+   */
+  async updateAllRecordsTakedownStatusByDid(
+    did: string,
+    takenDown: boolean,
+    takedownRef?: string,
+  ): Promise<void> {
+    if (takenDown && takedownRef) {
+      await this.db.models.Record.updateMany(
+        { did },
+        { $set: { takenDown, takedownRef } },
+      );
+    } else if (!takenDown) {
+      await this.db.models.Record.updateMany(
+        { did },
+        { $set: { takenDown }, $unset: { takedownRef: "" } },
+      );
+    } else {
+      await this.db.models.Record.updateMany(
+        { did },
+        { $set: { takenDown } },
+      );
+    }
   }
 }

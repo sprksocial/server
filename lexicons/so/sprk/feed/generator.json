@@ -39,13 +39,6 @@
             "description": "Self-label values",
             "refs": ["com.atproto.label.defs#selfLabels"]
           },
-          "contentMode": {
-            "type": "string",
-            "knownValues": [
-              "so.sprk.feed.defs#contentModeUnspecified",
-              "so.sprk.feed.defs#contentModeVideo"
-            ]
-          },
           "createdAt": { "type": "string", "format": "datetime" }
         }
       }

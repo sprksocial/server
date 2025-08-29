@@ -17,9 +17,14 @@ export class RepoSubscription {
   private firehoseRunning = false;
 
   constructor(
-    public opts: { service: string; db: Database; idResolver: IdResolver },
+    public opts: {
+      service: string;
+      db: Database;
+      idResolver: IdResolver;
+      startCursor?: number;
+    },
   ) {
-    const { service, db, idResolver } = opts;
+    const { service, db, idResolver, startCursor } = opts;
     this.logger = getLogger(["appview", "subscription"]);
     this.background = new BackgroundQueue(db, this.logger);
     this.indexingSvc = new IndexingService(
@@ -34,6 +39,8 @@ export class RepoSubscription {
       service,
       indexingSvc: this.indexingSvc,
       logger: this.logger,
+      db,
+      startCursor,
     });
     this.runner = runner;
     this.firehose = firehose;
@@ -43,7 +50,7 @@ export class RepoSubscription {
     const connected = await this.indexingSvc.db.waitForConnection(30000);
     if (!connected) {
       throw new Error(
-        "Failed to connect to database during subscription restart",
+        "Failed to connect to database during subscription start",
       );
     }
     this.logger.info("Starting firehose subscription");
@@ -59,11 +66,18 @@ export class RepoSubscription {
         "Failed to connect to database during subscription restart",
       );
     }
+
+    // Read fresh cursor from database
+    const savedCursor = await this.opts.db.getCursorState();
+    const startCursor = savedCursor !== null ? savedCursor : undefined;
+
     const { runner, firehose } = createFirehose({
       idResolver: this.opts.idResolver,
       service: this.opts.service,
       indexingSvc: this.indexingSvc,
       logger: this.logger,
+      db: this.opts.db,
+      startCursor,
     });
     this.runner = runner;
     this.firehose = firehose;
@@ -140,13 +154,21 @@ function createFirehose(opts: {
   service: string;
   indexingSvc: IndexingService;
   logger: Logger;
+  db: Database;
+  startCursor?: number;
 }): { firehose: Firehose; runner: MemoryRunner } {
-  const { idResolver, service, indexingSvc, logger } = opts;
-  const startCursor = env.NODE_ENV === "production" ? 0 : undefined;
-  logger.info("Creating firehose subscription", { service });
+  const { idResolver, service, indexingSvc, logger, db, startCursor } = opts;
+
+  logger.info("Creating firehose subscription", { service, startCursor });
+
   const runner = new MemoryRunner({
     startCursor,
     concurrency: env.RUNNER_CONCURRENCY,
+    cursorSaveIntervalMs: 30000, // Save cursor every 30 seconds
+    setCursor: async (cursor: number) => {
+      await db.saveCursorState(cursor);
+      logger.info("Cursor saved to database", { cursor });
+    },
   });
   const firehose = new Firehose({
     idResolver,

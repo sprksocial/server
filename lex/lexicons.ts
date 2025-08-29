@@ -4876,61 +4876,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkActorGetPreferences": {
-    "lexicon": 1,
-    "id": "so.sprk.actor.getPreferences",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Get private preferences attached to the current account. Expected use is synchronization between multiple devices, and import/export during account migration. Requires auth.",
-        "parameters": {
-          "type": "params",
-          "properties": {},
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "properties": {
-              "followMode": {
-                "type": "string",
-                "knownValues": [
-                  "bsky",
-                  "sprk",
-                ],
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkActorPutPreferences": {
-    "lexicon": 1,
-    "id": "so.sprk.actor.putPreferences",
-    "defs": {
-      "main": {
-        "type": "procedure",
-        "description": "Set the private preferences attached to the account.",
-        "input": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "properties": {
-              "followMode": {
-                "type": "string",
-                "knownValues": [
-                  "bsky",
-                  "sprk",
-                ],
-              },
-            },
-          },
-        },
-      },
-    },
-  },
   "SoSprkActorDefs": {
     "lexicon": 1,
     "id": "so.sprk.actor.defs",
@@ -5229,7 +5174,6 @@ export const schemaDict = {
             "lex:so.sprk.actor.defs#adultContentPref",
             "lex:so.sprk.actor.defs#contentLabelPref",
             "lex:so.sprk.actor.defs#savedFeedsPref",
-            "lex:so.sprk.actor.defs#savedFeedsPrefV2",
             "lex:so.sprk.actor.defs#personalDetailsPref",
             "lex:so.sprk.actor.defs#feedViewPref",
             "lex:so.sprk.actor.defs#threadViewPref",
@@ -5308,7 +5252,7 @@ export const schemaDict = {
           },
         },
       },
-      "savedFeedsPrefV2": {
+      "savedFeedsPref": {
         "type": "object",
         "required": [
           "items",
@@ -5320,32 +5264,6 @@ export const schemaDict = {
               "type": "ref",
               "ref": "lex:so.sprk.actor.defs#savedFeed",
             },
-          },
-        },
-      },
-      "savedFeedsPref": {
-        "type": "object",
-        "required": [
-          "pinned",
-          "saved",
-        ],
-        "properties": {
-          "pinned": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "at-uri",
-            },
-          },
-          "saved": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "at-uri",
-            },
-          },
-          "timelineIndex": {
-            "type": "integer",
           },
         },
       },
@@ -5571,6 +5489,61 @@ export const schemaDict = {
                 "lex:so.sprk.feed.threadgate#followingRule",
                 "lex:so.sprk.feed.threadgate#listRule",
               ],
+            },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkActorGetPreferences": {
+    "lexicon": 1,
+    "id": "so.sprk.actor.getPreferences",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Get private preferences attached to the current account. Expected use is synchronization between multiple devices, and import/export during account migration. Requires auth.",
+        "parameters": {
+          "type": "params",
+          "properties": {},
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "preferences",
+            ],
+            "properties": {
+              "preferences": {
+                "type": "ref",
+                "ref": "lex:so.sprk.actor.defs#preferences",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkActorPutPreferences": {
+    "lexicon": 1,
+    "id": "so.sprk.actor.putPreferences",
+    "defs": {
+      "main": {
+        "type": "procedure",
+        "description": "Set the private preferences attached to the account.",
+        "input": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "preferences",
+            ],
+            "properties": {
+              "preferences": {
+                "type": "ref",
+                "ref": "lex:so.sprk.actor.defs#preferences",
+              },
             },
           },
         },
@@ -6955,187 +6928,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkFeedGetActorLooks": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.getActorLooks",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Get a list of posts looked by an actor. Requires auth, actor must be the requesting account.",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "actor",
-          ],
-          "properties": {
-            "actor": {
-              "type": "string",
-              "format": "at-identifier",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "feed",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "feed": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.defs#feedViewPost",
-                },
-              },
-            },
-          },
-        },
-        "errors": [
-          {
-            "name": "BlockedActor",
-          },
-          {
-            "name": "BlockedByActor",
-          },
-        ],
-      },
-    },
-  },
-  "SoSprkFeedGetLooks": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.getLooks",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Get look records which reference a subject (by AT-URI and CID).",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "uri",
-          ],
-          "properties": {
-            "uri": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "AT-URI of the subject (eg, a post record).",
-            },
-            "cid": {
-              "type": "string",
-              "format": "cid",
-              "description":
-                "CID of the subject record (aka, specific version of record), to filter looks.",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "uri",
-              "looks",
-            ],
-            "properties": {
-              "uri": {
-                "type": "string",
-                "format": "at-uri",
-              },
-              "cid": {
-                "type": "string",
-                "format": "cid",
-              },
-              "cursor": {
-                "type": "string",
-              },
-              "looks": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.getLooks#look",
-                },
-              },
-            },
-          },
-        },
-      },
-      "look": {
-        "type": "object",
-        "required": [
-          "indexedAt",
-          "createdAt",
-          "actor",
-        ],
-        "properties": {
-          "indexedAt": {
-            "type": "string",
-            "format": "datetime",
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "datetime",
-          },
-          "actor": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileView",
-          },
-        },
-      },
-    },
-  },
-  "SoSprkFeedLook": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.look",
-    "defs": {
-      "main": {
-        "type": "record",
-        "description":
-          "Record declaring a 'look' of a piece of subject content. Equivalent to a 'view'",
-        "key": "tid",
-        "record": {
-          "type": "object",
-          "required": [
-            "subject",
-            "createdAt",
-          ],
-          "properties": {
-            "subject": {
-              "type": "ref",
-              "ref": "lex:com.atproto.repo.strongRef",
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "datetime",
-            },
-          },
-        },
-      },
-    },
-  },
   "SoSprkFeedPost": {
     "lexicon": 1,
     "id": "so.sprk.feed.post",
@@ -7530,80 +7322,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkFeedGenerator": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.generator",
-    "defs": {
-      "main": {
-        "type": "record",
-        "description":
-          "Record declaring of the existence of a feed generator, and containing metadata about it. The record can exist in any repository.",
-        "key": "any",
-        "record": {
-          "type": "object",
-          "required": [
-            "did",
-            "displayName",
-            "createdAt",
-          ],
-          "properties": {
-            "did": {
-              "type": "string",
-              "format": "did",
-            },
-            "displayName": {
-              "type": "string",
-              "maxGraphemes": 24,
-              "maxLength": 240,
-            },
-            "description": {
-              "type": "string",
-              "maxGraphemes": 300,
-              "maxLength": 3000,
-            },
-            "descriptionFacets": {
-              "type": "array",
-              "items": {
-                "type": "ref",
-                "ref": "lex:so.sprk.richtext.facet",
-              },
-            },
-            "avatar": {
-              "type": "blob",
-              "accept": [
-                "image/png",
-                "image/jpeg",
-              ],
-              "maxSize": 1000000,
-            },
-            "acceptsInteractions": {
-              "type": "boolean",
-              "description":
-                "Declaration that a feed accepts feedback interactions from a client through so.sprk.feed.sendInteractions",
-            },
-            "labels": {
-              "type": "union",
-              "description": "Self-label values",
-              "refs": [
-                "lex:com.atproto.label.defs#selfLabels",
-              ],
-            },
-            "contentMode": {
-              "type": "string",
-              "knownValues": [
-                "so.sprk.feed.defs#contentModeUnspecified",
-                "so.sprk.feed.defs#contentModeVideo",
-              ],
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "datetime",
-            },
-          },
-        },
-      },
-    },
-  },
   "SoSprkFeedSearchPosts": {
     "lexicon": 1,
     "id": "so.sprk.feed.searchPosts",
@@ -7736,6 +7454,209 @@ export const schemaDict = {
       },
     },
   },
+  "SoSprkFeedGetActorAudios": {
+    "lexicon": 1,
+    "id": "so.sprk.feed.getActorAudios",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description": "Get a list of audio records created by the actor.",
+        "parameters": {
+          "type": "params",
+          "required": [
+            "actor",
+          ],
+          "properties": {
+            "actor": {
+              "type": "string",
+              "format": "at-identifier",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+            },
+            "cursor": {
+              "type": "string",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "audios",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "audios": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.feed.defs#audioView",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkFeedGetAudios": {
+    "lexicon": 1,
+    "id": "so.sprk.feed.getAudios",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Gets audio views for a specified list of audios (by AT-URI).",
+        "parameters": {
+          "type": "params",
+          "required": [
+            "uris",
+          ],
+          "properties": {
+            "uris": {
+              "type": "array",
+              "description": "List of audio AT-URIs to return views for.",
+              "items": {
+                "type": "string",
+                "format": "at-uri",
+              },
+              "maxLength": 25,
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "audios",
+            ],
+            "properties": {
+              "audios": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.feed.defs#audioView",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkFeedGetPostsByAudio": {
+    "lexicon": 1,
+    "id": "so.sprk.feed.getPostsByAudio",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Get a list of posts that use a given audio (by AT-URI).",
+        "parameters": {
+          "type": "params",
+          "required": [
+            "uri",
+          ],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "Audio AT-URI to find referencing posts for.",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+            },
+            "cursor": {
+              "type": "string",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "posts",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "posts": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.feed.defs#postView",
+                },
+              },
+              "audio": {
+                "type": "ref",
+                "ref": "lex:so.sprk.feed.defs#audioView",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkFeedGetTrendingAudios": {
+    "lexicon": 1,
+    "id": "so.sprk.feed.getTrendingAudios",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Return trending audios ranked by popularity, returning AudioViews.",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25,
+            },
+            "cursor": {
+              "type": "string",
+              "description": "Opaque cursor for pagination",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "audios",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "audios": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.feed.defs#audioView",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   "SoSprkFeedDefs": {
     "lexicon": 1,
     "id": "so.sprk.feed.defs",
@@ -7821,9 +7742,6 @@ export const schemaDict = {
             "type": "integer",
           },
           "likeCount": {
-            "type": "integer",
-          },
-          "lookCount": {
             "type": "integer",
           },
           "indexedAt": {
@@ -7922,10 +7840,6 @@ export const schemaDict = {
             "format": "at-uri",
           },
           "like": {
-            "type": "string",
-            "format": "at-uri",
-          },
-          "look": {
             "type": "string",
             "format": "at-uri",
           },
@@ -8207,10 +8121,6 @@ export const schemaDict = {
             "type": "integer",
             "minimum": 0,
           },
-          "lookCount": {
-            "type": "integer",
-            "minimum": 0,
-          },
           "acceptsInteractions": {
             "type": "boolean",
           },
@@ -8225,13 +8135,6 @@ export const schemaDict = {
             "type": "ref",
             "ref": "lex:so.sprk.feed.defs#generatorViewerState",
           },
-          "contentMode": {
-            "type": "string",
-            "knownValues": [
-              "so.sprk.feed.defs#contentModeUnspecified",
-              "so.sprk.feed.defs#contentModeVideo",
-            ],
-          },
           "indexedAt": {
             "type": "string",
             "format": "datetime",
@@ -8242,10 +8145,6 @@ export const schemaDict = {
         "type": "object",
         "properties": {
           "like": {
-            "type": "string",
-            "format": "at-uri",
-          },
-          "look": {
             "type": "string",
             "format": "at-uri",
           },
@@ -8410,203 +8309,67 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkFeedGetActorAudios": {
+  "SoSprkFeedGenerator": {
     "lexicon": 1,
-    "id": "so.sprk.feed.getActorAudios",
+    "id": "so.sprk.feed.generator",
     "defs": {
       "main": {
-        "type": "query",
-        "description": "Get a list of audio records created by the actor.",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "actor",
-          ],
-          "properties": {
-            "actor": {
-              "type": "string",
-              "format": "at-identifier",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "audios",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "audios": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.defs#audioView",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkFeedGetAudios": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.getAudios",
-    "defs": {
-      "main": {
-        "type": "query",
+        "type": "record",
         "description":
-          "Gets audio views for a specified list of audios (by AT-URI).",
-        "parameters": {
-          "type": "params",
+          "Record declaring of the existence of a feed generator, and containing metadata about it. The record can exist in any repository.",
+        "key": "any",
+        "record": {
+          "type": "object",
           "required": [
-            "uris",
+            "did",
+            "displayName",
+            "createdAt",
           ],
           "properties": {
-            "uris": {
+            "did": {
+              "type": "string",
+              "format": "did",
+            },
+            "displayName": {
+              "type": "string",
+              "maxGraphemes": 24,
+              "maxLength": 240,
+            },
+            "description": {
+              "type": "string",
+              "maxGraphemes": 300,
+              "maxLength": 3000,
+            },
+            "descriptionFacets": {
               "type": "array",
-              "description": "List of audio AT-URIs to return views for.",
               "items": {
-                "type": "string",
-                "format": "at-uri",
-              },
-              "maxLength": 25,
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "audios",
-            ],
-            "properties": {
-              "audios": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.defs#audioView",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkFeedGetPostsByAudio": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.getPostsByAudio",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Get a list of posts that use a given audio (by AT-URI).",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "uri",
-          ],
-          "properties": {
-            "uri": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "Audio AT-URI to find referencing posts for.",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "posts",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "posts": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.defs#postView",
-                },
-              },
-              "audio": {
                 "type": "ref",
-                "ref": "lex:so.sprk.feed.defs#audioView",
+                "ref": "lex:so.sprk.richtext.facet",
               },
             },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkFeedGetTrendingAudios": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.getTrendingAudios",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Return trending audios ranked by popularity, delivering AudioView objects.",
-        "parameters": {
-          "type": "params",
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 25,
+            "avatar": {
+              "type": "blob",
+              "accept": [
+                "image/png",
+                "image/jpeg",
+              ],
+              "maxSize": 1000000,
             },
-            "cursor": {
+            "acceptsInteractions": {
+              "type": "boolean",
+              "description":
+                "Declaration that a feed accepts feedback interactions from a client through so.sprk.feed.sendInteractions",
+            },
+            "labels": {
+              "type": "union",
+              "description": "Self-label values",
+              "refs": [
+                "lex:com.atproto.label.defs#selfLabels",
+              ],
+            },
+            "createdAt": {
               "type": "string",
-              "description": "Opaque cursor for pagination",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "audios",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "audios": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.defs#audioView",
-                },
-              },
+              "format": "datetime",
             },
           },
         },
@@ -22610,9 +22373,9 @@ export const ids = {
   SoSprkActorProfile: "so.sprk.actor.profile",
   SoSprkActorSearchActors: "so.sprk.actor.searchActors",
   SoSprkActorSearchActorsTypeahead: "so.sprk.actor.searchActorsTypeahead",
+  SoSprkActorDefs: "so.sprk.actor.defs",
   SoSprkActorGetPreferences: "so.sprk.actor.getPreferences",
   SoSprkActorPutPreferences: "so.sprk.actor.putPreferences",
-  SoSprkActorDefs: "so.sprk.actor.defs",
   SoSprkEmbedDefs: "so.sprk.embed.defs",
   SoSprkEmbedVideo: "so.sprk.embed.video",
   SoSprkEmbedImages: "so.sprk.embed.images",
@@ -22636,23 +22399,20 @@ export const ids = {
   SoSprkFeedRepost: "so.sprk.feed.repost",
   SoSprkFeedSendInteractions: "so.sprk.feed.sendInteractions",
   SoSprkFeedThreadgate: "so.sprk.feed.threadgate",
-  SoSprkFeedGetActorLooks: "so.sprk.feed.getActorLooks",
-  SoSprkFeedGetLooks: "so.sprk.feed.getLooks",
-  SoSprkFeedLook: "so.sprk.feed.look",
   SoSprkFeedPost: "so.sprk.feed.post",
   SoSprkFeedLike: "so.sprk.feed.like",
   SoSprkFeedGetStories: "so.sprk.feed.getStories",
   SoSprkFeedGetStoriesTimeline: "so.sprk.feed.getStoriesTimeline",
   SoSprkFeedMusic: "so.sprk.feed.music",
   SoSprkFeedStory: "so.sprk.feed.story",
-  SoSprkFeedGenerator: "so.sprk.feed.generator",
   SoSprkFeedSearchPosts: "so.sprk.feed.searchPosts",
   SoSprkFeedAudio: "so.sprk.feed.audio",
-  SoSprkFeedDefs: "so.sprk.feed.defs",
   SoSprkFeedGetActorAudios: "so.sprk.feed.getActorAudios",
   SoSprkFeedGetAudios: "so.sprk.feed.getAudios",
   SoSprkFeedGetPostsByAudio: "so.sprk.feed.getPostsByAudio",
   SoSprkFeedGetTrendingAudios: "so.sprk.feed.getTrendingAudios",
+  SoSprkFeedDefs: "so.sprk.feed.defs",
+  SoSprkFeedGenerator: "so.sprk.feed.generator",
   SoSprkGraphBlock: "so.sprk.graph.block",
   SoSprkGraphDefs: "so.sprk.graph.defs",
   SoSprkGraphFollow: "so.sprk.graph.follow",

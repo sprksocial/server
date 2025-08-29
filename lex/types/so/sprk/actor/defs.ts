@@ -174,7 +174,6 @@ export type Preferences = (
   | $Typed<AdultContentPref>
   | $Typed<ContentLabelPref>
   | $Typed<SavedFeedsPref>
-  | $Typed<SavedFeedsPrefV2>
   | $Typed<PersonalDetailsPref>
   | $Typed<FeedViewPref>
   | $Typed<ThreadViewPref>
@@ -246,26 +245,9 @@ export function validateSavedFeed<V>(v: V) {
   return validate<SavedFeed & V>(v, id, hashSavedFeed);
 }
 
-export interface SavedFeedsPrefV2 {
-  $type?: "so.sprk.actor.defs#savedFeedsPrefV2";
-  items: (SavedFeed)[];
-}
-
-const hashSavedFeedsPrefV2 = "savedFeedsPrefV2";
-
-export function isSavedFeedsPrefV2<V>(v: V) {
-  return is$typed(v, id, hashSavedFeedsPrefV2);
-}
-
-export function validateSavedFeedsPrefV2<V>(v: V) {
-  return validate<SavedFeedsPrefV2 & V>(v, id, hashSavedFeedsPrefV2);
-}
-
 export interface SavedFeedsPref {
   $type?: "so.sprk.actor.defs#savedFeedsPref";
-  pinned: (string)[];
-  saved: (string)[];
-  timelineIndex?: number;
+  items: (SavedFeed)[];
 }
 
 const hashSavedFeedsPref = "savedFeedsPref";

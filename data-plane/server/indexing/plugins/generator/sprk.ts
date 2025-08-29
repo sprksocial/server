@@ -1,14 +1,14 @@
 import { CID } from "multiformats/cid";
 import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
-import * as lex from "../../../../lex/lexicons.ts";
-import * as FeedGenerator from "../../../../lex/types/app/bsky/feed/generator.ts";
-import { BackgroundQueue } from "../../background.ts";
-import { Database } from "../../index.ts";
-import { GeneratorDocument } from "../../models.ts";
-import { RecordProcessor } from "../processor.ts";
+import * as lex from "../../../../../lex/lexicons.ts";
+import * as FeedGenerator from "../../../../../lex/types/so/sprk/feed/generator.ts";
+import { BackgroundQueue } from "../../../background.ts";
+import { Database } from "../../../index.ts";
+import { SprkGeneratorDocument } from "../../../models.ts";
+import { RecordProcessor } from "../../processor.ts";
 
-const lexIds = [lex.ids.AppBskyFeedGenerator];
-type IndexedFeedGenerator = GeneratorDocument;
+const lexId = lex.ids.SoSprkFeedGenerator;
+type IndexedFeedGenerator = SprkGeneratorDocument;
 
 const insertFn = async (
   db: Database,
@@ -36,14 +36,13 @@ const insertFn = async (
     avatar,
     acceptsInteractions: obj.acceptsInteractions || null,
     labels: null, // Will be populated by label processing
-    contentMode: null, // Not used in Bluesky
     createdAt: normalizeDatetimeAlways(obj.createdAt),
     indexedAt: timestamp,
   };
 
   // Use findOneAndUpdate with upsert to handle potential duplicate key errors
   try {
-    const insertedGenerator = await db.models.Generator.findOneAndUpdate(
+    const insertedGenerator = await db.models.SprkGenerator.findOneAndUpdate(
       { uri: generator.uri },
       generator,
       { upsert: true, new: true },
@@ -71,7 +70,7 @@ const deleteFn = async (
   db: Database,
   uri: AtUri,
 ): Promise<IndexedFeedGenerator | null> => {
-  const deleted = await db.models.Generator.findOneAndDelete({
+  const deleted = await db.models.SprkGenerator.findOneAndDelete({
     uri: uri.toString(),
   });
   return deleted;
@@ -91,7 +90,7 @@ export const makePlugin = (
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexIds,
+    lexId,
     insertFn,
     findDuplicate,
     deleteFn,

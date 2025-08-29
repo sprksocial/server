@@ -110,8 +110,6 @@ import * as SoSprkFeedGetRepostedBy from "./types/so/sprk/feed/getRepostedBy.ts"
 import * as SoSprkFeedGetSuggestedFeeds from "./types/so/sprk/feed/getSuggestedFeeds.ts";
 import * as SoSprkFeedGetTimeline from "./types/so/sprk/feed/getTimeline.ts";
 import * as SoSprkFeedSendInteractions from "./types/so/sprk/feed/sendInteractions.ts";
-import * as SoSprkFeedGetActorLooks from "./types/so/sprk/feed/getActorLooks.ts";
-import * as SoSprkFeedGetLooks from "./types/so/sprk/feed/getLooks.ts";
 import * as SoSprkFeedGetStories from "./types/so/sprk/feed/getStories.ts";
 import * as SoSprkFeedGetStoriesTimeline from "./types/so/sprk/feed/getStoriesTimeline.ts";
 import * as SoSprkFeedSearchPosts from "./types/so/sprk/feed/searchPosts.ts";
@@ -1719,30 +1717,6 @@ export class SoSprkFeedNS {
     >,
   ) {
     const nsid = "so.sprk.feed.sendInteractions"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
-  getActorLooks<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkFeedGetActorLooks.QueryParams,
-      SoSprkFeedGetActorLooks.HandlerInput,
-      SoSprkFeedGetActorLooks.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.feed.getActorLooks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
-  getLooks<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkFeedGetLooks.QueryParams,
-      SoSprkFeedGetLooks.HandlerInput,
-      SoSprkFeedGetLooks.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.feed.getLooks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
     return this._server.xrpc.method(nsid, cfg);
   }
 

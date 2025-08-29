@@ -63,12 +63,7 @@ export default function (server: Server, ctx: AppContext) {
         }
 
         // Parse the original record JSON
-        let recordValue;
-        try {
-          recordValue = record.json ? JSON.parse(record.json) : record;
-        } catch {
-          throw new InvalidRequestError(`Invalid record JSON: ${uri}`);
-        }
+        const recordValue = record.json;
 
         // Check if the record is subject to a takedown
         const takedown = await ctx.takedownService.getTakedown(uri);
