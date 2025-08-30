@@ -35,7 +35,7 @@
           "type": "union",
           "refs": ["so.sprk.embed.images#view", "so.sprk.embed.video#view"]
         },
-        "sound": { "type": "ref", "ref": "#soundView" },
+        "sound": { "type": "ref", "ref": "so.sprk.sound.defs#audioView" },
         "replyCount": { "type": "integer" },
         "repostCount": { "type": "integer" },
         "likeCount": { "type": "integer" },
@@ -46,26 +46,6 @@
           "items": { "type": "ref", "ref": "com.atproto.label.defs#label" }
         },
         "threadgate": { "type": "ref", "ref": "#threadgateView" }
-      }
-    },
-    "soundView": {
-      "type": "object",
-      "required": ["uri", "cid", "author", "record", "indexedAt"],
-      "properties": {
-        "uri": { "type": "string", "format": "at-uri" },
-        "cid": { "type": "string", "format": "cid" },
-        "author": {
-          "type": "ref",
-          "ref": "so.sprk.actor.defs#profileViewBasic"
-        },
-        "record": { "type": "unknown" },
-        "useCount": { "type": "integer" },
-        "likeCount": { "type": "integer" },
-        "indexedAt": { "type": "string", "format": "datetime" },
-        "labels": {
-          "type": "array",
-          "items": { "type": "ref", "ref": "com.atproto.label.defs#label" }
-        }
       }
     },
     "viewerState": {

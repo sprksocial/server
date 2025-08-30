@@ -7,6 +7,8 @@ import getPosts from "./so/sprk/feed/getPosts.ts";
 import getProfile from "./so/sprk/actor/getProfile.ts";
 import getAuthorFeed from "./so/sprk/feed/getAuthorFeed.ts";
 import getPostThread from "./so/sprk/feed/getPostThread.ts";
+import getAudios from "./so/sprk/sound/getAudios.ts";
+import getAudioPosts from "./so/sprk/sound/getAudioPosts.ts";
 import getFollows from "./so/sprk/graph/getFollows.ts";
 import getFollowers from "./so/sprk/graph/getFollowers.ts";
 import putPreferences from "./so/sprk/actor/putPreferences.ts";
@@ -18,6 +20,8 @@ import getStories from "./so/sprk/feed/getStories.ts";
 import getStoriesTimeline from "./so/sprk/feed/getStoriesTimeline.ts";
 import getProfiles from "./so/sprk/actor/getProfiles.ts";
 import searchPosts from "./so/sprk/feed/searchPosts.ts";
+import getActorAudios from "./so/sprk/sound/getActorAudios.ts";
+import getTrendingAudios from "./so/sprk/sound/getTrendingAudios.ts";
 import getSuggestedFeeds from "./so/sprk/feed/getSuggestedFeeds.ts";
 import getTimeline from "./so/sprk/feed/getTimeline.ts";
 
@@ -30,6 +34,8 @@ export default function (server: Server, ctx: AppContext) {
   getProfiles(server, ctx);
   getAuthorFeed(server, ctx);
   getPostThread(server, ctx);
+  getAudios(server, ctx);
+  getAudioPosts(server, ctx);
   getFollows(server, ctx);
   getFollowers(server, ctx);
   putPreferences(server, ctx);
@@ -40,6 +46,8 @@ export default function (server: Server, ctx: AppContext) {
   getStories(server, ctx);
   getStoriesTimeline(server, ctx);
   searchPosts(server, ctx);
+  getActorAudios(server, ctx);
+  getTrendingAudios(server, ctx);
   getSuggestedFeeds(server, ctx);
   getTimeline(server, ctx);
 }

@@ -202,26 +202,31 @@ profileSchema.index({
 });
 
 export interface AudioDocument extends AuthoredDocument {
-  sound: string;
-  origin: {
+  sound: MediaRef;
+  origin?: {
     uri: string;
     cid: string;
   };
-  title?: string;
-  text?: string;
+  title: string;
+  details?: {
+    artist?: string;
+    title?: string;
+  };
   labels?: Label[];
+  useCount: number;
 }
 
 export const audioSchema = new Schema<AudioDocument>({
   ...authoredSchema,
-  sound: { type: String, required: true },
+  sound: { type: Object, required: true },
   origin: {
     uri: { type: String, required: true },
     cid: { type: String, required: true },
   },
-  title: { type: String, required: false },
-  text: { type: String, required: false },
+  title: { type: String, required: true },
+  details: { type: Object, required: false },
   labels: { type: [Object], required: false },
+  useCount: { type: Number, required: true, default: 0 },
 });
 
 export interface RepostDocument extends AuthoredDocument {
@@ -405,6 +410,7 @@ blockSchema.index({ authorDid: 1, subject: 1 }, { unique: true });
 blockSchema.index({ subject: 1, createdAt: -1 });
 
 audioSchema.index({ authorDid: 1, createdAt: -1 });
+audioSchema.index({ useCount: -1, createdAt: -1 });
 repostSchema.index({ authorDid: 1, createdAt: -1 });
 repostSchema.index({ "subject.uri": 1, createdAt: -1 });
 

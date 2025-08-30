@@ -11058,6 +11058,8 @@ export const schemaDict = {
             "knownValues": [
               "JOB_STATE_COMPLETED",
               "JOB_STATE_FAILED",
+              "JOB_STATE_QUEUED",
+              "JOB_STATE_PROCESSING",
             ],
           },
           "progress": {
@@ -11069,11 +11071,32 @@ export const schemaDict = {
           "blob": {
             "type": "blob",
           },
+          "audio": {
+            "type": "ref",
+            "ref": "lex:so.sprk.video.defs#extractedAudio",
+          },
           "error": {
             "type": "string",
           },
           "message": {
             "type": "string",
+          },
+        },
+      },
+      "extractedAudio": {
+        "type": "object",
+        "description":
+          "Audio extracted from the uploaded video for client-side record creation.",
+        "required": [
+          "blob",
+        ],
+        "properties": {
+          "details": {
+            "type": "ref",
+            "ref": "lex:so.sprk.sound.defs#audioDetails",
+          },
+          "blob": {
+            "type": "blob",
           },
         },
       },
@@ -14037,7 +14060,7 @@ export const schemaDict = {
           },
           "sound": {
             "type": "ref",
-            "ref": "lex:so.sprk.feed.defs#soundView",
+            "ref": "lex:so.sprk.sound.defs#audioView",
           },
           "replyCount": {
             "type": "integer",
@@ -14066,50 +14089,6 @@ export const schemaDict = {
           "threadgate": {
             "type": "ref",
             "ref": "lex:so.sprk.feed.defs#threadgateView",
-          },
-        },
-      },
-      "soundView": {
-        "type": "object",
-        "required": [
-          "uri",
-          "cid",
-          "author",
-          "record",
-          "indexedAt",
-        ],
-        "properties": {
-          "uri": {
-            "type": "string",
-            "format": "at-uri",
-          },
-          "cid": {
-            "type": "string",
-            "format": "cid",
-          },
-          "author": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
-          },
-          "record": {
-            "type": "unknown",
-          },
-          "useCount": {
-            "type": "integer",
-          },
-          "likeCount": {
-            "type": "integer",
-          },
-          "indexedAt": {
-            "type": "string",
-            "format": "datetime",
-          },
-          "labels": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:com.atproto.label.defs#label",
-            },
           },
         },
       },
@@ -15643,65 +15622,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkFeedAudio": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.audio",
-    "description":
-      "A audio record referencable in a Spark record (e.g, a post)",
-    "defs": {
-      "main": {
-        "type": "record",
-        "key": "tid",
-        "record": {
-          "type": "object",
-          "required": [
-            "sound",
-            "origin",
-            "createdAt",
-          ],
-          "properties": {
-            "sound": {
-              "type": "blob",
-              "accept": [
-                "audio/mp3",
-              ],
-              "maxSize": 10485760,
-            },
-            "origin": {
-              "type": "ref",
-              "ref": "lex:com.atproto.repo.strongRef",
-            },
-            "title": {
-              "type": "string",
-              "maxLength": 1000,
-              "maxGraphemes": 100,
-              "description": "The audio's title.",
-            },
-            "text": {
-              "type": "string",
-              "maxLength": 3000,
-              "maxGraphemes": 300,
-              "description": "The audio's description.",
-            },
-            "labels": {
-              "type": "union",
-              "description":
-                "Self-label values for this audio. Effectively content warnings.",
-              "refs": [
-                "lex:com.atproto.label.defs#selfLabels",
-              ],
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "datetime",
-              "description":
-                "Client-declared timestamp when this post was originally created.",
-            },
-          },
-        },
-      },
-    },
-  },
   "SoSprkFeedGetQuotes": {
     "lexicon": 1,
     "id": "so.sprk.feed.getQuotes",
@@ -16223,6 +16143,337 @@ export const schemaDict = {
           "byteEnd": {
             "type": "integer",
             "minimum": 0,
+          },
+        },
+      },
+    },
+  },
+  "SoSprkSoundDefs": {
+    "lexicon": 1,
+    "id": "so.sprk.sound.defs",
+    "defs": {
+      "audioView": {
+        "type": "object",
+        "required": [
+          "uri",
+          "cid",
+          "author",
+          "title",
+          "coverArt",
+          "record",
+          "indexedAt",
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "cid": {
+            "type": "string",
+            "format": "cid",
+          },
+          "author": {
+            "type": "ref",
+            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
+          },
+          "record": {
+            "type": "unknown",
+          },
+          "useCount": {
+            "type": "integer",
+          },
+          "title": {
+            "type": "string",
+          },
+          "coverArt": {
+            "type": "string",
+          },
+          "details": {
+            "type": "ref",
+            "ref": "lex:so.sprk.sound.defs#audioDetails",
+          },
+          "indexedAt": {
+            "type": "string",
+            "format": "datetime",
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:com.atproto.label.defs#label",
+            },
+          },
+        },
+      },
+      "audioDetails": {
+        "type": "object",
+        "description": "Metadata about the audio content.",
+        "properties": {
+          "artist": {
+            "type": "string",
+          },
+          "title": {
+            "type": "string",
+          },
+        },
+      },
+    },
+  },
+  "SoSprkSoundGetActorAudios": {
+    "lexicon": 1,
+    "id": "so.sprk.sound.getActorAudios",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description": "Get a list of audio records created by the actor.",
+        "parameters": {
+          "type": "params",
+          "required": [
+            "actor",
+          ],
+          "properties": {
+            "actor": {
+              "type": "string",
+              "format": "at-identifier",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+            },
+            "cursor": {
+              "type": "string",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "audios",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "audios": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.sound.defs#audioView",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkSoundGetAudioPosts": {
+    "lexicon": 1,
+    "id": "so.sprk.sound.getAudioPosts",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Get a list of posts that use a given audio (by AT-URI).",
+        "parameters": {
+          "type": "params",
+          "required": [
+            "uri",
+          ],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "Audio AT-URI to find referencing posts for.",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+            },
+            "cursor": {
+              "type": "string",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "posts",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "posts": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.feed.defs#postView",
+                },
+              },
+              "audio": {
+                "type": "ref",
+                "ref": "lex:so.sprk.sound.defs#audioView",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkSoundGetAudios": {
+    "lexicon": 1,
+    "id": "so.sprk.sound.getAudios",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Gets audio views for a specified list of audios (by AT-URI).",
+        "parameters": {
+          "type": "params",
+          "required": [
+            "uris",
+          ],
+          "properties": {
+            "uris": {
+              "type": "array",
+              "description": "List of audio AT-URIs to return views for.",
+              "items": {
+                "type": "string",
+                "format": "at-uri",
+              },
+              "maxLength": 25,
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "audios",
+            ],
+            "properties": {
+              "audios": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.sound.defs#audioView",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkSoundAudio": {
+    "lexicon": 1,
+    "id": "so.sprk.sound.audio",
+    "description":
+      "A audio record referencable in a Spark record (e.g, a post)",
+    "defs": {
+      "main": {
+        "type": "record",
+        "key": "tid",
+        "record": {
+          "type": "object",
+          "required": [
+            "sound",
+            "title",
+            "createdAt",
+          ],
+          "properties": {
+            "sound": {
+              "type": "blob",
+              "accept": [
+                "audio/*",
+              ],
+              "maxSize": 10485760,
+            },
+            "origin": {
+              "type": "ref",
+              "ref": "lex:com.atproto.repo.strongRef",
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 1000,
+              "maxGraphemes": 100,
+              "description": "The audio's title.",
+            },
+            "details": {
+              "type": "ref",
+              "ref": "lex:so.sprk.sound.defs#audioDetails",
+            },
+            "labels": {
+              "type": "union",
+              "description":
+                "Self-label values for this audio. Effectively content warnings.",
+              "refs": [
+                "lex:com.atproto.label.defs#selfLabels",
+              ],
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "datetime",
+              "description":
+                "Client-declared timestamp when this audio was originally created.",
+            },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkSoundGetTrendingAudios": {
+    "lexicon": 1,
+    "id": "so.sprk.sound.getTrendingAudios",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Return trending audios ranked by popularity, returning AudioViews.",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25,
+            },
+            "cursor": {
+              "type": "string",
+              "description": "Opaque cursor for pagination",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "audios",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "audios": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.sound.defs#audioView",
+                },
+              },
+            },
           },
         },
       },
@@ -22267,7 +22518,6 @@ export const ids = {
   SoSprkFeedGetPosts: "so.sprk.feed.getPosts",
   SoSprkFeedGetFeed: "so.sprk.feed.getFeed",
   SoSprkFeedGetStories: "so.sprk.feed.getStories",
-  SoSprkFeedAudio: "so.sprk.feed.audio",
   SoSprkFeedGetQuotes: "so.sprk.feed.getQuotes",
   SoSprkFeedGetStoriesTimeline: "so.sprk.feed.getStoriesTimeline",
   SoSprkFeedGetFeedSkeleton: "so.sprk.feed.getFeedSkeleton",
@@ -22276,6 +22526,12 @@ export const ids = {
   SoSprkFeedGetActorFeeds: "so.sprk.feed.getActorFeeds",
   SoSprkFeedPost: "so.sprk.feed.post",
   SoSprkRichtextFacet: "so.sprk.richtext.facet",
+  SoSprkSoundDefs: "so.sprk.sound.defs",
+  SoSprkSoundGetActorAudios: "so.sprk.sound.getActorAudios",
+  SoSprkSoundGetAudioPosts: "so.sprk.sound.getAudioPosts",
+  SoSprkSoundGetAudios: "so.sprk.sound.getAudios",
+  SoSprkSoundAudio: "so.sprk.sound.audio",
+  SoSprkSoundGetTrendingAudios: "so.sprk.sound.getTrendingAudios",
   SoSprkActorSearchActorsTypeahead: "so.sprk.actor.searchActorsTypeahead",
   SoSprkActorDefs: "so.sprk.actor.defs",
   SoSprkActorPutPreferences: "so.sprk.actor.putPreferences",

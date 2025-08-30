@@ -7,6 +7,7 @@ import { type $Typed } from "../../../../util.ts";
 import type * as SoSprkActorDefs from "../actor/defs.ts";
 import type * as SoSprkEmbedImages from "../embed/images.ts";
 import type * as SoSprkEmbedVideo from "../embed/video.ts";
+import type * as SoSprkSoundDefs from "../sound/defs.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 import type * as SoSprkRichtextFacet from "../richtext/facet.ts";
 import type * as SoSprkGraphDefs from "../graph/defs.ts";
@@ -45,7 +46,7 @@ export interface PostView {
   embed?: $Typed<SoSprkEmbedImages.View> | $Typed<SoSprkEmbedVideo.View> | {
     $type: string;
   };
-  sound?: SoundView;
+  sound?: SoSprkSoundDefs.AudioView;
   replyCount?: number;
   repostCount?: number;
   likeCount?: number;
@@ -63,28 +64,6 @@ export function isPostView<V>(v: V) {
 
 export function validatePostView<V>(v: V) {
   return validate<PostView & V>(v, id, hashPostView);
-}
-
-export interface SoundView {
-  $type?: "so.sprk.feed.defs#soundView";
-  uri: string;
-  cid: string;
-  author: SoSprkActorDefs.ProfileViewBasic;
-  record: { [_ in string]: unknown };
-  useCount?: number;
-  likeCount?: number;
-  indexedAt: string;
-  labels?: (ComAtprotoLabelDefs.Label)[];
-}
-
-const hashSoundView = "soundView";
-
-export function isSoundView<V>(v: V) {
-  return is$typed(v, id, hashSoundView);
-}
-
-export function validateSoundView<V>(v: V) {
-  return validate<SoundView & V>(v, id, hashSoundView);
 }
 
 /** Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests. */

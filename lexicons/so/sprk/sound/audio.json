@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "so.sprk.feed.audio",
+  "id": "so.sprk.sound.audio",
   "description": "A audio record referencable in a Spark record (e.g, a post)",
   "defs": {
     "main": {
@@ -8,11 +8,11 @@
       "key": "tid",
       "record": {
         "type": "object",
-        "required": ["sound", "origin", "createdAt"],
+        "required": ["sound", "title", "createdAt"],
         "properties": {
           "sound": {
             "type": "blob",
-            "accept": ["audio/mp3"],
+            "accept": ["audio/*"],
             "maxSize": 10485760
           },
           "origin": {
@@ -25,11 +25,9 @@
             "maxGraphemes": 100,
             "description": "The audio's title."
           },
-          "text": {
-            "type": "string",
-            "maxLength": 3000,
-            "maxGraphemes": 300,
-            "description": "The audio's description."
+          "details": {
+            "type": "ref",
+            "ref": "so.sprk.sound.defs#audioDetails"
           },
           "labels": {
             "type": "union",
@@ -39,7 +37,7 @@
           "createdAt": {
             "type": "string",
             "format": "datetime",
-            "description": "Client-declared timestamp when this post was originally created."
+            "description": "Client-declared timestamp when this audio was originally created."
           }
         }
       }

@@ -3,6 +3,7 @@ import type { Label } from "../lex/types/com/atproto/label/defs.ts";
 import type * as SoSprkFeedDefs from "../lex/types/so/sprk/feed/defs.ts";
 import type * as SoSprkFeedPost from "../lex/types/so/sprk/feed/post.ts";
 import { AppContext } from "../main.ts";
+import { transformAudiosToAudioViews } from "./audio-transformer.ts";
 import { transformEmbed } from "./embed-transformer.ts";
 import { createProfileViewBasic } from "./profile-helper.ts";
 
@@ -18,6 +19,9 @@ export async function transformPostsToPostViews(
 
   const postUris = posts.map((p) => p.uri);
   const authorDids = [...new Set(posts.map((p) => p.authorDid))];
+  const soundUris = posts
+    .map((p) => p.sound?.uri)
+    .filter((u): u is string => typeof u === "string");
 
   const [
     likeCounts,
@@ -102,6 +106,10 @@ export async function transformPostsToPostViews(
     ]),
   );
 
+  const audios = await ctx.db.models.Audio.find({ uri: { $in: soundUris } });
+  const audioViews = await transformAudiosToAudioViews(audios, ctx);
+  const audioViewsMap = new Map(audioViews.map((av) => [av.uri, av]));
+
   return posts.map((post) => {
     const videoMapping = post.embed?.$type === "so.sprk.embed.video"
       ? videoMappingsMap.get(
@@ -145,6 +153,7 @@ export async function transformPostsToPostViews(
       likeCount: likeCountsMap.get(post.uri) || 0,
       indexedAt: post.indexedAt,
       labels,
+      sound: post.sound?.uri ? audioViewsMap.get(post.sound.uri) : undefined,
     };
   });
 }
