@@ -40,7 +40,7 @@
       "properties": {
         "details": {
           "type": "ref",
-          "ref": "so.sprk.feed.defs#audioDetails"
+          "ref": "so.sprk.sound.defs#audioDetails"
         },
         "blob": { "type": "blob" }
       }

@@ -1,16 +1,21 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import type * as SoSprkFeedDefs from "./defs.ts";
+import type * as SoSprkFeedDefs from "../feed/defs.ts";
+import type * as SoSprkSoundDefs from "./defs.ts";
 
 export type QueryParams = {
-  /** List of audio AT-URIs to return views for. */
-  uris: string[];
+  /** Audio AT-URI to find referencing posts for. */
+  uri: string;
+  limit: number;
+  cursor?: string;
 };
 export type InputSchema = undefined;
 
 export interface OutputSchema {
-  audios: (SoSprkFeedDefs.AudioView)[];
+  cursor?: string;
+  posts: (SoSprkFeedDefs.PostView)[];
+  audio?: SoSprkSoundDefs.AudioView;
 }
 
 export type HandlerInput = void;

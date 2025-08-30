@@ -1,6 +1,6 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { OutputSchema } from "../../../../lex/types/so/sprk/feed/getActorAudios.ts";
+import { OutputSchema } from "../../../../lex/types/so/sprk/sound/getActorAudios.ts";
 import { transformAudiosToAudioViews } from "../../../../utils/audio-transformer.ts";
 import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
 
@@ -25,7 +25,7 @@ function generateCursor(createdAt: string, id: string): string {
 }
 
 export default function (server: Server, ctx: AppContext) {
-  server.so.sprk.feed.getActorAudios({
+  server.so.sprk.sound.getActorAudios({
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth }) => {
       try {

@@ -1,14 +1,14 @@
 import { CID } from "multiformats/cid";
 import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
 import * as lex from "../../../../lex/lexicons.ts";
-import * as Audio from "../../../../lex/types/so/sprk/feed/audio.ts";
+import * as Audio from "../../../../lex/types/so/sprk/sound/audio.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../index.ts";
 import { AudioDocument } from "../../models.ts";
 import { RecordProcessor } from "../processor.ts";
 import { normalizeObject } from "../../../../utils/embed-normalizer.ts";
 
-const lexId = lex.ids.SoSprkFeedAudio;
+const lexId = lex.ids.SoSprkSoundAudio;
 type IndexedAudio = AudioDocument;
 
 const insertFn = async (

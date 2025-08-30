@@ -4,7 +4,7 @@
 import { BlobRef } from "@atproto/lexicon";
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
-import type * as SoSprkFeedDefs from "../feed/defs.ts";
+import type * as SoSprkSoundDefs from "../sound/defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.video.defs";
@@ -41,7 +41,7 @@ export function validateJobStatus<V>(v: V) {
 /** Audio extracted from the uploaded video for client-side record creation. */
 export interface ExtractedAudio {
   $type?: "so.sprk.video.defs#extractedAudio";
-  details?: SoSprkFeedDefs.AudioDetails;
+  details?: SoSprkSoundDefs.AudioDetails;
   blob: BlobRef;
 }
 

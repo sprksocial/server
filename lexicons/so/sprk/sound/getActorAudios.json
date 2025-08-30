@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "so.sprk.feed.getActorAudios",
+  "id": "so.sprk.sound.getActorAudios",
   "defs": {
     "main": {
       "type": "query",
@@ -30,7 +30,7 @@
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "so.sprk.feed.defs#audioView"
+                "ref": "so.sprk.sound.defs#audioView"
               }
             }
           }

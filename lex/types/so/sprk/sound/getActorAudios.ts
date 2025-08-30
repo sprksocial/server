@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import type * as SoSprkFeedDefs from "./defs.ts";
+import type * as SoSprkSoundDefs from "./defs.ts";
 
 export type QueryParams = {
   actor: string;
@@ -12,7 +12,7 @@ export type InputSchema = undefined;
 
 export interface OutputSchema {
   cursor?: string;
-  audios: (SoSprkFeedDefs.AudioView)[];
+  audios: (SoSprkSoundDefs.AudioView)[];
 }
 
 export type HandlerInput = void;

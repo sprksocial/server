@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "so.sprk.feed.getTrendingAudios",
+  "id": "so.sprk.sound.getTrendingAudios",
   "defs": {
     "main": {
       "type": "query",
@@ -29,7 +29,7 @@
             "cursor": { "type": "string" },
             "audios": {
               "type": "array",
-              "items": { "type": "ref", "ref": "so.sprk.feed.defs#audioView" }
+              "items": { "type": "ref", "ref": "so.sprk.sound.defs#audioView" }
             }
           }
         }

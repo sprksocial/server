@@ -1,6 +1,6 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { OutputSchema } from "../../../../lex/types/so/sprk/feed/getAudios.ts";
+import { OutputSchema } from "../../../../lex/types/so/sprk/sound/getAudios.ts";
 import { transformAudiosToAudioViews } from "../../../../utils/audio-transformer.ts";
 import { AudioDocument } from "../../../../data-plane/server/models.ts";
 
@@ -90,7 +90,7 @@ function sortAudiosByUriOrder(
 }
 
 export default function (server: Server, ctx: AppContext) {
-  server.so.sprk.feed.getAudios({
+  server.so.sprk.sound.getAudios({
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth }) => {
       try {

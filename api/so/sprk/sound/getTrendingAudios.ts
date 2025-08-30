@@ -1,6 +1,6 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { OutputSchema } from "../../../../lex/types/so/sprk/feed/getTrendingAudios.ts";
+import { OutputSchema } from "../../../../lex/types/so/sprk/sound/getTrendingAudios.ts";
 import { transformAudiosToAudioViews } from "../../../../utils/audio-transformer.ts";
 import { AudioDocument } from "../../../../data-plane/server/models.ts";
 
@@ -14,7 +14,7 @@ interface BlockDoc {
 }
 
 export default function (server: Server, ctx: AppContext) {
-  server.so.sprk.feed.getTrendingAudios({
+  server.so.sprk.sound.getTrendingAudios({
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth }) => {
       const { limit = 25, cursor } = params;

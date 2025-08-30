@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "so.sprk.feed.audio",
+  "id": "so.sprk.sound.audio",
   "description": "A audio record referencable in a Spark record (e.g, a post)",
   "defs": {
     "main": {
@@ -27,7 +27,7 @@
           },
           "details": {
             "type": "ref",
-            "ref": "so.sprk.feed.defs#audioDetails"
+            "ref": "so.sprk.sound.defs#audioDetails"
           },
           "labels": {
             "type": "union",

@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "so.sprk.feed.getPostsByAudio",
+  "id": "so.sprk.sound.getPostsByAudio",
   "defs": {
     "main": {
       "type": "query",
@@ -36,7 +36,7 @@
             },
             "audio": {
               "type": "ref",
-              "ref": "so.sprk.feed.defs#audioView"
+              "ref": "so.sprk.sound.defs#audioView"
             }
           }
         }

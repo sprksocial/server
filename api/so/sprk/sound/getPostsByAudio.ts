@@ -1,6 +1,6 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { OutputSchema } from "../../../../lex/types/so/sprk/feed/getPostsByAudio.ts";
+import { OutputSchema } from "../../../../lex/types/so/sprk/sound/getPostsByAudio.ts";
 import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts";
 import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
 import { transformAudioToAudioView } from "../../../../utils/audio-transformer.ts";
@@ -28,7 +28,7 @@ function generateCursor(createdAt: string, id: string): string {
 }
 
 export default function (server: Server, ctx: AppContext) {
-  server.so.sprk.feed.getPostsByAudio({
+  server.so.sprk.sound.getPostsByAudio({
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth }) => {
       try {

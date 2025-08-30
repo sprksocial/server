@@ -1,4 +1,4 @@
-import type * as SoSprkFeedDefs from "../lex/types/so/sprk/feed/defs.ts";
+import type * as SoSprkSoundDefs from "../lex/types/so/sprk/sound/defs.ts";
 import { AudioDocument } from "../data-plane/server/models.ts";
 import { AppContext } from "../main.ts";
 import { createProfileViewBasic } from "./profile-helper.ts";
@@ -9,7 +9,7 @@ export async function transformAudioToAudioView(
   audio: AudioDocument,
   ctx: AppContext,
   usageCount?: number,
-): Promise<SoSprkFeedDefs.AudioView> {
+): Promise<SoSprkSoundDefs.AudioView> {
   const authorView = await createProfileViewBasic(audio.authorDid, ctx);
 
   const labels = audio.labels
@@ -54,7 +54,7 @@ export async function transformAudioToAudioView(
 export async function transformAudiosToAudioViews(
   audios: AudioDocument[],
   ctx: AppContext,
-): Promise<SoSprkFeedDefs.AudioView[]> {
+): Promise<SoSprkSoundDefs.AudioView[]> {
   if (audios.length === 0) return [];
 
   // Prefetch authors
@@ -103,6 +103,6 @@ export async function transformAudiosToAudioViews(
       details,
       indexedAt: audio.indexedAt,
       labels,
-    } satisfies SoSprkFeedDefs.AudioView;
+    } satisfies SoSprkSoundDefs.AudioView;
   });
 }
