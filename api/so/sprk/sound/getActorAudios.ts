@@ -1,6 +1,5 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { OutputSchema } from "../../../../lex/types/so/sprk/sound/getActorAudios.ts";
 import { transformAudiosToAudioViews } from "../../../../utils/audio-transformer.ts";
 import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
 
@@ -109,7 +108,7 @@ export default function (server: Server, ctx: AppContext) {
           nextCursor = generateCursor(String(last.createdAt), String(last._id));
         }
 
-        const body: OutputSchema = {
+        const body = {
           audios: audioViews,
           ...(nextCursor ? { cursor: nextCursor } : {}),
         };

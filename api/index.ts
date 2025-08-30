@@ -8,7 +8,7 @@ import getProfile from "./so/sprk/actor/getProfile.ts";
 import getAuthorFeed from "./so/sprk/feed/getAuthorFeed.ts";
 import getPostThread from "./so/sprk/feed/getPostThread.ts";
 import getAudios from "./so/sprk/sound/getAudios.ts";
-import getPostsByAudio from "./so/sprk/sound/getPostsByAudio.ts";
+import getAudioPosts from "./so/sprk/sound/getAudioPosts.ts";
 import getFollows from "./so/sprk/graph/getFollows.ts";
 import getFollowers from "./so/sprk/graph/getFollowers.ts";
 import putPreferences from "./so/sprk/actor/putPreferences.ts";
@@ -35,7 +35,7 @@ export default function (server: Server, ctx: AppContext) {
   getAuthorFeed(server, ctx);
   getPostThread(server, ctx);
   getAudios(server, ctx);
-  getPostsByAudio(server, ctx);
+  getAudioPosts(server, ctx);
   getFollows(server, ctx);
   getFollowers(server, ctx);
   putPreferences(server, ctx);

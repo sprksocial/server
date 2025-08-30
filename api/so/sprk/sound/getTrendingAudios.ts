@@ -1,6 +1,5 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { OutputSchema } from "../../../../lex/types/so/sprk/sound/getTrendingAudios.ts";
 import { transformAudiosToAudioViews } from "../../../../utils/audio-transformer.ts";
 import { AudioDocument } from "../../../../data-plane/server/models.ts";
 
@@ -75,7 +74,7 @@ export default function (server: Server, ctx: AppContext) {
         nextCursor = (skip + limit).toString();
       }
 
-      const body: OutputSchema = {
+      const body = {
         audios: views,
         ...(nextCursor ? { cursor: nextCursor } : {}),
       };

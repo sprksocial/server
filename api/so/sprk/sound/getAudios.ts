@@ -1,6 +1,5 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { OutputSchema } from "../../../../lex/types/so/sprk/sound/getAudios.ts";
 import { transformAudiosToAudioViews } from "../../../../utils/audio-transformer.ts";
 import { AudioDocument } from "../../../../data-plane/server/models.ts";
 
@@ -112,7 +111,7 @@ export default function (server: Server, ctx: AppContext) {
         if (validUris.length === 0) {
           return {
             encoding: "application/json",
-            body: { audios: [] } as OutputSchema,
+            body: { audios: [] },
           };
         }
 
@@ -127,7 +126,7 @@ export default function (server: Server, ctx: AppContext) {
         if (dbAudios.length === 0) {
           return {
             encoding: "application/json",
-            body: { audios: [] } as OutputSchema,
+            body: { audios: [] },
           };
         }
 
@@ -142,14 +141,14 @@ export default function (server: Server, ctx: AppContext) {
         if (accessibleAudios.length === 0) {
           return {
             encoding: "application/json",
-            body: { audios: [] } as OutputSchema,
+            body: { audios: [] },
           };
         }
 
         const sorted = sortAudiosByUriOrder(accessibleAudios, uniqueUris);
         const views = await transformAudiosToAudioViews(sorted, ctx);
 
-        const response: OutputSchema = { audios: views };
+        const response = { audios: views };
         return { encoding: "application/json", body: response };
       } catch (error) {
         console.error("Error in getAudios:", error);
