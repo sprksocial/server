@@ -1,10 +1,10 @@
 import { CID } from "multiformats/cid";
 import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
-import * as lex from "../../../../lex/lexicons.ts";
-import * as Like from "../../../../lex/types/so/sprk/feed/like.ts";
+import * as lex from "../../../lex/lexicons.ts";
+import * as Like from "../../../lex/types/so/sprk/feed/like.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { Database } from "../../index.ts";
-import { LikeDocument } from "../../models.ts";
+import { Database } from "../../db/index.ts";
+import { LikeDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
 const lexId = lex.ids.SoSprkFeedLike;

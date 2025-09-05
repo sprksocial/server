@@ -1,9 +1,9 @@
 import { CID } from "multiformats/cid";
 import { stringifyLex } from "@atproto/lexicon";
 import { AtUri } from "@atproto/syntax";
-import { lexicons } from "../../../lex/lexicons.ts";
+import { lexicons } from "../../lex/lexicons.ts";
 import { BackgroundQueue } from "../background.ts";
-import { Database } from "../index.ts";
+import { Database } from "../db/index.ts";
 import { jsonToLex } from "@atproto/api";
 
 // @NOTE re: insertions and deletions. Due to how record updates are handled,
@@ -79,6 +79,12 @@ export class RecordProcessor<T, S> {
 
   matchesSchema(obj: unknown): obj is T {
     try {
+      if (this.collection === "so.sprk.actor.profile") {
+        console.log(
+          `[matchesSchema] Validating object for collection ${this.collection}:`,
+          JSON.stringify(obj, null, 2),
+        );
+      }
       lexicons.assertValidRecord(this.collection, obj);
       return true;
     } catch {
@@ -93,6 +99,12 @@ export class RecordProcessor<T, S> {
       );
     }
     try {
+      if (this.collection === "so.sprk.actor.profile") {
+        console.log(
+          `[matchesSchema] Validating object for collection ${this.collection}:`,
+          JSON.stringify(obj, null, 2),
+        );
+      }
       lexicons.assertValidRecord(this.collection, obj);
     } catch (err) {
       throw new Error(

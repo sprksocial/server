@@ -1,20 +1,20 @@
 import { CID } from "multiformats/cid";
 import { AtUri } from "@atproto/syntax";
-import * as lex from "../../../../lex/lexicons.ts";
-import { isMain as isEmbedImage } from "../../../../lex/types/so/sprk/embed/images.ts";
-import { isMain as isEmbedVideo } from "../../../../lex/types/so/sprk/embed/video.ts";
+import * as lex from "../../../lex/lexicons.ts";
+import { isMain as isEmbedImage } from "../../../lex/types/so/sprk/embed/images.ts";
+import { isMain as isEmbedVideo } from "../../../lex/types/so/sprk/embed/video.ts";
 import {
   Record as PostRecord,
   ReplyRef,
-} from "../../../../lex/types/so/sprk/feed/post.ts";
-import { Record as GateRecord } from "../../../../lex/types/so/sprk/feed/threadgate.ts";
+} from "../../../lex/types/so/sprk/feed/post.ts";
+import { Record as GateRecord } from "../../../lex/types/so/sprk/feed/threadgate.ts";
 import {
   isLink,
   isMention,
-} from "../../../../lex/types/so/sprk/richtext/facet.ts";
+} from "../../../lex/types/so/sprk/richtext/facet.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { Database } from "../../index.ts";
-import { PostDocument } from "../../models.ts";
+import { Database } from "../../db/index.ts";
+import { PostDocument } from "../../db/models.ts";
 import {
   getAncestorsAndSelf,
   getDescendents,
@@ -24,7 +24,7 @@ import { RecordProcessor } from "../processor.ts";
 import {
   normalizeEmbed,
   normalizeObject,
-} from "../../../../utils/embed-normalizer.ts";
+} from "../../../utils/embed-normalizer.ts";
 import { jsonToLex } from "@atproto/api";
 
 type PostAncestor = {

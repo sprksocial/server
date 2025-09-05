@@ -1,10 +1,10 @@
 import { CID } from "multiformats/cid";
 import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
-import * as lex from "../../../../lex/lexicons.ts";
-import * as Repost from "../../../../lex/types/app/bsky/feed/repost.ts";
+import * as lex from "../../../lex/lexicons.ts";
+import * as Repost from "../../../lex/types/app/bsky/feed/repost.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { Database } from "../../index.ts";
-import { RepostDocument } from "../../models.ts";
+import { Database } from "../../db/index.ts";
+import { RepostDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
 const lexId = lex.ids.AppBskyFeedRepost;

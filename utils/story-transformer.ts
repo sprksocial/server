@@ -1,5 +1,5 @@
 import type * as SoSprkFeedDefs from "../lex/types/so/sprk/feed/defs.ts";
-import { StoryDocument } from "../data-plane/server/models.ts";
+import { StoryDocument } from "../data-plane/db/models.ts";
 import { transformEmbed } from "./embed-transformer.ts";
 import { createProfileViewBasic } from "./profile-helper.ts";
 import { AppContext } from "../main.ts";

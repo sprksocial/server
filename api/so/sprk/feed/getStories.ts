@@ -2,7 +2,7 @@ import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { OutputSchema } from "../../../../lex/types/so/sprk/feed/getStories.ts";
 import { transformStoriesToStoryViews } from "../../../../utils/story-transformer.ts";
-import { StoryDocument } from "../../../../data-plane/server/models.ts";
+import { StoryDocument } from "../../../../data-plane/db/models.ts";
 
 // Constants
 const MAX_STORIES_LIMIT = 25;

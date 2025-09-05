@@ -1,15 +1,14 @@
 import mongoose, { Connection } from "mongoose";
 import { IdResolver, MemoryCache } from "@atproto/identity";
 import { env } from "../../utils/env.ts";
-import { DataPlaneClient, GetIdentityByDidResponse } from "../client/index.ts";
 import * as models from "./models.ts";
-import { getResultFromDoc } from "./util.ts";
+import { getResultFromDoc } from "../util.ts";
 import { getLogger } from "@logtape/logtape";
 
 const HOUR = 60 * 60 * 1000;
 const DAY = HOUR * 24;
 
-export class Database implements DataPlaneClient {
+export class Database {
   private connection!: Connection;
   public models!: models.DatabaseModels;
   public logger = getLogger(["appview", "database"]);
@@ -199,7 +198,7 @@ export class Database implements DataPlaneClient {
   // Implement DataPlaneClient interface
   async getIdentityByDid(
     { did }: { did: string },
-  ): Promise<GetIdentityByDidResponse> {
+  ): Promise<{ did: string; handle?: string } | undefined> {
     const doc = await this.idResolver.did.resolve(did);
     if (!doc) {
       throw new Error("DID not found");

@@ -11,10 +11,10 @@ import {
   WriteOpAction,
 } from "@atproto/repo";
 import { AtUri } from "@atproto/syntax";
-import { retryXrpc } from "../../../utils/retry.ts";
+import { retryXrpc } from "../../utils/retry.ts";
 import { BackgroundQueue } from "../background.ts";
-import { Database } from "../index.ts";
-import { ActorDocument } from "../models.ts";
+import { Database } from "../db/index.ts";
+import { ActorDocument } from "../db/models.ts";
 import * as Block from "./plugins/block.ts";
 import * as Generator from "./plugins/generator/index.ts";
 import * as Follow from "./plugins/follow.ts";

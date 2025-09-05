@@ -4,7 +4,7 @@ import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts
 import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
 import { transformAudioToAudioView } from "../../../../utils/audio-transformer.ts";
 import { RootFilterQuery } from "mongoose";
-import { PostDocument } from "../../../../data-plane/server/models.ts";
+import { PostDocument } from "../../../../data-plane/db/models.ts";
 
 interface CursorData {
   createdAt: string;

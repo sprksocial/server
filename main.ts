@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
-import { Database } from "./data-plane/server/index.ts";
+import { Database } from "./data-plane/db/index.ts";
 import { env } from "./utils/env.ts";
 import { createAuthVerifier } from "./services/auth-verifier.ts";
 import API from "./api/index.ts";
@@ -18,7 +18,8 @@ import { BidirectionalResolver } from "./utils/id-resolver.ts";
 import { DidResolver } from "@atproto/identity";
 import { AuthVerifier } from "./services/auth-verifier.ts";
 import { AuthRequiredError } from "@sprk/xrpc-server";
-import { RepoSubscription } from "./data-plane/server/subscription.ts";
+import { RepoSubscription } from "./data-plane/subscription.ts";
+import { DataPlane } from "./data-plane/index.ts";
 import { configure, getConsoleSink, getLogger, Logger } from "@logtape/logtape";
 import { getPrettyFormatter } from "@logtape/pretty";
 
@@ -42,6 +43,7 @@ await configure({
 
 export type AppContext = {
   db: Database;
+  dataplane: DataPlane;
   logger: Logger;
   resolver: BidirectionalResolver;
   serviceDid: string;
@@ -159,6 +161,8 @@ export async function setupApp(): Promise<
   const resolver = createBidirectionalResolver(baseIdResolver);
   const serviceDid = env.SERVICE_DID;
 
+  const dataplane = new DataPlane(db, resolver.baseResolver);
+
   // Services
   const sub = new RepoSubscription({
     service: env.RELAY_URL,
@@ -167,7 +171,7 @@ export async function setupApp(): Promise<
     startCursor,
   });
   const takedownService = new TakedownService(db);
-  const authVerifier = createAuthVerifier(db, {
+  const authVerifier = createAuthVerifier(dataplane, {
     ownDid: serviceDid,
     alternateAudienceDids: [],
     modServiceDid: env.MOD_SERVICE_DID,
@@ -176,6 +180,7 @@ export async function setupApp(): Promise<
 
   const ctx = {
     db,
+    dataplane,
     logger: appLogger,
     resolver,
     serviceDid,

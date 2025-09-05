@@ -6,7 +6,7 @@ import type {
   ViewerState,
 } from "../lex/types/so/sprk/actor/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../lex/types/com/atproto/repo/strongRef.ts";
-import type { StoryDocument } from "../data-plane/server/models.ts";
+import type { StoryDocument } from "../data-plane/db/models.ts";
 import type { Label } from "../lex/types/com/atproto/label/defs.ts";
 import { ensureValidDid, isValidHandle } from "@atproto/syntax";
 import { AppContext } from "../main.ts";

@@ -1,12 +1,12 @@
 import { IdResolver } from "@atproto/identity";
 import { WriteOpAction } from "@atproto/repo";
 import { Event as FirehoseEvent, Firehose } from "@atproto/sync";
-import { MemoryRunner } from "../../utils/memory-runner.ts";
+import { MemoryRunner } from "../utils/memory-runner.ts";
 import { BackgroundQueue } from "./background.ts";
-import { Database } from "./index.ts";
+import { Database } from "./db/index.ts";
 import { IndexingService } from "./indexing/index.ts";
 import { getLogger, Logger } from "@logtape/logtape";
-import { env } from "../../utils/env.ts";
+import { env } from "../utils/env.ts";
 
 export class RepoSubscription {
   firehose: Firehose;

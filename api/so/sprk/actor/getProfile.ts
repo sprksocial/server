@@ -7,6 +7,8 @@ export default function (server: Server, ctx: AppContext) {
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth }) => {
       const { actor: actorParam } = params;
+      await ctx.sub.indexingSvc.indexRepo(actorParam);
+
       const viewerDid = auth.credentials.type === "standard"
         ? auth.credentials.iss
         : undefined;

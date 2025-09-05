@@ -1,7 +1,7 @@
 import PQueue from "p-queue";
-import { Database } from "./index.ts";
+import { Database } from "./db/index.ts";
 import { Logger } from "@logtape/logtape";
-import { env } from "../../utils/env.ts";
+import { env } from "../utils/env.ts";
 
 // A simple queue for in-process, out-of-band/backgrounded work
 

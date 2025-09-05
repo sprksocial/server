@@ -1,12 +1,12 @@
 import { CID } from "multiformats/cid";
 import { AtUri } from "@atproto/syntax";
-import * as lex from "../../../../lex/lexicons.ts";
-import * as Profile from "../../../../lex/types/so/sprk/actor/profile.ts";
+import * as lex from "../../../lex/lexicons.ts";
+import * as Profile from "../../../lex/types/so/sprk/actor/profile.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { Database } from "../../index.ts";
-import { ProfileDocument } from "../../models.ts";
+import { Database } from "../../db/index.ts";
+import { ProfileDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
-import { normalizeProfile } from "../../../../utils/embed-normalizer.ts";
+import { normalizeProfile } from "../../../utils/embed-normalizer.ts";
 
 const lexId = lex.ids.SoSprkActorProfile;
 type IndexedProfile = ProfileDocument;

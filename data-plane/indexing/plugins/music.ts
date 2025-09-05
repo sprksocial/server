@@ -1,32 +1,37 @@
 import { CID } from "multiformats/cid";
 import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
-import * as lex from "../../../../lex/lexicons.ts";
-import * as Story from "../../../../lex/types/so/sprk/feed/story.ts";
+import * as lex from "../../../lex/lexicons.ts";
+import * as Music from "../../../lex/types/so/sprk/feed/music.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { Database } from "../../index.ts";
-import { StoryDocument } from "../../models.ts";
+import { Database } from "../../db/index.ts";
+import { MusicDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
-import {
-  normalizeEmbed,
-  normalizeObject,
-} from "../../../../utils/embed-normalizer.ts";
+import { normalizeObject } from "../../../utils/embed-normalizer.ts";
 
-const lexId = lex.ids.SoSprkFeedStory;
-type IndexedStory = StoryDocument;
+const lexId = lex.ids.SoSprkFeedMusic;
+type IndexedMusic = MusicDocument;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
   cid: CID,
-  obj: Story.Record,
+  obj: Music.Record,
   timestamp: string,
-): Promise<IndexedStory | null> => {
-  const story = {
+): Promise<IndexedMusic | null> => {
+  const music = {
     uri: uri.toString(),
     cid: cid.toString(),
     authorDid: uri.host,
-    media: normalizeEmbed(obj.media) || null,
-    sound: normalizeObject(obj.sound) || null,
+    sound: normalizeObject(obj.sound?.ref) || null,
+    title: obj.title,
+    author: obj.author,
+    releaseDate: obj.releaseDate,
+    album: obj.album || null,
+    recordLabel: obj.recordLabel || null,
+    cover: normalizeObject(obj.cover?.ref) || null,
+    text: obj.text || null,
+    copyright: obj.copyright || null,
+    facets: obj.facets || [],
     labels: obj.labels || null,
     tags: obj.tags || [],
     createdAt: normalizeDatetimeAlways(obj.createdAt),
@@ -35,12 +40,12 @@ const insertFn = async (
 
   // Use findOneAndUpdate with upsert to handle potential duplicate key errors
   try {
-    const insertedStory = await db.models.Story.findOneAndUpdate(
-      { uri: story.uri },
-      story,
+    const insertedMusic = await db.models.Music.findOneAndUpdate(
+      { uri: music.uri },
+      music,
       { upsert: true, new: true },
     );
-    return insertedStory;
+    return insertedMusic;
   } catch (err) {
     // Handle duplicate key errors gracefully
     const mongoError = err as { code?: number };
@@ -62,8 +67,8 @@ const notifsForInsert = () => {
 const deleteFn = async (
   db: Database,
   uri: AtUri,
-): Promise<IndexedStory | null> => {
-  const deleted = await db.models.Story.findOneAndDelete({
+): Promise<IndexedMusic | null> => {
+  const deleted = await db.models.Music.findOneAndDelete({
     uri: uri.toString(),
   });
   return deleted;
@@ -73,7 +78,7 @@ const notifsForDelete = () => {
   return { notifs: [], toDelete: [] };
 };
 
-export type PluginType = RecordProcessor<Story.Record, IndexedStory>;
+export type PluginType = RecordProcessor<Music.Record, IndexedMusic>;
 
 export const makePlugin = (
   db: Database,

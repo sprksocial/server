@@ -1,16 +1,17 @@
 import { assertEquals } from "jsr:@std/assert";
 import { assertMatch } from "jsr:@std/assert/match";
 import { AppContext, createApp } from "./main.ts";
-import { Database } from "./data-plane/server/index.ts";
+import { Database } from "./data-plane/db/index.ts";
 import {
   createBidirectionalResolver,
   createIdResolver,
 } from "./utils/id-resolver.ts";
 import { TakedownService } from "./services/takedown.ts";
 import { createAuthVerifier } from "./services/auth-verifier.ts";
-import { RepoSubscription } from "./data-plane/server/subscription.ts";
+import { RepoSubscription } from "./data-plane/subscription.ts";
 import { MemoryRunner } from "./utils/memory-runner.ts";
 import { getLogger } from "@logtape/logtape";
+import { DataPlane } from "./data-plane/index.ts";
 
 Deno.env.set("SERVICE_DID", "did:web:test");
 Deno.env.set("MOD_SERVICE_DID", "did:web:test");
@@ -36,6 +37,7 @@ function createMockContext(): AppContext {
     saveCursorState: () => Promise.resolve(),
   } as unknown as Database;
 
+  const dataplane = new DataPlane(mockDb, resolver.baseResolver);
   const takedownService = new TakedownService(mockDb);
   const sub = new RepoSubscription({
     service: "wss://relay1.us-west.bsky.network",
@@ -43,7 +45,7 @@ function createMockContext(): AppContext {
     idResolver: baseIdResolver,
     startCursor: undefined,
   });
-  const authVerifier = createAuthVerifier(mockDb, {
+  const authVerifier = createAuthVerifier(dataplane, {
     ownDid: serviceDid,
     alternateAudienceDids: [],
     modServiceDid: "did:web:test",
@@ -52,6 +54,7 @@ function createMockContext(): AppContext {
 
   return {
     db: mockDb,
+    dataplane,
     logger: appLogger,
     resolver,
     serviceDid,

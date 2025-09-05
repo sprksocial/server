@@ -9,14 +9,7 @@ import {
   parseReqNsid,
   verifyJwt,
 } from "@sprk/xrpc-server";
-import {
-  Code,
-  DataPlaneClient,
-  GetIdentityByDidResponse,
-  getKeyAsDidKey,
-  isDataplaneError,
-  unpackIdentityKeys,
-} from "../data-plane/client/index.ts";
+import { DataPlane } from "../data-plane/index.ts";
 
 interface MinimalRequest {
   url?: string;
@@ -140,7 +133,7 @@ export interface AuthVerifier extends ExtendedAuthVerifier {
 }
 
 export function createAuthVerifier(
-  dataplane: DataPlaneClient,
+  dataplane: DataPlane,
   opts: AuthVerifierOpts,
 ): AuthVerifier {
   const impl = new AuthVerifierImpl(dataplane, opts);
@@ -193,7 +186,7 @@ class AuthVerifierImpl {
   private entrywayJwtPublicKey?: KeyObject;
 
   constructor(
-    public dataplane: DataPlaneClient,
+    public dataplane: DataPlane,
     opts: AuthVerifierOpts,
   ) {
     this.ownDid = opts.ownDid;
@@ -444,21 +437,26 @@ class AuthVerifierImpl {
       const keyId = serviceId === "atproto_labeler"
         ? "atproto_label"
         : "atproto";
-      let identity: GetIdentityByDidResponse;
       try {
-        identity = await this.dataplane.getIdentityByDid({ did });
-      } catch (err) {
-        if (isDataplaneError(err, Code.NotFound)) {
-          throw new AuthRequiredError("identity unknown");
+        const identity = await this.dataplane.identity.getByDid(did);
+
+        const keys = JSON.parse(identity.keys) as Record<string, {
+          Type: string;
+          PublicKeyMultibase: string;
+        }>;
+        const key = keys[keyId];
+
+        if (!key || !key.PublicKeyMultibase) {
+          throw new AuthRequiredError("missing or bad key");
         }
-        throw err;
+
+        return `did:key:${key.PublicKeyMultibase}`;
+      } catch (err) {
+        if (err instanceof AuthRequiredError) {
+          throw err;
+        }
+        throw new AuthRequiredError("identity unknown");
       }
-      const keys = unpackIdentityKeys(identity.keys);
-      const didKey = getKeyAsDidKey(keys, { id: keyId });
-      if (!didKey) {
-        throw new AuthRequiredError("missing or bad key");
-      }
-      return didKey;
     };
     const assertLxmCheck = () => {
       const lxm = parseReqNsid(reqCtx.req);

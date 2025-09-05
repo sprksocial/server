@@ -1,5 +1,5 @@
 import type * as SoSprkSoundDefs from "../lex/types/so/sprk/sound/defs.ts";
-import { AudioDocument } from "../data-plane/server/models.ts";
+import { AudioDocument } from "../data-plane/db/models.ts";
 import { AppContext } from "../main.ts";
 import { createProfileViewBasic } from "./profile-helper.ts";
 import type { Label } from "../lex/types/com/atproto/label/defs.ts";

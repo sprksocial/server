@@ -1,8 +1,8 @@
 import {
   Record as PostRecord,
   ReplyRef,
-} from "../../lex/types/so/sprk/feed/post.ts";
-import { Database } from "./index.ts";
+} from "../lex/types/so/sprk/feed/post.ts";
+import { Database } from "./db/index.ts";
 import { DidDocument } from "@atproto/identity";
 import { Buffer } from "node:buffer";
 import { Timestamp } from "npm:@bufbuild/protobuf@1.5.0";

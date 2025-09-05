@@ -1,0 +1,68 @@
+import { IdResolver } from "@atproto/identity";
+import { Database } from "./db/index.ts";
+import { getLogger, Logger } from "@logtape/logtape";
+import { Blocks } from "./routes/blocks.ts";
+import { Feeds } from "./routes/feeds.ts";
+import { Follows } from "./routes/follows.ts";
+import { Likes } from "./routes/likes.ts";
+import { Moderation } from "./routes/moderation.ts";
+import { Profiles } from "./routes/profiles.ts";
+import { Identity } from "./routes/identity.ts";
+import { Records } from "./routes/records.ts";
+import { Relationships } from "./routes/relationships.ts";
+import { Interactions } from "./routes/interactions.ts";
+import { Reposts } from "./routes/reposts.ts";
+import { Sync } from "./routes/sync.ts";
+import { Threads } from "./routes/threads.ts";
+
+export { RepoSubscription } from "./subscription.ts";
+
+export type ServerContext = {
+  db: Database;
+  idResolver?: IdResolver;
+};
+
+export class DataPlane {
+  private db: Database;
+  public logger: Logger;
+  private idResolver?: IdResolver;
+
+  // Route handlers as root-level properties
+  public blocks: Blocks;
+  public feeds: Feeds;
+  public follows: Follows;
+  public likes: Likes;
+  public moderation: Moderation;
+  public profiles: Profiles;
+  public identity: Identity;
+  public records: Records;
+  public relationships: Relationships;
+  public interactions: Interactions;
+  public reposts: Reposts;
+  public sync: Sync;
+  public threads: Threads;
+
+  constructor(
+    db: Database,
+    idResolver?: IdResolver,
+  ) {
+    this.db = db;
+    this.idResolver = idResolver;
+    this.logger = getLogger(["appview", "data-plane"]);
+
+    // Initialize all route handlers
+    this.blocks = new Blocks(db);
+    this.feeds = new Feeds(db);
+    this.follows = new Follows(db);
+    this.likes = new Likes(db);
+    this.moderation = new Moderation(db);
+    this.profiles = new Profiles(db);
+    this.identity = new Identity(db, idResolver);
+    this.records = new Records(db);
+    this.relationships = new Relationships(db);
+    this.interactions = new Interactions(db);
+    this.reposts = new Reposts(db);
+    this.sync = new Sync(db);
+    this.threads = new Threads(db);
+  }
+}

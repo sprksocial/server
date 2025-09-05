@@ -1,51 +1,44 @@
 import { CID } from "multiformats/cid";
 import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
-import * as lex from "../../../../lex/lexicons.ts";
-import * as Music from "../../../../lex/types/so/sprk/feed/music.ts";
+import * as lex from "../../../lex/lexicons.ts";
+import * as Audio from "../../../lex/types/so/sprk/sound/audio.ts";
 import { BackgroundQueue } from "../../background.ts";
-import { Database } from "../../index.ts";
-import { MusicDocument } from "../../models.ts";
+import { Database } from "../../db/index.ts";
+import { AudioDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
-import { normalizeObject } from "../../../../utils/embed-normalizer.ts";
+import { normalizeObject } from "../../../utils/embed-normalizer.ts";
 
-const lexId = lex.ids.SoSprkFeedMusic;
-type IndexedMusic = MusicDocument;
+const lexId = lex.ids.SoSprkSoundAudio;
+type IndexedAudio = AudioDocument;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
   cid: CID,
-  obj: Music.Record,
+  obj: Audio.Record,
   timestamp: string,
-): Promise<IndexedMusic | null> => {
-  const music = {
+): Promise<IndexedAudio | null> => {
+  const audio: Record<string, unknown> = {
     uri: uri.toString(),
     cid: cid.toString(),
     authorDid: uri.host,
-    sound: normalizeObject(obj.sound?.ref) || null,
+    sound: normalizeObject(obj.sound) || null,
+    origin: obj.origin ? { uri: obj.origin.uri, cid: obj.origin.cid } : null,
     title: obj.title,
-    author: obj.author,
-    releaseDate: obj.releaseDate,
-    album: obj.album || null,
-    recordLabel: obj.recordLabel || null,
-    cover: normalizeObject(obj.cover?.ref) || null,
-    text: obj.text || null,
-    copyright: obj.copyright || null,
-    facets: obj.facets || [],
     labels: obj.labels || null,
-    tags: obj.tags || [],
+    details: obj.details || null,
     createdAt: normalizeDatetimeAlways(obj.createdAt),
     indexedAt: timestamp,
   };
 
   // Use findOneAndUpdate with upsert to handle potential duplicate key errors
   try {
-    const insertedMusic = await db.models.Music.findOneAndUpdate(
-      { uri: music.uri },
-      music,
+    const insertedAudio = await db.models.Audio.findOneAndUpdate(
+      { uri: audio.uri },
+      audio,
       { upsert: true, new: true },
     );
-    return insertedMusic;
+    return insertedAudio;
   } catch (err) {
     // Handle duplicate key errors gracefully
     const mongoError = err as { code?: number };
@@ -67,8 +60,8 @@ const notifsForInsert = () => {
 const deleteFn = async (
   db: Database,
   uri: AtUri,
-): Promise<IndexedMusic | null> => {
-  const deleted = await db.models.Music.findOneAndDelete({
+): Promise<IndexedAudio | null> => {
+  const deleted = await db.models.Audio.findOneAndDelete({
     uri: uri.toString(),
   });
   return deleted;
@@ -78,7 +71,7 @@ const notifsForDelete = () => {
   return { notifs: [], toDelete: [] };
 };
 
-export type PluginType = RecordProcessor<Music.Record, IndexedMusic>;
+export type PluginType = RecordProcessor<Audio.Record, IndexedAudio>;
 
 export const makePlugin = (
   db: Database,

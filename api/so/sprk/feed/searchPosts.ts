@@ -4,7 +4,7 @@ import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts
 import * as SoSprkFeedDefs from "../../../../lex/types/so/sprk/feed/defs.ts";
 import { OutputSchema } from "../../../../lex/types/so/sprk/feed/searchPosts.ts";
 import { RootFilterQuery } from "mongoose";
-import { PostDocument } from "../../../../data-plane/server/models.ts";
+import { PostDocument } from "../../../../data-plane/db/models.ts";
 
 // Helper to escape user input for safe RegExp usage
 function escapeRegExp(str: string): string {

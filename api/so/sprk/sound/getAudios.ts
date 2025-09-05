@@ -1,7 +1,7 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { transformAudiosToAudioViews } from "../../../../utils/audio-transformer.ts";
-import { AudioDocument } from "../../../../data-plane/server/models.ts";
+import { AudioDocument } from "../../../../data-plane/db/models.ts";
 
 // Constants
 const MAX_URI_LENGTH = 3000;

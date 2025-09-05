@@ -3,7 +3,7 @@ import { AppContext } from "../../../../main.ts";
 import { OutputSchema } from "../../../../lex/types/so/sprk/feed/getPostThread.ts";
 import type * as SoSprkFeedDefs from "../../../../lex/types/so/sprk/feed/defs.ts";
 import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts";
-import { PostDocument } from "../../../../data-plane/server/models.ts";
+import { PostDocument } from "../../../../data-plane/db/models.ts";
 import { type $Typed } from "../../../../lex/util.ts";
 
 // Constants

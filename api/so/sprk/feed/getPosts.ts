@@ -2,7 +2,7 @@ import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { OutputSchema } from "../../../../lex/types/so/sprk/feed/getPosts.ts";
 import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts";
-import { PostDocument } from "../../../../data-plane/server/models.ts";
+import { PostDocument } from "../../../../data-plane/db/models.ts";
 
 // Constants
 const MAX_POSTS_LIMIT = 25;
