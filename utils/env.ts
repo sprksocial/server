@@ -14,6 +14,9 @@ export const env = {
   ADMIN_PASSWORD: envStr("ADMIN_PASSWORD") ?? "admin-token",
   HLS_CDN_URL: envStr("HLS_CDN_URL") ?? "https://vz-fb7436e9-c53.b-cdn.net",
   VIDEO_CDN_URL: envStr("VIDEO_CDN_URL") ?? "https://hls.sprk.so",
+  MEDIA_CDN_URL: envStr("MEDIA_CDN_URL") ?? "https://media.sprk.so",
+  THUMB_CDN_URL: envStr("THUMB_CDN_URL") ?? "https://thumb.sprk.so",
+
   RELAY_URL: envStr("RELAY_URL") ?? "wss://relay1.us-east.bsky.network",
 
   DB_URI: envStr("DB_URI"),
