@@ -15,16 +15,15 @@ export class Profiles {
     // Get actors from MongoDB
     const actors = await this.db.models.Actor.find({
       did: { $in: dids },
-    }).select("did handle takedownRef upstreamStatus indexedAt");
+    });
 
     // Get profiles for these actors
     const profileUris = dids.map(
-      (did) => `at://${did}/app.bsky.actor.profile/self`,
+      (did) => `at://${did}/so.sprk.actor.profile/self`,
     );
     const profiles = await this.db.models.Record.find({
       uri: { $in: profileUris },
-    }).select("uri record createdAt");
-
+    });
     // Create lookup maps
     const actorMap = new Map(actors.map((actor) => [actor.did, actor]));
     const profileMap = new Map(
@@ -33,7 +32,7 @@ export class Profiles {
 
     const result = dids.map((did) => {
       const actor = actorMap.get(did);
-      const profileUri = `at://${did}/app.bsky.actor.profile/self`;
+      const profileUri = `at://${did}/so.sprk.actor.profile/self`;
       const profile = profileMap.get(profileUri);
 
       return {

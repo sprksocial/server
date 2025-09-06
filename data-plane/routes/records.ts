@@ -11,6 +11,7 @@ async function getRecords(
 ): Promise<{
   records: Array<{
     record: string;
+    uri: string;
     cid?: string;
     createdAt?: string;
     indexedAt?: string;
@@ -64,6 +65,7 @@ async function getRecords(
 
     return {
       record: json,
+      uri,
       cid: record?.cid,
       createdAt,
       indexedAt,

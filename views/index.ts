@@ -95,6 +95,7 @@ export class Views {
   ): ProfileViewDetailed | undefined {
     const actor = state.actors?.get(did);
     if (!actor) return;
+    console.log(actor);
     const baseView = this.profile(did, state);
     if (!baseView) return;
     const knownFollowers = this.knownFollowers(did, state);
@@ -128,7 +129,7 @@ export class Views {
       handle: actor.handle ?? INVALID_HANDLE,
       displayName: actor.profile?.displayName,
       avatar: actor.profile?.avatar
-        ? `${env.MEDIA_CDN_URL}/avatar/medium/${did}`
+        ? `${env.MEDIA_CDN_URL}/avatar/medium/${did}/${actor.profile.avatar.ref}/webp`
         : undefined,
       viewer: this.profileViewer(did, state),
       createdAt: actor.createdAt?.toISOString(),

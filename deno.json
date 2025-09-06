@@ -30,7 +30,5 @@
     "jsx": "precompile",
     "jsxImportSource": "hono/jsx"
   },
-  "unstable": [
-    "sloppy-imports"
-  ]
+  "unstable": ["sloppy-imports"]
 }

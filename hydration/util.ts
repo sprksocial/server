@@ -1,11 +1,12 @@
 import { CID } from "multiformats/cid";
 import * as ui8 from "npm:uint8arrays";
-import { jsonToLex } from "@atproto/lexicon";
 import { AtUri } from "@atproto/syntax";
 import { lexicons } from "../lex/lexicons.ts";
+import { jsonStringToLex } from "@atproto/api";
 
 export type Record = {
   record: string;
+  uri: string;
   cid?: CID;
   createdAt?: string;
   indexedAt?: string;
@@ -73,12 +74,12 @@ export const parseRecord = <T extends UnknownRecord>(
   if (!includeTakedowns && entry.takenDown) {
     return undefined;
   }
-  const record = Object(entry.record);
+  const record = jsonStringToLex(entry.record);
   const cid = entry.cid;
   const createdAt = entry.createdAt ? new Date(entry.createdAt) : new Date(0);
   const indexedAt = entry.indexedAt ? new Date(entry.indexedAt) : new Date(0);
   if (!record || !cid) return;
-  if (!isValidRecord(record)) {
+  if (!isValidRecord(entry.record, entry.uri)) {
     return;
   }
   return {
@@ -90,15 +91,14 @@ export const parseRecord = <T extends UnknownRecord>(
   };
 };
 
-const isValidRecord = (json: JSON) => {
-  const lexRecord = jsonToLex(json);
-  if (typeof lexRecord?.["$type"] !== "string") {
-    return false;
-  }
+const isValidRecord = (record: string, uri: string) => {
+  const aturi = new AtUri(uri);
+  const recordObj = jsonStringToLex(record);
   try {
-    lexicons.assertValidRecord(lexRecord["$type"], lexRecord);
+    lexicons.assertValidRecord(aturi.collection.toString(), recordObj);
     return true;
-  } catch {
+  } catch (err) {
+    console.log(`Invalid record: ${err}`);
     return false;
   }
 };

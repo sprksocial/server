@@ -1,10 +1,9 @@
 import { CID } from "multiformats/cid";
-import { stringifyLex } from "@atproto/lexicon";
+import { jsonStringToLex, stringifyLex } from "@atproto/lexicon";
 import { AtUri } from "@atproto/syntax";
 import { lexicons } from "../../lex/lexicons.ts";
 import { BackgroundQueue } from "../background.ts";
 import { Database } from "../db/index.ts";
-import { jsonToLex } from "@atproto/api";
 
 // @NOTE re: insertions and deletions. Due to how record updates are handled,
 // (insertFn) should have the same effect as (insertFn -> deleteFn -> insertFn).
@@ -272,7 +271,7 @@ export class RecordProcessor<T, S> {
         return this.handleNotifs({ deleted });
       }
 
-      const record = jsonToLex(recordDoc.json);
+      const record = jsonStringToLex(recordDoc.json);
       if (!this.matchesSchema(record)) {
         return this.handleNotifs({ deleted });
       }

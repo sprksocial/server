@@ -12,6 +12,8 @@ import { RepoSubscription } from "./data-plane/subscription.ts";
 import { MemoryRunner } from "./utils/memory-runner.ts";
 import { getLogger } from "@logtape/logtape";
 import { DataPlane } from "./data-plane/index.ts";
+import { Hydrator } from "./hydration/index.ts";
+import { Views } from "./views/index.ts";
 
 Deno.env.set("SERVICE_DID", "did:web:test");
 Deno.env.set("MOD_SERVICE_DID", "did:web:test");
@@ -38,6 +40,8 @@ function createMockContext(): AppContext {
   } as unknown as Database;
 
   const dataplane = new DataPlane(mockDb, resolver.baseResolver);
+  const hydrator = new Hydrator(dataplane);
+  const views = new Views();
   const takedownService = new TakedownService(mockDb);
   const sub = new RepoSubscription({
     service: "wss://relay1.us-west.bsky.network",
@@ -55,6 +59,8 @@ function createMockContext(): AppContext {
   return {
     db: mockDb,
     dataplane,
+    hydrator,
+    views,
     logger: appLogger,
     resolver,
     serviceDid,

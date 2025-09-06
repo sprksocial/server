@@ -22,6 +22,8 @@ import { RepoSubscription } from "./data-plane/subscription.ts";
 import { DataPlane } from "./data-plane/index.ts";
 import { configure, getConsoleSink, getLogger, Logger } from "@logtape/logtape";
 import { getPrettyFormatter } from "@logtape/pretty";
+import { Hydrator } from "./hydration/index.ts";
+import { Views } from "./views/index.ts";
 
 await configure({
   sinks: {
@@ -44,6 +46,8 @@ await configure({
 export type AppContext = {
   db: Database;
   dataplane: DataPlane;
+  hydrator: Hydrator;
+  views: Views;
   logger: Logger;
   resolver: BidirectionalResolver;
   serviceDid: string;
@@ -162,6 +166,8 @@ export async function setupApp(): Promise<
   const serviceDid = env.SERVICE_DID;
 
   const dataplane = new DataPlane(db, resolver.baseResolver);
+  const hydrator = new Hydrator(dataplane);
+  const views = new Views();
 
   // Services
   const sub = new RepoSubscription({
@@ -181,6 +187,8 @@ export async function setupApp(): Promise<
   const ctx = {
     db,
     dataplane,
+    hydrator,
+    views,
     logger: appLogger,
     resolver,
     serviceDid,

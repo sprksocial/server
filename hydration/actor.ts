@@ -125,12 +125,13 @@ export class ActorHydrator {
 
       const profile = actor.profile
         ? parseRecord<ProfileRecord>({
-          record: JSON.stringify(actor.profile.json),
+          record: actor.profile.json,
+          uri: actor.profile.uri,
           cid: actor.profile.cid,
           createdAt: actor.profile.createdAt,
           indexedAt: actor.profile.indexedAt,
           takedownRef: actor.profile.takedownRef,
-          takenDown: actor.profile.takenDown || false,
+          takenDown: actor.profile.takenDown ?? false,
         }, includeTakedowns)
         : undefined;
 
