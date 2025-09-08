@@ -3,6 +3,7 @@ import { InvalidRequestError } from "@sprk/xrpc-server";
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { OutputSchema } from "../../../../lex/types/com/atproto/repo/getRecord.ts";
+import { jsonStringToLex } from "@atproto/api";
 
 interface TakedownInfo {
   reason: string;
@@ -63,7 +64,7 @@ export default function (server: Server, ctx: AppContext) {
         }
 
         // Parse the original record JSON
-        const recordValue = record.json;
+        const recordValue = jsonStringToLex(record.json);
 
         // Check if the record is subject to a takedown
         const takedown = await ctx.takedownService.getTakedown(uri);
