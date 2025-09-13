@@ -103,12 +103,16 @@ function sortStoriesByUriOrder(
   return sortedStories;
 }
 
-// Check if stories are expired (24 hours old)
-function filterExpiredStories(stories: StoryDocument[]): StoryDocument[] {
+function filterExpiredStories(
+  stories: StoryDocument[],
+  ownerDid?: string,
+): StoryDocument[] {
   const twentyFourHoursAgo = new Date();
   twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
 
   return stories.filter((story) => {
+    // If the authenticated user is the author, not apply the 24h expiration filter
+    if (ownerDid && story.authorDid === ownerDid) return true;
     const storyDate = new Date(story.indexedAt);
     return storyDate >= twentyFourHoursAgo;
   });
@@ -189,7 +193,7 @@ export default function (server: Server, ctx: AppContext) {
         }
 
         // Filter out expired stories (older than 24 hours)
-        const activeStories = filterExpiredStories(dbStories);
+        const activeStories = filterExpiredStories(dbStories, userDid);
 
         if (activeStories.length === 0) {
           return {
