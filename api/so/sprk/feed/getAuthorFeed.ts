@@ -1,7 +1,7 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts";
-import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
+import { decodeBase64, encodeBase64 } from "@std/encoding";
 import { OutputSchema } from "../../../../lex/types/so/sprk/feed/getAuthorFeed.ts";
 import { PostDocument } from "../../../../data-plane/db/models.ts";
 

@@ -1,8 +1,8 @@
 import { CID } from "multiformats/cid";
-import * as ui8 from "npm:uint8arrays";
+
 import { AtUri } from "@atproto/syntax";
 import { lexicons } from "../lex/lexicons.ts";
-import { jsonStringToLex } from "@atproto/api";
+import { jsonStringToLex } from "@atproto/lexicon";
 
 export type Record = {
   record: string;
@@ -112,7 +112,7 @@ export const parseRecordBytes = <T>(
 
 export const parseJsonBytes = (bytes: Uint8Array | undefined): unknown => {
   if (!bytes || bytes.byteLength === 0) return;
-  const parsed = JSON.parse(ui8.toString(bytes, "utf8"));
+  const parsed = JSON.parse(new TextDecoder("utf-8").decode(bytes));
   return parsed ?? undefined;
 };
 

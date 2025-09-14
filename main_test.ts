@@ -1,5 +1,5 @@
-import { assertEquals } from "jsr:@std/assert";
-import { assertMatch } from "jsr:@std/assert/match";
+import { assertEquals } from "@std/assert";
+import { assertMatch } from "@std/assert/match";
 import { AppContext, createApp } from "./main.ts";
 import { Database } from "./data-plane/db/index.ts";
 import {
@@ -7,7 +7,7 @@ import {
   createIdResolver,
 } from "./utils/id-resolver.ts";
 import { TakedownService } from "./services/takedown.ts";
-import { createAuthVerifier } from "./services/auth-verifier.ts";
+import { createAuthVerifier } from "./auth-verifier.ts";
 import { RepoSubscription } from "./data-plane/subscription.ts";
 import { MemoryRunner } from "./utils/memory-runner.ts";
 import { getLogger } from "@logtape/logtape";

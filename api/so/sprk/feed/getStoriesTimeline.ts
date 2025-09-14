@@ -2,7 +2,7 @@ import { InvalidRequestError } from "@sprk/xrpc-server";
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { transformStoriesToStoryViews } from "../../../../utils/story-transformer.ts";
-import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
+import { decodeBase64, encodeBase64 } from "@std/encoding";
 import type { ProfileViewBasic } from "../../../../lex/types/so/sprk/actor/defs.ts";
 import type * as SoSprkFeedDefs from "../../../../lex/types/so/sprk/feed/defs.ts";
 

@@ -1,7 +1,7 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { transformAudiosToAudioViews } from "../../../../utils/audio-transformer.ts";
-import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
+import { decodeBase64, encodeBase64 } from "@std/encoding";
 
 interface CursorData {
   createdAt: string;

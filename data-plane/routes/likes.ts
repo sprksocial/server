@@ -1,4 +1,4 @@
-import { decodeBase64, encodeBase64 } from "jsr:@std/encoding/base64";
+import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
 import { Types } from "mongoose";
 import { Database } from "../db/index.ts";
 

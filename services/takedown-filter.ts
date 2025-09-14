@@ -1,8 +1,6 @@
 import { Context, Next } from "hono";
 import { TakedownService } from "./takedown.ts";
-import lodash from "npm:lodash";
 import * as SoSprkFeedDefs from "../lex/types/so/sprk/feed/defs.ts";
-const { get } = lodash;
 
 /**
  * Middleware that filters out taken-down content from responses
@@ -210,8 +208,8 @@ async function filterTakenDownItems(
     let isTakenDown = false;
 
     // Get URI for this specific content
-    const uri = get(item, uriPath) as string | undefined;
-    if (uri) {
+    const uri = getNestedProperty(item, uriPath);
+    if (uri && typeof uri === "string") {
       const takedown = await takedownService.getTakedown(uri);
       isTakenDown = takedown?.applied ?? false;
     }
@@ -219,12 +217,12 @@ async function filterTakenDownItems(
     // Check if author's repo is taken down
     let isAuthorTakenDown = false;
     // Look for author DID in common locations
-    const authorDid = get(item, "author.did") ||
-      get(item, "post.author.did") ||
-      get(item, "user.did") ||
-      get(item, "actor.did");
+    const authorDid = getNestedProperty(item, "author.did") ||
+      getNestedProperty(item, "post.author.did") ||
+      getNestedProperty(item, "user.did") ||
+      getNestedProperty(item, "actor.did");
 
-    if (authorDid) {
+    if (authorDid && typeof authorDid === "string") {
       const repoTakedown = await takedownService.getRepoTakedown(authorDid);
       isAuthorTakenDown = repoTakedown?.applied ?? false;
     }
@@ -370,4 +368,16 @@ async function filterReplies(
   }
 
   return filteredReplies;
+}
+
+// Helper function to safely access nested object properties
+function getNestedProperty(obj: unknown, path: string): unknown {
+  if (!obj || typeof obj !== "object") return undefined;
+
+  return path.split(".").reduce((current: unknown, key: string): unknown => {
+    return current && typeof current === "object" && current !== null &&
+        key in current
+      ? (current as Record<string, unknown>)[key]
+      : undefined;
+  }, obj);
 }

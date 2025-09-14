@@ -6,7 +6,7 @@ import {
 } from "../../../../data-plane/db/models.ts";
 import { getProfileView } from "../../../../utils/profile-helper.ts";
 import type * as SoSprkFeedDefs from "../../../../lex/types/so/sprk/feed/defs.ts";
-import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
+import { decodeBase64, encodeBase64 } from "@std/encoding";
 
 interface CursorData {
   likeCount: number;

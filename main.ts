@@ -4,7 +4,7 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { Database } from "./data-plane/db/index.ts";
 import { env } from "./utils/env.ts";
-import { createAuthVerifier } from "./services/auth-verifier.ts";
+import { createAuthVerifier } from "./auth-verifier.ts";
 import API from "./api/index.ts";
 import { createServer } from "./lex/index.ts";
 import {
@@ -16,7 +16,7 @@ import wellKnownRouter from "./api/well-known.ts";
 import { TakedownService } from "./services/takedown.ts";
 import { BidirectionalResolver } from "./utils/id-resolver.ts";
 import { DidResolver } from "@atproto/identity";
-import { AuthVerifier } from "./services/auth-verifier.ts";
+import { AuthVerifier } from "./auth-verifier.ts";
 import { AuthRequiredError } from "@sprk/xrpc-server";
 import { RepoSubscription } from "./data-plane/subscription.ts";
 import { DataPlane } from "./data-plane/index.ts";

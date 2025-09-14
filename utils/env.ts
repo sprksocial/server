@@ -1,4 +1,4 @@
-import * as dotenv from "npm:dotenv";
+import * as dotenv from "dotenv";
 import { envInt, envStr } from "@atproto/common";
 
 dotenv.config({ quiet: true });

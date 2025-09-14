@@ -5,7 +5,6 @@ import {
 import { Database } from "./db/index.ts";
 import { DidDocument } from "@atproto/identity";
 import { Buffer } from "node:buffer";
-import { Timestamp } from "npm:@bufbuild/protobuf@1.5.0";
 
 export const getDescendents = async (
   db: Database,
@@ -163,6 +162,6 @@ export const getResultFromDoc = (doc: DidDocument) => {
     handle: getHandle(doc),
     keys: Buffer.from(JSON.stringify(keys)),
     services: Buffer.from(JSON.stringify(services)),
-    updated: Timestamp.fromDate(new Date()),
+    updated: new Date(),
   };
 };

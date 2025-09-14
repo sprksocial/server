@@ -25,7 +25,7 @@ import {
   normalizeEmbed,
   normalizeObject,
 } from "../../../utils/embed-normalizer.ts";
-import { jsonToLex } from "@atproto/api";
+import { jsonToLex } from "@atproto/lexicon";
 
 type PostAncestor = {
   uri: string;

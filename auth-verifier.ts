@@ -1,6 +1,5 @@
 import { KeyObject } from "node:crypto";
-import { IncomingHttpHeaders } from "node:http";
-import * as ui8 from "npm:uint8arrays";
+
 import * as jose from "jose";
 import {
   AuthRequiredError,
@@ -9,14 +8,7 @@ import {
   parseReqNsid,
   verifyJwt,
 } from "@sprk/xrpc-server";
-import { DataPlane } from "../data-plane/index.ts";
-
-interface MinimalRequest {
-  url?: string;
-  method?: string;
-  header: (name: string) => string | undefined;
-  headers: IncomingHttpHeaders;
-}
+import { DataPlane } from "./data-plane/index.ts";
 
 type StandardAuthOpts = {
   skipAudCheck?: boolean;
@@ -557,7 +549,12 @@ export const parseBasicAuth = (
   const b64 = token.slice(BASIC.length);
   let parsed: string[];
   try {
-    parsed = ui8.toString(ui8.fromString(b64, "base64pad"), "utf8").split(":");
+    const binaryString = atob(b64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    parsed = new TextDecoder("utf-8").decode(bytes).split(":");
   } catch {
     return null;
   }
@@ -569,6 +566,11 @@ export const parseBasicAuth = (
 export const buildBasicAuth = (username: string, password: string): string => {
   return (
     BASIC +
-    ui8.toString(ui8.fromString(`${username}:${password}`, "utf8"), "base64pad")
+    btoa(
+      new TextEncoder().encode(`${username}:${password}`).reduce(
+        (data, byte) => data + String.fromCharCode(byte),
+        "",
+      ),
+    )
   );
 };

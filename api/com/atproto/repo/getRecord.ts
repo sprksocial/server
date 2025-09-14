@@ -3,7 +3,7 @@ import { InvalidRequestError } from "@sprk/xrpc-server";
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { OutputSchema } from "../../../../lex/types/com/atproto/repo/getRecord.ts";
-import { jsonStringToLex } from "@atproto/api";
+import { jsonStringToLex } from "@atproto/lexicon";
 
 interface TakedownInfo {
   reason: string;
