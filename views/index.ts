@@ -1,6 +1,14 @@
 import { AtUri } from "@atproto/api";
 import { HydrationState } from "../hydration/index.ts";
-import { PostView } from "../lex/types/so/sprk/feed/defs.ts";
+import {
+  FeedViewPost,
+  isPostView,
+  PostView,
+  ReasonPin,
+  ReasonRepost,
+  ReplyRef,
+} from "../lex/types/so/sprk/feed/defs.ts";
+import { isRecord as isPostRecord } from "../lex/types/so/sprk/feed/post.ts";
 import {
   KnownFollowers,
   ProfileView,
@@ -9,12 +17,15 @@ import {
   ViewerState as ProfileViewer,
 } from "../lex/types/so/sprk/actor/defs.ts";
 import {
+  BlockedPost,
   Embed,
   EmbedView,
   ImagesEmbed,
   ImagesEmbedView,
   isImagesEmbed,
   isVideoEmbed,
+  MaybePostView,
+  NotFoundPost,
   VideoEmbed,
   VideoEmbedView,
 } from "./types.ts";
@@ -23,6 +34,8 @@ import { cidFromBlobJson } from "./util.ts";
 import { uriToDid } from "../utils/uris.ts";
 import { env } from "../utils/env.ts";
 import { mapDefined } from "@atproto/common";
+import { FeedItem, Repost } from "../hydration/feed.ts";
+import { $Typed } from "../lex/util.ts";
 
 export class Views {
   public indexedAtEpoch?: Date | undefined;
@@ -69,6 +82,156 @@ export class Views {
         : undefined,
     };
   }
+
+  feedViewPost(
+    item: FeedItem,
+    state: HydrationState,
+  ): FeedViewPost | undefined {
+    let reason;
+    if (item.authorPinned) {
+      reason = this.reasonPin();
+    } else if (item.repost) {
+      const repost = state.reposts?.get(item.repost.uri);
+      if (!repost || !repost?.record.subject) return;
+      if (repost.record.subject.uri !== item.post.uri) return;
+      reason = this.reasonRepost(item.repost.uri, repost, state);
+      if (!reason) return;
+    }
+    const post = this.post(item.post.uri, state);
+    if (!post) return;
+    const reply = this.replyRef(item.post.uri, state);
+    return {
+      post,
+      reason,
+      reply,
+    };
+  }
+
+  replyRef(uri: string, state: HydrationState): ReplyRef | undefined {
+    const postRecord = state.posts?.get(uri.toString())?.record;
+    if (!postRecord?.reply) return;
+    let root = this.maybePost(postRecord.reply.root.uri, state);
+    let parent = this.maybePost(postRecord.reply.parent.uri, state);
+    if (!state.ctx?.include3pBlocks) {
+      const childBlocks = state.postBlocks?.get(uri);
+      const parentBlocks = state.postBlocks?.get(parent.uri);
+      // if child blocks parent, block parent
+      if (isPostView(parent) && childBlocks?.parent) {
+        parent = this.blockedPost(parent.uri, parent.author.did, state);
+      }
+      // if child or parent blocks root, block root
+      if (isPostView(root) && (childBlocks?.root || parentBlocks?.root)) {
+        root = this.blockedPost(root.uri, root.author.did, state);
+      }
+    }
+    let grandparentAuthor: ProfileViewBasic | undefined;
+    if (
+      isPostView(parent) &&
+      isPostRecord(parent.record) &&
+      parent.record.reply
+    ) {
+      grandparentAuthor = this.profileBasic(
+        // @ts-expect-error isValidPostRecord(parent.record) should be used but the "parent" is not IPDL decoded
+        creatorFromUri(parent.record.reply.parent.uri),
+        state,
+      );
+    }
+    return {
+      root,
+      parent,
+      grandparentAuthor,
+    };
+  }
+
+  reasonPin(): $Typed<ReasonPin> {
+    return {
+      $type: "so.sprk.feed.defs#reasonPin",
+    };
+  }
+
+  reasonRepost(
+    uri: string,
+    repost: Repost,
+    state: HydrationState,
+  ): $Typed<ReasonRepost> | undefined {
+    const creatorDid = uriToDid(uri);
+    const creator = this.profileBasic(creatorDid, state);
+    if (!creator) return;
+    return {
+      $type: "so.sprk.feed.defs#reasonRepost",
+      by: creator,
+      indexedAt: this.indexedAt(repost).toISOString(),
+    };
+  }
+
+  maybePost(uri: string, state: HydrationState): $Typed<MaybePostView> {
+    const post = this.post(uri, state);
+    if (!post) {
+      return this.notFoundPost(uri);
+    }
+    if (this.viewerBlockExists(post.author.did, state)) {
+      return this.blockedPost(uri, post.author.did, state);
+    }
+    return {
+      ...post,
+      $type: "so.sprk.feed.defs#postView",
+    };
+  }
+
+  blockedPost(
+    uri: string,
+    authorDid: string,
+    state: HydrationState,
+  ): $Typed<BlockedPost> {
+    return {
+      $type: "so.sprk.feed.defs#blockedPost",
+      uri,
+      blocked: true,
+      author: {
+        did: authorDid,
+        viewer: this.blockedProfileViewer(authorDid, state),
+      },
+    };
+  }
+
+  notFoundPost(uri: string): $Typed<NotFoundPost> {
+    return {
+      $type: "so.sprk.feed.defs#notFoundPost",
+      uri,
+      notFound: true,
+    };
+  }
+
+  feedItemBlocksAndMutes(
+    item: FeedItem,
+    state: HydrationState,
+  ): {
+    originatorMuted: boolean;
+    originatorBlocked: boolean;
+    authorMuted: boolean;
+    authorBlocked: boolean;
+    ancestorAuthorBlocked: boolean;
+  } {
+    const authorDid = uriToDid(item.post.uri);
+    const originatorDid = item.repost ? uriToDid(item.repost.uri) : authorDid;
+    const post = state.posts?.get(item.post.uri);
+    const parentUri = post?.record.reply?.parent.uri;
+    const parentAuthorDid = parentUri && uriToDid(parentUri);
+    const parent = parentUri ? state.posts?.get(parentUri) : undefined;
+    const grandparentUri = parent?.record.reply?.parent.uri;
+    const grandparentAuthorDid = grandparentUri && uriToDid(grandparentUri);
+    return {
+      originatorMuted: this.viewerMuteExists(originatorDid, state),
+      originatorBlocked: this.viewerBlockExists(originatorDid, state),
+      authorMuted: this.viewerMuteExists(authorDid, state),
+      authorBlocked: this.viewerBlockExists(authorDid, state),
+      ancestorAuthorBlocked:
+        (!!parentAuthorDid && this.viewerBlockExists(parentAuthorDid, state)) ||
+        (!!grandparentAuthorDid &&
+          this.viewerBlockExists(grandparentAuthorDid, state)),
+    };
+  }
+
   profile(
     did: string,
     state: HydrationState,
@@ -89,6 +252,7 @@ export class Views {
         : undefined,
     };
   }
+
   profileDetailed(
     did: string,
     state: HydrationState,
@@ -118,6 +282,7 @@ export class Views {
       },
     };
   }
+
   profileBasic(
     did: string,
     state: HydrationState,
@@ -135,6 +300,7 @@ export class Views {
       createdAt: actor.createdAt?.toISOString(),
     };
   }
+
   profileViewer(did: string, state: HydrationState): ProfileViewer | undefined {
     const viewer = state.profileViewers?.get(did);
     if (!viewer) return;
@@ -148,6 +314,27 @@ export class Views {
       followedBy: viewer.followedBy && !block ? viewer.followedBy : undefined,
     };
   }
+
+  viewerMuteExists(did: string, state: HydrationState): boolean {
+    const viewer = state.profileViewers?.get(did);
+    if (!viewer) return false;
+    return !viewer.muted;
+  }
+
+  blockedProfileViewer(
+    did: string,
+    state: HydrationState,
+  ): ProfileViewer | undefined {
+    const viewer = state.profileViewers?.get(did);
+    if (!viewer) return;
+    const blockedByUri = viewer.blockedBy;
+    const blockingUri = viewer.blocking;
+    return {
+      blockedBy: !!blockedByUri,
+      blocking: blockingUri,
+    };
+  }
+
   knownFollowers(
     did: string,
     state: HydrationState,
@@ -238,8 +425,8 @@ export class Views {
   }
   indexedAt(
     { createdAt, indexedAt }: {
-      createdAt: Date | undefined;
-      indexedAt: Date | undefined;
+      createdAt: Date;
+      indexedAt: Date;
     },
   ) {
     if (!this.indexedAtEpoch) return createdAt;

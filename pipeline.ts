@@ -1,7 +1,9 @@
 import { HydrationState } from "./hydration/index.ts";
 
 export function createPipeline<Params, Skeleton, View, Context>(
-  skeletonFn: (input: SkeletonFnInput<Context, Params>) => Promise<Skeleton>,
+  skeletonFn: (
+    input: SkeletonFnInput<Context, Params>,
+  ) => Promise<Skeleton> | Skeleton,
   hydrationFn: (
     input: HydrationFnInput<Context, Params, Skeleton>,
   ) => Promise<HydrationState>,

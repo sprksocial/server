@@ -1,50 +1,13 @@
-import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
-import { Types } from "mongoose";
 import { Database } from "../db/index.ts";
-
-// Types for MongoDB queries
-interface BlockQuery {
-  authorDid?: string;
-  subject?: string;
-  $or?: Array<
-    {
-      authorDid: string;
-      subject: string;
-    } | {
-      createdAt: { $lt: string };
-      _id?: { $lt: string };
-    } | {
-      createdAt: string;
-      _id: { $lt: string };
-    }
-  >;
-  createdAt?: { $lt: string };
-  _id?: { $lt: string };
-}
-
-// Helper function to parse cursor
-function parseCursor(cursor?: string): { createdAt?: string; id?: string } {
-  if (!cursor) return {};
-  try {
-    const decoded = new TextDecoder().decode(decodeBase64(cursor));
-    return JSON.parse(decoded);
-  } catch {
-    return {};
-  }
-}
-
-// Helper function to create cursor
-function createCursor(createdAt: string, id: string): string {
-  const cursorData = { createdAt, id };
-  const encoded = new TextEncoder().encode(JSON.stringify(cursorData));
-  return encodeBase64(encoded);
-}
+import { TimeCidKeyset } from "../db/pagination.ts";
 
 export class Blocks {
   private db: Database;
+  private timeCidKeyset: TimeCidKeyset;
 
   constructor(db: Database) {
     this.db = db;
+    this.timeCidKeyset = new TimeCidKeyset();
   }
 
   async bidirectional(actorDid: string, targetDid: string) {
@@ -62,31 +25,27 @@ export class Blocks {
   }
 
   async getBlocks(actorDid: string, limit = 50, cursor?: string) {
-    const { createdAt, id } = parseCursor(cursor);
-
     // Build query for blocks by this actor
-    const query: BlockQuery = { authorDid: actorDid };
+    const blocksQuery = this.db.models.Block.find({ authorDid: actorDid })
+      .select("uri subject createdAt cid");
 
-    // Add cursor conditions for pagination
-    if (createdAt && id) {
-      query.$or = [
-        { createdAt: { $lt: createdAt } },
-        { createdAt: createdAt, _id: { $lt: id } },
-      ] as BlockQuery["$or"];
-    }
+    // Apply pagination using TimeCidKeyset
+    const paginatedQuery = this.timeCidKeyset.paginate(blocksQuery, {
+      limit,
+      cursor,
+      direction: "desc",
+    });
 
-    const blocks = await this.db.models.Block.find(query)
-      .select("uri subject createdAt")
-      .sort({ createdAt: -1, _id: -1 })
-      .limit(limit);
+    const blocks = await paginatedQuery.exec();
 
+    // Generate cursor from the last item if we have a full page
     let nextCursor: string | undefined;
-    if (blocks.length === limit) {
+    if (blocks.length === limit && blocks.length > 0) {
       const lastBlock = blocks[blocks.length - 1];
-      nextCursor = createCursor(
-        lastBlock.createdAt,
-        (lastBlock._id as Types.ObjectId).toString(),
-      );
+      nextCursor = this.timeCidKeyset.pack({
+        primary: lastBlock.createdAt,
+        secondary: lastBlock.cid,
+      });
     }
 
     return {

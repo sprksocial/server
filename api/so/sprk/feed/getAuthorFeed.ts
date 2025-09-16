@@ -1,285 +1,263 @@
-import { Server } from "../../../../lex/index.ts";
+import { mapDefined } from "@atproto/common";
+import { InvalidRequestError } from "@sprk/xrpc-server";
 import { AppContext } from "../../../../main.ts";
-import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts";
-import { decodeBase64, encodeBase64 } from "@std/encoding";
-import { OutputSchema } from "../../../../lex/types/so/sprk/feed/getAuthorFeed.ts";
-import { PostDocument } from "../../../../data-plane/db/models.ts";
-
-interface CursorData {
-  createdAt: string;
-  id: string;
-}
-
-interface BlockCheckResult {
-  isBlocked: boolean;
-  isBlocking: boolean;
-}
-
-// Helper function to parse cursor
-function parseCursor(cursor: string): CursorData {
-  try {
-    const decodedCursor = new TextDecoder().decode(decodeBase64(cursor));
-    const [timestamp, id] = decodedCursor.split("::");
-
-    if (!timestamp || !id) {
-      throw new Error("Invalid cursor format");
-    }
-
-    return { createdAt: timestamp, id };
-  } catch {
-    throw new Error("Invalid cursor format");
-  }
-}
-
-// Helper function to generate cursor
-function generateCursor(createdAt: string, id: string): string {
-  return encodeBase64(
-    new TextEncoder().encode(`${createdAt}::${id}`),
-  );
-}
-
-// Helper function to check block status
-async function checkBlockStatus(
-  ctx: AppContext,
-  userDid: string,
-  actorDid: string,
-): Promise<BlockCheckResult> {
-  const [userIsBlocked, userIsBlocking] = await Promise.all([
-    ctx.db.models.Block.findOne({
-      authorDid: actorDid,
-      subject: userDid,
-    }).lean(),
-    ctx.db.models.Block.findOne({
-      authorDid: userDid,
-      subject: actorDid,
-    }).lean(),
-  ]);
-
-  return {
-    isBlocked: !!userIsBlocked,
-    isBlocking: !!userIsBlocking,
-  };
-}
-
-// Helper function to build post query
-function buildPostQuery(
-  actorDid: string,
-  filter?: string,
-  cursor?: CursorData,
-): Record<string, unknown> {
-  const query: Record<string, unknown> = {
-    authorDid: actorDid,
-    reply: null,
-  };
-
-  // Add filter conditions
-  if (filter === "posts_with_media") {
-    query.$or = [
-      { "embed.$type": "so.sprk.embed.images" },
-      { "embed.$type": "so.sprk.embed.video" },
-    ];
-  } else if (filter === "posts_with_video") {
-    query["embed.$type"] = "so.sprk.embed.video";
-  }
-
-  // Add cursor-based pagination
-  if (cursor) {
-    const paginationConditions = [
-      { createdAt: { $lt: cursor.createdAt } },
-      { createdAt: cursor.createdAt, _id: { $lt: cursor.id } },
-    ];
-
-    if (query.$or) {
-      // If filter already uses $or, wrap everything in $and
-      query.$and = [
-        { $or: query.$or },
-        { $or: paginationConditions },
-      ];
-      delete query.$or;
-    } else {
-      query.$or = paginationConditions;
-    }
-  }
-
-  return query;
-}
-
-// Helper function to get pinned posts
-async function getPinnedPosts(
-  ctx: AppContext,
-  actorDid: string,
-): Promise<PostDocument[]> {
-  const profile = await ctx.db.models.Profile.findOne({
-    authorDid: actorDid,
-  }).lean();
-
-  if (!profile?.pinnedPost?.uri) {
-    return [];
-  }
-
-  const pinnedPost = await ctx.db.models.Post.findOne({
-    uri: profile.pinnedPost.uri,
-  }).lean();
-
-  return pinnedPost ? [pinnedPost] : [];
-}
+import { DataPlane } from "../../../../data-plane/index.ts";
+import { Actor } from "../../../../hydration/actor.ts";
+import { FeedItem, Post } from "../../../../hydration/feed.ts";
+import {
+  HydrateCtx,
+  HydrationState,
+  Hydrator,
+  mergeStates,
+} from "../../../../hydration/index.ts";
+import { parseString } from "../../../../hydration/util.ts";
+import { Server } from "../../../../lex/index.ts";
+import { QueryParams } from "../../../../lex/types/so/sprk/feed/getAuthorFeed.ts";
+import { createPipeline } from "../../../../pipeline.ts";
+import { safePinnedPost, uriToDid } from "../../../../utils/uris.ts";
+import { Views } from "../../../../views/index.ts";
+import { clearlyBadCursor, resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
+  const getAuthorFeed = createPipeline(
+    skeleton,
+    hydration,
+    noBlocksOrMutedReposts,
+    presentation,
+  );
   server.so.sprk.feed.getAuthorFeed({
-    auth: ctx.authVerifier.standardOptional,
+    auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth }) => {
-      try {
-        // Extract and validate parameters
-        const { actor, limit = 50, cursor, filter, includePins = false } =
-          params;
-        const userDid = auth.credentials.type === "standard"
-          ? auth.credentials.iss
-          : undefined;
+      const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
+      const hydrateCtx = ctx.hydrator.createContext({
+        viewer,
+        includeTakedowns,
+      });
 
-        // Validate required parameters
-        if (!actor) {
-          throw new Error("Actor parameter is required");
-        }
+      const result = await getAuthorFeed({ ...params, hydrateCtx }, ctx);
 
-        // Validate limit
-        if (limit < 1 || limit > 100) {
-          throw new Error("Limit must be between 1 and 100");
-        }
+      const repoRev = await ctx.hydrator.actor.getRepoRevSafe(viewer);
 
-        // Resolve actor DID
-        let resolvedActorDid = actor;
-        if (!actor.startsWith("did:")) {
-          try {
-            const didDoc = await ctx.resolver.resolveHandleToDidDoc(actor);
-            resolvedActorDid = didDoc.did;
-          } catch (error) {
-            console.error("Failed to resolve handle:", error);
-            throw new Error("Could not resolve actor handle");
-          }
-        }
-
-        // Check block status if user is authenticated
-        if (userDid) {
-          const { isBlocked, isBlocking } = await checkBlockStatus(
-            ctx,
-            userDid,
-            resolvedActorDid,
-          );
-
-          if (isBlocked) {
-            return {
-              status: 400,
-              error: "BlockedByActor" as const,
-              message: "The requesting account is blocked by the actor",
-            };
-          }
-
-          if (isBlocking) {
-            return {
-              status: 400,
-              error: "BlockedActor" as const,
-              message: "The requesting account has blocked the actor",
-            };
-          }
-        }
-
-        // Parse cursor if provided
-        let cursorData: CursorData | undefined;
-        if (cursor) {
-          cursorData = parseCursor(cursor);
-        }
-
-        // Build and execute query
-        const query = buildPostQuery(resolvedActorDid, filter, cursorData);
-        const posts = await ctx.db.models.Post.find(query)
-          .sort({ createdAt: -1, _id: -1 })
-          .limit(limit + 1) // Get one extra for hasMore check
-          .lean();
-
-        // Check if there are more results
-        const hasMore = posts.length > limit;
-        if (hasMore) {
-          posts.pop(); // Remove the extra item
-        }
-
-        // Get pinned posts if requested (only on first page)
-        let pinnedPosts: PostDocument[] = [];
-        if (includePins && !cursor) {
-          pinnedPosts = await getPinnedPosts(ctx, resolvedActorDid);
-        }
-
-        // Transform posts to feed view posts
-        const allPosts = [...pinnedPosts, ...posts];
-        const feedViewPosts = await transformPostsToPostViews(
-          allPosts,
-          ctx,
-          userDid,
-        );
-
-        // Generate next cursor if there are more results
-        let nextCursor: string | undefined;
-        if (hasMore && posts.length > 0) {
-          const lastPost = posts[posts.length - 1];
-          nextCursor = generateCursor(
-            String(lastPost.createdAt),
-            String(lastPost._id),
-          );
-        }
-
-        // Prepare response
-        const response: OutputSchema = {
-          feed: feedViewPosts.map((post) => ({ post })),
-        };
-
-        if (nextCursor) {
-          response.cursor = nextCursor;
-        }
-
-        return {
-          encoding: "application/json",
-          body: response,
-        };
-      } catch (error) {
-        // Handle specific error cases
-        if (error instanceof Error) {
-          const message = error.message;
-
-          if (message === "BlockedByActor" || message === "BlockedActor") {
-            return {
-              status: 400,
-              error: message as "BlockedByActor" | "BlockedActor",
-              message: message === "BlockedByActor"
-                ? "The requesting account is blocked by the actor"
-                : "The requesting account has blocked the actor",
-            };
-          }
-
-          if (message.includes("cursor") || message.includes("Cursor")) {
-            return {
-              status: 400,
-              message: "The provided cursor is invalid",
-            };
-          }
-
-          if (message.includes("limit") || message.includes("Limit")) {
-            return {
-              status: 400,
-              message: "Limit must be between 1 and 100",
-            };
-          }
-
-          if (message.includes("Actor") || message.includes("actor")) {
-            return {
-              status: 400,
-              message: "Invalid actor parameter or could not resolve handle",
-            };
-          }
-        }
-
-        // Log unexpected errors and rethrow
-        console.error("Unexpected error in getAuthorFeed:", error);
-        throw error;
-      }
+      return {
+        encoding: "application/json",
+        body: result,
+        headers: resHeaders({
+          repoRev,
+        }),
+      };
     },
   });
+}
+
+export const skeleton = async (inputs: {
+  ctx: Context;
+  params: Params;
+}): Promise<Skeleton> => {
+  const { ctx, params } = inputs;
+  const [did] = await ctx.hydrator.actor.getDids([params.actor]);
+  if (!did) {
+    throw new InvalidRequestError("Profile not found");
+  }
+  const actors = await ctx.hydrator.actor.getActors([did], {
+    includeTakedowns: params.hydrateCtx.includeTakedowns,
+  });
+  const actor = actors.get(did);
+  if (!actor) {
+    throw new InvalidRequestError("Profile not found");
+  }
+  if (clearlyBadCursor(params.cursor)) {
+    return { actor, filter: params.filter, items: [] };
+  }
+
+  const pinnedPost = safePinnedPost(actor.profile?.pinnedPost);
+  const isFirstPageRequest = !params.cursor;
+  const shouldInsertPinnedPost = isFirstPageRequest &&
+    params.includePins &&
+    pinnedPost &&
+    uriToDid(pinnedPost.uri) === actor.did;
+
+  const res = await ctx.dataplane.feeds.getAuthorFeed(
+    did,
+    params.limit,
+    params.cursor,
+  );
+
+  let items: FeedItem[] = res.items.map((item) => ({
+    post: { uri: item.uri, cid: item.cid || undefined },
+    repost: item.repost
+      ? { uri: item.repost, cid: item.repostCid || undefined }
+      : undefined,
+  }));
+
+  if (shouldInsertPinnedPost && pinnedPost) {
+    const pinnedItem = {
+      post: {
+        uri: pinnedPost.uri,
+        cid: pinnedPost.cid,
+      },
+      authorPinned: true,
+    };
+
+    items = items.filter((item) => item.post.uri !== pinnedItem.post.uri);
+    items.unshift(pinnedItem);
+  }
+
+  return {
+    actor,
+    filter: params.filter,
+    items,
+    cursor: parseString(res.cursor),
+  };
+};
+
+const hydration = async (inputs: {
+  ctx: Context;
+  params: Params;
+  skeleton: Skeleton;
+}): Promise<HydrationState> => {
+  const { ctx, params, skeleton } = inputs;
+  const [feedPostState, profileViewerState] = await Promise.all([
+    ctx.hydrator.hydrateFeedItems(skeleton.items, params.hydrateCtx),
+    ctx.hydrator.hydrateProfileViewers([skeleton.actor.did], params.hydrateCtx),
+  ]);
+  return mergeStates(feedPostState, profileViewerState);
+};
+
+const noBlocksOrMutedReposts = (inputs: {
+  ctx: Context;
+  skeleton: Skeleton;
+  hydration: HydrationState;
+}): Skeleton => {
+  const { ctx, skeleton, hydration } = inputs;
+  const relationship = hydration.profileViewers?.get(skeleton.actor.did);
+  if (
+    relationship &&
+    (relationship.blocking)
+  ) {
+    throw new InvalidRequestError(
+      `Requester has blocked actor: ${skeleton.actor.did}`,
+      "BlockedActor",
+    );
+  }
+  if (
+    relationship &&
+    (relationship.blockedBy)
+  ) {
+    throw new InvalidRequestError(
+      `Requester is blocked by actor: ${skeleton.actor.did}`,
+      "BlockedByActor",
+    );
+  }
+
+  const checkBlocksAndMutes = (item: FeedItem) => {
+    const bam = ctx.views.feedItemBlocksAndMutes(item, hydration);
+    return (
+      !bam.authorBlocked &&
+      !bam.originatorBlocked &&
+      (!bam.authorMuted || bam.originatorMuted) // repost of muted content
+    );
+  };
+
+  if (skeleton.filter === "posts_and_author_threads") {
+    // ensure replies are only included if the feed contains all
+    // replies up to the thread root (i.e. a complete self-thread.)
+    const selfThread = new SelfThreadTracker(skeleton.items, hydration);
+    skeleton.items = skeleton.items.filter((item) => {
+      return (
+        checkBlocksAndMutes(item) &&
+        (item.repost || item.authorPinned || selfThread.ok(item.post.uri))
+      );
+    });
+  } else {
+    skeleton.items = skeleton.items.filter(checkBlocksAndMutes);
+  }
+
+  return skeleton;
+};
+
+const presentation = (inputs: {
+  ctx: Context;
+  skeleton: Skeleton;
+  hydration: HydrationState;
+}) => {
+  const { ctx, skeleton, hydration } = inputs;
+  const feed = mapDefined(
+    skeleton.items,
+    (item) => ctx.views.feedViewPost(item, hydration),
+  );
+  return { feed, cursor: skeleton.cursor };
+};
+
+type Context = {
+  hydrator: Hydrator;
+  views: Views;
+  dataplane: DataPlane;
+};
+
+type Params = QueryParams & {
+  hydrateCtx: HydrateCtx;
+};
+
+type Skeleton = {
+  actor: Actor;
+  items: FeedItem[];
+  filter: QueryParams["filter"];
+  cursor?: string;
+};
+
+class SelfThreadTracker {
+  feedUris = new Set<string>();
+  cache = new Map<string, boolean>();
+
+  constructor(
+    items: FeedItem[],
+    private hydration: HydrationState,
+  ) {
+    items.forEach((item) => {
+      if (!item.repost) {
+        this.feedUris.add(item.post.uri);
+      }
+    });
+  }
+
+  ok(uri: string, loop = new Set<string>()) {
+    // if we've already checked this uri, pull from the cache
+    if (this.cache.has(uri)) {
+      return this.cache.get(uri) ?? false;
+    }
+    // loop detection
+    if (loop.has(uri)) {
+      this.cache.set(uri, false);
+      return false;
+    } else {
+      loop.add(uri);
+    }
+    // cache through the result
+    const result = this._ok(uri, loop);
+    this.cache.set(uri, result);
+    return result;
+  }
+
+  private _ok(uri: string, loop: Set<string>): boolean {
+    // must be in the feed to be in a self-thread
+    if (!this.feedUris.has(uri)) {
+      return false;
+    }
+    // must be hydratable to be part of self-thread
+    const post = this.hydration.posts?.get(uri);
+    if (!post) {
+      return false;
+    }
+    // root posts (no parent) are trivial case of self-thread
+    const parentUri = getParentUri(post);
+    if (parentUri === null) {
+      return true;
+    }
+    // recurse w/ cache: this post is in a self-thread if its parent is.
+    return this.ok(parentUri, loop);
+  }
+}
+
+function getParentUri(post: Post) {
+  return post.record.reply?.parent.uri ?? null;
 }

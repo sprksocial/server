@@ -1,21 +1,5 @@
-import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
-import { Types } from "mongoose";
 import { Database } from "../db/index.ts";
-
-// Types for MongoDB queries
-interface FollowQuery {
-  subject?: string;
-  authorDid?: string;
-  $or?: Array<
-    {
-      createdAt?: { $lt: string };
-      _id?: { $lt: string };
-    } | {
-      createdAt: string;
-      _id: { $lt: string };
-    }
-  >;
-}
+import { TimeCidKeyset } from "../db/pagination.ts";
 
 // Create a simple FollowsFollowing class since we removed the proto import
 class FollowsFollowing {
@@ -28,29 +12,13 @@ class FollowsFollowing {
   }
 }
 
-// Helper function to parse cursor
-function parseCursor(cursor?: string): { createdAt?: string; id?: string } {
-  if (!cursor) return {};
-  try {
-    const decoded = new TextDecoder().decode(decodeBase64(cursor));
-    return JSON.parse(decoded);
-  } catch {
-    return {};
-  }
-}
-
-// Helper function to create cursor
-function createCursor(createdAt: string, id: string): string {
-  const cursorData = { createdAt, id };
-  const encoded = new TextEncoder().encode(JSON.stringify(cursorData));
-  return encodeBase64(encoded);
-}
-
 export class Follows {
   private db: Database;
+  private timeCidKeyset: TimeCidKeyset;
 
   constructor(db: Database) {
     this.db = db;
+    this.timeCidKeyset = new TimeCidKeyset();
   }
 
   async getActorFollowsActors(actorDid: string, targetDids: string[]) {
@@ -71,32 +39,28 @@ export class Follows {
   }
 
   async getFollowers(actorDid: string, limit = 50, cursor?: string) {
-    const { createdAt, id } = parseCursor(cursor);
-
     // Build query for followers (people who follow this actor)
-    const query: FollowQuery = { subject: actorDid };
-
-    // Add cursor conditions for pagination
-    if (createdAt && id) {
-      query.$or = [
-        { createdAt: { $lt: createdAt } },
-        { createdAt: createdAt, _id: { $lt: id } },
-      ];
-    }
-
-    const followers = await this.db.models.Follow.find(query)
+    const followersQuery = this.db.models.Follow.find({ subject: actorDid })
       .populate("actor", "did handle indexedAt takedownRef upstreamStatus")
-      .select("uri authorDid subject createdAt")
-      .sort({ createdAt: -1, _id: -1 })
-      .limit(limit);
+      .select("uri authorDid subject createdAt cid");
 
+    // Apply pagination using TimeCidKeyset
+    const paginatedQuery = this.timeCidKeyset.paginate(followersQuery, {
+      limit,
+      cursor,
+      direction: "desc",
+    });
+
+    const followers = await paginatedQuery.exec();
+
+    // Generate cursor from the last item if we have a full page
     let nextCursor: string | undefined;
-    if (followers.length === limit) {
+    if (followers.length === limit && followers.length > 0) {
       const lastFollower = followers[followers.length - 1];
-      nextCursor = createCursor(
-        lastFollower.createdAt,
-        (lastFollower._id as Types.ObjectId).toString(),
-      );
+      nextCursor = this.timeCidKeyset.pack({
+        primary: lastFollower.createdAt,
+        secondary: lastFollower.cid,
+      });
     }
 
     return {
@@ -110,32 +74,28 @@ export class Follows {
   }
 
   async getFollows(actorDid: string, limit = 50, cursor?: string) {
-    const { createdAt, id } = parseCursor(cursor);
-
     // Build query for follows (people this actor follows)
-    const query: FollowQuery = { authorDid: actorDid };
-
-    // Add cursor conditions for pagination
-    if (createdAt && id) {
-      query.$or = [
-        { createdAt: { $lt: createdAt } },
-        { createdAt: createdAt, _id: { $lt: id } },
-      ];
-    }
-
-    const follows = await this.db.models.Follow.find(query)
+    const followsQuery = this.db.models.Follow.find({ authorDid: actorDid })
       .populate("actor", "did handle indexedAt takedownRef upstreamStatus")
-      .select("uri authorDid subject createdAt")
-      .sort({ createdAt: -1, _id: -1 })
-      .limit(limit);
+      .select("uri authorDid subject createdAt cid");
 
+    // Apply pagination using TimeCidKeyset
+    const paginatedQuery = this.timeCidKeyset.paginate(followsQuery, {
+      limit,
+      cursor,
+      direction: "desc",
+    });
+
+    const follows = await paginatedQuery.exec();
+
+    // Generate cursor from the last item if we have a full page
     let nextCursor: string | undefined;
-    if (follows.length === limit) {
+    if (follows.length === limit && follows.length > 0) {
       const lastFollow = follows[follows.length - 1];
-      nextCursor = createCursor(
-        lastFollow.createdAt,
-        (lastFollow._id as Types.ObjectId).toString(),
-      );
+      nextCursor = this.timeCidKeyset.pack({
+        primary: lastFollow.createdAt,
+        secondary: lastFollow.cid,
+      });
     }
 
     return {

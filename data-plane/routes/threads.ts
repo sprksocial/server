@@ -1,17 +1,5 @@
 import { Database } from "../db/index.ts";
 
-// Types for thread processing
-interface PostWithReply {
-  uri: string;
-  createdAt: string;
-  authorDid?: string;
-  reply?: {
-    parent?: {
-      uri: string;
-    };
-  };
-}
-
 // Parameter validation
 function validateThreadParams(above: number, below: number) {
   if (!Number.isInteger(above) || above < 0 || above > 100) {

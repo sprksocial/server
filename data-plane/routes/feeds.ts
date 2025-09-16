@@ -1,249 +1,165 @@
-import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
-import { Types } from "mongoose";
 import { Database } from "../db/index.ts";
-
-// TypeScript types
-type FeedType =
-  | "POSTS_WITH_MEDIA"
-  | "POSTS_WITH_VIDEO"
-  | "POSTS_NO_REPLIES"
-  | "POSTS_AND_AUTHOR_THREADS";
-
-// Types for MongoDB queries
-interface FeedQuery {
-  authorDid?: string | { $in: string[] };
-  "embed.images"?: { $exists: boolean };
-  "embed.video"?: { $exists: boolean };
-  "reply.parent"?: { $exists: boolean } | null;
-  "reply.root.uri"?: { $regex: RegExp };
-  createdAt?: { $lt: string };
-  _id?: { $lt: string };
-  $or?: Array<
-    {
-      createdAt?: { $lt: string };
-      _id?: { $lt: string };
-      "reply.parent"?: null;
-      "reply.root.uri"?: { $regex: RegExp };
-    } | {
-      createdAt: string;
-      _id: { $lt: string };
-      "reply.parent"?: null;
-      "reply.root.uri"?: { $regex: RegExp };
-    }
-  >;
-  $and?: Array<{
-    $or: Array<{
-      createdAt?: { $lt: string };
-      _id?: { $lt: string };
-      "reply.parent"?: null;
-      "reply.root.uri"?: { $regex: RegExp };
-    }>;
-  }>;
-}
-
-// Helper function to parse cursor
-function parseCursor(cursor?: string): { createdAt?: string; id?: string } {
-  if (!cursor) return {};
-  try {
-    const decoded = new TextDecoder().decode(decodeBase64(cursor));
-    return JSON.parse(decoded);
-  } catch {
-    return {};
-  }
-}
-
-// Helper function to create cursor
-function createCursor(createdAt: string, id: string): string {
-  const cursorData = { createdAt, id };
-  const encoded = new TextEncoder().encode(JSON.stringify(cursorData));
-  return encodeBase64(encoded);
-}
+import { TimeCidKeyset } from "../db/pagination.ts";
 
 // Helper function to format feed items
 function feedItemFromRow(
-  item: { uri: string; repostUri?: string },
-): { uri: string; repost?: string } {
+  item: { uri: string; cid: string; repostUri?: string },
+): { uri: string; cid: string; repost?: string; repostCid?: string } {
   return {
     uri: item.uri,
+    cid: item.cid,
     repost: item.repostUri && item.repostUri !== item.uri
       ? item.repostUri
+      : undefined,
+    repostCid: item.repostUri && item.repostUri !== item.uri
+      ? item.cid
       : undefined,
   };
 }
 
+interface FeedItem {
+  uri: string;
+  cid: string;
+  authorDid: string;
+  createdAt: string;
+  type: "post" | "repost";
+  repostUri?: string;
+  sortAt: string;
+}
+
 export class Feeds {
   private db: Database;
+  private timeCidKeyset: TimeCidKeyset;
 
   constructor(db: Database) {
     this.db = db;
+    this.timeCidKeyset = new TimeCidKeyset();
   }
 
-  async getAuthor(
+  async getAuthorFeed(
     actorDid: string,
     limit = 50,
     cursor?: string,
-    feedType?: FeedType,
   ) {
-    const { createdAt, id } = parseCursor(cursor);
+    // Get posts by this author
+    const postsQuery = this.db.models.Post.find({ authorDid: actorDid })
+      .select("uri cid authorDid createdAt");
 
-    // Base query for posts by this author
-    let query: FeedQuery = { authorDid: actorDid };
+    // Apply pagination to posts query
+    const paginatedPostsQuery = this.timeCidKeyset.paginate(postsQuery, {
+      limit,
+      cursor,
+      direction: "desc",
+    });
 
-    // Add feed type filters
-    if (feedType === "POSTS_WITH_MEDIA") {
-      query["embed.images"] = { $exists: true };
-    } else if (feedType === "POSTS_WITH_VIDEO") {
-      query["embed.video"] = { $exists: true };
-    } else if (feedType === "POSTS_NO_REPLIES") {
-      query["reply.parent"] = null;
-    } else if (feedType === "POSTS_AND_AUTHOR_THREADS") {
-      // Posts that are either not replies, or replies to this author's posts
-      query = {
-        authorDid: actorDid,
-        $or: [
-          { "reply.parent": null },
-          { "reply.root.uri": { $regex: new RegExp(`^at://${actorDid}/`) } },
-        ],
-      } as FeedQuery;
-    }
+    const posts = await paginatedPostsQuery.exec();
 
-    // Add cursor conditions for pagination
-    if (createdAt && id) {
-      if (query.$or) {
-        // If we already have $or conditions, we need to restructure
-        const existingOr = query.$or;
-        query = {
-          ...query,
-          $and: [
-            { $or: existingOr },
-            {
-              $or: [
-                { createdAt: { $lt: createdAt } },
-                { createdAt: createdAt, _id: { $lt: id } },
-              ],
-            },
-          ],
-        } as FeedQuery;
-        delete query.$or;
-      } else {
-        query.$or = [
-          { createdAt: { $lt: createdAt } },
-          { createdAt: createdAt, _id: { $lt: id } },
-        ];
-      }
-    }
+    // Transform posts
+    const transformedPosts: FeedItem[] = posts.map((p) => ({
+      uri: p.uri,
+      cid: p.cid,
+      authorDid: p.authorDid,
+      createdAt: p.createdAt,
+      type: "post" as const,
+      sortAt: p.createdAt,
+    }));
 
-    // Get posts
-    const posts = await this.db.models.Post.find(query)
-      .select("uri authorDid createdAt")
-      .sort({ createdAt: -1, _id: -1 })
-      .limit(limit);
-
-    // Get reposts by this author
-    const reposts = await this.db.models.Repost.find({
-      authorDid: actorDid,
-      ...(createdAt && id
-        ? {
-          $or: [
-            { createdAt: { $lt: createdAt } },
-            { createdAt: createdAt, _id: { $lt: id } },
-          ],
-        }
-        : {}),
-    })
-      .select("uri subject.uri authorDid createdAt")
-      .sort({ createdAt: -1, _id: -1 })
-      .limit(limit);
-
-    // Combine and sort all items
-    const allItems = [
-      ...posts.map((p) => ({ ...p.toObject(), type: "post" })),
-      ...reposts.map((r) => ({
-        ...r.toObject(),
-        type: "repost",
-        repostUri: r.uri,
-        uri: r.subject.uri,
-      })),
-    ]
-      .sort((a, b) => {
-        if (a.createdAt > b.createdAt) return -1;
-        if (a.createdAt < b.createdAt) return 1;
-        return (a._id as Types.ObjectId) > (b._id as Types.ObjectId) ? -1 : 1;
-      })
-      .slice(0, limit);
-
+    // Generate cursor from the last item if we have a full page
     let nextCursor: string | undefined;
-    if (allItems.length === limit) {
-      const lastItem = allItems[allItems.length - 1];
-      nextCursor = createCursor(
-        lastItem.createdAt,
-        (lastItem._id as Types.ObjectId).toString(),
-      );
+    if (transformedPosts.length === limit && transformedPosts.length > 0) {
+      const lastItem = transformedPosts[transformedPosts.length - 1];
+      nextCursor = this.timeCidKeyset.pack({
+        primary: lastItem.createdAt,
+        secondary: lastItem.cid,
+      });
     }
 
     return {
-      items: allItems.map(feedItemFromRow),
+      items: transformedPosts.map(feedItemFromRow),
       cursor: nextCursor,
     };
   }
 
   async getTimeline(actorDid: string, limit = 50, cursor?: string) {
-    const { createdAt, id } = parseCursor(cursor);
-
     // Get people this actor follows
     const follows = await this.db.models.Follow.find({ authorDid: actorDid })
       .select("subject");
+
     const followedDids = follows.map((f) => f.subject);
+    const timelineDids = [...followedDids, actorDid];
 
-    // Build query for timeline posts
-    const query: FeedQuery = {
-      authorDid: { $in: [...followedDids, actorDid] },
-    };
+    const postsLimit = Math.floor(limit * 0.8);
+    const repostsLimit = limit - postsLimit;
 
-    // Add cursor conditions for pagination
-    if (createdAt && id) {
-      query.$or = [
-        { createdAt: { $lt: createdAt } },
-        { createdAt: createdAt, _id: { $lt: id } },
-      ];
-    }
+    // Get timeline posts
+    const postsQuery = this.db.models.Post.find({
+      authorDid: { $in: timelineDids },
+    })
+      .select("uri cid authorDid createdAt");
 
-    // Get posts from followed users and self
-    const posts = await this.db.models.Post.find(query)
-      .select("uri authorDid createdAt")
-      .sort({ createdAt: -1, _id: -1 })
-      .limit(Math.floor(limit * 0.8)); // Reserve some space for reposts
+    // Apply pagination to posts query
+    const paginatedPostsQuery = this.timeCidKeyset.paginate(postsQuery, {
+      limit: postsLimit,
+      cursor,
+      direction: "desc",
+    });
 
-    // Get reposts from followed users and self
-    const reposts = await this.db.models.Repost.find(query)
-      .select("uri subject.uri authorDid createdAt")
-      .sort({ createdAt: -1, _id: -1 })
-      .limit(Math.floor(limit * 0.2));
+    const posts = await paginatedPostsQuery.exec();
+
+    // Get timeline reposts
+    const repostsQuery = this.db.models.Repost.find({
+      authorDid: { $in: timelineDids },
+    })
+      .select("uri subject authorDid createdAt cid");
+
+    // Apply pagination to reposts query
+    const paginatedRepostsQuery = this.timeCidKeyset.paginate(repostsQuery, {
+      limit: repostsLimit,
+      cursor,
+      direction: "desc",
+    });
+
+    const reposts = await paginatedRepostsQuery.exec();
+
+    // Transform and combine results
+    const transformedPosts: FeedItem[] = posts.map((p) => ({
+      uri: p.uri,
+      cid: p.cid,
+      authorDid: p.authorDid,
+      createdAt: p.createdAt,
+      type: "post" as const,
+      sortAt: p.createdAt,
+    }));
+
+    const transformedReposts: FeedItem[] = reposts.map((r) => ({
+      uri: r.subject?.uri || r.uri,
+      cid: r.cid,
+      authorDid: r.authorDid,
+      createdAt: r.createdAt,
+      type: "repost" as const,
+      repostUri: r.uri,
+      sortAt: r.createdAt,
+    }));
 
     // Combine and sort all items
-    const allItems = [
-      ...posts.map((p) => ({ ...p.toObject(), type: "post" })),
-      ...reposts.map((r) => ({
-        ...r.toObject(),
-        type: "repost",
-        repostUri: r.uri,
-        uri: r.subject.uri,
-      })),
-    ]
+    const allItems = [...transformedPosts, ...transformedReposts]
       .sort((a, b) => {
-        if (a.createdAt > b.createdAt) return -1;
-        if (a.createdAt < b.createdAt) return 1;
-        return (a._id as Types.ObjectId) > (b._id as Types.ObjectId) ? -1 : 1;
+        // Sort by createdAt descending, then by cid descending
+        if (a.createdAt !== b.createdAt) {
+          return a.createdAt > b.createdAt ? -1 : 1;
+        }
+        return a.cid > b.cid ? -1 : 1;
       })
       .slice(0, limit);
 
+    // Generate cursor from the last item if we have a full page
     let nextCursor: string | undefined;
-    if (allItems.length === limit) {
+    if (allItems.length === limit && allItems.length > 0) {
       const lastItem = allItems[allItems.length - 1];
-      nextCursor = createCursor(
-        lastItem.createdAt,
-        (lastItem._id as Types.ObjectId).toString(),
-      );
+      nextCursor = this.timeCidKeyset.pack({
+        primary: lastItem.createdAt,
+        secondary: lastItem.cid,
+      });
     }
 
     return {

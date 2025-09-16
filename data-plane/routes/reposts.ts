@@ -1,47 +1,13 @@
-import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
-import { Types } from "mongoose";
 import { Database } from "../db/index.ts";
-
-// Types for MongoDB queries
-interface RepostQuery {
-  "subject.uri"?: string;
-  authorDid?: string;
-  createdAt?: { $lt: string };
-  _id?: { $lt: string };
-  $or?: Array<
-    {
-      createdAt?: { $lt: string };
-      _id?: { $lt: string };
-    } | {
-      createdAt: string;
-      _id: { $lt: string };
-    }
-  >;
-}
-
-// Helper function to parse cursor
-function parseCursor(cursor?: string): { createdAt?: string; id?: string } {
-  if (!cursor) return {};
-  try {
-    const decoded = new TextDecoder().decode(decodeBase64(cursor));
-    return JSON.parse(decoded);
-  } catch {
-    return {};
-  }
-}
-
-// Helper function to create cursor
-function createCursor(createdAt: string, id: string): string {
-  const cursorData = { createdAt, id };
-  const encoded = new TextEncoder().encode(JSON.stringify(cursorData));
-  return encodeBase64(encoded);
-}
+import { TimeCidKeyset } from "../db/pagination.ts";
 
 export class Reposts {
   private db: Database;
+  private timeCidKeyset: TimeCidKeyset;
 
   constructor(db: Database) {
     this.db = db;
+    this.timeCidKeyset = new TimeCidKeyset();
   }
 
   async bySubject(
@@ -50,34 +16,32 @@ export class Reposts {
     cursor?: string,
   ) {
     if (!subject?.uri) {
-      return { uris: [] };
+      return { uris: [], cursor: undefined };
     }
-
-    const { createdAt, id } = parseCursor(cursor);
 
     // Build query for reposts of this subject
-    const query: RepostQuery = { "subject.uri": subject.uri };
+    const repostsQuery = this.db.models.Repost.find({
+      "subject.uri": subject.uri,
+    })
+      .select("uri authorDid subject createdAt cid");
 
-    // Add cursor conditions for pagination
-    if (createdAt && id) {
-      query.$or = [
-        { createdAt: { $lt: createdAt } },
-        { createdAt: createdAt, _id: { $lt: id } },
-      ];
-    }
+    // Apply pagination using TimeCidKeyset
+    const paginatedQuery = this.timeCidKeyset.paginate(repostsQuery, {
+      limit,
+      cursor,
+      direction: "desc",
+    });
 
-    const reposts = await this.db.models.Repost.find(query)
-      .select("uri authorDid subject createdAt")
-      .sort({ createdAt: -1, _id: -1 })
-      .limit(limit);
+    const reposts = await paginatedQuery.exec();
 
+    // Generate cursor from the last item if we have a full page
     let nextCursor: string | undefined;
-    if (reposts.length === limit) {
+    if (reposts.length === limit && reposts.length > 0) {
       const lastRepost = reposts[reposts.length - 1];
-      nextCursor = createCursor(
-        lastRepost.createdAt,
-        (lastRepost._id as Types.ObjectId).toString(),
-      );
+      nextCursor = this.timeCidKeyset.pack({
+        primary: lastRepost.createdAt,
+        secondary: lastRepost.cid,
+      });
     }
 
     return {
@@ -109,31 +73,27 @@ export class Reposts {
   }
 
   async getActor(actorDid: string, limit = 50, cursor?: string) {
-    const { createdAt, id } = parseCursor(cursor);
-
     // Build query for reposts by this actor
-    const query: RepostQuery = { authorDid: actorDid };
+    const repostsQuery = this.db.models.Repost.find({ authorDid: actorDid })
+      .select("uri authorDid subject createdAt cid");
 
-    // Add cursor conditions for pagination
-    if (createdAt && id) {
-      query.$or = [
-        { createdAt: { $lt: createdAt } },
-        { createdAt: createdAt, _id: { $lt: id } },
-      ];
-    }
+    // Apply pagination using TimeCidKeyset
+    const paginatedQuery = this.timeCidKeyset.paginate(repostsQuery, {
+      limit,
+      cursor,
+      direction: "desc",
+    });
 
-    const reposts = await this.db.models.Repost.find(query)
-      .select("uri authorDid subject createdAt")
-      .sort({ createdAt: -1, _id: -1 })
-      .limit(limit);
+    const reposts = await paginatedQuery.exec();
 
+    // Generate cursor from the last item if we have a full page
     let nextCursor: string | undefined;
-    if (reposts.length === limit) {
+    if (reposts.length === limit && reposts.length > 0) {
       const lastRepost = reposts[reposts.length - 1];
-      nextCursor = createCursor(
-        lastRepost.createdAt,
-        (lastRepost._id as Types.ObjectId).toString(),
-      );
+      nextCursor = this.timeCidKeyset.pack({
+        primary: lastRepost.createdAt,
+        secondary: lastRepost.cid,
+      });
     }
 
     return {

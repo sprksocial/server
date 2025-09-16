@@ -111,7 +111,18 @@ export class FeedHydrator {
         return acc.set(uri, null);
       }
 
-      const recordJson = JSON.parse(responseRecord.record);
+      let recordJson;
+      try {
+        recordJson = JSON.parse(responseRecord.record);
+      } catch (parseError) {
+        console.error("Failed to parse record JSON:", {
+          uri,
+          record: responseRecord.record.substring(0, 200),
+          error: parseError,
+        });
+        return acc.set(uri, null);
+      }
+
       const record = {
         record: recordJson,
         cid: responseRecord.cid || "",
