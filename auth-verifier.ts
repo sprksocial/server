@@ -1,5 +1,3 @@
-import { KeyObject } from "node:crypto";
-
 import * as jose from "jose";
 import {
   AuthRequiredError,
@@ -67,7 +65,7 @@ export type AuthVerifierOpts = {
   alternateAudienceDids: string[];
   modServiceDid: string;
   adminPasses: string[];
-  entrywayJwtPublicKey?: KeyObject;
+  entrywayJwtPublicKey?: CryptoKey;
 };
 
 export interface ExtendedAuthVerifier {
@@ -121,7 +119,7 @@ export interface AuthVerifier extends ExtendedAuthVerifier {
   standardAudienceDids: Set<string>;
   modServiceDid: string;
   adminPasses: Set<string>;
-  entrywayJwtPublicKey?: KeyObject;
+  entrywayJwtPublicKey?: CryptoKey;
 }
 
 export function createAuthVerifier(
@@ -175,7 +173,7 @@ class AuthVerifierImpl {
   public standardAudienceDids: Set<string>;
   public modServiceDid: string;
   private adminPasses: Set<string>;
-  private entrywayJwtPublicKey?: KeyObject;
+  private entrywayJwtPublicKey?: CryptoKey;
 
   constructor(
     public dataplane: DataPlane,

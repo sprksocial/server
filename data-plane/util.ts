@@ -4,7 +4,6 @@ import {
 } from "../lex/types/so/sprk/feed/post.ts";
 import { Database } from "./db/index.ts";
 import { DidDocument } from "@atproto/identity";
-import { Buffer } from "node:buffer";
 
 export const getDescendents = async (
   db: Database,
@@ -160,8 +159,8 @@ export const getResultFromDoc = (doc: DidDocument) => {
   return {
     did: getDid(doc),
     handle: getHandle(doc),
-    keys: Buffer.from(JSON.stringify(keys)),
-    services: Buffer.from(JSON.stringify(services)),
+    keys: Uint8Array.from(JSON.stringify(keys)),
+    services: Uint8Array.from(JSON.stringify(services)),
     updated: new Date(),
   };
 };

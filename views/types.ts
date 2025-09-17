@@ -12,11 +12,7 @@ import {
   NotFoundPost,
   PostView,
 } from "../lex/types/so/sprk/feed/defs.ts";
-import {
-  ListView,
-  StarterPackViewBasic,
-} from "../lex/types/so/sprk/graph/defs.ts";
-import { LabelerView } from "../lex/types/so/sprk/labeler/defs.ts";
+import { LabelerView } from "../lex/types/app/bsky/labeler/defs.ts";
 
 export type {
   Main as ImagesEmbed,
@@ -47,6 +43,4 @@ export type MaybePostView = PostView | NotFoundPost | BlockedPost;
 
 export type RecordEmbedViewInternal =
   | GeneratorView
-  | ListView
-  | LabelerView
-  | StarterPackViewBasic;
+  | LabelerView;

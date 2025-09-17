@@ -1,4 +1,4 @@
-import assert from "node:assert";
+import { assert } from "@std/assert";
 import { mapDefined } from "@atproto/common";
 import { AtUri } from "@atproto/syntax";
 import { DataPlane } from "../data-plane/index.ts";

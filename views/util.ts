@@ -1,5 +1,9 @@
-import * as util from "node:util";
 import { BlobRef } from "@atproto/lexicon";
+
+// Simple string format function to replace util.format
+const format = (template: string, ...args: string[]): string => {
+  return template.replace(/%s/g, () => args.shift() || "");
+};
 
 export const cidFromBlobJson = (json: BlobRef) => {
   if (json instanceof BlobRef) {
@@ -20,14 +24,14 @@ export class VideoUriBuilder {
     },
   ) {}
   playlist({ did, cid }: { did: string; cid: string }) {
-    return util.format(
+    return format(
       this.opts.playlistUrlPattern,
       encodeURIComponent(did),
       encodeURIComponent(cid),
     );
   }
   thumbnail({ did, cid }: { did: string; cid: string }) {
-    return util.format(
+    return format(
       this.opts.thumbnailUrlPattern,
       encodeURIComponent(did),
       encodeURIComponent(cid),
