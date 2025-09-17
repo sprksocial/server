@@ -6,8 +6,7 @@ import {
   Hydrator,
 } from "../../../../hydration/index.ts";
 import { Server } from "../../../../lex/index.ts";
-import { ids } from "../../../../lex/lexicons.ts";
-import { QueryParams } from "../../../../lex/types/app/bsky/actor/getProfiles.ts";
+import { QueryParams } from "../../../../lex/types/so/sprk/actor/getProfiles.ts";
 import { createPipeline, noRules } from "../../../../pipeline.ts";
 import { Views } from "../../../../views/index.ts";
 import { resHeaders } from "../../../util.ts";
@@ -15,15 +14,7 @@ import { resHeaders } from "../../../util.ts";
 export default function (server: Server, ctx: AppContext) {
   const getProfile = createPipeline(skeleton, hydration, noRules, presentation);
   server.so.sprk.actor.getProfiles({
-    auth: ctx.authVerifier.standardOptionalParameterized({
-      lxmCheck: (method) => {
-        if (!method) return false;
-        return (
-          method === ids.SoSprkActorGetProfiles ||
-          method.startsWith("chat.bsky.")
-        );
-      },
-    }),
+    auth: ctx.authVerifier.standardOptional,
     handler: async ({ auth, params }) => {
       const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
       const hydrateCtx = ctx.hydrator.createContext({

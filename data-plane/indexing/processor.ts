@@ -78,12 +78,6 @@ export class RecordProcessor<T, S> {
 
   matchesSchema(obj: unknown): obj is T {
     try {
-      if (this.collection === "so.sprk.actor.profile") {
-        console.log(
-          `[matchesSchema] Validating object for collection ${this.collection}:`,
-          JSON.stringify(obj, null, 2),
-        );
-      }
       lexicons.assertValidRecord(this.collection, obj);
       return true;
     } catch {
@@ -98,12 +92,6 @@ export class RecordProcessor<T, S> {
       );
     }
     try {
-      if (this.collection === "so.sprk.actor.profile") {
-        console.log(
-          `[matchesSchema] Validating object for collection ${this.collection}:`,
-          JSON.stringify(obj, null, 2),
-        );
-      }
       lexicons.assertValidRecord(this.collection, obj);
     } catch (err) {
       throw new Error(

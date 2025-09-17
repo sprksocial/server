@@ -6,7 +6,6 @@ import {
   Hydrator,
 } from "../../../../hydration/index.ts";
 import { Server } from "../../../../lex/index.ts";
-import { ids } from "../../../../lex/lexicons.ts";
 import { QueryParams } from "../../../../lex/types/so/sprk/feed/getPosts.ts";
 import { createPipeline } from "../../../../pipeline.ts";
 import { uriToDid as creatorFromUri } from "../../../../utils/uris.ts";
@@ -16,14 +15,7 @@ import { resHeaders } from "../../../util.ts";
 export default function (server: Server, ctx: AppContext) {
   const getPosts = createPipeline(skeleton, hydration, noBlocks, presentation);
   server.so.sprk.feed.getPosts({
-    auth: ctx.authVerifier.standardOptionalParameterized({
-      lxmCheck: (method) => {
-        if (!method) return false;
-        return (
-          method === ids.AppBskyFeedGetPosts || method.startsWith("chat.bsky.")
-        );
-      },
-    }),
+    auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth }) => {
       const viewer = auth.credentials.iss;
       const hydrateCtx = ctx.hydrator.createContext({ viewer });

@@ -130,7 +130,7 @@ export class Hydrator {
     this.graph = new GraphHydrator(dataplane);
   }
 
-  // app.bsky.actor.defs#profileView
+  // so.sprk.actor.defs#profileView
   // - profile viewer
   // Note: builds on the naive profile viewer hydrator and removes references to lists that have been deleted
   async hydrateProfileViewers(
@@ -527,7 +527,7 @@ export class Hydrator {
     return mergeStates(profileState, { likes, likeBlocks, ctx });
   }
 
-  // app.bsky.feed.getRepostedBy#repostedBy
+  // so.sprk.feed.getRepostedBy#repostedBy
   // - repost
   //   - profile
   //     - list basic
@@ -607,7 +607,7 @@ export class Hydrator {
   async getRecord(uri: string, includeTakedowns = false) {
     const parsed = new AtUri(uri);
     const collection = parsed.collection;
-    if (collection === ids.AppBskyFeedPost) {
+    if (collection === ids.SoSprkFeedPost) {
       return (
         (await this.feed.getPosts([uri], includeTakedowns)).get(uri) ??
           undefined

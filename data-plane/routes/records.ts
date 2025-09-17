@@ -139,7 +139,7 @@ export class Records {
 
   async getProfileRecords(uris: string[]) {
     try {
-      const result = await getRecords(this.db, uris, ids.AppBskyActorProfile);
+      const result = await getRecords(this.db, uris, ids.SoSprkActorProfile);
       return result;
     } catch (error) {
       console.error("Error fetching profile records:", error);

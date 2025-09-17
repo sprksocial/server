@@ -143,5 +143,5 @@ export const safeTakedownRef = (obj?: {
 }): string | undefined => {
   if (!obj) return;
   if (obj.takedownRef) return obj.takedownRef;
-  if (obj.takenDown) return "BSKY-TAKEDOWN-UNKNOWN";
+  if (obj.takenDown) return "SPRK-TAKEDOWN-UNKNOWN";
 };

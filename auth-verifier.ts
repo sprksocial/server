@@ -344,8 +344,7 @@ class AuthVerifierImpl {
       throw new AuthRequiredError("Malformed token", "InvalidToken");
     } else if (
       typeof aud !== "string" ||
-      !aud.startsWith("did:web:") ||
-      !aud.endsWith(".bsky.network")
+      !aud.startsWith("did:web:")
     ) {
       throw new AuthRequiredError("Bad token aud", "InvalidToken");
     } else if (typeof scope !== "string" || !ALLOWED_AUTH_SCOPES.has(scope)) {
