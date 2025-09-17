@@ -17,7 +17,7 @@ export async function transformStoryToStoryView(
 
   const embedView = transformEmbed(story.media, story.authorDid, null, {
     firstImageOnly: true,
-  });
+  }, true);
 
   return {
     uri: story.uri,
@@ -61,7 +61,7 @@ export async function transformStoriesToStoryViews(
 
     const embedView = transformEmbed(story.media, story.authorDid, null, {
       firstImageOnly: true,
-    });
+    }, true);
 
     return {
       uri: story.uri,

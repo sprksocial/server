@@ -45,6 +45,7 @@ export function transformVideoEmbed(
   embed: PostEmbed,
   authorDid: string,
   videoMapping?: VideoMappingDocument | null,
+  isStory = false,
 ) {
   if (!embed.video) {
     return undefined;
@@ -56,6 +57,11 @@ export function transformVideoEmbed(
   if (videoMapping) {
     playlist = `${env.HLS_CDN_URL}/${videoMapping.bunnyGuid}/playlist.m3u8`;
     thumbnail = `${env.HLS_CDN_URL}/${videoMapping.bunnyGuid}/thumbnail.jpg`;
+  } else if (isStory) {
+    playlist =
+      `https://media.sprk.so/video/${authorDid}/${embed.video.ref.$link}`;
+    thumbnail =
+      `https://thumb.sprk.so/${authorDid}/${embed.video.ref.$link}/thumbnail`;
   } else {
     playlist =
       `${env.VIDEO_CDN_URL}/watch/${authorDid}/${embed.video.ref.$link}/playlist.m3u8`;
@@ -77,6 +83,7 @@ export function transformEmbed(
   authorDid: string,
   videoMapping?: VideoMappingDocument | null,
   options: ImageTransformOptions = {},
+  isStory = false,
 ) {
   if (!embed) {
     return undefined;
@@ -87,7 +94,7 @@ export function transformEmbed(
   }
 
   if (embed.$type === "so.sprk.embed.video") {
-    return transformVideoEmbed(embed, authorDid, videoMapping);
+    return transformVideoEmbed(embed, authorDid, videoMapping, isStory);
   }
 
   return undefined;
