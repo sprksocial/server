@@ -87,7 +87,6 @@ export interface RecordDocument extends Document {
   createdAt: string;
   indexedAt: string;
   json: string;
-  invalidReplyRoot?: boolean;
   takenDown: boolean;
   takedownRef: string;
 }
@@ -101,7 +100,6 @@ export const recordSchema = new Schema<RecordDocument>({
   createdAt: { type: String, required: true },
   indexedAt: { type: String, required: true },
   json: { type: String, required: true },
-  invalidReplyRoot: { type: Boolean, required: false },
   takenDown: { type: Boolean, required: false },
   takedownRef: { type: String, required: false },
 });

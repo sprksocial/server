@@ -2,17 +2,9 @@ import { CID } from "multiformats/cid";
 
 import { AtUri } from "@atproto/syntax";
 import { lexicons } from "../lex/lexicons.ts";
+import { jsonToLex } from "@atproto/lexicon";
+import { Record } from "../data-plane/routes/records.ts";
 import { jsonStringToLex } from "@atproto/lexicon";
-
-export type Record = {
-  record: string;
-  uri: string;
-  cid?: CID;
-  createdAt?: string;
-  indexedAt?: string;
-  takedownRef?: string | undefined;
-  takenDown: boolean;
-};
 
 export class HydrationMap<T> extends Map<string, T | null> implements Merges {
   merge(map: HydrationMap<T>): this {
@@ -32,7 +24,7 @@ type UnknownRecord = { $type: string; [x: string]: unknown };
 export type RecordInfo<T extends UnknownRecord> = {
   record: T;
   cid: string;
-  createdAt: Date;
+  sortedAt: Date;
   indexedAt: Date;
   takedownRef: string | undefined;
 };
@@ -76,44 +68,33 @@ export const parseRecord = <T extends UnknownRecord>(
   }
   const record = jsonStringToLex(entry.record);
   const cid = entry.cid;
-  const createdAt = entry.createdAt ? new Date(entry.createdAt) : new Date(0);
-  const indexedAt = entry.indexedAt ? new Date(entry.indexedAt) : new Date(0);
+  const sortedAt = new Date(entry.sortedAt ?? 0);
+  const indexedAt = new Date(entry.indexedAt ?? 0);
   if (!record || !cid) return;
-  if (!isValidRecord(entry.record, entry.uri)) {
+  if (!isValidRecord(record)) {
     return;
   }
   return {
     record,
     cid,
-    createdAt,
+    sortedAt,
     indexedAt,
     takedownRef: safeTakedownRef(entry),
   };
 };
 
-const isValidRecord = (record: string, uri: string) => {
-  const aturi = new AtUri(uri);
-  const recordObj = jsonStringToLex(record);
+const isValidRecord = (json: unknown) => {
+  const lexRecord = jsonToLex(json);
+  if (typeof lexRecord?.["$type"] !== "string") {
+    return false;
+  }
   try {
-    lexicons.assertValidRecord(aturi.collection.toString(), recordObj);
+    lexicons.assertValidRecord(lexRecord["$type"], lexRecord);
     return true;
   } catch (err) {
     console.log(`Invalid record: ${err}`);
     return false;
   }
-};
-
-// @NOTE not parsed into lex format, so will not match lexicon record types on CID and blob values.
-export const parseRecordBytes = <T>(
-  bytes: Uint8Array | undefined,
-): T | undefined => {
-  return parseJsonBytes(bytes) as T;
-};
-
-export const parseJsonBytes = (bytes: Uint8Array | undefined): unknown => {
-  if (!bytes || bytes.byteLength === 0) return;
-  const parsed = JSON.parse(new TextDecoder("utf-8").decode(bytes));
-  return parsed ?? undefined;
 };
 
 export const parseString = (str: string | undefined): string | undefined => {
@@ -164,11 +145,3 @@ export const safeTakedownRef = (obj?: {
   if (obj.takedownRef) return obj.takedownRef;
   if (obj.takenDown) return "BSKY-TAKEDOWN-UNKNOWN";
 };
-
-export const isActivitySubscriptionEnabled = ({
-  post,
-  reply,
-}: {
-  post: boolean;
-  reply: boolean;
-}): boolean => post || reply;

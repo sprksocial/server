@@ -120,19 +120,19 @@ export abstract class GenericKeyset<R, LR extends KeysetLabeledResult> {
   }
 }
 
-type SortAtCidResult = { sortAt: string; cid: string };
+type SortedAtCidResult = { sortedAt?: string; cid: string };
 type TimeCidLabeledResult = KeysetCursor;
 
 export class TimeCidKeyset<
-  TimeCidResult = SortAtCidResult,
+  TimeCidResult = SortedAtCidResult,
 > extends GenericKeyset<TimeCidResult, TimeCidLabeledResult> {
   constructor() {
-    super("sortAt", "cid");
+    super("sortedAt", "cid");
   }
 
   labelResult(result: TimeCidResult): TimeCidLabeledResult;
-  labelResult<TimeCidResult extends SortAtCidResult>(result: TimeCidResult) {
-    return { primary: result.sortAt, secondary: result.cid };
+  labelResult<TimeCidResult extends SortedAtCidResult>(result: TimeCidResult) {
+    return { primary: result.sortedAt, secondary: result.cid };
   }
   labeledResultToCursor(labeled: TimeCidLabeledResult) {
     return {

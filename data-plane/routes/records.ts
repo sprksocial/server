@@ -1,82 +1,62 @@
 import { Database } from "../db/index.ts";
 import { AtUri } from "@atproto/syntax";
 import { ids } from "../../lex/lexicons.ts";
-import { RecordDocument } from "../db/models.ts";
+import { keyBy } from "@atproto/common";
+
+export type Record = {
+  record: string;
+  uri: string;
+  cid?: string;
+  createdAt?: string;
+  sortedAt?: string;
+  indexedAt?: string;
+  takenDown: boolean;
+  takedownRef?: string;
+};
 
 // Helper function to get records by collection
-async function getRecords(
+export async function getRecords(
   db: Database,
   uris: string[],
   collection?: string | string[],
 ): Promise<{
-  records: Array<{
-    record: string;
-    uri: string;
-    cid?: string;
-    createdAt?: string;
-    indexedAt?: string;
-    takenDown: boolean;
-    takedownRef?: string;
-    tags?: string[];
-  }>;
+  records: Array<Record>;
 }> {
-  // Filter out empty or invalid URIs first
-  const nonEmptyUris = uris.filter((uri) => uri && uri.trim().length > 0);
-
   const validUris = collection
-    ? Array.isArray(collection)
-      ? nonEmptyUris.filter((uri) => {
-        try {
-          return new AtUri(uri).collection === collection[0];
-        } catch {
-          return false;
-        }
-      })
-      : nonEmptyUris.filter((uri) => {
-        try {
-          return new AtUri(uri).collection === collection;
-        } catch {
-          return false;
-        }
-      })
-    : nonEmptyUris;
+    ? uris.filter((uri) => new AtUri(uri).collection === collection)
+    : uris;
 
-  const records = validUris.length
+  const res = validUris.length
     ? await db.models.Record.find({
       uri: { $in: validUris },
-    }).select("uri cid json createdAt indexedAt takedownRef")
+    })
     : [];
 
-  const recordMap = new Map(records.map((r: RecordDocument) => [r.uri, r]));
+  const byUri = keyBy(res, "uri");
 
-  const result = uris.map((uri) => {
-    const record = recordMap.get(uri);
-    const json = record ? JSON.stringify(record.json) : JSON.stringify(null);
-    const parsedJson = record ? Object(record.json) : null;
-    const createdAtRaw = parsedJson?.createdAt
-      ? new Date(parsedJson.createdAt)
-      : null;
-    const createdAt = createdAtRaw && !isNaN(createdAtRaw.getTime())
-      ? createdAtRaw.toISOString()
+  const records: Record[] = uris.map((uri) => {
+    const row = byUri.get(uri);
+    const json = row ? row.json : JSON.stringify(null);
+    const createdAt = JSON.parse(json)?.["createdAt"]
+      ? new Date(JSON.parse(json)?.["createdAt"]).toISOString()
       : undefined;
-    const indexedAt = record?.indexedAt
-      ? new Date(record.indexedAt).toISOString()
+    const indexedAt = row?.indexedAt
+      ? new Date(row.indexedAt).toISOString()
       : undefined;
 
     return {
       record: json,
       uri,
-      cid: record?.cid,
+      cid: row?.cid,
       createdAt,
       indexedAt,
       sortedAt: compositeTime(createdAt, indexedAt),
-      takenDown: !!record?.takedownRef,
-      takedownRef: record?.takedownRef || undefined,
-      tags: parsedJson?.tags || undefined,
+      takenDown: !!row?.takedownRef,
+      takedownRef: row?.takedownRef || undefined,
     };
   });
 
-  return { records: result };
+  return { records };
 }
 
 // Helper function to get post records with metadata
@@ -84,17 +64,7 @@ async function getPostRecords(
   db: Database,
   uris: string[],
 ): Promise<{
-  records: Array<{
-    record: string;
-    cid?: string;
-    createdAt?: string;
-    indexedAt?: string;
-    sortedAt?: string;
-    takenDown: boolean;
-    takedownRef?: string;
-    tags?: string[];
-    sound?: string;
-  }>;
+  records: Array<Record>;
 }> {
   const [{ records }] = await Promise.all([
     getRecords(db, uris, ids.SoSprkFeedPost),
@@ -111,7 +81,7 @@ async function getPostRecords(
 }
 
 // Helper function for composite time
-function compositeTime(ts1?: string, ts2?: string): string | undefined {
+export function compositeTime(ts1?: string, ts2?: string): string | undefined {
   if (!ts1) return ts2;
   if (!ts2) return ts1;
   return new Date(ts1) < new Date(ts2) ? ts1 : ts2;

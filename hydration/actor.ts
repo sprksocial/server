@@ -14,8 +14,9 @@ export type Actor = {
   profileCid?: string;
   profileTakedownRef?: string;
   indexedAt?: Date;
-  takedownRef?: string;
   createdAt?: Date;
+  sortedAt?: Date;
+  takedownRef?: string;
   upstreamStatus?: string;
 };
 
@@ -118,21 +119,14 @@ export class ActorHydrator {
         (actor.upstreamStatus && actor.upstreamStatus !== "active");
       if (
         !actor.exists ||
-        (isNoHosted && !includeTakedowns)
+        (isNoHosted && !includeTakedowns) ||
+        !!actor.tombstonedAt
       ) {
         return acc.set(did, null);
       }
 
       const profile = actor.profile
-        ? parseRecord<ProfileRecord>({
-          record: actor.profile.json,
-          uri: actor.profile.uri,
-          cid: actor.profile.cid,
-          createdAt: actor.profile.createdAt,
-          indexedAt: actor.profile.indexedAt,
-          takedownRef: actor.profile.takedownRef,
-          takenDown: actor.profile.takenDown ?? false,
-        }, includeTakedowns)
+        ? parseRecord<ProfileRecord>(actor.profile, includeTakedowns)
         : undefined;
 
       return acc.set(did, {
@@ -140,11 +134,12 @@ export class ActorHydrator {
         handle: parseString(actor.handle),
         profile: profile?.record,
         profileCid: profile?.cid,
+        sortedAt: profile?.sortedAt ?? new Date(0),
         profileTakedownRef: profile?.takedownRef,
         indexedAt: profile?.indexedAt,
         takedownRef: safeTakedownRef(actor),
-        createdAt: actor.createdAt ? new Date(actor.createdAt) : undefined,
-        upstreamStatus: parseString(actor.upstreamStatus),
+        upstreamStatus: actor.upstreamStatus || undefined,
+        createdAt: new Date(actor.createdAt ?? 0),
       });
     }, new HydrationMap<Actor>());
   }

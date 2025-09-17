@@ -244,11 +244,11 @@ export class Views {
       ...basicView,
       $type: "so.sprk.actor.defs#profileView",
       description: actor.profile?.description || undefined,
-      indexedAt: actor.indexedAt && actor.createdAt
+      indexedAt: actor.indexedAt && actor.sortedAt
         ? this.indexedAt({
-          createdAt: actor.createdAt,
+          sortedAt: actor.sortedAt,
           indexedAt: actor.indexedAt,
-        })?.toISOString()
+        }).toISOString()
         : undefined,
     };
   }
@@ -423,14 +423,9 @@ export class Views {
       aspectRatio: embed.aspectRatio,
     };
   }
-  indexedAt(
-    { createdAt, indexedAt }: {
-      createdAt: Date;
-      indexedAt: Date;
-    },
-  ) {
-    if (!this.indexedAtEpoch) return createdAt;
-    return indexedAt && indexedAt > this.indexedAtEpoch ? indexedAt : createdAt;
+  indexedAt({ sortedAt, indexedAt }: { sortedAt: Date; indexedAt: Date }) {
+    if (!this.indexedAtEpoch) return sortedAt;
+    return indexedAt && indexedAt > this.indexedAtEpoch ? indexedAt : sortedAt;
   }
   viewerBlockExists(did: string, state: HydrationState): boolean {
     const viewer = state.profileViewers?.get(did);

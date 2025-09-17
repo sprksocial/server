@@ -1,4 +1,6 @@
+import { keyBy } from "@atproto/common";
 import { Database } from "../db/index.ts";
+import { getRecords } from "./records.ts";
 
 export class Profiles {
   private db: Database;
@@ -8,48 +10,39 @@ export class Profiles {
   }
 
   async getActors(dids: string[]) {
-    if (dids.length === 0) {
-      return { actors: [] };
-    }
-
-    // Get actors from MongoDB
-    const actors = await this.db.models.Actor.find({
-      did: { $in: dids },
-    });
-
-    // Get profiles for these actors
     const profileUris = dids.map(
       (did) => `at://${did}/so.sprk.actor.profile/self`,
     );
-    const profiles = await this.db.models.Record.find({
-      uri: { $in: profileUris },
-    });
-    // Create lookup maps
-    const actorMap = new Map(actors.map((actor) => [actor.did, actor]));
-    const profileMap = new Map(
-      profiles.map((profile) => [profile.uri, profile]),
-    );
 
-    const result = dids.map((did) => {
-      const actor = actorMap.get(did);
-      const profileUri = `at://${did}/so.sprk.actor.profile/self`;
-      const profile = profileMap.get(profileUri);
+    const [
+      handlesRes,
+      profiles,
+    ] = await Promise.all([
+      this.db.models.Actor.find({
+        did: { $in: dids },
+      }),
+      getRecords(this.db, profileUris),
+    ]);
+
+    const byDid = keyBy(handlesRes, "did");
+    const actors = dids.map((did, i) => {
+      const row = byDid.get(did);
 
       return {
-        exists: !!actor,
-        handle: actor?.handle ?? undefined,
-        profile: profile || null,
-        takenDown: !!actor?.takedownRef,
-        takedownRef: actor?.takedownRef || undefined,
-        tombstonedAt: undefined,
-        upstreamStatus: actor?.upstreamStatus ?? "",
-        createdAt: profile?.createdAt || null,
+        exists: !!row,
+        handle: row?.handle ?? undefined,
+        profile: profiles.records[i],
+        takenDown: !!row?.takedownRef,
+        takedownRef: row?.takedownRef || undefined,
+        tombstonedAt: undefined, // in current implementation, tombstoned actors are deleted
+        upstreamStatus: row?.upstreamStatus ?? "",
+        createdAt: profiles.records[i].createdAt, // @NOTE profile creation date not trusted in production
         tags: [],
         profileTags: [],
       };
     });
 
-    return { actors: result };
+    return { actors };
   }
 
   async getDidsByHandles(handles: string[]) {
@@ -57,16 +50,12 @@ export class Profiles {
       return { dids: [] };
     }
 
-    const actors = await this.db.models.Actor.find({
+    const res = await this.db.models.Actor.find({
       handle: { $in: handles },
     }).select("did handle");
 
-    // Create lookup map
-    const handleMap = new Map(
-      actors.map((actor) => [actor.handle, actor.did]),
-    );
-    const dids = handles.map((handle) => handleMap.get(handle) || "");
-
+    const byHandle = keyBy(res, "handle");
+    const dids = handles.map((handle) => byHandle.get(handle)?.did ?? "");
     return { dids };
   }
 

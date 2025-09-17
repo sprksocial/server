@@ -1,5 +1,6 @@
 import { Database } from "../db/index.ts";
 import { TimeCidKeyset } from "../db/pagination.ts";
+import { compositeTime } from "./records.ts";
 
 // Helper function to format feed items
 function feedItemFromRow(
@@ -24,7 +25,7 @@ interface FeedItem {
   createdAt: string;
   type: "post" | "repost";
   repostUri?: string;
-  sortAt: string;
+  sortedAt?: string;
 }
 
 export class Feeds {
@@ -41,9 +42,11 @@ export class Feeds {
     limit = 50,
     cursor?: string,
   ) {
-    // Get posts by this author
-    const postsQuery = this.db.models.Post.find({ authorDid: actorDid })
-      .select("uri cid authorDid createdAt");
+    // Get posts by this author (exclude replies)
+    const postsQuery = this.db.models.Post.find({
+      authorDid: actorDid,
+      reply: null,
+    });
 
     // Apply pagination to posts query
     const paginatedPostsQuery = this.timeCidKeyset.paginate(postsQuery, {
@@ -61,22 +64,12 @@ export class Feeds {
       authorDid: p.authorDid,
       createdAt: p.createdAt,
       type: "post" as const,
-      sortAt: p.createdAt,
+      sortedAt: compositeTime(p.createdAt, p.cid),
     }));
-
-    // Generate cursor from the last item if we have a full page
-    let nextCursor: string | undefined;
-    if (transformedPosts.length === limit && transformedPosts.length > 0) {
-      const lastItem = transformedPosts[transformedPosts.length - 1];
-      nextCursor = this.timeCidKeyset.pack({
-        primary: lastItem.createdAt,
-        secondary: lastItem.cid,
-      });
-    }
 
     return {
       items: transformedPosts.map(feedItemFromRow),
-      cursor: nextCursor,
+      cursor: this.timeCidKeyset.packFromResult(transformedPosts),
     };
   }
 
@@ -91,9 +84,10 @@ export class Feeds {
     const postsLimit = Math.floor(limit * 0.8);
     const repostsLimit = limit - postsLimit;
 
-    // Get timeline posts
+    // Get timeline posts (exclude replies)
     const postsQuery = this.db.models.Post.find({
       authorDid: { $in: timelineDids },
+      reply: null,
     })
       .select("uri cid authorDid createdAt");
 

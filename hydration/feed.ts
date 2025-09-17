@@ -7,16 +7,14 @@ import { uriToDid as didFromUri } from "../utils/uris.ts";
 import {
   HydrationMap,
   ItemRef,
+  parseRecord,
   parseString,
   RecordInfo,
   split,
 } from "./util.ts";
 import { DataPlane } from "../data-plane/index.ts";
 
-export type Post = RecordInfo<PostRecord> & {
-  sound: Set<string>;
-  tags: Set<string>;
-};
+export type Post = RecordInfo<PostRecord>;
 export type Posts = HydrationMap<Post>;
 
 export type VideoMapping = VideoMappingDocument;
@@ -105,50 +103,12 @@ export class FeedHydrator {
     );
     if (!need.length) return base;
     const res = await this.dataplane.records.getPostRecords(need);
+
     return need.reduce((acc, uri, i) => {
-      const responseRecord = res.records[i];
-      if (!responseRecord || responseRecord.record === "null") {
-        return acc.set(uri, null);
-      }
-
-      let recordJson;
-      try {
-        recordJson = JSON.parse(responseRecord.record);
-      } catch (parseError) {
-        console.error("Failed to parse record JSON:", {
-          uri,
-          record: responseRecord.record.substring(0, 200),
-          error: parseError,
-        });
-        return acc.set(uri, null);
-      }
-
-      const record = {
-        record: recordJson,
-        cid: responseRecord.cid || "",
-        createdAt: responseRecord.createdAt
-          ? new Date(responseRecord.createdAt)
-          : new Date(0),
-        indexedAt: responseRecord.indexedAt
-          ? new Date(responseRecord.indexedAt)
-          : new Date(0),
-        takedownRef: responseRecord.takedownRef,
-      };
-
-      if (!includeTakedowns && responseRecord.takenDown) {
-        return acc.set(uri, null);
-      }
-
-      const tags = new Set<string>(responseRecord.tags ?? []);
-      const sound = new Set<string>(responseRecord.sound ?? "");
-
+      const record = parseRecord<PostRecord>(res.records[i], includeTakedowns);
       return acc.set(
         uri,
-        {
-          ...record,
-          sound,
-          tags,
-        },
+        record ? record : null,
       );
     }, base);
   }
@@ -233,29 +193,11 @@ export class FeedHydrator {
     if (!uris.length) return new HydrationMap<FeedGen>();
     const res = await this.dataplane.records.getFeedGeneratorRecords(uris);
     return uris.reduce((acc, uri, i) => {
-      const responseRecord = res.records[i];
-      if (!responseRecord || responseRecord.record === "null") {
-        return acc.set(uri, null);
-      }
-
-      if (!includeTakedowns && responseRecord.takenDown) {
-        return acc.set(uri, null);
-      }
-
-      const recordJson = JSON.parse(responseRecord.record);
-      const record = {
-        record: recordJson,
-        cid: responseRecord.cid || "",
-        createdAt: responseRecord.createdAt
-          ? new Date(responseRecord.createdAt)
-          : new Date(0),
-        indexedAt: responseRecord.indexedAt
-          ? new Date(responseRecord.indexedAt)
-          : new Date(0),
-        takedownRef: responseRecord.takedownRef,
-      };
-
-      return acc.set(uri, record);
+      const record = parseRecord<FeedGenRecord>(
+        res.records[i],
+        includeTakedowns,
+      );
+      return acc.set(uri, record ?? null);
     }, new HydrationMap<FeedGen>());
   }
 
@@ -291,29 +233,8 @@ export class FeedHydrator {
     if (!uris.length) return new HydrationMap<Like>();
     const res = await this.dataplane.records.getLikeRecords(uris);
     return uris.reduce((acc, uri, i) => {
-      const responseRecord = res.records[i];
-      if (!responseRecord || responseRecord.record === "null") {
-        return acc.set(uri, null);
-      }
-
-      if (!includeTakedowns && responseRecord.takenDown) {
-        return acc.set(uri, null);
-      }
-
-      const recordJson = JSON.parse(responseRecord.record);
-      const record = {
-        record: recordJson,
-        cid: responseRecord.cid || "",
-        createdAt: responseRecord.createdAt
-          ? new Date(responseRecord.createdAt)
-          : new Date(0),
-        indexedAt: responseRecord.indexedAt
-          ? new Date(responseRecord.indexedAt)
-          : new Date(0),
-        takedownRef: responseRecord.takedownRef,
-      };
-
-      return acc.set(uri, record);
+      const record = parseRecord<LikeRecord>(res.records[i], includeTakedowns);
+      return acc.set(uri, record ?? null);
     }, new HydrationMap<Like>());
   }
 
@@ -321,29 +242,11 @@ export class FeedHydrator {
     if (!uris.length) return new HydrationMap<Repost>();
     const res = await this.dataplane.records.getRepostRecords(uris);
     return uris.reduce((acc, uri, i) => {
-      const responseRecord = res.records[i];
-      if (!responseRecord || responseRecord.record === "null") {
-        return acc.set(uri, null);
-      }
-
-      if (!includeTakedowns && responseRecord.takenDown) {
-        return acc.set(uri, null);
-      }
-
-      const recordJson = JSON.parse(responseRecord.record);
-      const record = {
-        record: recordJson,
-        cid: responseRecord.cid || "",
-        createdAt: responseRecord.createdAt
-          ? new Date(responseRecord.createdAt)
-          : new Date(0),
-        indexedAt: responseRecord.indexedAt
-          ? new Date(responseRecord.indexedAt)
-          : new Date(0),
-        takedownRef: responseRecord.takedownRef,
-      };
-
-      return acc.set(uri, record);
+      const record = parseRecord<RepostRecord>(
+        res.records[i],
+        includeTakedowns,
+      );
+      return acc.set(uri, record ?? null);
     }, new HydrationMap<Repost>());
   }
 }

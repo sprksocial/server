@@ -649,8 +649,8 @@ export class Hydrator {
       const recordInfo: RecordInfo<ProfileRecord> = {
         record: actor.profile,
         cid: actor.profileCid,
-        createdAt: actor.createdAt ?? new Date(0), // @NOTE will be present since profile record is present
-        indexedAt: actor.indexedAt ?? new Date(0), // @NOTE will be present since profile record is present
+        sortedAt: actor.sortedAt ?? new Date(0),
+        indexedAt: actor.indexedAt ?? new Date(0),
         takedownRef: actor.profileTakedownRef,
       };
 
