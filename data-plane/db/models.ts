@@ -89,6 +89,7 @@ export interface RecordDocument extends Document {
   json: string;
   takenDown: boolean;
   takedownRef: string;
+  invalidReplyRoot?: boolean;
 }
 
 export const recordSchema = new Schema<RecordDocument>({
@@ -102,6 +103,7 @@ export const recordSchema = new Schema<RecordDocument>({
   json: { type: String, required: true },
   takenDown: { type: Boolean, required: false },
   takedownRef: { type: String, required: false },
+  invalidReplyRoot: { type: Boolean, required: false },
 });
 
 export interface DuplicateRecordDocument extends Document {
