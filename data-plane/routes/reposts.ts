@@ -22,8 +22,7 @@ export class Reposts {
     // Build query for reposts of this subject
     const repostsQuery = this.db.models.Repost.find({
       "subject.uri": subject.uri,
-    })
-      .select("uri authorDid subject createdAt cid");
+    });
 
     // Apply pagination using TimeCidKeyset
     const paginatedQuery = this.timeCidKeyset.paginate(repostsQuery, {
@@ -63,7 +62,7 @@ export class Reposts {
     const reposts = await this.db.models.Repost.find({
       authorDid: actorDid,
       "subject.uri": { $in: subjectUris },
-    }).select("uri subject");
+    });
 
     // Create a map for quick lookup
     const repostMap = new Map(reposts.map((r) => [r.subject.uri, r.uri]));
@@ -74,8 +73,7 @@ export class Reposts {
 
   async getActor(actorDid: string, limit = 50, cursor?: string) {
     // Build query for reposts by this actor
-    const repostsQuery = this.db.models.Repost.find({ authorDid: actorDid })
-      .select("uri authorDid subject createdAt cid");
+    const repostsQuery = this.db.models.Repost.find({ authorDid: actorDid });
 
     // Apply pagination using TimeCidKeyset
     const paginatedQuery = this.timeCidKeyset.paginate(repostsQuery, {

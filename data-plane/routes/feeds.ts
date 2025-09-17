@@ -75,8 +75,7 @@ export class Feeds {
 
   async getTimeline(actorDid: string, limit = 50, cursor?: string) {
     // Get people this actor follows
-    const follows = await this.db.models.Follow.find({ authorDid: actorDid })
-      .select("subject");
+    const follows = await this.db.models.Follow.find({ authorDid: actorDid });
 
     const followedDids = follows.map((f) => f.subject);
     const timelineDids = [...followedDids, actorDid];
@@ -88,8 +87,7 @@ export class Feeds {
     const postsQuery = this.db.models.Post.find({
       authorDid: { $in: timelineDids },
       reply: null,
-    })
-      .select("uri cid authorDid createdAt");
+    });
 
     // Apply pagination to posts query
     const paginatedPostsQuery = this.timeCidKeyset.paginate(postsQuery, {
@@ -103,8 +101,7 @@ export class Feeds {
     // Get timeline reposts
     const repostsQuery = this.db.models.Repost.find({
       authorDid: { $in: timelineDids },
-    })
-      .select("uri subject authorDid createdAt cid");
+    });
 
     // Apply pagination to reposts query
     const paginatedRepostsQuery = this.timeCidKeyset.paginate(repostsQuery, {
@@ -122,7 +119,7 @@ export class Feeds {
       authorDid: p.authorDid,
       createdAt: p.createdAt,
       type: "post" as const,
-      sortAt: p.createdAt,
+      sortedAt: compositeTime(p.createdAt, p.indexedAt),
     }));
 
     const transformedReposts: FeedItem[] = reposts.map((r) => ({
@@ -132,15 +129,15 @@ export class Feeds {
       createdAt: r.createdAt,
       type: "repost" as const,
       repostUri: r.uri,
-      sortAt: r.createdAt,
+      sortedAt: compositeTime(r.createdAt, r.indexedAt),
     }));
 
     // Combine and sort all items
     const allItems = [...transformedPosts, ...transformedReposts]
       .sort((a, b) => {
         // Sort by createdAt descending, then by cid descending
-        if (a.createdAt !== b.createdAt) {
-          return a.createdAt > b.createdAt ? -1 : 1;
+        if (a.sortedAt && b.sortedAt && a.sortedAt !== b.sortedAt) {
+          return a.sortedAt > b.sortedAt ? -1 : 1;
         }
         return a.cid > b.cid ? -1 : 1;
       })

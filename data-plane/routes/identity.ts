@@ -1,4 +1,3 @@
-import { Database } from "../db/index.ts";
 import { IdResolver } from "@atproto/identity";
 import { DidDocument, getDid, getHandle } from "@atproto/identity";
 
@@ -35,11 +34,9 @@ function getResultFromDoc(doc: DidDocument) {
 }
 
 export class Identity {
-  private db: Database;
   private idResolver?: IdResolver;
 
-  constructor(db: Database, idResolver?: IdResolver) {
-    this.db = db;
+  constructor(idResolver?: IdResolver) {
     this.idResolver = idResolver;
   }
 

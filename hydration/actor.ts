@@ -82,7 +82,7 @@ export class ActorHydrator {
   ): Promise<(string | undefined)[]> {
     const handles = handleOrDids.filter((actor) => !actor.startsWith("did:"));
     const res = handles.length
-      ? await this.dataplane.profiles.getDidsByHandles(handles)
+      ? await this.dataplane.actors.getDidsByHandles(handles)
       : { dids: [] };
     const didByHandle = handles.reduce(
       (acc, cur, i) => {
@@ -112,7 +112,7 @@ export class ActorHydrator {
   ): Promise<Actors> {
     const { includeTakedowns = false } = opts;
     if (!dids.length) return new HydrationMap<Actor>();
-    const res = await this.dataplane.profiles.getActors(dids);
+    const res = await this.dataplane.actors.getActors(dids);
     return dids.reduce((acc, did, i) => {
       const actor = res.actors[i];
       const isNoHosted = actor.takenDown ||

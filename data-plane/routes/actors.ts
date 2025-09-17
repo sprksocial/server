@@ -2,7 +2,7 @@ import { keyBy } from "@atproto/common";
 import { Database } from "../db/index.ts";
 import { getRecords } from "./records.ts";
 
-export class Profiles {
+export class Actors {
   private db: Database;
 
   constructor(db: Database) {

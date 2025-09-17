@@ -8,9 +8,7 @@ export class Moderation {
   }
 
   async getActorTakedown(did: string) {
-    const actor = await this.db.models.Actor.findOne({ did }).select(
-      "takedownRef",
-    );
+    const actor = await this.db.models.Actor.findOne({ did });
 
     return {
       takenDown: !!actor?.takedownRef,
@@ -22,7 +20,7 @@ export class Moderation {
     const blobTakedown = await this.db.models.BlobTakedown.findOne({
       did,
       cid,
-    }).select("ref");
+    });
 
     return {
       takenDown: !!blobTakedown,
@@ -33,7 +31,7 @@ export class Moderation {
   async getRecordTakedown(recordUri: string) {
     const record = await this.db.models.Record.findOne({
       uri: recordUri,
-    }).select("takedownRef");
+    });
 
     return {
       takenDown: !!record?.takedownRef,

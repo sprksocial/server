@@ -10,14 +10,14 @@ export class Blocks {
     this.timeCidKeyset = new TimeCidKeyset();
   }
 
-  async bidirectional(actorDid: string, targetDid: string) {
+  async getBidirectionalBlock(actorDid: string, targetDid: string) {
     // Check for blocks in both directions
     const block = await this.db.models.Block.findOne({
       $or: [
         { authorDid: actorDid, subject: targetDid },
         { authorDid: targetDid, subject: actorDid },
       ],
-    }).select("uri");
+    });
 
     return {
       blockUri: block?.uri || null,
@@ -26,8 +26,7 @@ export class Blocks {
 
   async getBlocks(actorDid: string, limit = 50, cursor?: string) {
     // Build query for blocks by this actor
-    const blocksQuery = this.db.models.Block.find({ authorDid: actorDid })
-      .select("uri subject createdAt cid");
+    const blocksQuery = this.db.models.Block.find({ authorDid: actorDid });
 
     // Apply pagination using TimeCidKeyset
     const paginatedQuery = this.timeCidKeyset.paginate(blocksQuery, {

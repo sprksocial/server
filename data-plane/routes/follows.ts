@@ -29,7 +29,7 @@ export class Follows {
     const follows = await this.db.models.Follow.find({
       authorDid: actorDid,
       subject: { $in: targetDids },
-    }).select("uri subject");
+    });
 
     // Create a map for quick lookup
     const followMap = new Map(follows.map((f) => [f.subject, f.uri]));
@@ -41,8 +41,7 @@ export class Follows {
   async getFollowers(actorDid: string, limit = 50, cursor?: string) {
     // Build query for followers (people who follow this actor)
     const followersQuery = this.db.models.Follow.find({ subject: actorDid })
-      .populate("actor", "did handle indexedAt takedownRef upstreamStatus")
-      .select("uri authorDid subject createdAt cid");
+      .populate("actor", "did handle indexedAt takedownRef upstreamStatus");
 
     // Apply pagination using TimeCidKeyset
     const paginatedQuery = this.timeCidKeyset.paginate(followersQuery, {
@@ -76,8 +75,7 @@ export class Follows {
   async getFollows(actorDid: string, limit = 50, cursor?: string) {
     // Build query for follows (people this actor follows)
     const followsQuery = this.db.models.Follow.find({ authorDid: actorDid })
-      .populate("actor", "did handle indexedAt takedownRef upstreamStatus")
-      .select("uri authorDid subject createdAt cid");
+      .populate("actor", "did handle indexedAt takedownRef upstreamStatus");
 
     // Apply pagination using TimeCidKeyset
     const paginatedQuery = this.timeCidKeyset.paginate(followsQuery, {
@@ -121,7 +119,7 @@ export class Follows {
       // Get people who follow the subject (Dan's followers)
       const subjectFollowers = await this.db.models.Follow.find({
         subject: subjectDid,
-      }).select("authorDid");
+      });
 
       const followerDids = subjectFollowers.map((f) => f.authorDid);
 
@@ -129,7 +127,7 @@ export class Follows {
       const mutualConnections = await this.db.models.Follow.find({
         authorDid: viewerDid,
         subject: { $in: followerDids },
-      }).select("subject");
+      });
 
       results.push(
         new FollowsFollowing({

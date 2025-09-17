@@ -8,6 +8,7 @@ import {
 /**
  * Convert a post URI to a threadgate URI. If the URI is not a valid
  * post URI, return URI unchanged. Threadgate lookups will then fail.
+ * Threadgates aren't implemented yet but will be in the future.
  */
 export function postUriToThreadgateUri(postUri: string) {
   const urip = new AtUri(postUri);
@@ -20,6 +21,7 @@ export function postUriToThreadgateUri(postUri: string) {
 /**
  * Convert a post URI to a postgate URI. If the URI is not a valid
  * post URI, return URI unchanged. Postgate lookups will then fail.
+ * Postgates aren't implemented yet but will be in the future.
  */
 export function postUriToPostgateUri(postUri: string) {
   const urip = new AtUri(postUri);

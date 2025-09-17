@@ -71,9 +71,7 @@ async function getPostRecords(
     uris.length
       ? db.models.Post.find({
         uri: { $in: uris },
-      }).select(
-        "uri violatesThreadGate violatesEmbeddingRules hasThreadGate hasPostGate",
-      )
+      })
       : [],
   ]);
 

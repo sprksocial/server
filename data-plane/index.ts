@@ -6,7 +6,7 @@ import { Feeds } from "./routes/feeds.ts";
 import { Follows } from "./routes/follows.ts";
 import { Likes } from "./routes/likes.ts";
 import { Moderation } from "./routes/moderation.ts";
-import { Profiles } from "./routes/profiles.ts";
+import { Actors } from "./routes/actors.ts";
 import { Identity } from "./routes/identity.ts";
 import { Records } from "./routes/records.ts";
 import { Relationships } from "./routes/relationships.ts";
@@ -33,7 +33,7 @@ export class DataPlane {
   public follows: Follows;
   public likes: Likes;
   public moderation: Moderation;
-  public profiles: Profiles;
+  public actors: Actors;
   public identity: Identity;
   public records: Records;
   public relationships: Relationships;
@@ -56,8 +56,8 @@ export class DataPlane {
     this.follows = new Follows(db);
     this.likes = new Likes(db);
     this.moderation = new Moderation(db);
-    this.profiles = new Profiles(db);
-    this.identity = new Identity(db, idResolver);
+    this.actors = new Actors(db);
+    this.identity = new Identity(idResolver);
     this.records = new Records(db);
     this.relationships = new Relationships(db);
     this.interactions = new Interactions(db);

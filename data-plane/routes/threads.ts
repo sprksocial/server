@@ -22,8 +22,7 @@ async function getAncestors(
   let depth = 0;
 
   while (depth < maxDepth) {
-    const post = await db.models.Post.findOne({ uri: currentUri })
-      .select("reply.parent.uri");
+    const post = await db.models.Post.findOne({ uri: currentUri });
 
     if (!post || !post.reply?.parent?.uri) {
       break;
@@ -66,7 +65,6 @@ async function getDescendants(
     const replies = await db.models.Post.find({
       "reply.parent.uri": currentUri,
     })
-      .select("uri createdAt")
       .sort({ createdAt: -1 }); // Most recent first
 
     for (const reply of replies) {
@@ -102,8 +100,7 @@ export class Threads {
       ]);
 
       // Verify the original post exists
-      const originalPost = await this.db.models.Post.findOne({ uri: postUri })
-        .select("uri");
+      const originalPost = await this.db.models.Post.findOne({ uri: postUri });
 
       if (!originalPost) {
         throw new Error("Post not found");
@@ -142,8 +139,7 @@ export class Threads {
 
     try {
       // Get the original post
-      const originalPost = await this.db.models.Post.findOne({ uri: postUri })
-        .select("uri createdAt authorDid reply");
+      const originalPost = await this.db.models.Post.findOne({ uri: postUri });
 
       if (!originalPost) {
         throw new Error("Post not found");
@@ -155,8 +151,7 @@ export class Threads {
       let depth = 0;
 
       while (depth < above) {
-        const post = await this.db.models.Post.findOne({ uri: currentUri })
-          .select("reply.parent.uri");
+        const post = await this.db.models.Post.findOne({ uri: currentUri });
 
         if (!post || !post.reply?.parent?.uri) {
           break;
@@ -187,7 +182,6 @@ export class Threads {
         const replies = await this.db.models.Post.find({
           "reply.parent.uri": currentUri,
         })
-          .select("uri createdAt")
           .sort({ createdAt: -1 });
 
         for (const reply of replies) {

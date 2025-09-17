@@ -20,8 +20,7 @@ export class Likes {
     }
 
     // Build query for likes on this subject
-    const likesQuery = this.db.models.Like.find({ subject: subject.uri })
-      .select("uri authorDid subject createdAt cid");
+    const likesQuery = this.db.models.Like.find({ subject: subject.uri });
 
     // Apply pagination using TimeCidKeyset
     const paginatedQuery = this.timeCidKeyset.paginate(likesQuery, {
@@ -61,7 +60,7 @@ export class Likes {
     const likes = await this.db.models.Like.find({
       authorDid: actorDid,
       subject: { $in: subjectUris },
-    }).select("uri subject");
+    });
 
     // Create a map for quick lookup
     const likeMap = new Map(likes.map((l) => [l.subject, l.uri]));
@@ -72,8 +71,7 @@ export class Likes {
 
   async getActor(actorDid: string, limit = 50, cursor?: string) {
     // Build query for likes by this actor
-    const likesQuery = this.db.models.Like.find({ authorDid: actorDid })
-      .select("uri authorDid subject createdAt cid");
+    const likesQuery = this.db.models.Like.find({ authorDid: actorDid });
 
     // Apply pagination using TimeCidKeyset
     const paginatedQuery = this.timeCidKeyset.paginate(likesQuery, {
