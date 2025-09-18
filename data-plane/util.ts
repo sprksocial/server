@@ -159,8 +159,8 @@ export const getResultFromDoc = (doc: DidDocument) => {
   return {
     did: getDid(doc),
     handle: getHandle(doc),
-    keys: Uint8Array.from(JSON.stringify(keys)),
-    services: Uint8Array.from(JSON.stringify(services)),
+    keys: new TextEncoder().encode(JSON.stringify(keys)),
+    services: new TextEncoder().encode(JSON.stringify(services)),
     updated: new Date(),
   };
 };
