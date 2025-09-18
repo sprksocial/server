@@ -10,18 +10,18 @@ const id = "so.sprk.feed.like";
 
 export interface Record {
   $type: "so.sprk.feed.like";
-  subject: (ComAtprotoRepoStrongRef.Main);
-  createdAt: (string);
-  via?: (ComAtprotoRepoStrongRef.Main);
+  subject: ComAtprotoRepoStrongRef.Main;
+  createdAt: string;
+  via?: ComAtprotoRepoStrongRef.Main;
   [k: string]: unknown;
 }
 
 const hashRecord = "main";
 
 export function isRecord<V>(v: V) {
-  return is$typed(v, id, hashRecord)
+  return is$typed(v, id, hashRecord);
 }
 
 export function validateRecord<V>(v: V) {
-  return validate<Record & V>(v, id, hashRecord, true)
+  return validate<Record & V>(v, id, hashRecord, true);
 }
