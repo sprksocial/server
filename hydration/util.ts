@@ -2,7 +2,6 @@ import { CID } from "multiformats/cid";
 
 import { AtUri } from "@atproto/syntax";
 import { lexicons } from "../lex/lexicons.ts";
-import { jsonToLex } from "@atproto/lexicon";
 import { Record } from "../data-plane/routes/records.ts";
 import { jsonStringToLex } from "@atproto/lexicon";
 
@@ -71,7 +70,7 @@ export const parseRecord = <T extends UnknownRecord>(
   const sortedAt = new Date(entry.sortedAt ?? 0);
   const indexedAt = new Date(entry.indexedAt ?? 0);
   if (!record || !cid) return;
-  if (!isValidRecord(record)) {
+  if (!isValidRecord(entry.record)) {
     return;
   }
   return {
@@ -83,8 +82,8 @@ export const parseRecord = <T extends UnknownRecord>(
   };
 };
 
-const isValidRecord = (json: unknown) => {
-  const lexRecord = jsonToLex(json);
+const isValidRecord = (record: string) => {
+  const lexRecord = jsonStringToLex(record);
   if (typeof lexRecord?.["$type"] !== "string") {
     return false;
   }

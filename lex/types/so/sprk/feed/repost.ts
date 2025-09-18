@@ -10,17 +10,18 @@ const id = "so.sprk.feed.repost";
 
 export interface Record {
   $type: "so.sprk.feed.repost";
-  subject: ComAtprotoRepoStrongRef.Main;
-  createdAt: string;
+  subject: (ComAtprotoRepoStrongRef.Main);
+  createdAt: (string);
+  via?: (ComAtprotoRepoStrongRef.Main);
   [k: string]: unknown;
 }
 
 const hashRecord = "main";
 
 export function isRecord<V>(v: V) {
-  return is$typed(v, id, hashRecord);
+  return is$typed(v, id, hashRecord)
 }
 
 export function validateRecord<V>(v: V) {
-  return validate<Record & V>(v, id, hashRecord, true);
+  return validate<Record & V>(v, id, hashRecord, true)
 }

@@ -154,11 +154,17 @@ export async function setupApp(): Promise<
     throw new Error("Failed to connect to database during startup");
   }
 
-  // Read cursor from database
-  const savedCursor = await db.getCursorState();
+  // Read cursor from database (skip in dev environment)
+  const savedCursor = env.NODE_ENV === "development"
+    ? null
+    : await db.getCursorState();
   const startCursor = savedCursor !== null ? savedCursor : undefined;
 
-  appLogger.info("Database cursor loaded", { cursor: startCursor });
+  appLogger.info("Database cursor loaded", {
+    cursor: startCursor,
+    isDev: env.NODE_ENV === "development",
+    skippedSavedCursor: env.NODE_ENV === "development",
+  });
 
   // DID and resolver setup
   const baseIdResolver = createIdResolver();

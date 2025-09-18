@@ -7523,6 +7523,10 @@ export const schemaDict = {
               "type": "string",
               "format": "datetime",
             },
+            "via": {
+              "type": "ref",
+              "ref": "lex:com.atproto.repo.strongRef",
+            },
           },
         },
       },
@@ -7619,6 +7623,10 @@ export const schemaDict = {
             "createdAt": {
               "type": "string",
               "format": "datetime",
+            },
+            "via": {
+              "type": "ref",
+              "ref": "lex:com.atproto.repo.strongRef",
             },
           },
         },
@@ -15160,7 +15168,7 @@ export const schemaDict = {
       "main": {
         "type": "record",
         "description":
-          "Record declaring a 'like' of a piece of subject content. Duplicate likes from the same author to the same subject will be ignored by the AppView.",
+          "Record declaring a 'like' of a piece of subject content.",
         "key": "tid",
         "record": {
           "type": "object",
@@ -15176,6 +15184,10 @@ export const schemaDict = {
             "createdAt": {
               "type": "string",
               "format": "datetime",
+            },
+            "via": {
+              "type": "ref",
+              "ref": "lex:com.atproto.repo.strongRef",
             },
           },
         },
@@ -15273,6 +15285,10 @@ export const schemaDict = {
             "createdAt": {
               "type": "string",
               "format": "datetime",
+            },
+            "via": {
+              "type": "ref",
+              "ref": "lex:com.atproto.repo.strongRef",
             },
           },
         },
