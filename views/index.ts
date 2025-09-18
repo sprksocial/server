@@ -259,7 +259,6 @@ export class Views {
   ): ProfileViewDetailed | undefined {
     const actor = state.actors?.get(did);
     if (!actor) return;
-    console.log(actor);
     const baseView = this.profile(did, state);
     if (!baseView) return;
     const knownFollowers = this.knownFollowers(did, state);
