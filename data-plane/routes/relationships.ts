@@ -44,11 +44,8 @@ export class Relationships {
 
         return {
           muted: false,
-          mutedByList: "",
           blockedBy: blockedBy?.uri || "",
           blocking: blocking?.uri || "",
-          blockedByList: "",
-          blockingByList: "",
           following: following?.uri || "",
           followedBy: followedBy?.uri || "",
         };

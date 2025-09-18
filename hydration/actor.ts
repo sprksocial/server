@@ -24,11 +24,8 @@ export type Actors = HydrationMap<Actor>;
 
 export type ProfileViewerState = {
   muted?: boolean;
-  mutedByList?: string;
   blockedBy?: string;
   blocking?: string;
-  blockedByList?: string;
-  blockingByList?: string;
   following?: string;
   followedBy?: string;
 };
@@ -57,9 +54,7 @@ export type ProfileAgg = {
   followers: number;
   follows: number;
   posts: number;
-  lists: number;
   feeds: number;
-  starterPacks: number;
 };
 
 export type ProfileAggs = HydrationMap<ProfileAgg>;
@@ -165,11 +160,8 @@ export class ActorHydrator {
       }
       return acc.set(did, {
         muted: rels.muted ?? false,
-        mutedByList: parseString(rels.mutedByList),
         blockedBy: parseString(rels.blockedBy),
         blocking: parseString(rels.blocking),
-        blockedByList: parseString(rels.blockedByList),
-        blockingByList: parseString(rels.blockingByList),
         following: parseString(rels.following),
         followedBy: parseString(rels.followedBy),
       });
@@ -205,9 +197,7 @@ export class ActorHydrator {
         followers: counts.followers[i] ?? 0,
         follows: counts.following[i] ?? 0,
         posts: counts.posts[i] ?? 0,
-        lists: counts.lists[i] ?? 0,
         feeds: counts.feeds[i] ?? 0,
-        starterPacks: counts.starterPacks[i] ?? 0,
       });
     }, new HydrationMap<ProfileAgg>());
   }
