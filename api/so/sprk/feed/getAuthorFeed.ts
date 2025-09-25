@@ -1,5 +1,5 @@
-import { mapDefined } from "@atproto/common";
-import { InvalidRequestError } from "@sprk/xrpc-server";
+import { mapDefined } from "@atp/common";
+import { InvalidRequestError } from "@atp/xrpc-server";
 import { AppContext } from "../../../../main.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
 import { Actor } from "../../../../hydration/actor.ts";

@@ -1,6 +1,6 @@
 import { assert } from "@std/assert";
-import { mapDefined } from "@atproto/common";
-import { AtUri } from "@atproto/syntax";
+import { mapDefined } from "@atp/common";
+import { AtUri } from "@atp/syntax";
 import { DataPlane } from "../data-plane/index.ts";
 import { ids } from "../lex/lexicons.ts";
 import { Record as ProfileRecord } from "../lex/types/so/sprk/actor/profile.ts";

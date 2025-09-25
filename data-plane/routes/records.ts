@@ -1,7 +1,7 @@
 import { Database } from "../db/index.ts";
-import { AtUri } from "@atproto/syntax";
+import { AtUri } from "@atp/syntax";
 import { ids } from "../../lex/lexicons.ts";
-import { keyBy } from "@atproto/common";
+import { keyBy } from "@atp/common";
 
 export type Record = {
   record: string;

@@ -8,7 +8,7 @@ import {
   type Options as XrpcOptions,
   Server as XrpcServer,
   type StreamConfigOrHandler,
-} from "@sprk/xrpc-server";
+} from "@atp/xrpc-server";
 import { schemas } from "./lexicons.ts";
 import * as ToolsOzoneSignatureFindCorrelation from "./types/tools/ozone/signature/findCorrelation.ts";
 import * as ToolsOzoneSignatureSearchAccounts from "./types/tools/ozone/signature/searchAccounts.ts";
@@ -402,7 +402,7 @@ export class ToolsOzoneSignatureNS {
       ToolsOzoneSignatureFindCorrelation.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.signature.findCorrelation"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.signature.findCorrelation"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -414,7 +414,7 @@ export class ToolsOzoneSignatureNS {
       ToolsOzoneSignatureSearchAccounts.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.signature.searchAccounts"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.signature.searchAccounts"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -426,7 +426,7 @@ export class ToolsOzoneSignatureNS {
       ToolsOzoneSignatureFindRelatedAccounts.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.signature.findRelatedAccounts"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.signature.findRelatedAccounts"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -446,7 +446,7 @@ export class ToolsOzoneServerNS {
       ToolsOzoneServerGetConfig.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.server.getConfig"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.server.getConfig"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -466,7 +466,7 @@ export class ToolsOzoneTeamNS {
       ToolsOzoneTeamListMembers.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.team.listMembers"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.team.listMembers"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -478,7 +478,7 @@ export class ToolsOzoneTeamNS {
       ToolsOzoneTeamDeleteMember.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.team.deleteMember"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.team.deleteMember"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -490,7 +490,7 @@ export class ToolsOzoneTeamNS {
       ToolsOzoneTeamUpdateMember.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.team.updateMember"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.team.updateMember"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -502,7 +502,7 @@ export class ToolsOzoneTeamNS {
       ToolsOzoneTeamAddMember.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.team.addMember"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.team.addMember"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -522,7 +522,7 @@ export class ToolsOzoneCommunicationNS {
       ToolsOzoneCommunicationUpdateTemplate.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.communication.updateTemplate"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.communication.updateTemplate"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -534,7 +534,7 @@ export class ToolsOzoneCommunicationNS {
       ToolsOzoneCommunicationCreateTemplate.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.communication.createTemplate"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.communication.createTemplate"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -546,7 +546,7 @@ export class ToolsOzoneCommunicationNS {
       ToolsOzoneCommunicationListTemplates.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.communication.listTemplates"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.communication.listTemplates"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -558,7 +558,7 @@ export class ToolsOzoneCommunicationNS {
       ToolsOzoneCommunicationDeleteTemplate.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.communication.deleteTemplate"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.communication.deleteTemplate"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -578,7 +578,7 @@ export class ToolsOzoneSetNS {
       ToolsOzoneSetAddValues.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.set.addValues"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.set.addValues"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -590,7 +590,7 @@ export class ToolsOzoneSetNS {
       ToolsOzoneSetGetValues.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.set.getValues"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.set.getValues"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -602,7 +602,7 @@ export class ToolsOzoneSetNS {
       ToolsOzoneSetDeleteSet.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.set.deleteSet"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.set.deleteSet"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -614,7 +614,7 @@ export class ToolsOzoneSetNS {
       ToolsOzoneSetUpsertSet.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.set.upsertSet"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.set.upsertSet"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -626,7 +626,7 @@ export class ToolsOzoneSetNS {
       ToolsOzoneSetDeleteValues.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.set.deleteValues"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.set.deleteValues"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -638,7 +638,7 @@ export class ToolsOzoneSetNS {
       ToolsOzoneSetQuerySets.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.set.querySets"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.set.querySets"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -658,7 +658,7 @@ export class ToolsOzoneSettingNS {
       ToolsOzoneSettingListOptions.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.setting.listOptions"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.setting.listOptions"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -670,7 +670,7 @@ export class ToolsOzoneSettingNS {
       ToolsOzoneSettingRemoveOptions.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.setting.removeOptions"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.setting.removeOptions"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -682,7 +682,7 @@ export class ToolsOzoneSettingNS {
       ToolsOzoneSettingUpsertOption.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.setting.upsertOption"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.setting.upsertOption"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -702,7 +702,7 @@ export class ToolsOzoneModerationNS {
       ToolsOzoneModerationGetReporterStats.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.moderation.getReporterStats"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.moderation.getReporterStats"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -714,7 +714,7 @@ export class ToolsOzoneModerationNS {
       ToolsOzoneModerationQueryStatuses.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.moderation.queryStatuses"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.moderation.queryStatuses"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -726,7 +726,7 @@ export class ToolsOzoneModerationNS {
       ToolsOzoneModerationGetRepo.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.moderation.getRepo"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.moderation.getRepo"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -738,7 +738,7 @@ export class ToolsOzoneModerationNS {
       ToolsOzoneModerationGetRecords.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.moderation.getRecords"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.moderation.getRecords"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -750,7 +750,7 @@ export class ToolsOzoneModerationNS {
       ToolsOzoneModerationGetEvent.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.moderation.getEvent"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.moderation.getEvent"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -762,7 +762,7 @@ export class ToolsOzoneModerationNS {
       ToolsOzoneModerationQueryEvents.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.moderation.queryEvents"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.moderation.queryEvents"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -774,7 +774,7 @@ export class ToolsOzoneModerationNS {
       ToolsOzoneModerationGetRecord.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.moderation.getRecord"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.moderation.getRecord"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -786,7 +786,7 @@ export class ToolsOzoneModerationNS {
       ToolsOzoneModerationEmitEvent.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.moderation.emitEvent"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.moderation.emitEvent"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -798,7 +798,7 @@ export class ToolsOzoneModerationNS {
       ToolsOzoneModerationSearchRepos.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.moderation.searchRepos"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.moderation.searchRepos"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -810,7 +810,7 @@ export class ToolsOzoneModerationNS {
       ToolsOzoneModerationGetRepos.HandlerOutput
     >,
   ) {
-    const nsid = "tools.ozone.moderation.getRepos"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "tools.ozone.moderation.getRepos"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -866,7 +866,7 @@ export class AppBskyVideoNS {
       AppBskyVideoUploadVideo.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.video.uploadVideo"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.video.uploadVideo"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -878,7 +878,7 @@ export class AppBskyVideoNS {
       AppBskyVideoGetJobStatus.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.video.getJobStatus"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.video.getJobStatus"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -890,7 +890,7 @@ export class AppBskyVideoNS {
       AppBskyVideoGetUploadLimits.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.video.getUploadLimits"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.video.getUploadLimits"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -918,7 +918,7 @@ export class AppBskyNotificationNS {
       AppBskyNotificationRegisterPush.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.notification.registerPush"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.notification.registerPush"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -930,7 +930,7 @@ export class AppBskyNotificationNS {
       AppBskyNotificationPutPreferences.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.notification.putPreferences"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.notification.putPreferences"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -942,7 +942,7 @@ export class AppBskyNotificationNS {
       AppBskyNotificationUpdateSeen.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.notification.updateSeen"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.notification.updateSeen"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -954,7 +954,7 @@ export class AppBskyNotificationNS {
       AppBskyNotificationListNotifications.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.notification.listNotifications"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.notification.listNotifications"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -966,7 +966,7 @@ export class AppBskyNotificationNS {
       AppBskyNotificationGetUnreadCount.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.notification.getUnreadCount"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.notification.getUnreadCount"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -986,7 +986,7 @@ export class AppBskyUnspeccedNS {
       AppBskyUnspeccedSearchStarterPacksSkeleton.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.unspecced.searchStarterPacksSkeleton"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.unspecced.searchStarterPacksSkeleton"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -998,7 +998,7 @@ export class AppBskyUnspeccedNS {
       AppBskyUnspeccedSearchActorsSkeleton.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.unspecced.searchActorsSkeleton"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.unspecced.searchActorsSkeleton"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1010,7 +1010,7 @@ export class AppBskyUnspeccedNS {
       AppBskyUnspeccedGetSuggestionsSkeleton.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.unspecced.getSuggestionsSkeleton"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.unspecced.getSuggestionsSkeleton"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1022,7 +1022,7 @@ export class AppBskyUnspeccedNS {
       AppBskyUnspeccedSearchPostsSkeleton.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.unspecced.searchPostsSkeleton"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.unspecced.searchPostsSkeleton"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1034,7 +1034,7 @@ export class AppBskyUnspeccedNS {
       AppBskyUnspeccedGetPopularFeedGenerators.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.unspecced.getPopularFeedGenerators"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.unspecced.getPopularFeedGenerators"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1046,7 +1046,7 @@ export class AppBskyUnspeccedNS {
       AppBskyUnspeccedGetTrendingTopics.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.unspecced.getTrendingTopics"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.unspecced.getTrendingTopics"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1058,7 +1058,7 @@ export class AppBskyUnspeccedNS {
       AppBskyUnspeccedGetTaggedSuggestions.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.unspecced.getTaggedSuggestions"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.unspecced.getTaggedSuggestions"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1070,7 +1070,7 @@ export class AppBskyUnspeccedNS {
       AppBskyUnspeccedGetConfig.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.unspecced.getConfig"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.unspecced.getConfig"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -1090,7 +1090,7 @@ export class AppBskyGraphNS {
       AppBskyGraphGetStarterPacks.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.getStarterPacks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.getStarterPacks"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1102,7 +1102,7 @@ export class AppBskyGraphNS {
       AppBskyGraphGetSuggestedFollowsByActor.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.getSuggestedFollowsByActor"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.getSuggestedFollowsByActor"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1114,7 +1114,7 @@ export class AppBskyGraphNS {
       AppBskyGraphUnmuteActorList.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.unmuteActorList"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.unmuteActorList"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1126,7 +1126,7 @@ export class AppBskyGraphNS {
       AppBskyGraphGetListBlocks.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.getListBlocks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.getListBlocks"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1138,7 +1138,7 @@ export class AppBskyGraphNS {
       AppBskyGraphGetStarterPack.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.getStarterPack"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.getStarterPack"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1150,7 +1150,7 @@ export class AppBskyGraphNS {
       AppBskyGraphMuteActorList.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.muteActorList"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.muteActorList"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1162,7 +1162,7 @@ export class AppBskyGraphNS {
       AppBskyGraphMuteThread.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.muteThread"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.muteThread"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1174,7 +1174,7 @@ export class AppBskyGraphNS {
       AppBskyGraphSearchStarterPacks.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.searchStarterPacks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.searchStarterPacks"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1186,7 +1186,7 @@ export class AppBskyGraphNS {
       AppBskyGraphGetActorStarterPacks.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.getActorStarterPacks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.getActorStarterPacks"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1198,7 +1198,7 @@ export class AppBskyGraphNS {
       AppBskyGraphGetLists.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.getLists"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.getLists"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1210,7 +1210,7 @@ export class AppBskyGraphNS {
       AppBskyGraphGetFollowers.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.getFollowers"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.getFollowers"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1222,7 +1222,7 @@ export class AppBskyGraphNS {
       AppBskyGraphUnmuteThread.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.unmuteThread"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.unmuteThread"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1234,7 +1234,7 @@ export class AppBskyGraphNS {
       AppBskyGraphMuteActor.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.muteActor"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.muteActor"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1246,7 +1246,7 @@ export class AppBskyGraphNS {
       AppBskyGraphGetMutes.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.getMutes"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.getMutes"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1258,7 +1258,7 @@ export class AppBskyGraphNS {
       AppBskyGraphGetKnownFollowers.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.getKnownFollowers"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.getKnownFollowers"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1270,7 +1270,7 @@ export class AppBskyGraphNS {
       AppBskyGraphGetListMutes.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.getListMutes"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.getListMutes"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1282,7 +1282,7 @@ export class AppBskyGraphNS {
       AppBskyGraphGetFollows.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.getFollows"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.getFollows"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1294,7 +1294,7 @@ export class AppBskyGraphNS {
       AppBskyGraphGetBlocks.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.getBlocks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.getBlocks"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1306,7 +1306,7 @@ export class AppBskyGraphNS {
       AppBskyGraphGetRelationships.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.getRelationships"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.getRelationships"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1318,7 +1318,7 @@ export class AppBskyGraphNS {
       AppBskyGraphUnmuteActor.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.unmuteActor"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.unmuteActor"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1330,7 +1330,7 @@ export class AppBskyGraphNS {
       AppBskyGraphGetList.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.graph.getList"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.graph.getList"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -1350,7 +1350,7 @@ export class AppBskyFeedNS {
       AppBskyFeedSendInteractions.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.sendInteractions"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.sendInteractions"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1362,7 +1362,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetFeedGenerators.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getFeedGenerators"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getFeedGenerators"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1374,7 +1374,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetTimeline.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getTimeline"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getTimeline"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1386,7 +1386,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetFeedGenerator.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getFeedGenerator"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getFeedGenerator"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1398,7 +1398,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetAuthorFeed.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getAuthorFeed"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getAuthorFeed"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1410,7 +1410,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetLikes.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getLikes"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getLikes"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1422,7 +1422,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetPostThread.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getPostThread"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getPostThread"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1434,7 +1434,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetActorLikes.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getActorLikes"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getActorLikes"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1446,7 +1446,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetRepostedBy.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getRepostedBy"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getRepostedBy"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1458,7 +1458,7 @@ export class AppBskyFeedNS {
       AppBskyFeedDescribeFeedGenerator.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.describeFeedGenerator"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.describeFeedGenerator"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1470,7 +1470,7 @@ export class AppBskyFeedNS {
       AppBskyFeedSearchPosts.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.searchPosts"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.searchPosts"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1482,7 +1482,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetPosts.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getPosts"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getPosts"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1494,7 +1494,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetFeed.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getFeed"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getFeed"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1506,7 +1506,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetQuotes.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getQuotes"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getQuotes"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1518,7 +1518,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetFeedSkeleton.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getFeedSkeleton"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getFeedSkeleton"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1530,7 +1530,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetListFeed.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getListFeed"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getListFeed"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1542,7 +1542,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetSuggestedFeeds.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getSuggestedFeeds"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getSuggestedFeeds"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1554,7 +1554,7 @@ export class AppBskyFeedNS {
       AppBskyFeedGetActorFeeds.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.feed.getActorFeeds"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.feed.getActorFeeds"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -1582,7 +1582,7 @@ export class AppBskyActorNS {
       AppBskyActorSearchActorsTypeahead.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.actor.searchActorsTypeahead"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.actor.searchActorsTypeahead"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1594,7 +1594,7 @@ export class AppBskyActorNS {
       AppBskyActorPutPreferences.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.actor.putPreferences"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.actor.putPreferences"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1606,7 +1606,7 @@ export class AppBskyActorNS {
       AppBskyActorGetProfile.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.actor.getProfile"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.actor.getProfile"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1618,7 +1618,7 @@ export class AppBskyActorNS {
       AppBskyActorGetSuggestions.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.actor.getSuggestions"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.actor.getSuggestions"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1630,7 +1630,7 @@ export class AppBskyActorNS {
       AppBskyActorSearchActors.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.actor.searchActors"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.actor.searchActors"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1642,7 +1642,7 @@ export class AppBskyActorNS {
       AppBskyActorGetProfiles.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.actor.getProfiles"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.actor.getProfiles"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1654,7 +1654,7 @@ export class AppBskyActorNS {
       AppBskyActorGetPreferences.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.actor.getPreferences"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.actor.getPreferences"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -1674,7 +1674,7 @@ export class AppBskyLabelerNS {
       AppBskyLabelerGetServices.HandlerOutput
     >,
   ) {
-    const nsid = "app.bsky.labeler.getServices"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "app.bsky.labeler.getServices"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -1718,7 +1718,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoListConvos.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.listConvos"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.listConvos"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1730,7 +1730,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoUnmuteConvo.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.unmuteConvo"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.unmuteConvo"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1742,7 +1742,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoGetConvoAvailability.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.getConvoAvailability"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.getConvoAvailability"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1754,7 +1754,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoGetLog.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.getLog"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.getLog"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1766,7 +1766,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoSendMessage.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.sendMessage"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.sendMessage"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1778,7 +1778,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoLeaveConvo.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.leaveConvo"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.leaveConvo"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1790,7 +1790,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoAcceptConvo.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.acceptConvo"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.acceptConvo"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1802,7 +1802,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoMuteConvo.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.muteConvo"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.muteConvo"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1814,7 +1814,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoDeleteMessageForSelf.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.deleteMessageForSelf"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.deleteMessageForSelf"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1826,7 +1826,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoUpdateRead.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.updateRead"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.updateRead"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1838,7 +1838,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoUpdateAllRead.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.updateAllRead"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.updateAllRead"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1850,7 +1850,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoGetConvo.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.getConvo"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.getConvo"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1862,7 +1862,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoGetMessages.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.getMessages"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.getMessages"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1874,7 +1874,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoGetConvoForMembers.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.getConvoForMembers"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.getConvoForMembers"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1886,7 +1886,7 @@ export class ChatBskyConvoNS {
       ChatBskyConvoSendMessageBatch.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.convo.sendMessageBatch"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.convo.sendMessageBatch"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -1906,7 +1906,7 @@ export class ChatBskyActorNS {
       ChatBskyActorExportAccountData.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.actor.exportAccountData"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.actor.exportAccountData"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1918,7 +1918,7 @@ export class ChatBskyActorNS {
       ChatBskyActorDeleteAccount.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.actor.deleteAccount"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.actor.deleteAccount"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -1938,7 +1938,7 @@ export class ChatBskyModerationNS {
       ChatBskyModerationGetActorMetadata.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.moderation.getActorMetadata"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.moderation.getActorMetadata"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1950,7 +1950,7 @@ export class ChatBskyModerationNS {
       ChatBskyModerationGetMessageContext.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.moderation.getMessageContext"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.moderation.getMessageContext"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1962,7 +1962,7 @@ export class ChatBskyModerationNS {
       ChatBskyModerationUpdateActorAccess.HandlerOutput
     >,
   ) {
-    const nsid = "chat.bsky.moderation.updateActorAccess"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "chat.bsky.moderation.updateActorAccess"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -2020,7 +2020,7 @@ export class SoSprkVideoNS {
       SoSprkVideoUploadVideo.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.video.uploadVideo"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.video.uploadVideo"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2032,7 +2032,7 @@ export class SoSprkVideoNS {
       SoSprkVideoGetJobStatus.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.video.getJobStatus"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.video.getJobStatus"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2044,7 +2044,7 @@ export class SoSprkVideoNS {
       SoSprkVideoGetUploadLimits.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.video.getUploadLimits"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.video.getUploadLimits"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -2072,7 +2072,7 @@ export class SoSprkNotificationNS {
       SoSprkNotificationRegisterPush.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.notification.registerPush"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.notification.registerPush"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2084,7 +2084,7 @@ export class SoSprkNotificationNS {
       SoSprkNotificationPutPreferences.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.notification.putPreferences"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.notification.putPreferences"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2096,7 +2096,7 @@ export class SoSprkNotificationNS {
       SoSprkNotificationUpdateSeen.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.notification.updateSeen"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.notification.updateSeen"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2108,7 +2108,7 @@ export class SoSprkNotificationNS {
       SoSprkNotificationListNotifications.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.notification.listNotifications"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.notification.listNotifications"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2120,7 +2120,7 @@ export class SoSprkNotificationNS {
       SoSprkNotificationGetUnreadCount.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.notification.getUnreadCount"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.notification.getUnreadCount"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -2140,7 +2140,7 @@ export class SoSprkUnspeccedNS {
       SoSprkUnspeccedSearchStarterPacksSkeleton.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.unspecced.searchStarterPacksSkeleton"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.unspecced.searchStarterPacksSkeleton"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2152,7 +2152,7 @@ export class SoSprkUnspeccedNS {
       SoSprkUnspeccedSearchActorsSkeleton.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.unspecced.searchActorsSkeleton"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.unspecced.searchActorsSkeleton"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2164,7 +2164,7 @@ export class SoSprkUnspeccedNS {
       SoSprkUnspeccedGetSuggestionsSkeleton.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.unspecced.getSuggestionsSkeleton"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.unspecced.getSuggestionsSkeleton"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2176,7 +2176,7 @@ export class SoSprkUnspeccedNS {
       SoSprkUnspeccedSearchPostsSkeleton.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.unspecced.searchPostsSkeleton"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.unspecced.searchPostsSkeleton"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2188,7 +2188,7 @@ export class SoSprkUnspeccedNS {
       SoSprkUnspeccedGetPopularFeedGenerators.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.unspecced.getPopularFeedGenerators"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.unspecced.getPopularFeedGenerators"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2200,7 +2200,7 @@ export class SoSprkUnspeccedNS {
       SoSprkUnspeccedGetTrendingTopics.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.unspecced.getTrendingTopics"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.unspecced.getTrendingTopics"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2212,7 +2212,7 @@ export class SoSprkUnspeccedNS {
       SoSprkUnspeccedGetTaggedSuggestions.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.unspecced.getTaggedSuggestions"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.unspecced.getTaggedSuggestions"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2224,7 +2224,7 @@ export class SoSprkUnspeccedNS {
       SoSprkUnspeccedGetConfig.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.unspecced.getConfig"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.unspecced.getConfig"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -2244,7 +2244,7 @@ export class SoSprkGraphNS {
       SoSprkGraphGetStarterPacks.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.getStarterPacks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.getStarterPacks"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2256,7 +2256,7 @@ export class SoSprkGraphNS {
       SoSprkGraphGetSuggestedFollowsByActor.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.getSuggestedFollowsByActor"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.getSuggestedFollowsByActor"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2268,7 +2268,7 @@ export class SoSprkGraphNS {
       SoSprkGraphUnmuteActorList.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.unmuteActorList"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.unmuteActorList"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2280,7 +2280,7 @@ export class SoSprkGraphNS {
       SoSprkGraphGetListBlocks.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.getListBlocks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.getListBlocks"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2292,7 +2292,7 @@ export class SoSprkGraphNS {
       SoSprkGraphGetStarterPack.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.getStarterPack"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.getStarterPack"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2304,7 +2304,7 @@ export class SoSprkGraphNS {
       SoSprkGraphMuteActorList.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.muteActorList"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.muteActorList"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2316,7 +2316,7 @@ export class SoSprkGraphNS {
       SoSprkGraphMuteThread.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.muteThread"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.muteThread"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2328,7 +2328,7 @@ export class SoSprkGraphNS {
       SoSprkGraphSearchStarterPacks.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.searchStarterPacks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.searchStarterPacks"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2340,7 +2340,7 @@ export class SoSprkGraphNS {
       SoSprkGraphGetActorStarterPacks.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.getActorStarterPacks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.getActorStarterPacks"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2352,7 +2352,7 @@ export class SoSprkGraphNS {
       SoSprkGraphGetLists.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.getLists"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.getLists"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2364,7 +2364,7 @@ export class SoSprkGraphNS {
       SoSprkGraphGetFollowers.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.getFollowers"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.getFollowers"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2376,7 +2376,7 @@ export class SoSprkGraphNS {
       SoSprkGraphUnmuteThread.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.unmuteThread"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.unmuteThread"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2388,7 +2388,7 @@ export class SoSprkGraphNS {
       SoSprkGraphMuteActor.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.muteActor"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.muteActor"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2400,7 +2400,7 @@ export class SoSprkGraphNS {
       SoSprkGraphGetMutes.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.getMutes"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.getMutes"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2412,7 +2412,7 @@ export class SoSprkGraphNS {
       SoSprkGraphGetKnownFollowers.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.getKnownFollowers"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.getKnownFollowers"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2424,7 +2424,7 @@ export class SoSprkGraphNS {
       SoSprkGraphGetListMutes.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.getListMutes"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.getListMutes"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2436,7 +2436,7 @@ export class SoSprkGraphNS {
       SoSprkGraphGetFollows.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.getFollows"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.getFollows"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2448,7 +2448,7 @@ export class SoSprkGraphNS {
       SoSprkGraphGetBlocks.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.getBlocks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.getBlocks"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2460,7 +2460,7 @@ export class SoSprkGraphNS {
       SoSprkGraphGetRelationships.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.getRelationships"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.getRelationships"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2472,7 +2472,7 @@ export class SoSprkGraphNS {
       SoSprkGraphUnmuteActor.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.unmuteActor"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.unmuteActor"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2484,7 +2484,7 @@ export class SoSprkGraphNS {
       SoSprkGraphGetList.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.graph.getList"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.graph.getList"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -2504,7 +2504,7 @@ export class SoSprkFeedNS {
       SoSprkFeedSendInteractions.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.sendInteractions"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.sendInteractions"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2516,7 +2516,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetFeedGenerators.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getFeedGenerators"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getFeedGenerators"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2528,7 +2528,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetTimeline.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getTimeline"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getTimeline"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2540,7 +2540,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetFeedGenerator.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getFeedGenerator"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getFeedGenerator"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2552,7 +2552,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetAuthorFeed.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getAuthorFeed"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getAuthorFeed"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2564,7 +2564,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetLikes.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getLikes"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getLikes"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2576,7 +2576,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetPostThread.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getPostThread"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getPostThread"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2588,7 +2588,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetActorLikes.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getActorLikes"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getActorLikes"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2600,7 +2600,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetRepostedBy.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getRepostedBy"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getRepostedBy"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2612,7 +2612,7 @@ export class SoSprkFeedNS {
       SoSprkFeedDescribeFeedGenerator.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.describeFeedGenerator"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.describeFeedGenerator"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2624,7 +2624,7 @@ export class SoSprkFeedNS {
       SoSprkFeedSearchPosts.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.searchPosts"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.searchPosts"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2636,7 +2636,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetPosts.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getPosts"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getPosts"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2648,7 +2648,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetFeed.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getFeed"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getFeed"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2660,7 +2660,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetStories.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getStories"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getStories"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2672,7 +2672,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetQuotes.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getQuotes"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getQuotes"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2684,7 +2684,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetStoriesTimeline.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getStoriesTimeline"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getStoriesTimeline"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2696,7 +2696,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetFeedSkeleton.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getFeedSkeleton"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getFeedSkeleton"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2708,7 +2708,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetListFeed.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getListFeed"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getListFeed"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2720,7 +2720,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetSuggestedFeeds.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getSuggestedFeeds"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getSuggestedFeeds"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2732,7 +2732,7 @@ export class SoSprkFeedNS {
       SoSprkFeedGetActorFeeds.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.feed.getActorFeeds"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.feed.getActorFeeds"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -2760,7 +2760,7 @@ export class SoSprkSoundNS {
       SoSprkSoundGetActorAudios.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.sound.getActorAudios"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.sound.getActorAudios"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2772,7 +2772,7 @@ export class SoSprkSoundNS {
       SoSprkSoundGetAudioPosts.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.sound.getAudioPosts"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.sound.getAudioPosts"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2784,7 +2784,7 @@ export class SoSprkSoundNS {
       SoSprkSoundGetAudios.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.sound.getAudios"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.sound.getAudios"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2796,7 +2796,7 @@ export class SoSprkSoundNS {
       SoSprkSoundGetTrendingAudios.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.sound.getTrendingAudios"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.sound.getTrendingAudios"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -2816,7 +2816,7 @@ export class SoSprkActorNS {
       SoSprkActorSearchActorsTypeahead.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.actor.searchActorsTypeahead"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.actor.searchActorsTypeahead"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2828,7 +2828,7 @@ export class SoSprkActorNS {
       SoSprkActorPutPreferences.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.actor.putPreferences"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.actor.putPreferences"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2840,7 +2840,7 @@ export class SoSprkActorNS {
       SoSprkActorGetProfile.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.actor.getProfile"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.actor.getProfile"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2852,7 +2852,7 @@ export class SoSprkActorNS {
       SoSprkActorGetSuggestions.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.actor.getSuggestions"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.actor.getSuggestions"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2864,7 +2864,7 @@ export class SoSprkActorNS {
       SoSprkActorSearchActors.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.actor.searchActors"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.actor.searchActors"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2876,7 +2876,7 @@ export class SoSprkActorNS {
       SoSprkActorGetProfiles.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.actor.getProfiles"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.actor.getProfiles"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2888,7 +2888,7 @@ export class SoSprkActorNS {
       SoSprkActorGetPreferences.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.actor.getPreferences"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.actor.getPreferences"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -2908,7 +2908,7 @@ export class SoSprkLabelerNS {
       SoSprkLabelerGetServices.HandlerOutput
     >,
   ) {
-    const nsid = "so.sprk.labeler.getServices"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "so.sprk.labeler.getServices"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -2964,7 +2964,7 @@ export class ComAtprotoTempNS {
       ComAtprotoTempAddReservedHandle.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.temp.addReservedHandle"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.temp.addReservedHandle"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2976,7 +2976,7 @@ export class ComAtprotoTempNS {
       ComAtprotoTempCheckSignupQueue.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.temp.checkSignupQueue"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.temp.checkSignupQueue"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2988,7 +2988,7 @@ export class ComAtprotoTempNS {
       ComAtprotoTempRequestPhoneVerification.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.temp.requestPhoneVerification"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.temp.requestPhoneVerification"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3000,7 +3000,7 @@ export class ComAtprotoTempNS {
       ComAtprotoTempFetchLabels.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.temp.fetchLabels"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.temp.fetchLabels"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -3020,7 +3020,7 @@ export class ComAtprotoIdentityNS {
       ComAtprotoIdentityUpdateHandle.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.identity.updateHandle"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.identity.updateHandle"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3032,7 +3032,7 @@ export class ComAtprotoIdentityNS {
       ComAtprotoIdentitySignPlcOperation.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.identity.signPlcOperation"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.identity.signPlcOperation"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3044,7 +3044,7 @@ export class ComAtprotoIdentityNS {
       ComAtprotoIdentitySubmitPlcOperation.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.identity.submitPlcOperation"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.identity.submitPlcOperation"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3056,7 +3056,7 @@ export class ComAtprotoIdentityNS {
       ComAtprotoIdentityResolveHandle.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.identity.resolveHandle"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.identity.resolveHandle"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3068,7 +3068,7 @@ export class ComAtprotoIdentityNS {
       ComAtprotoIdentityRequestPlcOperationSignature.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.identity.requestPlcOperationSignature"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.identity.requestPlcOperationSignature"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3080,7 +3080,7 @@ export class ComAtprotoIdentityNS {
       ComAtprotoIdentityGetRecommendedDidCredentials.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.identity.getRecommendedDidCredentials"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.identity.getRecommendedDidCredentials"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -3100,7 +3100,7 @@ export class ComAtprotoAdminNS {
       ComAtprotoAdminUpdateAccountEmail.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.admin.updateAccountEmail"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.admin.updateAccountEmail"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3112,7 +3112,7 @@ export class ComAtprotoAdminNS {
       ComAtprotoAdminGetAccountInfo.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.admin.getAccountInfo"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.admin.getAccountInfo"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3124,7 +3124,7 @@ export class ComAtprotoAdminNS {
       ComAtprotoAdminGetSubjectStatus.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.admin.getSubjectStatus"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.admin.getSubjectStatus"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3136,7 +3136,7 @@ export class ComAtprotoAdminNS {
       ComAtprotoAdminSearchAccounts.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.admin.searchAccounts"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.admin.searchAccounts"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3148,7 +3148,7 @@ export class ComAtprotoAdminNS {
       ComAtprotoAdminUpdateAccountPassword.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.admin.updateAccountPassword"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.admin.updateAccountPassword"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3160,7 +3160,7 @@ export class ComAtprotoAdminNS {
       ComAtprotoAdminUpdateAccountHandle.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.admin.updateAccountHandle"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.admin.updateAccountHandle"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3172,7 +3172,7 @@ export class ComAtprotoAdminNS {
       ComAtprotoAdminGetInviteCodes.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.admin.getInviteCodes"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.admin.getInviteCodes"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3184,7 +3184,7 @@ export class ComAtprotoAdminNS {
       ComAtprotoAdminEnableAccountInvites.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.admin.enableAccountInvites"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.admin.enableAccountInvites"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3196,7 +3196,7 @@ export class ComAtprotoAdminNS {
       ComAtprotoAdminDisableAccountInvites.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.admin.disableAccountInvites"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.admin.disableAccountInvites"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3208,7 +3208,7 @@ export class ComAtprotoAdminNS {
       ComAtprotoAdminDisableInviteCodes.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.admin.disableInviteCodes"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.admin.disableInviteCodes"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3220,7 +3220,7 @@ export class ComAtprotoAdminNS {
       ComAtprotoAdminUpdateSubjectStatus.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.admin.updateSubjectStatus"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.admin.updateSubjectStatus"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3232,7 +3232,7 @@ export class ComAtprotoAdminNS {
       ComAtprotoAdminSendEmail.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.admin.sendEmail"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.admin.sendEmail"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3244,7 +3244,7 @@ export class ComAtprotoAdminNS {
       ComAtprotoAdminGetAccountInfos.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.admin.getAccountInfos"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.admin.getAccountInfos"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3256,7 +3256,7 @@ export class ComAtprotoAdminNS {
       ComAtprotoAdminDeleteAccount.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.admin.deleteAccount"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.admin.deleteAccount"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -3275,7 +3275,7 @@ export class ComAtprotoLabelNS {
       ComAtprotoLabelSubscribeLabels.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.label.subscribeLabels"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.label.subscribeLabels"; // @ts-ignore - dynamically generated
     return this._server.xrpc.streamMethod(nsid, cfg);
   }
 
@@ -3287,7 +3287,7 @@ export class ComAtprotoLabelNS {
       ComAtprotoLabelQueryLabels.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.label.queryLabels"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.label.queryLabels"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -3307,7 +3307,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerRequestEmailConfirmation.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.requestEmailConfirmation"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.requestEmailConfirmation"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3319,7 +3319,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerReserveSigningKey.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.reserveSigningKey"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.reserveSigningKey"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3331,7 +3331,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerGetServiceAuth.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.getServiceAuth"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.getServiceAuth"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3343,7 +3343,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerGetAccountInviteCodes.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.getAccountInviteCodes"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.getAccountInviteCodes"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3355,7 +3355,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerCreateSession.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.createSession"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.createSession"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3367,7 +3367,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerListAppPasswords.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.listAppPasswords"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.listAppPasswords"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3379,7 +3379,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerCreateInviteCodes.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.createInviteCodes"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.createInviteCodes"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3391,7 +3391,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerDeleteSession.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.deleteSession"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.deleteSession"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3403,7 +3403,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerRevokeAppPassword.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.revokeAppPassword"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.revokeAppPassword"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3415,7 +3415,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerCreateAppPassword.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.createAppPassword"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.createAppPassword"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3427,7 +3427,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerActivateAccount.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.activateAccount"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.activateAccount"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3439,7 +3439,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerDescribeServer.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.describeServer"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.describeServer"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3451,7 +3451,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerConfirmEmail.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.confirmEmail"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.confirmEmail"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3463,7 +3463,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerGetSession.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.getSession"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.getSession"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3475,7 +3475,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerRefreshSession.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.refreshSession"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.refreshSession"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3487,7 +3487,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerDeactivateAccount.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.deactivateAccount"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.deactivateAccount"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3499,7 +3499,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerUpdateEmail.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.updateEmail"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.updateEmail"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3511,7 +3511,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerResetPassword.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.resetPassword"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.resetPassword"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3523,7 +3523,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerCheckAccountStatus.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.checkAccountStatus"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.checkAccountStatus"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3535,7 +3535,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerRequestEmailUpdate.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.requestEmailUpdate"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.requestEmailUpdate"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3547,7 +3547,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerRequestPasswordReset.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.requestPasswordReset"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.requestPasswordReset"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3559,7 +3559,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerRequestAccountDelete.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.requestAccountDelete"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.requestAccountDelete"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3571,7 +3571,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerCreateAccount.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.createAccount"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.createAccount"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3583,7 +3583,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerDeleteAccount.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.deleteAccount"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.deleteAccount"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3595,7 +3595,7 @@ export class ComAtprotoServerNS {
       ComAtprotoServerCreateInviteCode.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.server.createInviteCode"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.server.createInviteCode"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -3623,7 +3623,7 @@ export class ComAtprotoSyncNS {
       ComAtprotoSyncGetHead.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.sync.getHead"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.sync.getHead"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3635,7 +3635,7 @@ export class ComAtprotoSyncNS {
       ComAtprotoSyncGetBlob.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.sync.getBlob"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.sync.getBlob"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3647,7 +3647,7 @@ export class ComAtprotoSyncNS {
       ComAtprotoSyncGetRepo.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.sync.getRepo"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.sync.getRepo"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3659,7 +3659,7 @@ export class ComAtprotoSyncNS {
       ComAtprotoSyncNotifyOfUpdate.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.sync.notifyOfUpdate"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.sync.notifyOfUpdate"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3671,7 +3671,7 @@ export class ComAtprotoSyncNS {
       ComAtprotoSyncRequestCrawl.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.sync.requestCrawl"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.sync.requestCrawl"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3683,7 +3683,7 @@ export class ComAtprotoSyncNS {
       ComAtprotoSyncListBlobs.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.sync.listBlobs"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.sync.listBlobs"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3695,7 +3695,7 @@ export class ComAtprotoSyncNS {
       ComAtprotoSyncGetLatestCommit.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.sync.getLatestCommit"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.sync.getLatestCommit"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3706,7 +3706,7 @@ export class ComAtprotoSyncNS {
       ComAtprotoSyncSubscribeRepos.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.sync.subscribeRepos"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.sync.subscribeRepos"; // @ts-ignore - dynamically generated
     return this._server.xrpc.streamMethod(nsid, cfg);
   }
 
@@ -3718,7 +3718,7 @@ export class ComAtprotoSyncNS {
       ComAtprotoSyncGetRepoStatus.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.sync.getRepoStatus"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.sync.getRepoStatus"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3730,7 +3730,7 @@ export class ComAtprotoSyncNS {
       ComAtprotoSyncGetRecord.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.sync.getRecord"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.sync.getRecord"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3742,7 +3742,7 @@ export class ComAtprotoSyncNS {
       ComAtprotoSyncListRepos.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.sync.listRepos"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.sync.listRepos"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3754,7 +3754,7 @@ export class ComAtprotoSyncNS {
       ComAtprotoSyncGetBlocks.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.sync.getBlocks"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.sync.getBlocks"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3766,7 +3766,7 @@ export class ComAtprotoSyncNS {
       ComAtprotoSyncListReposByCollection.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.sync.listReposByCollection"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.sync.listReposByCollection"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3778,7 +3778,7 @@ export class ComAtprotoSyncNS {
       ComAtprotoSyncGetCheckout.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.sync.getCheckout"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.sync.getCheckout"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -3798,7 +3798,7 @@ export class ComAtprotoRepoNS {
       ComAtprotoRepoListMissingBlobs.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.repo.listMissingBlobs"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.repo.listMissingBlobs"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3810,7 +3810,7 @@ export class ComAtprotoRepoNS {
       ComAtprotoRepoCreateRecord.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.repo.createRecord"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.repo.createRecord"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3822,7 +3822,7 @@ export class ComAtprotoRepoNS {
       ComAtprotoRepoDeleteRecord.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.repo.deleteRecord"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.repo.deleteRecord"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3834,7 +3834,7 @@ export class ComAtprotoRepoNS {
       ComAtprotoRepoPutRecord.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.repo.putRecord"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.repo.putRecord"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3846,7 +3846,7 @@ export class ComAtprotoRepoNS {
       ComAtprotoRepoUploadBlob.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.repo.uploadBlob"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.repo.uploadBlob"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3858,7 +3858,7 @@ export class ComAtprotoRepoNS {
       ComAtprotoRepoImportRepo.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.repo.importRepo"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.repo.importRepo"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3870,7 +3870,7 @@ export class ComAtprotoRepoNS {
       ComAtprotoRepoDescribeRepo.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.repo.describeRepo"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.repo.describeRepo"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3882,7 +3882,7 @@ export class ComAtprotoRepoNS {
       ComAtprotoRepoGetRecord.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.repo.getRecord"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.repo.getRecord"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3894,7 +3894,7 @@ export class ComAtprotoRepoNS {
       ComAtprotoRepoApplyWrites.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.repo.applyWrites"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.repo.applyWrites"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3906,7 +3906,7 @@ export class ComAtprotoRepoNS {
       ComAtprotoRepoListRecords.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.repo.listRecords"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.repo.listRecords"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -3926,7 +3926,7 @@ export class ComAtprotoModerationNS {
       ComAtprotoModerationCreateReport.HandlerOutput
     >,
   ) {
-    const nsid = "com.atproto.moderation.createReport"; // @ts-ignore - userType.nsid is dynamically generated and TypeScript can't infer its type
+    const nsid = "com.atproto.moderation.createReport"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }

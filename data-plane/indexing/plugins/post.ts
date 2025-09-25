@@ -1,5 +1,5 @@
 import { CID } from "multiformats/cid";
-import { AtUri } from "@atproto/syntax";
+import { AtUri } from "@atp/syntax";
 import * as lex from "../../../lex/lexicons.ts";
 import { isMain as isEmbedImage } from "../../../lex/types/so/sprk/embed/images.ts";
 import { isMain as isEmbedVideo } from "../../../lex/types/so/sprk/embed/video.ts";
@@ -25,7 +25,7 @@ import {
   normalizeEmbed,
   normalizeObject,
 } from "../../../utils/embed-normalizer.ts";
-import { jsonToLex } from "@atproto/lexicon";
+import { jsonToLex } from "@atp/lexicon";
 
 type PostAncestor = {
   uri: string;

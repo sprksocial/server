@@ -17,7 +17,7 @@ import { TakedownService } from "./services/takedown.ts";
 import { BidirectionalResolver } from "./utils/id-resolver.ts";
 import { DidResolver } from "@atproto/identity";
 import { AuthVerifier } from "./auth-verifier.ts";
-import { AuthRequiredError } from "@sprk/xrpc-server";
+import { AuthRequiredError } from "@atp/xrpc-server";
 import { RepoSubscription } from "./data-plane/subscription.ts";
 import { DataPlane } from "./data-plane/index.ts";
 import { configure, getConsoleSink, getLogger, Logger } from "@logtape/logtape";

@@ -1,4 +1,4 @@
-import { keyBy } from "@atproto/common";
+import { keyBy } from "@atp/common";
 import { Database } from "../db/index.ts";
 import { getRecords } from "./records.ts";
 

@@ -1,4 +1,4 @@
-import { dedupeStrs, mapDefined } from "@atproto/common";
+import { dedupeStrs, mapDefined } from "@atp/common";
 import { AppContext } from "../../../../main.ts";
 import {
   HydrateCtx,

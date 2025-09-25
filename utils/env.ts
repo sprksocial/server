@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import { envInt, envStr } from "@atproto/common";
+import { envInt, envStr } from "@atp/common";
 
 dotenv.config({ quiet: true });
 

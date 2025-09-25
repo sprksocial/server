@@ -29,11 +29,11 @@ import {
   VideoEmbed,
   VideoEmbedView,
 } from "./types.ts";
-import { INVALID_HANDLE } from "@atproto/syntax";
+import { INVALID_HANDLE } from "@atp/syntax";
 import { cidFromBlobJson } from "./util.ts";
 import { uriToDid } from "../utils/uris.ts";
 import { env } from "../utils/env.ts";
-import { mapDefined } from "@atproto/common";
+import { mapDefined } from "@atp/common";
 import { FeedItem, Repost } from "../hydration/feed.ts";
 import { $Typed } from "../lex/util.ts";
 

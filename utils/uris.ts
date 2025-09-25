@@ -1,4 +1,4 @@
-import { AtUri } from "@atproto/syntax";
+import { AtUri } from "@atp/syntax";
 import { ids } from "../lex/lexicons.ts";
 import {
   Main as StrongRef,

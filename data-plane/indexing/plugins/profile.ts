@@ -1,5 +1,5 @@
 import { CID } from "multiformats/cid";
-import { AtUri } from "@atproto/syntax";
+import { AtUri } from "@atp/syntax";
 import * as lex from "../../../lex/lexicons.ts";
 import * as Profile from "../../../lex/types/so/sprk/actor/profile.ts";
 import { BackgroundQueue } from "../../background.ts";

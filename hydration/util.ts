@@ -1,9 +1,9 @@
 import { CID } from "multiformats/cid";
 
-import { AtUri } from "@atproto/syntax";
+import { AtUri } from "@atp/syntax";
 import { lexicons } from "../lex/lexicons.ts";
 import { Record } from "../data-plane/routes/records.ts";
-import { jsonStringToLex } from "@atproto/lexicon";
+import { jsonStringToLex, RepoRecord } from "@atp/lexicon";
 
 export class HydrationMap<T> extends Map<string, T | null> implements Merges {
   merge(map: HydrationMap<T>): this {
@@ -74,7 +74,7 @@ export const parseRecord = <T extends UnknownRecord>(
     return;
   }
   return {
-    record,
+    record: record as T,
     cid,
     sortedAt,
     indexedAt,
@@ -83,15 +83,15 @@ export const parseRecord = <T extends UnknownRecord>(
 };
 
 const isValidRecord = (record: string) => {
-  const lexRecord = jsonStringToLex(record);
-  if (typeof lexRecord?.["$type"] !== "string") {
+  const lex = jsonStringToLex(record);
+  const lexRecord = lex as RepoRecord;
+  if (typeof lexRecord["$type"] !== "string") {
     return false;
   }
   try {
     lexicons.assertValidRecord(lexRecord["$type"], lexRecord);
     return true;
-  } catch (err) {
-    console.log(`Invalid record: ${err}`);
+  } catch {
     return false;
   }
 };

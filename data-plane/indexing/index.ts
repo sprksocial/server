@@ -1,8 +1,8 @@
 import { CID } from "multiformats/cid";
 import { AtpAgent, ComAtprotoSyncGetLatestCommit } from "@atproto/api";
-import { DAY, HOUR } from "@atproto/common";
+import { DAY, HOUR } from "@atp/common";
 import { getPds, IdResolver } from "@atproto/identity";
-import { ValidationError } from "@atproto/lexicon";
+import { ValidationError } from "@atp/lexicon";
 import {
   getAndParseRecord,
   readCarWithRoot,
@@ -10,7 +10,7 @@ import {
   verifyRepo,
   WriteOpAction,
 } from "@atproto/repo";
-import { AtUri } from "@atproto/syntax";
+import { AtUri } from "@atp/syntax";
 import { retryXrpc } from "../../utils/retry.ts";
 import { BackgroundQueue } from "../background.ts";
 import { Database } from "../db/index.ts";

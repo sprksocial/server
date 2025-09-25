@@ -1,6 +1,6 @@
 import { CID } from "multiformats/cid";
-import { jsonStringToLex, stringifyLex } from "@atproto/lexicon";
-import { AtUri } from "@atproto/syntax";
+import { jsonStringToLex, stringifyLex } from "@atp/lexicon";
+import { AtUri } from "@atp/syntax";
 import { lexicons } from "../../lex/lexicons.ts";
 import { BackgroundQueue } from "../background.ts";
 import { Database } from "../db/index.ts";

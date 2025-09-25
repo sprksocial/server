@@ -1,5 +1,5 @@
-import { AtUri } from "@atproto/syntax";
-import { InvalidRequestError } from "@sprk/xrpc-server";
+import { AtUri } from "@atp/syntax";
+import { InvalidRequestError } from "@atp/xrpc-server";
 import { AppContext } from "../../../../main.ts";
 import { Server } from "../../../../lex/index.ts";
 

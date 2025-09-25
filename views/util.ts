@@ -1,4 +1,4 @@
-import { BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atp/lexicon";
 
 // Simple string format function to replace util.format
 const format = (template: string, ...args: string[]): string => {

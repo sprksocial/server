@@ -1,4 +1,4 @@
-import { InvalidRequestError } from "@sprk/xrpc-server";
+import { InvalidRequestError } from "@atp/xrpc-server";
 import { AppContext } from "../../../../main.ts";
 import {
   HydrateCtx,

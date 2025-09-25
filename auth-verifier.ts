@@ -5,7 +5,7 @@ import {
   MethodAuthContext,
   parseReqNsid,
   verifyJwt,
-} from "@sprk/xrpc-server";
+} from "@atp/xrpc-server";
 import { DataPlane } from "./data-plane/index.ts";
 
 type StandardAuthOpts = {

@@ -8,9 +8,9 @@ import type {
 import type * as ComAtprotoRepoStrongRef from "../lex/types/com/atproto/repo/strongRef.ts";
 import type { StoryDocument } from "../data-plane/db/models.ts";
 import type { Label } from "../lex/types/com/atproto/label/defs.ts";
-import { ensureValidDid, isValidHandle } from "@atproto/syntax";
+import { ensureValidDid, isValidHandle } from "@atp/syntax";
 import { AppContext } from "../main.ts";
-import { XRPCError } from "@sprk/xrpc-server";
+import { XRPCError } from "@atp/xrpc-server";
 
 // Helper function to create ProfileViewBasic with stories
 export async function createProfileViewBasic(

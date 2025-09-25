@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atp/lexicon";
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
 

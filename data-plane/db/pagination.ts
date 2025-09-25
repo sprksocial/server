@@ -1,5 +1,5 @@
-import { ensureValidRecordKey } from "@atproto/syntax";
-import { InvalidRequestError } from "@sprk/xrpc-server";
+import { ensureValidRecordKey } from "@atp/syntax";
+import { InvalidRequestError } from "@atp/xrpc-server";
 import { Document, FilterQuery, Query } from "mongoose";
 
 type KeysetCursor = { primary: string; secondary: string };

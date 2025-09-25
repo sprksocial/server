@@ -1,5 +1,5 @@
 import { CID } from "multiformats/cid";
-import { AtUri, normalizeDatetimeAlways } from "@atproto/syntax";
+import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
 import * as lex from "../../../lex/lexicons.ts";
 import * as Repost from "../../../lex/types/app/bsky/feed/repost.ts";
 import { BackgroundQueue } from "../../background.ts";

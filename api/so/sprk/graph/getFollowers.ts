@@ -1,9 +1,9 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { FollowDocument } from "../../../../data-plane/db/models.ts";
-import { ensureValidDid, isValidHandle } from "@atproto/syntax";
+import { ensureValidDid, isValidHandle } from "@atp/syntax";
 import { RootFilterQuery } from "mongoose";
-import { XRPCError } from "@sprk/xrpc-server";
+import { XRPCError } from "@atp/xrpc-server";
 import { OutputSchema } from "../../../../lex/types/so/sprk/graph/getFollowers.ts";
 import {
   getProfileView,
