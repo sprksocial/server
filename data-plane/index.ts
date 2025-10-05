@@ -1,4 +1,4 @@
-import { IdResolver } from "@atproto/identity";
+import { IdResolver } from "@atp/identity";
 import { Database } from "./db/index.ts";
 import { getLogger, Logger } from "@logtape/logtape";
 import { Blocks } from "./routes/blocks.ts";

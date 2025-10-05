@@ -1,4 +1,4 @@
-import { AtprotoData, IdResolver, MemoryCache } from "@atproto/identity";
+import { AtprotoData, IdResolver, MemoryCache } from "@atp/identity";
 
 const HOUR = 60e3 * 60;
 const DAY = HOUR * 24;

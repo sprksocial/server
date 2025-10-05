@@ -1,15 +1,15 @@
 import { CID } from "multiformats/cid";
 import { AtpAgent, ComAtprotoSyncGetLatestCommit } from "@atproto/api";
 import { DAY, HOUR } from "@atp/common";
-import { getPds, IdResolver } from "@atproto/identity";
-import { ValidationError } from "@atp/lexicon";
+import { getPds, IdResolver } from "@atp/identity";
+import { RepoRecord, ValidationError } from "@atp/lexicon";
 import {
   getAndParseRecord,
   readCarWithRoot,
   VerifiedRepo,
   verifyRepo,
   WriteOpAction,
-} from "@atproto/repo";
+} from "@atp/repo";
 import { AtUri } from "@atp/syntax";
 import { retryXrpc } from "../../utils/retry.ts";
 import { BackgroundQueue } from "../background.ts";
@@ -76,7 +76,7 @@ export class IndexingService {
   async indexRecord(
     uri: AtUri,
     cid: CID,
-    obj: unknown,
+    obj: RepoRecord,
     action: WriteOpAction.Create | WriteOpAction.Update,
     timestamp: string,
     opts?: { disableNotifs?: boolean; disableLabels?: boolean },
@@ -187,7 +187,7 @@ export class IndexingService {
           if (op.op === "delete") {
             await this.deleteRecord(uri);
           } else {
-            const parsed = await getAndParseRecord(blocks, cid);
+            const parsed = getAndParseRecord(blocks, cid);
             await this.indexRecord(
               uri,
               cid,

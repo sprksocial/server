@@ -1,7 +1,6 @@
-import { IdResolver } from "@atproto/identity";
-import { WriteOpAction } from "@atproto/repo";
-import { Event as FirehoseEvent, Firehose } from "@atproto/sync";
-import { MemoryRunner } from "../utils/memory-runner.ts";
+import { IdResolver } from "@atp/identity";
+import { WriteOpAction } from "@atp/repo";
+import { Event as FirehoseEvent, Firehose, MemoryRunner } from "@atp/sync";
 import { BackgroundQueue } from "./background.ts";
 import { Database } from "./db/index.ts";
 import { IndexingService } from "./indexing/index.ts";
@@ -164,7 +163,7 @@ function createFirehose(opts: {
   const runner = new MemoryRunner({
     startCursor,
     concurrency: env.RUNNER_CONCURRENCY,
-    cursorSaveIntervalMs: 30000, // Save cursor every 30 seconds
+    setCursorInterval: 30000, // Save cursor every 30 seconds
     setCursor: async (cursor: number) => {
       await db.saveCursorState(cursor);
       logger.info("Cursor saved to database", { cursor });

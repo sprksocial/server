@@ -15,7 +15,7 @@ import { takedownFilterMiddleware } from "./services/takedown-filter.ts";
 import wellKnownRouter from "./api/well-known.ts";
 import { TakedownService } from "./services/takedown.ts";
 import { BidirectionalResolver } from "./utils/id-resolver.ts";
-import { DidResolver } from "@atproto/identity";
+import { DidResolver } from "@atp/identity";
 import { AuthVerifier } from "./auth-verifier.ts";
 import { AuthRequiredError } from "@atp/xrpc-server";
 import { RepoSubscription } from "./data-plane/subscription.ts";

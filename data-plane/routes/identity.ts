@@ -1,5 +1,4 @@
-import { IdResolver } from "@atproto/identity";
-import { DidDocument, getDid, getHandle } from "@atproto/identity";
+import { DidDocument, getDid, getHandle, IdResolver } from "@atp/identity";
 
 // Helper function to format DID document result
 function getResultFromDoc(doc: DidDocument) {

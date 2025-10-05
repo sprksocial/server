@@ -1,5 +1,5 @@
 import mongoose, { Connection } from "mongoose";
-import { IdResolver, MemoryCache } from "@atproto/identity";
+import { IdResolver, MemoryCache } from "@atp/identity";
 import { env } from "../../utils/env.ts";
 import * as models from "./models.ts";
 import { getResultFromDoc } from "../util.ts";

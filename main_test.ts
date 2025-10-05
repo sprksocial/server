@@ -9,7 +9,7 @@ import {
 import { TakedownService } from "./services/takedown.ts";
 import { createAuthVerifier } from "./auth-verifier.ts";
 import { RepoSubscription } from "./data-plane/subscription.ts";
-import { MemoryRunner } from "./utils/memory-runner.ts";
+import { MemoryRunner } from "@atp/sync";
 import { getLogger } from "@logtape/logtape";
 import { DataPlane } from "./data-plane/index.ts";
 import { Hydrator } from "./hydration/index.ts";
@@ -184,11 +184,12 @@ Deno.test("Cursor Save Throttling Test", async () => {
   // Create a direct MemoryRunner to test throttling
   const runner = new MemoryRunner({
     startCursor: 0,
-    cursorSaveIntervalMs: 100, // Use 100ms for faster testing
-    setCursor: (cursor: number) => {
+    setCursorInterval: 100, // Use 100ms for faster testing
+    setCursor: (cursor: number): Promise<void> => {
       saveCount++;
       lastSavedCursor = cursor;
       console.log(`Save #${saveCount}: cursor ${cursor}`);
+      return Promise.resolve();
     },
   });
 

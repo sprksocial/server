@@ -3,7 +3,7 @@ import {
   ReplyRef,
 } from "../lex/types/so/sprk/feed/post.ts";
 import { Database } from "./db/index.ts";
-import { DidDocument } from "@atproto/identity";
+import { DidDocument } from "@atp/identity";
 
 export const getDescendents = async (
   db: Database,
