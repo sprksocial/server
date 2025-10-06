@@ -34,7 +34,7 @@ async function getCompleteThreadStructure(
   const childToParent = new Map<string, string>();
 
   // Step 1: Get the root post first
-  const rootPosts = await ctx.db.models.Post.find({ uri: rootUri }).lean();
+  const rootPosts = await ctx.db.models.Post.find({ uri: rootUri });
   if (rootPosts.length === 0) {
     return {
       posts,

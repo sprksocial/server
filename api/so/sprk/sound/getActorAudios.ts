@@ -94,8 +94,7 @@ export default function (server: Server, ctx: AppContext) {
 
         const audios = await ctx.db.models.Audio.find(query)
           .sort({ createdAt: -1, _id: -1 })
-          .limit(limit + 1)
-          .lean();
+          .limit(limit + 1);
 
         const hasMore = audios.length > limit;
         if (hasMore) audios.pop();

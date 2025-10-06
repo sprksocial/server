@@ -97,7 +97,7 @@ export class IndexingService {
   }
 
   async indexHandle(did: string, timestamp: string, force = false) {
-    const actor = await this.db.models.Actor.findOne({ did }).lean();
+    const actor = await this.db.models.Actor.findOne({ did });
     if (!force && !needsHandleReindex(actor, timestamp)) {
       return;
     }

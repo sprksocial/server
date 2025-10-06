@@ -64,7 +64,7 @@ export async function transformPostsToPostViews(
           .filter((p) => p.embed?.$type === "so.sprk.embed.video")
           .map((p) => `${p.authorDid}-${p.embed?.video?.ref.$link}`),
       },
-    }).lean(),
+    }),
     // Get viewer likes
     userDid
       ? ctx.db.models.Like.find({

@@ -178,7 +178,6 @@ export default function (server: Server, ctx: AppContext) {
         const dbStories = await ctx.db.models.Story.find({
           uri: { $in: uniqueUris },
         })
-          .lean()
           .exec();
 
         if (dbStories.length === 0) {

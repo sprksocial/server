@@ -62,9 +62,7 @@ export default function (server: Server, ctx: AppContext) {
         : undefined;
 
       // Extract follow subject DIDs and batch fetch profile views
-      const followSubjectDids = follows.map((follow: FollowDocument) =>
-        follow.subject
-      );
+      const followSubjectDids = follows.map((follow) => follow.subject);
       const profileViews = await getProfileViews(
         ctx,
         followSubjectDids,

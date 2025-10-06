@@ -166,8 +166,7 @@ export class TakedownService {
     const takedowns = await this.db.models.Takedown
       .find(query)
       .sort({ targetUri: -1 })
-      .limit(limit + 1)
-      .lean();
+      .limit(limit + 1);
 
     const items = takedowns.slice(0, limit);
 
@@ -201,8 +200,7 @@ export class TakedownService {
     const takedowns = await this.db.models.RepoTakedown
       .find(query)
       .sort({ did: -1 })
-      .limit(limit + 1)
-      .lean();
+      .limit(limit + 1);
 
     const items = takedowns.slice(0, limit);
 
@@ -235,8 +233,7 @@ export class TakedownService {
     const takedowns = await this.db.models.BlobTakedown
       .find(query)
       .sort({ did: -1, cid: -1 })
-      .limit(limit + 1)
-      .lean();
+      .limit(limit + 1);
 
     const items = takedowns.slice(0, limit);
 

@@ -207,7 +207,6 @@ export default function (server: Server, ctx: AppContext) {
       const stories = await ctx.db.models.Story.find(query)
         .sort({ indexedAt: -1, _id: -1 })
         .limit(limit + 1) // Get one extra for hasMore check
-        .lean()
         .exec();
 
       if (stories.length === 0) {

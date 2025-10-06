@@ -21,10 +21,10 @@ export async function createProfileViewBasic(
   // Get author profile data
   const profile = await ctx.db.models.Profile.findOne({
     authorDid: authorDid,
-  }).lean();
+  });
   const actor = await ctx.db.models.Actor.findOne({
     did: authorDid,
-  }).lean();
+  });
   const authorHandle = actor?.handle ?? "unknown.invalid";
 
   let stories: ComAtprotoRepoStrongRef.Main[] = [];
@@ -41,8 +41,7 @@ export async function createProfileViewBasic(
         indexedAt: { $gte: twentyFourHoursAgo.toISOString() },
       })
         .sort({ indexedAt: -1 })
-        .limit(15)
-        .lean();
+        .limit(15);
 
       // Convert recent stories to strongRefs
       stories = recentStories.map((story: StoryDocument) => ({
@@ -360,7 +359,6 @@ export async function getProfiles(
         })
           .sort({ indexedAt: -1 })
           .limit(15)
-          .lean()
           .catch((error: Error) => {
             ctx.logger.warn(
               "Failed to fetch stories for profile",

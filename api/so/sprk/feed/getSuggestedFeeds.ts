@@ -121,11 +121,9 @@ export default function (server: Server, ctx: AppContext) {
         // Get both BskyGenerator and SprkGenerator documents
         const [bskyGenerators, sprkGenerators] = await Promise.all([
           ctx.db.models.BskyGenerator.find(query)
-            .sort({ likeCount: -1, _id: -1 })
-            .lean(),
+            .sort({ likeCount: -1, _id: -1 }),
           ctx.db.models.SprkGenerator.find(query)
-            .sort({ likeCount: -1, _id: -1 })
-            .lean(),
+            .sort({ likeCount: -1, _id: -1 }),
         ]);
 
         // Combine and sort all generators by like count

@@ -120,7 +120,6 @@ export default function (server: Server, ctx: AppContext) {
         const dbAudios = await ctx.db.models.Audio.find({
           uri: { $in: uniqueUris },
         })
-          .lean()
           .exec();
 
         if (dbAudios.length === 0) {
