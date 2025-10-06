@@ -1,13 +1,13 @@
 import { CID } from "multiformats/cid";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
 import * as lex from "../../../lex/lexicons.ts";
-import * as Repost from "../../../lex/types/app/bsky/feed/repost.ts";
+import * as Repost from "../../../lex/types/so/sprk/feed/repost.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { RepostDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexId = lex.ids.AppBskyFeedRepost;
+const lexId = lex.ids.SoSprkFeedRepost;
 type IndexedRepost = RepostDocument;
 
 const insertFn = async (

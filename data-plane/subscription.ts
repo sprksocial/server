@@ -213,17 +213,10 @@ function createFirehose(opts: {
       }
     },
     filterCollections: [
-      "so.sprk.feed.post",
-      "so.sprk.feed.like",
-      "so.sprk.feed.music",
-      "so.sprk.feed.audio",
-      "so.sprk.actor.profile",
-      "so.sprk.feed.story",
-      "so.sprk.graph.follow",
+      "so.sprk.*",
       "app.bsky.graph.follow",
       "app.bsky.graph.block",
       "app.bsky.feed.generator",
-      "app.bsky.feed.repost",
     ],
   });
   return { firehose, runner };

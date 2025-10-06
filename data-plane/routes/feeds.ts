@@ -25,7 +25,7 @@ interface FeedItem {
   createdAt: string;
   type: "post" | "repost";
   repostUri?: string;
-  sortedAt?: string;
+  sortAt: string;
 }
 
 export class Feeds {
@@ -64,7 +64,7 @@ export class Feeds {
       authorDid: p.authorDid,
       createdAt: p.createdAt,
       type: "post" as const,
-      sortedAt: compositeTime(p.createdAt, p.cid),
+      sortAt: compositeTime(p.createdAt, p.indexedAt) || p.createdAt,
     }));
 
     return {
@@ -119,7 +119,7 @@ export class Feeds {
       authorDid: p.authorDid,
       createdAt: p.createdAt,
       type: "post" as const,
-      sortedAt: compositeTime(p.createdAt, p.indexedAt),
+      sortAt: compositeTime(p.createdAt, p.indexedAt) || p.createdAt,
     }));
 
     const transformedReposts: FeedItem[] = reposts.map((r) => ({
@@ -129,15 +129,15 @@ export class Feeds {
       createdAt: r.createdAt,
       type: "repost" as const,
       repostUri: r.uri,
-      sortedAt: compositeTime(r.createdAt, r.indexedAt),
+      sortAt: compositeTime(r.createdAt, r.indexedAt) || r.createdAt,
     }));
 
     // Combine and sort all items
     const allItems = [...transformedPosts, ...transformedReposts]
       .sort((a, b) => {
-        // Sort by createdAt descending, then by cid descending
-        if (a.sortedAt && b.sortedAt && a.sortedAt !== b.sortedAt) {
-          return a.sortedAt > b.sortedAt ? -1 : 1;
+        // Sort by sortAt descending, then by cid descending
+        if (a.sortAt !== b.sortAt) {
+          return a.sortAt > b.sortAt ? -1 : 1;
         }
         return a.cid > b.cid ? -1 : 1;
       })
@@ -148,7 +148,7 @@ export class Feeds {
     if (allItems.length === limit && allItems.length > 0) {
       const lastItem = allItems[allItems.length - 1];
       nextCursor = this.timeCidKeyset.pack({
-        primary: lastItem.createdAt,
+        primary: lastItem.sortAt,
         secondary: lastItem.cid,
       });
     }

@@ -47,14 +47,21 @@ export abstract class GenericKeyset<R, LR extends KeysetLabeledResult> {
   }
   packCursor(cursor?: KeysetCursor): string | undefined {
     if (!cursor) return;
-    return `${cursor.primary}__${cursor.secondary}`;
+    // Use colon as separator (more compact than double underscore)
+    return `${cursor.primary}:${cursor.secondary}`;
   }
   unpackCursor(cursorStr?: string): KeysetCursor | undefined {
     if (!cursorStr) return;
-    const result = cursorStr.split("__");
-    const [primary, secondary, ...others] = result;
-    if (!primary || !secondary || others.length > 0) {
-      throw new InvalidRequestError("Malformed cursor");
+    const separatorIndex = cursorStr.indexOf(":");
+    if (separatorIndex === -1) {
+      throw new InvalidRequestError("Malformed cursor: missing separator");
+    }
+    const primary = cursorStr.slice(0, separatorIndex);
+    const secondary = cursorStr.slice(separatorIndex + 1);
+    if (!primary || !secondary) {
+      throw new InvalidRequestError(
+        "Malformed cursor: missing primary or secondary",
+      );
     }
     return {
       primary,
@@ -120,30 +127,43 @@ export abstract class GenericKeyset<R, LR extends KeysetLabeledResult> {
   }
 }
 
-type SortedAtCidResult = { sortedAt?: string; cid: string };
+type SortedAtCidResult = { sortAt?: string; cid: string };
 type TimeCidLabeledResult = KeysetCursor;
 
 export class TimeCidKeyset<
   TimeCidResult = SortedAtCidResult,
 > extends GenericKeyset<TimeCidResult, TimeCidLabeledResult> {
   constructor() {
-    super("sortedAt", "cid");
+    super("sortAt", "cid");
   }
 
   labelResult(result: TimeCidResult): TimeCidLabeledResult;
   labelResult<TimeCidResult extends SortedAtCidResult>(result: TimeCidResult) {
-    return { primary: result.sortedAt, secondary: result.cid };
+    // Use current time as fallback if sortAt is missing
+    const sortAt = result.sortAt || new Date().toISOString();
+    return { primary: sortAt, secondary: result.cid };
   }
   labeledResultToCursor(labeled: TimeCidLabeledResult) {
+    const timestamp = new Date(labeled.primary).getTime();
+    if (isNaN(timestamp)) {
+      throw new InvalidRequestError("Invalid date for cursor");
+    }
+    // Use seconds instead of milliseconds and base36 encoding for compactness
+    const secondsBase36 = Math.floor(timestamp / 1000).toString(36);
     return {
-      primary: new Date(labeled.primary).getTime().toString(),
+      primary: secondsBase36,
       secondary: labeled.secondary,
     };
   }
   cursorToLabeledResult(cursor: KeysetCursor) {
-    const primaryDate = new Date(parseInt(cursor.primary, 10));
+    // Parse from base36 and convert seconds back to milliseconds
+    const seconds = parseInt(cursor.primary, 36);
+    if (isNaN(seconds)) {
+      throw new InvalidRequestError("Malformed cursor: invalid timestamp");
+    }
+    const primaryDate = new Date(seconds * 1000);
     if (isNaN(primaryDate.getTime())) {
-      throw new InvalidRequestError("Malformed cursor");
+      throw new InvalidRequestError("Malformed cursor: invalid date");
     }
     return {
       primary: primaryDate.toISOString(),
@@ -163,7 +183,9 @@ export class CreatedAtDidKeyset extends TimeCidKeyset<{
   }
 
   override labelResult(result: { createdAt: string; did: string }) {
-    return { primary: result.createdAt, secondary: result.did };
+    // Use current time as fallback if createdAt is missing
+    const createdAt = result.createdAt || new Date().toISOString();
+    return { primary: createdAt, secondary: result.did };
   }
 }
 
@@ -178,7 +200,9 @@ export class IndexedAtDidKeyset extends TimeCidKeyset<{
   }
 
   override labelResult(result: { indexedAt: string; did: string }) {
-    return { primary: result.indexedAt, secondary: result.did };
+    // Use current time as fallback if indexedAt is missing
+    const indexedAt = result.indexedAt || new Date().toISOString();
+    return { primary: indexedAt, secondary: result.did };
   }
 }
 
@@ -237,13 +261,14 @@ export abstract class GenericSingleKey<R, LR extends SingleKeyLabeledResult> {
   }
   unpackCursor(cursorStr?: string): SingleKeyCursor | undefined {
     if (!cursorStr) return;
-    const result = cursorStr.split("__");
-    const [primary, ...others] = result;
-    if (!primary || others.length > 0) {
-      throw new InvalidRequestError("Malformed cursor");
+    // Single key cursors don't use separators
+    if (cursorStr.includes(":") || cursorStr.includes("__")) {
+      throw new InvalidRequestError(
+        "Malformed cursor: unexpected separator in single key cursor",
+      );
     }
     return {
-      primary,
+      primary: cursorStr,
     };
   }
   getFilter<T>(
@@ -298,14 +323,18 @@ export class IsoTimeKey<TimeResult = SortAtResult> extends GenericSingleKey<
     return { primary: result.sortAt };
   }
   labeledResultToCursor(labeled: TimeLabeledResult) {
+    const primaryDate = new Date(labeled.primary);
+    if (isNaN(primaryDate.getTime())) {
+      throw new InvalidRequestError("Invalid date for cursor");
+    }
     return {
-      primary: new Date(labeled.primary).toISOString(),
+      primary: primaryDate.toISOString(),
     };
   }
   cursorToLabeledResult(cursor: SingleKeyCursor) {
     const primaryDate = new Date(cursor.primary);
     if (isNaN(primaryDate.getTime())) {
-      throw new InvalidRequestError("Malformed cursor");
+      throw new InvalidRequestError("Malformed cursor: invalid date");
     }
     return {
       primary: primaryDate.toISOString(),
