@@ -6,11 +6,11 @@ import type {
   ViewerState,
 } from "../lex/types/so/sprk/actor/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../lex/types/com/atproto/repo/strongRef.ts";
-import type { StoryDocument } from "../data-plane/server/models.ts";
+import type { StoryDocument } from "../data-plane/db/models.ts";
 import type { Label } from "../lex/types/com/atproto/label/defs.ts";
-import { ensureValidDid, isValidHandle } from "@atproto/syntax";
+import { ensureValidDid, isValidHandle } from "@atp/syntax";
 import { AppContext } from "../main.ts";
-import { XRPCError } from "@sprk/xrpc-server";
+import { XRPCError } from "@atp/xrpc-server";
 
 // Helper function to create ProfileViewBasic with stories
 export async function createProfileViewBasic(
@@ -21,10 +21,10 @@ export async function createProfileViewBasic(
   // Get author profile data
   const profile = await ctx.db.models.Profile.findOne({
     authorDid: authorDid,
-  }).lean();
+  });
   const actor = await ctx.db.models.Actor.findOne({
     did: authorDid,
-  }).lean();
+  });
   const authorHandle = actor?.handle ?? "unknown.invalid";
 
   let stories: ComAtprotoRepoStrongRef.Main[] = [];
@@ -41,8 +41,7 @@ export async function createProfileViewBasic(
         indexedAt: { $gte: twentyFourHoursAgo.toISOString() },
       })
         .sort({ indexedAt: -1 })
-        .limit(15)
-        .lean();
+        .limit(15);
 
       // Convert recent stories to strongRefs
       stories = recentStories.map((story: StoryDocument) => ({
@@ -360,7 +359,6 @@ export async function getProfiles(
         })
           .sort({ indexedAt: -1 })
           .limit(15)
-          .lean()
           .catch((error: Error) => {
             ctx.logger.warn(
               "Failed to fetch stories for profile",

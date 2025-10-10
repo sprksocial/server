@@ -1,7 +1,7 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { transformAudiosToAudioViews } from "../../../../utils/audio-transformer.ts";
-import { AudioDocument } from "../../../../data-plane/server/models.ts";
+import { AudioDocument } from "../../../../data-plane/db/models.ts";
 
 interface AudioAggDoc {
   uri: string;
@@ -36,8 +36,7 @@ export default function (server: Server, ctx: AppContext) {
       const uris = docsPage.map((a) => a.uri);
 
       // Fetch full audio documents and preserve order
-      const docs = await ctx.db.models.Audio.find({ uri: { $in: uris } })
-        .lean();
+      const docs = await ctx.db.models.Audio.find({ uri: { $in: uris } });
       const byUri = new Map(docs.map((d) => [d.uri, d] as const));
       let audiosOrdered: AudioDocument[] = [];
       for (const uri of uris) {

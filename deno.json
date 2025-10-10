@@ -1,36 +1,38 @@
 {
   "tasks": {
     "dev": "deno run -A --watch main.ts",
-    "codegen": "deno run -A jsr:@sprk/lex-cli@^0.2.1 gen-server --yes ./lex ./lexicons",
+    "codegen": "deno run -A jsr:@atp/lex-cli@^0.1.0-alpha.1 gen-server -o ./lex -i ./lexicons",
     "start": "deno run -A --env-file main.ts",
     "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
   },
   "imports": {
-    "@atproto/repo": "npm:@atproto/repo@^0.8.5",
-    "@atproto/sync": "npm:@atproto/sync@^0.1.30",
-    "@atproto/xrpc": "npm:@atproto/xrpc@^0.7.1",
-    "@logtape/logtape": "jsr:@logtape/logtape@^1.0.4",
-    "@logtape/pretty": "jsr:@logtape/pretty@^1.1.0-dev.333+b25e634b",
-    "dotenv": "npm:dotenv@^17.2.1",
-    "hono": "jsr:@hono/hono@^4.9.1",
+    "@atp/common": "jsr:@atp/common@^0.1.0-alpha.4",
+    "@atp/crypto": "jsr:@atp/crypto@^0.1.0-alpha.2",
+    "@atp/identity": "jsr:@atp/identity@^0.1.0-alpha.1",
+    "@atp/lexicon": "jsr:@atp/lexicon@^0.1.0-alpha.2",
+    "@atp/repo": "jsr:@atp/repo@^0.1.0-alpha.2",
+    "@atp/sync": "jsr:@atp/sync@^0.1.0-alpha.3",
+    "@atp/syntax": "jsr:@atp/syntax@^0.1.0-alpha.1",
+    "@atp/xrpc": "jsr:@atp/xrpc@^0.1.0-alpha.2",
+    "@atp/xrpc-server": "jsr:@atp/xrpc-server@^0.1.0-alpha.2",
+    "@atproto/identity": "npm:@atproto/identity@^0.4.9",
+    "@atproto/repo": "npm:@atproto/repo@^0.8.10",
+    "@atproto/sync": "npm:@atproto/sync@^0.1.35",
+    "@logtape/logtape": "jsr:@logtape/logtape@^1.2.0-dev.344+834f24a9",
+    "@logtape/pretty": "jsr:@logtape/pretty@^1.2.0-dev.344+834f24a9",
+    "@std/assert": "jsr:@std/assert@^1.0.14",
+    "dotenv": "npm:dotenv@^17.2.3",
+    "hono": "jsr:@hono/hono@^4.9.9",
     "@std/encoding": "jsr:@std/encoding@^1.0.10",
-    "@atproto/api": "npm:@atproto/api@^0.14.22",
-    "@atproto/common": "npm:@atproto/common@^0.4.11",
-    "@atproto/crypto": "npm:@atproto/crypto@^0.4.4",
-    "@atproto/identity": "npm:@atproto/identity@^0.4.8",
-    "@atproto/lexicon": "npm:@atproto/lexicon@^0.4.12",
-    "@atproto/syntax": "npm:@atproto/syntax@^0.3.4",
-    "@sprk/xrpc-server": "jsr:@sprk/xrpc-server@^0.2.0",
-    "jose": "npm:jose@^6.0.12",
-    "mongoose": "npm:mongoose@^8.17.1",
-    "multiformats": "npm:multiformats@^9.9.0",
-    "p-queue": "npm:p-queue@^8.1.0"
+    "@atproto/api": "npm:@atproto/api@^0.16.11",
+    "jose": "npm:jose@^6.1.0",
+    "mongoose": "npm:mongoose@^8.19.0",
+    "multiformats": "npm:multiformats@^13.4.1",
+    "p-queue": "npm:p-queue@^8.1.1"
   },
   "compilerOptions": {
     "jsx": "precompile",
     "jsxImportSource": "hono/jsx"
   },
-  "unstable": [
-    "sloppy-imports"
-  ]
+  "unstable": ["sloppy-imports"]
 }

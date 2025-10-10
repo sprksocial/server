@@ -1,10 +1,10 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts";
-import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
+import { decodeBase64, encodeBase64 } from "@std/encoding";
 import { transformAudioToAudioView } from "../../../../utils/audio-transformer.ts";
 import { RootFilterQuery } from "mongoose";
-import { PostDocument } from "../../../../data-plane/server/models.ts";
+import { PostDocument } from "../../../../data-plane/db/models.ts";
 
 interface CursorData {
   createdAt: string;
@@ -48,7 +48,6 @@ export default function (server: Server, ctx: AppContext) {
         const dbAudio = await ctx.db.models.Audio.findOne({
           uri: uri,
         })
-          .lean()
           .exec();
 
         if (!dbAudio) {
@@ -72,8 +71,7 @@ export default function (server: Server, ctx: AppContext) {
         const posts = await ctx.db.models.Post
           .find(query)
           .sort({ createdAt: -1, _id: -1 })
-          .limit(limit + 1)
-          .lean();
+          .limit(limit + 1);
 
         const hasMore = posts.length > limit;
         if (hasMore) posts.pop();
@@ -85,11 +83,11 @@ export default function (server: Server, ctx: AppContext) {
             ctx.db.models.Block.find({
               authorDid: userDid,
               subject: { $in: authorDids },
-            }).lean(),
+            }),
             ctx.db.models.Block.find({
               authorDid: { $in: authorDids },
               subject: userDid,
-            }).lean(),
+            }),
           ]);
           const blockedAuthorDids = new Set<string>([
             ...userBlocking.map((b) => b.subject),

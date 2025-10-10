@@ -2,9 +2,9 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
-import { Database } from "./data-plane/server/index.ts";
+import { Database } from "./data-plane/db/index.ts";
 import { env } from "./utils/env.ts";
-import { createAuthVerifier } from "./services/auth-verifier.ts";
+import { createAuthVerifier } from "./auth-verifier.ts";
 import API from "./api/index.ts";
 import { createServer } from "./lex/index.ts";
 import {
@@ -15,12 +15,15 @@ import { takedownFilterMiddleware } from "./services/takedown-filter.ts";
 import wellKnownRouter from "./api/well-known.ts";
 import { TakedownService } from "./services/takedown.ts";
 import { BidirectionalResolver } from "./utils/id-resolver.ts";
-import { DidResolver } from "@atproto/identity";
-import { AuthVerifier } from "./services/auth-verifier.ts";
-import { AuthRequiredError } from "@sprk/xrpc-server";
-import { RepoSubscription } from "./data-plane/server/subscription.ts";
+import { DidResolver } from "@atp/identity";
+import { AuthVerifier } from "./auth-verifier.ts";
+import { AuthRequiredError } from "@atp/xrpc-server";
+import { RepoSubscription } from "./data-plane/subscription.ts";
+import { DataPlane } from "./data-plane/index.ts";
 import { configure, getConsoleSink, getLogger, Logger } from "@logtape/logtape";
 import { getPrettyFormatter } from "@logtape/pretty";
+import { Hydrator } from "./hydration/index.ts";
+import { Views } from "./views/index.ts";
 
 await configure({
   sinks: {
@@ -42,6 +45,9 @@ await configure({
 
 export type AppContext = {
   db: Database;
+  dataplane: DataPlane;
+  hydrator: Hydrator;
+  views: Views;
   logger: Logger;
   resolver: BidirectionalResolver;
   serviceDid: string;
@@ -148,16 +154,26 @@ export async function setupApp(): Promise<
     throw new Error("Failed to connect to database during startup");
   }
 
-  // Read cursor from database
-  const savedCursor = await db.getCursorState();
+  // Read cursor from database (skip in dev environment)
+  const savedCursor = env.NODE_ENV === "development"
+    ? null
+    : await db.getCursorState();
   const startCursor = savedCursor !== null ? savedCursor : undefined;
 
-  appLogger.info("Database cursor loaded", { cursor: startCursor });
+  appLogger.info("Database cursor loaded", {
+    cursor: startCursor,
+    isDev: env.NODE_ENV === "development",
+    skippedSavedCursor: env.NODE_ENV === "development",
+  });
 
   // DID and resolver setup
   const baseIdResolver = createIdResolver();
   const resolver = createBidirectionalResolver(baseIdResolver);
   const serviceDid = env.SERVICE_DID;
+
+  const dataplane = new DataPlane(db, resolver.baseResolver);
+  const hydrator = new Hydrator(dataplane);
+  const views = new Views();
 
   // Services
   const sub = new RepoSubscription({
@@ -167,7 +183,7 @@ export async function setupApp(): Promise<
     startCursor,
   });
   const takedownService = new TakedownService(db);
-  const authVerifier = createAuthVerifier(db, {
+  const authVerifier = createAuthVerifier(dataplane, {
     ownDid: serviceDid,
     alternateAudienceDids: [],
     modServiceDid: env.MOD_SERVICE_DID,
@@ -176,6 +192,9 @@ export async function setupApp(): Promise<
 
   const ctx = {
     db,
+    dataplane,
+    hydrator,
+    views,
     logger: appLogger,
     resolver,
     serviceDid,

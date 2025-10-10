@@ -1,6 +1,6 @@
 import { AppContext } from "../../../../main.ts";
 import { Server } from "../../../../lex/index.ts";
-import { AuthRequiredError, XRPCError } from "@sprk/xrpc-server";
+import { AuthRequiredError, XRPCError } from "@atp/xrpc-server";
 
 export default function (server: Server, ctx: AppContext) {
   server.com.atproto.admin.getSubjectStatus({

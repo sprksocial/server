@@ -2,7 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import stream from "node:stream";
-import { BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atp/lexicon";
 
 export type QueryParams = globalThis.Record<PropertyKey, never>;
 export type InputSchema = string | Uint8Array | Blob;

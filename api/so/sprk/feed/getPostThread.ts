@@ -3,7 +3,7 @@ import { AppContext } from "../../../../main.ts";
 import { OutputSchema } from "../../../../lex/types/so/sprk/feed/getPostThread.ts";
 import type * as SoSprkFeedDefs from "../../../../lex/types/so/sprk/feed/defs.ts";
 import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts";
-import { PostDocument } from "../../../../data-plane/server/models.ts";
+import { PostDocument } from "../../../../data-plane/db/models.ts";
 import { type $Typed } from "../../../../lex/util.ts";
 
 // Constants
@@ -34,7 +34,7 @@ async function getCompleteThreadStructure(
   const childToParent = new Map<string, string>();
 
   // Step 1: Get the root post first
-  const rootPosts = await ctx.db.models.Post.find({ uri: rootUri }).lean();
+  const rootPosts = await ctx.db.models.Post.find({ uri: rootUri });
   if (rootPosts.length === 0) {
     return {
       posts,

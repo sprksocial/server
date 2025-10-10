@@ -3,10 +3,10 @@ import { AppContext } from "../../../../main.ts";
 import {
   BskyGeneratorDocument,
   SprkGeneratorDocument,
-} from "../../../../data-plane/server/models.ts";
+} from "../../../../data-plane/db/models.ts";
 import { getProfileView } from "../../../../utils/profile-helper.ts";
 import type * as SoSprkFeedDefs from "../../../../lex/types/so/sprk/feed/defs.ts";
-import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
+import { decodeBase64, encodeBase64 } from "@std/encoding";
 
 interface CursorData {
   likeCount: number;
@@ -121,11 +121,9 @@ export default function (server: Server, ctx: AppContext) {
         // Get both BskyGenerator and SprkGenerator documents
         const [bskyGenerators, sprkGenerators] = await Promise.all([
           ctx.db.models.BskyGenerator.find(query)
-            .sort({ likeCount: -1, _id: -1 })
-            .lean(),
+            .sort({ likeCount: -1, _id: -1 }),
           ctx.db.models.SprkGenerator.find(query)
-            .sort({ likeCount: -1, _id: -1 })
-            .lean(),
+            .sort({ likeCount: -1, _id: -1 }),
         ]);
 
         // Combine and sort all generators by like count

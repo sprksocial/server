@@ -3,7 +3,7 @@ import { AppContext } from "../../../../main.ts";
 import { Server } from "../../../../lex/index.ts";
 import type * as ComAtprotoAdminDefs from "../../../../lex/types/com/atproto/admin/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../../lex/types/com/atproto/repo/strongRef.ts";
-import { AuthRequiredError } from "@sprk/xrpc-server";
+import { AuthRequiredError } from "@atp/xrpc-server";
 
 export default function (server: Server, ctx: AppContext) {
   server.com.atproto.admin.updateSubjectStatus({

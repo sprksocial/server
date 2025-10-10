@@ -1,24 +1,82 @@
-import { Server } from "../../../../lex/index.ts";
+import { mapDefined } from "@atp/common";
 import { AppContext } from "../../../../main.ts";
-import { getProfiles } from "../../../../utils/profile-helper.ts";
+import {
+  HydrateCtx,
+  HydrationState,
+  Hydrator,
+} from "../../../../hydration/index.ts";
+import { Server } from "../../../../lex/index.ts";
+import { QueryParams } from "../../../../lex/types/so/sprk/actor/getProfiles.ts";
+import { createPipeline, noRules } from "../../../../pipeline.ts";
+import { Views } from "../../../../views/index.ts";
+import { resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
+  const getProfile = createPipeline(skeleton, hydration, noRules, presentation);
   server.so.sprk.actor.getProfiles({
     auth: ctx.authVerifier.standardOptional,
-    handler: async ({ params, auth }) => {
-      const { actors: actorParams } = params;
-      const viewerDid = auth.credentials.type === "standard"
-        ? auth.credentials.iss
-        : undefined;
+    handler: async ({ auth, params }) => {
+      const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
+      const hydrateCtx = ctx.hydrator.createContext({
+        viewer,
+        includeTakedowns,
+      });
 
-      const profiles = await getProfiles(ctx, actorParams, viewerDid);
+      const result = await getProfile({ ...params, hydrateCtx }, ctx);
+
+      const repoRev = await ctx.hydrator.actor.getRepoRevSafe(viewer);
 
       return {
         encoding: "application/json",
-        body: {
-          profiles,
-        },
+        body: result,
+        headers: resHeaders({
+          repoRev,
+        }),
       };
     },
   });
 }
+
+const skeleton = async (input: {
+  ctx: Context;
+  params: Params;
+}): Promise<SkeletonState> => {
+  const { ctx, params } = input;
+  console.log("actor params:", params.actors, typeof params.actors);
+  const dids = await ctx.hydrator.actor.getDidsDefined(params.actors);
+  return { dids };
+};
+
+const hydration = (input: {
+  ctx: Context;
+  params: Params;
+  skeleton: SkeletonState;
+}) => {
+  const { ctx, params, skeleton } = input;
+  return ctx.hydrator.hydrateProfilesDetailed(skeleton.dids, params.hydrateCtx);
+};
+
+const presentation = (input: {
+  ctx: Context;
+  params: Params;
+  skeleton: SkeletonState;
+  hydration: HydrationState;
+}) => {
+  const { ctx, skeleton, hydration } = input;
+  const profiles = mapDefined(
+    skeleton.dids,
+    (did) => ctx.views.profileDetailed(did, hydration),
+  );
+  return { profiles };
+};
+
+type Context = {
+  hydrator: Hydrator;
+  views: Views;
+};
+
+type Params = QueryParams & {
+  hydrateCtx: HydrateCtx;
+};
+
+type SkeletonState = { dids: string[] };

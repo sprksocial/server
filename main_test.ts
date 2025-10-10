@@ -1,16 +1,19 @@
-import { assertEquals } from "jsr:@std/assert";
-import { assertMatch } from "jsr:@std/assert/match";
+import { assertEquals } from "@std/assert";
+import { assertMatch } from "@std/assert/match";
 import { AppContext, createApp } from "./main.ts";
-import { Database } from "./data-plane/server/index.ts";
+import { Database } from "./data-plane/db/index.ts";
 import {
   createBidirectionalResolver,
   createIdResolver,
 } from "./utils/id-resolver.ts";
 import { TakedownService } from "./services/takedown.ts";
-import { createAuthVerifier } from "./services/auth-verifier.ts";
-import { RepoSubscription } from "./data-plane/server/subscription.ts";
-import { MemoryRunner } from "./utils/memory-runner.ts";
+import { createAuthVerifier } from "./auth-verifier.ts";
+import { RepoSubscription } from "./data-plane/subscription.ts";
+import { MemoryRunner } from "@atp/sync";
 import { getLogger } from "@logtape/logtape";
+import { DataPlane } from "./data-plane/index.ts";
+import { Hydrator } from "./hydration/index.ts";
+import { Views } from "./views/index.ts";
 
 Deno.env.set("SERVICE_DID", "did:web:test");
 Deno.env.set("MOD_SERVICE_DID", "did:web:test");
@@ -36,6 +39,9 @@ function createMockContext(): AppContext {
     saveCursorState: () => Promise.resolve(),
   } as unknown as Database;
 
+  const dataplane = new DataPlane(mockDb, resolver.baseResolver);
+  const hydrator = new Hydrator(dataplane);
+  const views = new Views();
   const takedownService = new TakedownService(mockDb);
   const sub = new RepoSubscription({
     service: "wss://relay1.us-west.bsky.network",
@@ -43,7 +49,7 @@ function createMockContext(): AppContext {
     idResolver: baseIdResolver,
     startCursor: undefined,
   });
-  const authVerifier = createAuthVerifier(mockDb, {
+  const authVerifier = createAuthVerifier(dataplane, {
     ownDid: serviceDid,
     alternateAudienceDids: [],
     modServiceDid: "did:web:test",
@@ -52,6 +58,9 @@ function createMockContext(): AppContext {
 
   return {
     db: mockDb,
+    dataplane,
+    hydrator,
+    views,
     logger: appLogger,
     resolver,
     serviceDid,
@@ -175,11 +184,12 @@ Deno.test("Cursor Save Throttling Test", async () => {
   // Create a direct MemoryRunner to test throttling
   const runner = new MemoryRunner({
     startCursor: 0,
-    cursorSaveIntervalMs: 100, // Use 100ms for faster testing
-    setCursor: (cursor: number) => {
+    setCursorInterval: 100, // Use 100ms for faster testing
+    setCursor: (cursor: number): Promise<void> => {
       saveCount++;
       lastSavedCursor = cursor;
       console.log(`Save #${saveCount}: cursor ${cursor}`);
+      return Promise.resolve();
     },
   });
 

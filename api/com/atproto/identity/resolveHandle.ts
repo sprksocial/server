@@ -1,5 +1,5 @@
-import * as ident from "@atproto/syntax";
-import { InvalidRequestError } from "@sprk/xrpc-server";
+import * as ident from "@atp/syntax";
+import { InvalidRequestError } from "@atp/xrpc-server";
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
 

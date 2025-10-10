@@ -3,7 +3,7 @@ import {
   EmbedImage,
   PostEmbed,
   VideoMappingDocument,
-} from "../data-plane/server/models.ts";
+} from "../data-plane/db/models.ts";
 import { env } from "./env.ts";
 
 interface ImageTransformOptions {

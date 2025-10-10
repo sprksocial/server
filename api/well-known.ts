@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { env } from "../utils/env.ts";
-import { formatMultikey, Secp256k1Keypair } from "@atproto/crypto";
+import { formatMultikey, Secp256k1Keypair } from "@atp/crypto";
 
 const wellKnownRouter = () => {
   const router = new Hono();

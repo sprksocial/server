@@ -1,7 +1,7 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
 import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts";
-import { decodeBase64, encodeBase64 } from "jsr:@std/encoding";
+import { decodeBase64, encodeBase64 } from "@std/encoding";
 import { OutputSchema } from "../../../../lex/types/so/sprk/feed/getTimeline.ts";
 
 interface CursorData {
@@ -101,8 +101,7 @@ export default function (server: Server, ctx: AppContext) {
         const query = buildTimelineQuery(followedDids, cursorData);
         const posts = await ctx.db.models.Post.find(query)
           .sort({ createdAt: -1, _id: -1 })
-          .limit(limit + 1) // Get one extra for hasMore check
-          .lean();
+          .limit(limit + 1); // Get one extra for hasMore check
 
         // Check if there are more results
         const hasMore = posts.length > limit;

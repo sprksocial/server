@@ -12,6 +12,7 @@ export interface Record {
   $type: "so.sprk.feed.repost";
   subject: ComAtprotoRepoStrongRef.Main;
   createdAt: string;
+  via?: ComAtprotoRepoStrongRef.Main;
   [k: string]: unknown;
 }
 

@@ -1,9 +1,9 @@
 import { Server } from "../../../../lex/index.ts";
 import { AppContext } from "../../../../main.ts";
-import { FollowDocument } from "../../../../data-plane/server/models.ts";
-import { ensureValidDid, isValidHandle } from "@atproto/syntax";
+import { FollowDocument } from "../../../../data-plane/db/models.ts";
+import { ensureValidDid, isValidHandle } from "@atp/syntax";
 import { RootFilterQuery } from "mongoose";
-import { XRPCError } from "@sprk/xrpc-server";
+import { XRPCError } from "@atp/xrpc-server";
 import { OutputSchema } from "../../../../lex/types/so/sprk/graph/getFollowers.ts";
 import {
   getProfileView,
@@ -62,9 +62,7 @@ export default function (server: Server, ctx: AppContext) {
         : undefined;
 
       // Extract follower DIDs and batch fetch profile views
-      const followerDids = followers.map((follow: FollowDocument) =>
-        follow.authorDid
-      );
+      const followerDids = followers.map((follow) => follow.authorDid);
       const profileViews = await getProfileViews(ctx, followerDids, viewerDid);
 
       const res = {
