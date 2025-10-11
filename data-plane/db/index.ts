@@ -146,23 +146,6 @@ export class Database {
     }
   }
 
-  isConnected(): boolean {
-    return !!this.connection && this.connection.readyState === 1; // 1 = connected
-  }
-
-  async waitForConnection(timeoutMs = 30000, pollMs = 250): Promise<boolean> {
-    if (this.isConnected()) return true;
-    const start = Date.now();
-    return await new Promise((resolve) => {
-      const check = () => {
-        if (this.isConnected()) return resolve(true);
-        if (Date.now() - start >= timeoutMs) return resolve(false);
-        setTimeout(check, pollMs);
-      };
-      check();
-    });
-  }
-
   async disconnect(): Promise<void> {
     if (this.connection) {
       await this.connection.close();

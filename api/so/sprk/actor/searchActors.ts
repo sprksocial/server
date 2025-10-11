@@ -1,5 +1,5 @@
 import { Server } from "../../../../lex/index.ts";
-import { AppContext } from "../../../../main.ts";
+import { AppContext } from "../../../../context.ts";
 import type * as SoSprkActorSearch from "../../../../lex/types/so/sprk/actor/searchActors.ts";
 import { getProfileViews } from "../../../../utils/profile-helper.ts";
 

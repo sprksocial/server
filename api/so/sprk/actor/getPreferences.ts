@@ -1,5 +1,5 @@
 import { Server } from "../../../../lex/index.ts";
-import { AppContext } from "../../../../main.ts";
+import { AppContext } from "../../../../context.ts";
 import { Preferences } from "../../../../lex/types/so/sprk/actor/defs.ts";
 
 export default function (server: Server, ctx: AppContext) {

@@ -1,6 +1,6 @@
 import { AtUri } from "@atp/syntax";
 import { InvalidRequestError } from "@atp/xrpc-server";
-import { AppContext } from "../../../../main.ts";
+import { AppContext } from "../../../../context.ts";
 import { Server } from "../../../../lex/index.ts";
 
 export default function (server: Server, ctx: AppContext) {

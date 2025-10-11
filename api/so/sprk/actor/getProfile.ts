@@ -1,5 +1,5 @@
 import { InvalidRequestError } from "@atp/xrpc-server";
-import { AppContext } from "../../../../main.ts";
+import { AppContext } from "../../../../context.ts";
 import {
   HydrateCtx,
   HydrationState,

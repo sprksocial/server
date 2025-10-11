@@ -1,5 +1,5 @@
 import { Server } from "../../../../lex/index.ts";
-import { AppContext } from "../../../../main.ts";
+import { AppContext } from "../../../../context.ts";
 import { transformAudiosToAudioViews } from "../../../../utils/audio-transformer.ts";
 import { decodeBase64, encodeBase64 } from "@std/encoding";
 
@@ -37,7 +37,7 @@ export default function (server: Server, ctx: AppContext) {
         let actorDid = actor;
         if (!actor.startsWith("did:")) {
           try {
-            const didDoc = await ctx.resolver.resolveHandleToDidDoc(actor);
+            const didDoc = await ctx.idResolver.did.resolveAtprotoData(actor);
             actorDid = didDoc.did;
           } catch (err) {
             console.error("Failed to resolve handle:", err);

@@ -505,16 +505,18 @@ class AuthVerifierImpl {
     auth: StandardOutput | RoleOutput | NullOutput | ModServiceOutput,
   ) {
     const creds = auth.credentials;
-    const isAdmin = creds.type === "role" && creds.admin;
-    const isModService =
-      (creds.type === "standard" || creds.type === "mod_service") &&
-      creds.iss && this.isModService(creds.iss);
-    const includeTakedownsAnd3pBlocks = Boolean(isAdmin || isModService);
+    const includeTakedownsAnd3pBlocks =
+      (creds.type === "role" && creds.admin) ||
+      creds.type === "mod_service" ||
+      (creds.type === "standard" &&
+        this.isModService(creds.iss));
+    const canPerformTakedown = (creds.type === "role" && creds.admin) ||
+      creds.type === "mod_service";
     return {
       viewer: creds.type === "standard" ? creds.iss : null,
       includeTakedowns: includeTakedownsAnd3pBlocks,
       include3pBlocks: includeTakedownsAnd3pBlocks,
-      canPerformTakedown: includeTakedownsAnd3pBlocks,
+      canPerformTakedown,
     };
   }
 }

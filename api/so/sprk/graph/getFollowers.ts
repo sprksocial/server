@@ -1,5 +1,5 @@
 import { Server } from "../../../../lex/index.ts";
-import { AppContext } from "../../../../main.ts";
+import { AppContext } from "../../../../context.ts";
 import { FollowDocument } from "../../../../data-plane/db/models.ts";
 import { ensureValidDid, isValidHandle } from "@atp/syntax";
 import { RootFilterQuery } from "mongoose";
@@ -24,7 +24,7 @@ export default function (server: Server, ctx: AppContext) {
       let actorDid;
 
       if (isValidHandle(actor)) {
-        const actorDidDoc = await ctx.resolver.resolveHandleToDidDoc(actor);
+        const actorDidDoc = await ctx.idResolver.did.resolveAtprotoData(actor);
         actorDid = actorDidDoc.did;
       } else {
         try {

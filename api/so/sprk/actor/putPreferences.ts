@@ -1,6 +1,6 @@
 import { Server } from "../../../../lex/index.ts";
 import { SavedFeedsPref } from "../../../../lex/types/so/sprk/actor/defs.ts";
-import { AppContext } from "../../../../main.ts";
+import { AppContext } from "../../../../context.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.actor.putPreferences({

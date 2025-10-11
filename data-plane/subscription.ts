@@ -45,13 +45,7 @@ export class RepoSubscription {
     this.firehose = firehose;
   }
 
-  async start() {
-    const connected = await this.indexingSvc.db.waitForConnection(30000);
-    if (!connected) {
-      throw new Error(
-        "Failed to connect to database during subscription start",
-      );
-    }
+  start() {
     this.logger.info("Starting firehose subscription");
     this.firehoseRunning = true;
     this.firehose.start();
@@ -59,12 +53,6 @@ export class RepoSubscription {
 
   async restart() {
     await this.destroy();
-    const connected = await this.indexingSvc.db.waitForConnection(30000);
-    if (!connected) {
-      throw new Error(
-        "Failed to connect to database during subscription restart",
-      );
-    }
 
     // Read fresh cursor from database
     const savedCursor = await this.opts.db.getCursorState();
@@ -157,8 +145,6 @@ function createFirehose(opts: {
   startCursor?: number;
 }): { firehose: Firehose; runner: MemoryRunner } {
   const { idResolver, service, indexingSvc, logger, db, startCursor } = opts;
-
-  logger.info("Creating firehose subscription", { service, startCursor });
 
   const runner = new MemoryRunner({
     startCursor,
