@@ -6,7 +6,7 @@ import { env } from "./utils/env.ts";
 import { createAuthVerifier } from "./auth-verifier.ts";
 import API from "./api/index.ts";
 import { createServer } from "./lex/index.ts";
-import wellKnownRouter from "./api/well-known.ts";
+import wellKnown from "./api/well-known.ts";
 import { IdResolver } from "@atp/identity";
 import { DataPlane } from "./data-plane/index.ts";
 import { getLogger } from "@logtape/logtape";
@@ -21,33 +21,15 @@ await configureLogger();
 export function createApp(ctx: AppContext): Hono<AppEnv> {
   const app = new Hono<AppEnv>();
 
-  app.use("*", async (c, next) => {
-    await next();
-    if (c.res.status === 500) {
-      ctx.logger.error(c.error?.message!);
-      console.log(c.error);
-    }
-  });
-
   app.use("*", cors());
   app.use("*", logger());
-  app.use("*", async (c, next) => {
-    // Initialize c.env if it doesn't exist (for testing compatibility)
-    if (!c.env) {
-      c.env = {} as AppContext;
-    }
-    c.env.serviceDid = ctx.serviceDid;
-    c.env.authVerifier = ctx.authVerifier;
-    await next();
-  });
 
   // Lexicon/XRPC server and routers
   const lexServer = createServer();
   API(lexServer, ctx);
-
-  app.route("/", wellKnownRouter());
   app.route("/", lexServer.xrpc.app);
 
+  app.route("/.well-known", wellKnown);
   // Root route
   app.get("/", (c) => {
     return c.text(
@@ -65,23 +47,11 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
 }
 
 // Setup function to create context and app
-export async function setupApp(): Promise<
-  { app: Hono<AppEnv>; ctx: AppContext }
-> {
+export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
   // Setup logger and database
   const appLogger = getLogger(["appview"]);
   const db = new Database();
   db.connect();
-
-  // Read cursor from database (skip in dev environment)
-  const savedCursor = env.NODE_ENV === "development"
-    ? null
-    : await db.getCursorState();
-  const startCursor = savedCursor !== null ? savedCursor : undefined;
-
-  appLogger.info("Database cursor loaded", {
-    cursor: startCursor,
-  });
 
   // DID and resolver setup
   const idResolver = new IdResolver();
@@ -114,8 +84,8 @@ export async function setupApp(): Promise<
 }
 
 // Start server function
-export async function startServer() {
-  const { app, ctx } = await setupApp();
+export function startServer() {
+  const { app, ctx } = setupApp();
 
   // Start HTTP server immediately
   const { HOST, PORT } = env;
@@ -127,24 +97,14 @@ export async function startServer() {
     },
   }, app.fetch);
 
-  let retryTimeoutId: number | undefined;
-  let retryResolve: (() => void) | null = null;
-
   // Handle shutdown
   const shutdown = async (signal: string) => {
     ctx.logger.info(`Received ${signal}; shutting down...`);
-    if (retryTimeoutId !== undefined) {
-      clearTimeout(retryTimeoutId);
-      retryTimeoutId = undefined;
-    }
-    if (retryResolve) {
-      retryResolve();
-      retryResolve = null;
-    }
     try {
+      ctx.logger.info("Disconnecting database...");
       await ctx.db.disconnect();
-    } catch (e) {
-      ctx.logger.error("Error disconnecting database during shutdown", { e });
+    } catch (err) {
+      ctx.logger.error("Error disconnecting database during shutdown", { err });
     }
     ctx.logger.info("Shutdown complete");
     Deno.exit(0);
@@ -154,18 +114,7 @@ export async function startServer() {
   Deno.addSignalListener("SIGTERM", () => shutdown("SIGTERM"));
 }
 
-// Default export for backward compatibility (creates app without starting services)
-let defaultApp: Hono<AppEnv> | null = null;
-
-export default async function getApp(): Promise<Hono<AppEnv>> {
-  if (!defaultApp) {
-    const result = await setupApp();
-    defaultApp = result.app;
-  }
-  return defaultApp;
-}
-
 // Start the server if this file is run directly
 if (import.meta.main) {
-  await startServer();
+  startServer();
 }

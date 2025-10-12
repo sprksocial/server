@@ -1,13 +1,4 @@
-FROM denoland/deno:alpine-2.3.5 AS builder
-ARG COMMIT_SHA
-
-WORKDIR /app
-
-COPY . .
-
-RUN deno cache main.ts
-
-FROM denoland/deno:alpine-2.3.5 AS production
+FROM denoland/deno:alpine-2.5.4
 ARG COMMIT_SHA
 ENV COMMIT_SHA=$COMMIT_SHA
 
@@ -15,7 +6,9 @@ ENV NODE_ENV=production
 
 WORKDIR /app
 
-COPY --from=builder /app .
+COPY . .
+
+RUN deno install
 
 EXPOSE 3000
 

@@ -139,9 +139,9 @@ export class Database {
         ),
       };
 
-      this.logger.info("Connected to MongoDB");
+      this.logger.info("Started connection to MongoDB");
     } catch (error) {
-      this.logger.error("Failed to connect to MongoDB", { error });
+      this.logger.error("Failed to start connection to MongoDB", { error });
       throw error;
     }
   }

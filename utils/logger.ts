@@ -16,6 +16,7 @@ export async function configureLogger() {
     },
     loggers: [
       { category: "appview", lowestLevel: "info", sinks: ["console"] },
+      { category: "ingester", lowestLevel: "info", sinks: ["console"] },
       {
         category: ["logtape", "meta"],
         lowestLevel: "error",

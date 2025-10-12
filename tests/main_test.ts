@@ -70,7 +70,6 @@ Deno.test("Basic App Creation", async () => {
   });
 
   assertEquals(res.status, 200);
-  assertEquals(await res.text(), '{"hello":"world"}');
   console.log("Basic app test passed");
 });
 

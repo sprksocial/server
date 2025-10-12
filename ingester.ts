@@ -2,28 +2,12 @@ import { RepoSubscription } from "./data-plane/subscription.ts";
 import { IdResolver } from "@atp/identity";
 import { env } from "./utils/env.ts";
 import { Database } from "./data-plane/db/index.ts";
-import { configure, getConsoleSink, getLogger } from "@logtape/logtape";
-import { getPrettyFormatter } from "@logtape/pretty";
+import { getLogger } from "@logtape/logtape";
+import { configureLogger } from "./utils/logger.ts";
 
-await configure({
-  sinks: {
-    console: getConsoleSink({
-      formatter: getPrettyFormatter({
-        properties: true,
-        categoryStyle: "underline",
-        messageColor: "rgb(255, 255, 255)",
-        categoryColor: "rgb(255, 255, 255)",
-        messageStyle: "reset",
-      }),
-    }),
-  },
-  loggers: [
-    { category: "ingester", lowestLevel: "info", sinks: ["console"] },
-    { category: ["logtape", "meta"], lowestLevel: "error", sinks: ["console"] },
-  ],
-});
+await configureLogger();
 
-const logger = getLogger();
+const logger = getLogger(["ingester"]);
 
 const idResolver = new IdResolver();
 const db = new Database();

@@ -2,7 +2,7 @@
   "tasks": {
     "dev": "deno run -A --watch main.ts",
     "codegen": "deno run -A jsr:@atp/lex-cli@^0.1.0-alpha.1 gen-server -o ./lex -i ./lexicons",
-    "start": "deno run -A --env-file main.ts",
+    "start": "deno run -A main.ts",
     "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
   },
   "imports": {
