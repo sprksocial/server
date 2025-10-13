@@ -1,6 +1,6 @@
 import { RepoSubscription } from "./data-plane/subscription.ts";
 import { IdResolver } from "@atp/identity";
-import { env } from "./utils/env.ts";
+import { ServerConfig } from "./config.ts";
 import { Database } from "./data-plane/db/index.ts";
 import { getLogger } from "@logtape/logtape";
 import { configureLogger } from "./utils/logger.ts";
@@ -8,18 +8,17 @@ import { configureLogger } from "./utils/logger.ts";
 await configureLogger();
 
 const logger = getLogger(["ingester"]);
+const cfg = ServerConfig.readEnv();
 
-const idResolver = new IdResolver();
-const db = new Database();
+const idResolver = new IdResolver({ plcUrl: cfg.plcUrl });
+const db = new Database(cfg);
 db.connect();
 
-const savedCursor = env.NODE_ENV === "development"
-  ? null
-  : await db.getCursorState();
+const savedCursor = cfg.debugMode ? null : await db.getCursorState();
 const startCursor = savedCursor !== null ? savedCursor : undefined;
 
 const sub = new RepoSubscription({
-  service: env.RELAY_URL,
+  cfg,
   db,
   idResolver,
   startCursor,

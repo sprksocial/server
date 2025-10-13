@@ -4,7 +4,7 @@ import {
   PostEmbed,
   VideoMappingDocument,
 } from "../data-plane/db/models.ts";
-import { env } from "./env.ts";
+import { ServerConfig } from "../config.ts";
 
 interface ImageTransformOptions {
   /** If true, only return the first image (useful for stories) */
@@ -44,6 +44,7 @@ export function transformImagesEmbed(
 export function transformVideoEmbed(
   embed: PostEmbed,
   authorDid: string,
+  cfg: ServerConfig,
   videoMapping?: VideoMappingDocument | null,
   isStory = false,
 ) {
@@ -55,8 +56,8 @@ export function transformVideoEmbed(
   let thumbnail: string;
 
   if (videoMapping) {
-    playlist = `${env.HLS_CDN_URL}/${videoMapping.bunnyGuid}/playlist.m3u8`;
-    thumbnail = `${env.HLS_CDN_URL}/${videoMapping.bunnyGuid}/thumbnail.jpg`;
+    playlist = `${cfg.hlsCdn}/${videoMapping.bunnyGuid}/playlist.m3u8`;
+    thumbnail = `${cfg.hlsCdn}/${videoMapping.bunnyGuid}/thumbnail.jpg`;
   } else if (isStory) {
     playlist =
       `https://media.sprk.so/video/${authorDid}/${embed.video.ref.$link}`;
@@ -64,7 +65,7 @@ export function transformVideoEmbed(
       `https://thumb.sprk.so/${authorDid}/${embed.video.ref.$link}/thumbnail`;
   } else {
     playlist =
-      `${env.VIDEO_CDN_URL}/watch/${authorDid}/${embed.video.ref.$link}/playlist.m3u8`;
+      `${cfg.videoCdn}/watch/${authorDid}/${embed.video.ref.$link}/playlist.m3u8`;
     thumbnail =
       `https://thumb.sprk.so/${authorDid}/${embed.video.ref.$link}/thumbnail`;
   }
@@ -81,6 +82,7 @@ export function transformVideoEmbed(
 export function transformEmbed(
   embed: PostEmbed | null,
   authorDid: string,
+  cfg: ServerConfig,
   videoMapping?: VideoMappingDocument | null,
   options: ImageTransformOptions = {},
   isStory = false,
@@ -94,7 +96,13 @@ export function transformEmbed(
   }
 
   if (embed.$type === "so.sprk.embed.video") {
-    return transformVideoEmbed(embed, authorDid, videoMapping, isStory);
+    return transformVideoEmbed(
+      embed,
+      authorDid,
+      cfg,
+      videoMapping,
+      isStory,
+    );
   }
 
   return undefined;

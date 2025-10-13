@@ -5,6 +5,7 @@ import { Hydrator } from "./hydration/index.ts";
 import { Views } from "./views/index.ts";
 import { IdResolver } from "@atp/identity";
 import { AuthVerifier } from "./auth-verifier.ts";
+import { ServerConfig } from "./config.ts";
 
 export type AppContext = {
   db: Database;
@@ -13,8 +14,8 @@ export type AppContext = {
   views: Views;
   logger: Logger;
   idResolver: IdResolver;
-  serviceDid: string;
   authVerifier: AuthVerifier;
+  cfg: ServerConfig;
 };
 
 export type AppEnv = {

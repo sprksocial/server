@@ -9,14 +9,20 @@ import { DataPlane } from "../data-plane/index.ts";
 import { Hydrator } from "../hydration/index.ts";
 import { Views } from "../views/index.ts";
 import { IdResolver } from "@atp/identity";
+import { ServerConfig } from "../config.ts";
 
-Deno.env.set("SERVICE_DID", "did:web:test");
-Deno.env.set("MOD_SERVICE_DID", "did:web:test");
-Deno.env.set("ADMIN_PASSWORD", "test");
-Deno.env.set(
-  "APPVIEW_K256_PRIVATE_KEY_HEX",
-  "5676df35fd3a185a1771a43536635ad90057e0c0d1fd91436344bb50ce23a460", // random valid test key
-);
+const cfg = new ServerConfig({
+  relayUrl: "http://localhost:8080",
+  serverDid: "did:web:localhost",
+  modServiceDid: "did:web:test",
+  adminPasswords: ["test"],
+  privateKey:
+    "5676df35fd3a185a1771a43536635ad90057e0c0d1fd91436344bb50ce23a460",
+  publicUrl: "http://localhost:4000",
+  alternateAudienceDids: [],
+  bigThreadUris: new Set(["did:web:test"]),
+  maxThreadParents: 10,
+});
 
 // Create a mock context for testing without database
 function createMockContext(): AppContext {
@@ -35,7 +41,7 @@ function createMockContext(): AppContext {
 
   const dataplane = new DataPlane(mockDb, idResolver);
   const hydrator = new Hydrator(dataplane);
-  const views = new Views();
+  const views = new Views(cfg);
   const authVerifier = createAuthVerifier(dataplane, {
     ownDid: serviceDid,
     alternateAudienceDids: [],
@@ -50,7 +56,7 @@ function createMockContext(): AppContext {
     views,
     logger: appLogger,
     idResolver,
-    serviceDid,
+    cfg,
     authVerifier,
   };
 }

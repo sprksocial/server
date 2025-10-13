@@ -1,12 +1,11 @@
 import PQueue from "p-queue";
 import { Database } from "./db/index.ts";
 import { Logger } from "@logtape/logtape";
-import { env } from "../utils/env.ts";
 
 // A simple queue for in-process, out-of-band/backgrounded work
 
 export class BackgroundQueue {
-  queue = new PQueue({ concurrency: env.BACKGROUND_CONCURRENCY });
+  queue = new PQueue();
   destroyed = false;
   private processAllInterval: number | null = null;
   private isProcessingAll = false;

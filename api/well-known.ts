@@ -1,13 +1,13 @@
 import { Hono } from "hono";
-import { env } from "../utils/env.ts";
 import { formatMultikey, Secp256k1Keypair } from "@atp/crypto";
+import { AppEnv } from "../context.ts";
 
-const app = new Hono();
+const app = new Hono<AppEnv>();
 
 app.get("/did.json", (c) => {
-  const domain = env.PUBLIC_URL?.split("://")[1] || "localhost";
+  const did = c.env.cfg.serverDid;
   const keypair = Secp256k1Keypair.import(
-    Deno.env.get("APPVIEW_K256_PRIVATE_KEY_HEX") || "",
+    c.env.cfg.privateKey,
   );
   const multikey = formatMultikey(keypair.jwtAlg, keypair.publicKeyBytes());
 
@@ -16,12 +16,12 @@ app.get("/did.json", (c) => {
       "https://www.w3.org/ns/did/v1",
       "https://w3id.org/security/multikey/v1",
     ],
-    id: `did:web:${domain}`,
+    id: did,
     verificationMethod: [
       {
-        id: `did:web:${domain}#atproto`,
+        id: `${did}#atproto`,
         type: "Multikey",
-        controller: `did:web:${domain}`,
+        controller: did,
         publicKeyMultibase: multikey,
       },
     ],
@@ -29,7 +29,7 @@ app.get("/did.json", (c) => {
       {
         id: "#sprk_appview",
         type: "SprkAppView",
-        serviceEndpoint: `https://${domain}`,
+        serviceEndpoint: c.env.cfg.publicUrl,
       },
     ],
   });

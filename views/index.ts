@@ -32,7 +32,6 @@ import {
 import { INVALID_HANDLE } from "@atp/syntax";
 import { cidFromBlobJson } from "./util.ts";
 import { uriToDid } from "../utils/uris.ts";
-import { env } from "../utils/env.ts";
 import { mapDefined } from "@atp/common";
 import { FeedItem, Repost } from "../hydration/feed.ts";
 import { $Typed } from "../lex/util.ts";
@@ -40,12 +39,24 @@ import { $Typed } from "../lex/util.ts";
 export class Views {
   public indexedAtEpoch?: Date | undefined;
 
+  private videoCdn?: string;
+  private hlsCdn?: string;
+  private mediaCdn?: string;
+  private thumbCdn?: string;
+
   constructor(
-    opts?: {
+    opts: {
       indexedAtEpoch?: Date | undefined;
+      videoCdn?: string;
+      hlsCdn?: string;
+      mediaCdn?: string;
+      thumbCdn?: string;
     },
   ) {
     this.indexedAtEpoch = opts?.indexedAtEpoch;
+    this.videoCdn = opts?.videoCdn;
+    this.hlsCdn = opts?.hlsCdn;
+    this.mediaCdn = opts?.mediaCdn;
   }
 
   post(
@@ -293,7 +304,7 @@ export class Views {
       handle: actor.handle ?? INVALID_HANDLE,
       displayName: actor.profile?.displayName,
       avatar: actor.profile?.avatar
-        ? `${env.MEDIA_CDN_URL}/avatar/medium/${did}/${actor.profile.avatar.ref}/webp`
+        ? `${this.mediaCdn}/avatar/medium/${did}/${actor.profile.avatar.ref}/webp`
         : undefined,
       viewer: this.profileViewer(did, state),
       createdAt: actor.createdAt?.toISOString(),
@@ -380,10 +391,10 @@ export class Views {
     embed: ImagesEmbed,
   ): ImagesEmbedView & { $type: string } {
     const imgViews = embed.images.map((img) => ({
-      thumb: `${env.MEDIA_CDN_URL}/img/medium/${did}/${
+      thumb: `${this.mediaCdn}/img/medium/${did}/${
         cidFromBlobJson(img.image)
       }/webp`,
-      fullsize: `${env.MEDIA_CDN_URL}/img/full/${did}/${
+      fullsize: `${this.mediaCdn}/img/full/${did}/${
         cidFromBlobJson(img.image)
       }/webp`,
       alt: img.alt,
@@ -406,11 +417,11 @@ export class Views {
     let thumbnail: string;
 
     if (videoMapping) {
-      playlist = `${env.HLS_CDN_URL}/${videoMapping.bunnyGuid}/playlist.m3u8`;
-      thumbnail = `${env.HLS_CDN_URL}/${videoMapping.bunnyGuid}/thumbnail.jpg`;
+      playlist = `${this.hlsCdn}/${videoMapping.bunnyGuid}/playlist.m3u8`;
+      thumbnail = `${this.hlsCdn}/${videoMapping.bunnyGuid}/thumbnail.jpg`;
     } else {
-      playlist = `${env.VIDEO_CDN_URL}/watch/${did}/${cid}/playlist.m3u8`;
-      thumbnail = `${env.THUMB_CDN_URL}/${did}/${cid}/thumbnail`;
+      playlist = `${this.videoCdn}/watch/${did}/${cid}/playlist.m3u8`;
+      thumbnail = `${this.thumbCdn}/${did}/${cid}/thumbnail`;
     }
 
     return {

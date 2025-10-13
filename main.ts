@@ -2,11 +2,11 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { Database } from "./data-plane/db/index.ts";
-import { env } from "./utils/env.ts";
 import { createAuthVerifier } from "./auth-verifier.ts";
 import API from "./api/index.ts";
 import { createServer } from "./lex/index.ts";
 import wellKnown from "./api/well-known.ts";
+import health from "./api/health.ts";
 import { IdResolver } from "@atp/identity";
 import { DataPlane } from "./data-plane/index.ts";
 import { getLogger } from "@logtape/logtape";
@@ -14,6 +14,7 @@ import { configureLogger } from "./utils/logger.ts";
 import { Hydrator } from "./hydration/index.ts";
 import { Views } from "./views/index.ts";
 import { AppContext, AppEnv } from "./context.ts";
+import { ServerConfig } from "./config.ts";
 
 await configureLogger();
 
@@ -23,6 +24,10 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
 
   app.use("*", cors());
   app.use("*", logger());
+  app.use("*", async (c, next) => {
+    c.env = ctx;
+    await next();
+  });
 
   // Lexicon/XRPC server and routers
   const lexServer = createServer();
@@ -30,19 +35,7 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
   app.route("/", lexServer.xrpc.app);
 
   app.route("/.well-known", wellKnown);
-  // Root route
-  app.get("/", (c) => {
-    return c.text(
-      "✧･ﾟ: ✧･ﾟ:. ݁₊ ⊹ . ݁˖ . ݁ SPARK API . ݁₊ ⊹ . ݁˖ . ݁ :･ﾟ✧:･ﾟ✧",
-    );
-  });
-
-  // Health endpoint
-  app.get("/xrpc/_health", (c) => {
-    const version = Deno.env.get("COMMIT_SHA") ?? "unknown";
-    return c.json({ version });
-  });
-
+  app.route("/", health);
   return app;
 }
 
@@ -50,22 +43,28 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
 export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
   // Setup logger and database
   const appLogger = getLogger(["appview"]);
-  const db = new Database();
+  const cfg = ServerConfig.readEnv();
+  const db = new Database(cfg);
   db.connect();
 
   // DID and resolver setup
   const idResolver = new IdResolver();
-  const serviceDid = env.SERVICE_DID;
 
   const dataplane = new DataPlane(db, idResolver);
   const hydrator = new Hydrator(dataplane);
-  const views = new Views();
+  const views = new Views({
+    indexedAtEpoch: cfg.indexedAtEpoch,
+    videoCdn: cfg.videoCdn,
+    hlsCdn: cfg.hlsCdn,
+    mediaCdn: cfg.mediaCdn,
+    thumbCdn: cfg.thumbCdn,
+  });
 
   const authVerifier = createAuthVerifier(dataplane, {
-    ownDid: serviceDid,
+    ownDid: cfg.serverDid,
     alternateAudienceDids: [],
-    modServiceDid: env.MOD_SERVICE_DID,
-    adminPasses: [env.ADMIN_PASSWORD],
+    modServiceDid: cfg.modServiceDid,
+    adminPasses: cfg.adminPasswords,
   });
 
   const ctx = {
@@ -75,7 +74,7 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
     views,
     logger: appLogger,
     idResolver,
-    serviceDid,
+    cfg,
     authVerifier,
   };
 
@@ -88,10 +87,9 @@ export function startServer() {
   const { app, ctx } = setupApp();
 
   // Start HTTP server immediately
-  const { HOST, PORT } = env;
+  const { port } = ctx.cfg;
   Deno.serve({
-    hostname: HOST,
-    port: PORT,
+    port,
     onListen: (info) => {
       ctx.logger.info(`Server listening on ${info.hostname}:${info.port}`);
     },

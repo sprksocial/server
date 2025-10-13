@@ -15,9 +15,16 @@ export async function transformStoryToStoryView(
     ctx,
   );
 
-  const embedView = transformEmbed(story.media, story.authorDid, null, {
-    firstImageOnly: true,
-  }, true);
+  const embedView = transformEmbed(
+    story.media,
+    story.authorDid,
+    ctx.cfg,
+    null,
+    {
+      firstImageOnly: true,
+    },
+    true,
+  );
 
   return {
     uri: story.uri,
@@ -59,9 +66,16 @@ export async function transformStoriesToStoryViews(
   return stories.map((story) => {
     const authorView = authorsMap.get(story.authorDid)!;
 
-    const embedView = transformEmbed(story.media, story.authorDid, null, {
-      firstImageOnly: true,
-    }, true);
+    const embedView = transformEmbed(
+      story.media,
+      story.authorDid,
+      ctx.cfg,
+      null,
+      {
+        firstImageOnly: true,
+      },
+      true,
+    );
 
     return {
       uri: story.uri,
