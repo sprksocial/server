@@ -24,13 +24,10 @@ services:
     environment:
       NODE_ENV: development
       HOST: 0.0.0.0
-      PORT: 3000
-      DB_HOST: db
-      DB_PORT: 27017
-      DB_USER: mongo
-      DB_PASSWORD: mongo
-      DB_NAME: dev
-      ADMIN_PASSWORD: "00000000000000000000000000000000"
+      SPRK_PORT: 3000
+      SPRK_DB_URI: mongodb://mongo:mongo@db:27017
+      SPRK_DB_NAME: dev
+      SPRK_ADMIN_PASSWORDS: "12345"
     env_file:
       - .env
     ports:
@@ -73,16 +70,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["deno", "run", "-A", "--watch", "ingester.ts"]
+    command: ["deno", "run", "-A", "--watch", "ingest.ts"]
     environment:
       NODE_ENV: development
       HOST: 0.0.0.0
-      PORT: 3000
+      SPRK_DB_URI: mongodb://mongo:mongo@db:27017
       DB_HOST: db
       DB_PORT: 27017
       DB_USER: mongo
       DB_PASSWORD: mongo
-      DB_NAME: dev
+      SPRK_DB_NAME: dev
       ADMIN_PASSWORD: "00000000000000000000000000000000"
     env_file:
       - .env
