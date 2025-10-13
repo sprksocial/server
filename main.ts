@@ -48,7 +48,7 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
   db.connect();
 
   // DID and resolver setup
-  const idResolver = new IdResolver();
+  const idResolver = new IdResolver({ plcUrl: cfg.plcUrl });
 
   const dataplane = new DataPlane(db, idResolver);
   const hydrator = new Hydrator(dataplane);
