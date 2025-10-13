@@ -23,6 +23,7 @@ const sub = new RepoSubscription({
   idResolver,
   startCursor,
 });
+await sub.indexingSvc.indexRepo("did:plc:6hbqm2oftpotwuw7gvvrui3i");
 
 sub.start();
 logger.info("Subscription started");
