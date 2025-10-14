@@ -75,12 +75,8 @@ services:
       NODE_ENV: development
       HOST: 0.0.0.0
       SPRK_DB_URI: mongodb://mongo:mongo@db:27017
-      DB_HOST: db
-      DB_PORT: 27017
-      DB_USER: mongo
-      DB_PASSWORD: mongo
       SPRK_DB_NAME: dev
-      ADMIN_PASSWORD: "00000000000000000000000000000000"
+      ADMIN_PASSWORD: "12345"
     env_file:
       - .env
     depends_on:

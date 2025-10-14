@@ -12,7 +12,8 @@ import { ensureValidDid, isValidHandle } from "@atp/syntax";
 import { AppContext } from "../context.ts";
 import { XRPCError } from "@atp/xrpc-server";
 
-// Helper function to create ProfileViewBasic with stories
+// Helper function to resolve an actor identifier (handle or DID),
+// fetch profile data, and return a detailed profile view or null if not found
 export async function createProfileViewBasic(
   authorDid: string,
   ctx: AppContext,
