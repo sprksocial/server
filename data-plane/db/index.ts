@@ -62,6 +62,10 @@ export class Database {
           "Post",
           models.postSchema,
         ),
+        Reply: this.connection.model<models.ReplyDocument>(
+          "Reply",
+          models.replySchema,
+        ),
         Story: this.connection.model<models.StoryDocument>(
           "Story",
           models.storySchema,
@@ -90,17 +94,9 @@ export class Database {
           "Repost",
           models.repostSchema,
         ),
-        Music: this.connection.model<models.MusicDocument>(
-          "Music",
-          models.musicSchema,
-        ),
-        BskyGenerator: this.connection.model<models.BskyGeneratorDocument>(
-          "Generator",
-          models.bskyGeneratorSchema,
-        ),
-        SprkGenerator: this.connection.model<models.SprkGeneratorDocument>(
+        Generator: this.connection.model<models.GeneratorDocument>(
           "SprkGenerator",
-          models.sprkGeneratorSchema,
+          models.generatorSchema,
         ),
         Takedown: this.connection.model<models.TakedownDocument>(
           "Takedown",

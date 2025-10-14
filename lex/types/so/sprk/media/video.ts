@@ -4,18 +4,18 @@
 import { BlobRef } from "@atp/lexicon";
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
-import type * as SoSprkEmbedDefs from "./defs.ts";
+import type * as SoSprkMediaDefs from "./defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
-const id = "so.sprk.embed.video";
+const id = "so.sprk.media.video";
 
 export interface Main {
-  $type?: "so.sprk.embed.video";
+  $type?: "so.sprk.media.video";
   video: BlobRef;
   captions?: (Caption)[];
   /** Alt text description of the video, for accessibility. */
   alt?: string;
-  aspectRatio?: SoSprkEmbedDefs.AspectRatio;
+  aspectRatio?: SoSprkMediaDefs.AspectRatio;
 }
 
 const hashMain = "main";
@@ -29,7 +29,7 @@ export function validateMain<V>(v: V) {
 }
 
 export interface Caption {
-  $type?: "so.sprk.embed.video#caption";
+  $type?: "so.sprk.media.video#caption";
   lang: string;
   file: BlobRef;
 }
@@ -45,12 +45,12 @@ export function validateCaption<V>(v: V) {
 }
 
 export interface View {
-  $type?: "so.sprk.embed.video#view";
+  $type?: "so.sprk.media.video#view";
   cid: string;
   playlist: string;
   thumbnail?: string;
   alt?: string;
-  aspectRatio?: SoSprkEmbedDefs.AspectRatio;
+  aspectRatio?: SoSprkMediaDefs.AspectRatio;
 }
 
 const hashView = "view";

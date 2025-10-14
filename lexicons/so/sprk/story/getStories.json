@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "so.sprk.feed.getStories",
+  "id": "so.sprk.story.getStories",
   "defs": {
     "main": {
       "type": "query",
@@ -24,7 +24,7 @@
           "properties": {
             "stories": {
               "type": "array",
-              "items": { "type": "ref", "ref": "so.sprk.feed.defs#storyView" }
+              "items": { "type": "ref", "ref": "so.sprk.story.defs#storyView" }
             }
           }
         }

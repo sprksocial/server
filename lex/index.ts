@@ -174,9 +174,7 @@ import * as SoSprkFeedDescribeFeedGenerator from "./types/so/sprk/feed/describeF
 import * as SoSprkFeedSearchPosts from "./types/so/sprk/feed/searchPosts.ts";
 import * as SoSprkFeedGetPosts from "./types/so/sprk/feed/getPosts.ts";
 import * as SoSprkFeedGetFeed from "./types/so/sprk/feed/getFeed.ts";
-import * as SoSprkFeedGetStories from "./types/so/sprk/feed/getStories.ts";
 import * as SoSprkFeedGetQuotes from "./types/so/sprk/feed/getQuotes.ts";
-import * as SoSprkFeedGetStoriesTimeline from "./types/so/sprk/feed/getStoriesTimeline.ts";
 import * as SoSprkFeedGetFeedSkeleton from "./types/so/sprk/feed/getFeedSkeleton.ts";
 import * as SoSprkFeedGetListFeed from "./types/so/sprk/feed/getListFeed.ts";
 import * as SoSprkFeedGetSuggestedFeeds from "./types/so/sprk/feed/getSuggestedFeeds.ts";
@@ -192,6 +190,8 @@ import * as SoSprkActorGetSuggestions from "./types/so/sprk/actor/getSuggestions
 import * as SoSprkActorSearchActors from "./types/so/sprk/actor/searchActors.ts";
 import * as SoSprkActorGetProfiles from "./types/so/sprk/actor/getProfiles.ts";
 import * as SoSprkActorGetPreferences from "./types/so/sprk/actor/getPreferences.ts";
+import * as SoSprkStoryGetTimeline from "./types/so/sprk/story/getTimeline.ts";
+import * as SoSprkStoryGetStories from "./types/so/sprk/story/getStories.ts";
 import * as SoSprkLabelerGetServices from "./types/so/sprk/labeler/getServices.ts";
 import * as ComAtprotoTempAddReservedHandle from "./types/com/atproto/temp/addReservedHandle.ts";
 import * as ComAtprotoTempCheckSignupQueue from "./types/com/atproto/temp/checkSignupQueue.ts";
@@ -314,13 +314,10 @@ export const SO_SPRK_FEED = {
   DefsClickthroughAuthor: "so.sprk.feed.defs#clickthroughAuthor",
   DefsClickthroughReposter: "so.sprk.feed.defs#clickthroughReposter",
   DefsClickthroughEmbed: "so.sprk.feed.defs#clickthroughEmbed",
-  DefsContentModeUnspecified: "so.sprk.feed.defs#contentModeUnspecified",
-  DefsContentModeVideo: "so.sprk.feed.defs#contentModeVideo",
   DefsInteractionSeen: "so.sprk.feed.defs#interactionSeen",
   DefsInteractionLike: "so.sprk.feed.defs#interactionLike",
   DefsInteractionRepost: "so.sprk.feed.defs#interactionRepost",
   DefsInteractionReply: "so.sprk.feed.defs#interactionReply",
-  DefsInteractionQuote: "so.sprk.feed.defs#interactionQuote",
   DefsInteractionShare: "so.sprk.feed.defs#interactionShare",
 };
 export const COM_ATPROTO_MODERATION = {
@@ -1980,7 +1977,6 @@ export class SoNS {
 export class SoSprkNS {
   _server: Server;
   video: SoSprkVideoNS;
-  embed: SoSprkEmbedNS;
   notification: SoSprkNotificationNS;
   unspecced: SoSprkUnspeccedNS;
   graph: SoSprkGraphNS;
@@ -1988,12 +1984,13 @@ export class SoSprkNS {
   richtext: SoSprkRichtextNS;
   sound: SoSprkSoundNS;
   actor: SoSprkActorNS;
+  story: SoSprkStoryNS;
   labeler: SoSprkLabelerNS;
+  media: SoSprkMediaNS;
 
   constructor(server: Server) {
     this._server = server;
     this.video = new SoSprkVideoNS(server);
-    this.embed = new SoSprkEmbedNS(server);
     this.notification = new SoSprkNotificationNS(server);
     this.unspecced = new SoSprkUnspeccedNS(server);
     this.graph = new SoSprkGraphNS(server);
@@ -2001,7 +1998,9 @@ export class SoSprkNS {
     this.richtext = new SoSprkRichtextNS(server);
     this.sound = new SoSprkSoundNS(server);
     this.actor = new SoSprkActorNS(server);
+    this.story = new SoSprkStoryNS(server);
     this.labeler = new SoSprkLabelerNS(server);
+    this.media = new SoSprkMediaNS(server);
   }
 }
 
@@ -2046,14 +2045,6 @@ export class SoSprkVideoNS {
   ) {
     const nsid = "so.sprk.video.getUploadLimits"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
-  }
-}
-
-export class SoSprkEmbedNS {
-  _server: Server;
-
-  constructor(server: Server) {
-    this._server = server;
   }
 }
 
@@ -2652,18 +2643,6 @@ export class SoSprkFeedNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
-  getStories<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkFeedGetStories.QueryParams,
-      SoSprkFeedGetStories.HandlerInput,
-      SoSprkFeedGetStories.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.feed.getStories"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
   getQuotes<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -2673,18 +2652,6 @@ export class SoSprkFeedNS {
     >,
   ) {
     const nsid = "so.sprk.feed.getQuotes"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
-  getStoriesTimeline<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkFeedGetStoriesTimeline.QueryParams,
-      SoSprkFeedGetStoriesTimeline.HandlerInput,
-      SoSprkFeedGetStoriesTimeline.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.feed.getStoriesTimeline"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2893,6 +2860,38 @@ export class SoSprkActorNS {
   }
 }
 
+export class SoSprkStoryNS {
+  _server: Server;
+
+  constructor(server: Server) {
+    this._server = server;
+  }
+
+  getTimeline<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      SoSprkStoryGetTimeline.QueryParams,
+      SoSprkStoryGetTimeline.HandlerInput,
+      SoSprkStoryGetTimeline.HandlerOutput
+    >,
+  ) {
+    const nsid = "so.sprk.story.getTimeline"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getStories<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      SoSprkStoryGetStories.QueryParams,
+      SoSprkStoryGetStories.HandlerInput,
+      SoSprkStoryGetStories.HandlerOutput
+    >,
+  ) {
+    const nsid = "so.sprk.story.getStories"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+}
+
 export class SoSprkLabelerNS {
   _server: Server;
 
@@ -2910,6 +2909,14 @@ export class SoSprkLabelerNS {
   ) {
     const nsid = "so.sprk.labeler.getServices"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
+  }
+}
+
+export class SoSprkMediaNS {
+  _server: Server;
+
+  constructor(server: Server) {
+    this._server = server;
   }
 }
 

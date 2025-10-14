@@ -1,20 +1,9 @@
 {
   "lexicon": 1,
-  "id": "so.sprk.embed.images",
-  "description": "A set of images embedded in a Spark record (eg, a post).",
+  "id": "so.sprk.media.image",
+  "description": "An image in a Spark record.",
   "defs": {
     "main": {
-      "type": "object",
-      "required": ["images"],
-      "properties": {
-        "images": {
-          "type": "array",
-          "items": { "type": "ref", "ref": "#image" },
-          "maxLength": 12
-        }
-      }
-    },
-    "image": {
       "type": "object",
       "required": ["image", "alt"],
       "properties": {
@@ -29,22 +18,11 @@
         },
         "aspectRatio": {
           "type": "ref",
-          "ref": "so.sprk.embed.defs#aspectRatio"
+          "ref": "so.sprk.media.defs#aspectRatio"
         }
       }
     },
     "view": {
-      "type": "object",
-      "required": ["images"],
-      "properties": {
-        "images": {
-          "type": "array",
-          "items": { "type": "ref", "ref": "#viewImage" },
-          "maxLength": 12
-        }
-      }
-    },
-    "viewImage": {
       "type": "object",
       "required": ["thumb", "fullsize", "alt"],
       "properties": {
@@ -64,7 +42,7 @@
         },
         "aspectRatio": {
           "type": "ref",
-          "ref": "so.sprk.embed.defs#aspectRatio"
+          "ref": "so.sprk.media.defs#aspectRatio"
         }
       }
     }

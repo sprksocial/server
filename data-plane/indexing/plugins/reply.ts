@@ -1,16 +1,11 @@
 import { CID } from "multiformats/cid";
 import { AtUri } from "@atp/syntax";
 import * as lex from "../../../lex/lexicons.ts";
+import { isMain as isMediaImage } from "../../../lex/types/so/sprk/media/image.ts";
 import {
-  isMain as isMediaImages,
-  Main as MediaImages,
-} from "../../../lex/types/so/sprk/media/images.ts";
-import { Main as MediaImage } from "../../../lex/types/so/sprk/media/image.ts";
-import {
-  isMain as isMediaVideo,
-  Main as MediaVideo,
-} from "../../../lex/types/so/sprk/media/video.ts";
-import { Record as PostRecord } from "../../../lex/types/so/sprk/feed/post.ts";
+  Record as ReplyRecord,
+  ReplyRef,
+} from "../../../lex/types/so/sprk/feed/reply.ts";
 import { Record as GateRecord } from "../../../lex/types/so/sprk/feed/threadgate.ts";
 import {
   isLink,
@@ -18,13 +13,18 @@ import {
 } from "../../../lex/types/so/sprk/richtext/facet.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
-import { PostDocument } from "../../db/models.ts";
-import { getDescendents } from "../../util.ts";
+import { ReplyDocument } from "../../db/models.ts";
+import {
+  getAncestorsAndSelf,
+  getDescendents,
+  invalidReplyRoot as checkInvalidReplyRoot,
+} from "../../util.ts";
 import { RecordProcessor } from "../processor.ts";
 import {
   normalizeEmbed,
   normalizeObject,
 } from "../../../utils/embed-normalizer.ts";
+import { jsonToLex } from "@atp/lexicon";
 
 type PostAncestor = {
   uri: string;
@@ -37,16 +37,13 @@ type PostDescendent = {
   creator: string;
   sortAt: string;
 };
-type IndexedPost = {
-  post: PostDocument;
+type IndexedReply = {
+  reply: ReplyDocument;
   facets?: { type: "mention" | "link"; value: string }[];
-  medias?: Array<{
-    position?: number;
-    imageCid?: string;
+  image?: {
+    cid?: string;
     alt?: string | null;
-    thumbCid?: string | null;
-    videoCid?: string;
-  }>;
+  };
   ancestors?: PostAncestor[];
   descendents?: PostDescendent[];
   threadgate?: GateRecord;
@@ -60,9 +57,9 @@ const insertFn = async (
   db: Database,
   uri: AtUri,
   cid: CID,
-  obj: PostRecord,
+  obj: ReplyRecord,
   timestamp: string,
-): Promise<IndexedPost | null> => {
+): Promise<IndexedReply | null> => {
   console.log("DEBUG: Post indexing started");
   // Ensure actor record exists before creating post
   const actorExists = await db.models.Actor.findOne({ did: uri.host }).lean();
@@ -73,12 +70,12 @@ const insertFn = async (
     );
   }
 
-  console.log("DEBUG: Post media:", JSON.stringify(obj.media, null, 2));
+  console.log("DEBUG: Post embed:", JSON.stringify(obj.embed, null, 2));
 
-  const normalizedMedia = normalizeEmbed(obj.media);
+  const normalizedEmbed = normalizeEmbed(obj.embed);
   console.log(
-    "DEBUG: Normalized media:",
-    JSON.stringify(normalizedMedia, null, 2),
+    "DEBUG: Normalized embed:",
+    JSON.stringify(normalizedEmbed, null, 2),
   );
 
   const post = {
@@ -87,7 +84,19 @@ const insertFn = async (
     authorDid: uri.host,
     text: obj.text || "",
     facets: obj.facets || [],
-    media: normalizedMedia || null,
+    reply: obj.reply
+      ? {
+        root: {
+          uri: obj.reply.root.uri,
+          cid: obj.reply.root.cid,
+        },
+        parent: {
+          uri: obj.reply.parent.uri,
+          cid: obj.reply.parent.cid,
+        },
+      }
+      : null,
+    embed: normalizedEmbed || null,
     sound: normalizeObject(obj.sound) || null,
     langs: obj.langs || [],
     labels: obj.labels || null,
@@ -104,7 +113,21 @@ const insertFn = async (
       { upsert: true, new: true },
     );
 
-    const facets = (obj.caption?.facets || [])
+    if (obj.reply) {
+      const { invalidReplyRoot } = await validateReply(
+        db,
+        obj.reply,
+      );
+      if (invalidReplyRoot) {
+        Object.assign(insertedPost, { invalidReplyRoot });
+        await db.models.Post.updateOne(
+          { uri: post.uri },
+          { invalidReplyRoot },
+        );
+      }
+    }
+
+    const facets = (obj.facets || [])
       .flatMap((facet) => facet.features)
       .flatMap((feature) => {
         if (isMention(feature)) {
@@ -122,47 +145,35 @@ const insertFn = async (
         return [];
       });
 
-    // Media processing - medias are stored inline in the Post model
-    const medias: Array<{
-      position?: number;
-      imageCid?: string;
-      alt?: string | null;
-      thumbCid?: string | null;
-      videoCid?: string;
-    }> = [];
-    const postMedias = separateMedia(obj.media);
-    for (const postMedia of postMedias) {
-      if (isMediaImages(postMedia)) {
-        const { images } = postMedia as MediaImages;
-        const imagesMedia = images.map((
-          img: MediaImage,
-          i: number,
-        ) => ({
-          position: i,
-          imageCid: img.image.ref.toString(),
-          alt: img.alt,
-        }));
-        medias.push(...imagesMedia);
-      } else if (isMediaVideo(postMedia)) {
-        const media = postMedia as MediaVideo;
-        const videoMedia = {
-          postUri: uri.toString(),
-          videoCid: media.video.ref.toString(),
-          alt: media.alt ?? null,
-        };
-        medias.push(videoMedia);
-      }
+    // Embed processing - embeds are stored inline in the Post model
+    let image: {
+      postUri?: string;
+      cid?: string;
+      alt?: string;
+    } = {};
+    if (isMediaImage(obj.image)) {
+      const imageEmbed = {
+        postUri: uri.toString(),
+        cid: obj.image.image.ref.toString(),
+        alt: obj.alt as string,
+      };
+      image = imageEmbed;
     }
 
+    const ancestors = await getAncestorsAndSelf(db, {
+      uri: post.uri,
+      parentHeight: REPLY_NOTIF_DEPTH,
+    });
     const descendents = await getDescendents(db, {
       uri: post.uri,
       depth: REPLY_NOTIF_DEPTH,
     });
 
     return {
-      post: insertedPost,
+      reply: insertedPost,
       facets,
-      medias,
+      image,
+      ancestors,
       descendents,
     };
   } catch (err) {
@@ -179,7 +190,7 @@ const findDuplicate = (): AtUri | null => {
   return null;
 };
 
-const notifsForInsert = (obj: IndexedPost) => {
+const notifsForInsert = (obj: IndexedReply) => {
   const notifs: Array<{
     did: string;
     reason: string;
@@ -189,7 +200,7 @@ const notifsForInsert = (obj: IndexedPost) => {
     sortAt: string;
     reasonSubject?: string;
   }> = [];
-  const notified = new Set([obj.post.authorDid]);
+  const notified = new Set([obj.reply.authorDid]);
   const maybeNotify = (notif: {
     did: string;
     reason: string;
@@ -209,10 +220,10 @@ const notifsForInsert = (obj: IndexedPost) => {
       maybeNotify({
         did: facet.value,
         reason: "mention",
-        author: obj.post.authorDid,
-        recordUri: obj.post.uri,
-        recordCid: obj.post.cid,
-        sortAt: obj.post.createdAt,
+        author: obj.reply.authorDid,
+        recordUri: obj.reply.uri,
+        recordCid: obj.reply.cid,
+        sortAt: obj.reply.createdAt,
       });
     }
   }
@@ -221,17 +232,17 @@ const notifsForInsert = (obj: IndexedPost) => {
 
   // reply notifications
   for (const ancestor of obj.ancestors ?? []) {
-    if (ancestor.uri === obj.post.uri) continue; // no need to notify for own post
+    if (ancestor.uri === obj.reply.uri) continue; // no need to notify for own post
     if (ancestor.height < REPLY_NOTIF_DEPTH) {
       const ancestorUri = new AtUri(ancestor.uri);
       maybeNotify({
         did: ancestorUri.host,
         reason: "reply",
         reasonSubject: ancestorUri.toString(),
-        author: obj.post.authorDid,
-        recordUri: obj.post.uri,
-        recordCid: obj.post.cid,
-        sortAt: obj.post.createdAt,
+        author: obj.reply.authorDid,
+        recordUri: obj.reply.uri,
+        recordCid: obj.reply.cid,
+        sortAt: obj.reply.createdAt,
       });
       // found hidden reply, don't notify any higher ancestors
       if (threadgateHiddenReplies.includes(ancestorUri.toString())) break;
@@ -264,7 +275,7 @@ const notifsForInsert = (obj: IndexedPost) => {
 const deleteFn = async (
   db: Database,
   uri: AtUri,
-): Promise<IndexedPost | null> => {
+): Promise<IndexedReply | null> => {
   const uriStr = uri.toString();
   const deleted = await db.models.Post.findOneAndDelete({ uri: uriStr });
 
@@ -273,38 +284,52 @@ const deleteFn = async (
   }
 
   return {
-    post: deleted,
-    facets: [],
+    reply: deleted,
+    facets: [], // Not used
   };
 };
 
 const notifsForDelete = (
-  deleted: IndexedPost,
-  replacedBy: IndexedPost | null,
+  deleted: IndexedReply,
+  replacedBy: IndexedReply | null,
 ) => {
   const notifs = replacedBy ? notifsForInsert(replacedBy) : [];
   return {
     notifs,
-    toDelete: [deleted.post.uri],
+    toDelete: [deleted.reply.uri],
   };
 };
 
-const updateAggregates = async (db: Database, postIdx: IndexedPost) => {
+const updateAggregates = async (db: Database, replyIdx: IndexedReply) => {
+  // Update reply count for parent post
+  if (replyIdx.reply.reply?.parent?.uri) {
+    const replyCount = await db.models.Post.countDocuments({
+      "reply.parent.uri": replyIdx.reply.reply.parent.uri,
+      violatesThreadGate: { $ne: true },
+    });
+
+    await db.models.Post.findOneAndUpdate(
+      { uri: replyIdx.reply.reply?.parent.uri },
+      { replyCount },
+      { upsert: true, new: true },
+    );
+  }
+
   try {
     // Update posts count for author
     const postsCount = await db.models.Post.countDocuments({
-      authorDid: postIdx.post.authorDid,
+      authorDid: replyIdx.reply.authorDid,
     });
 
     // First check if profile exists to avoid creating one with null URI
     const existingProfile = await db.models.Profile.findOne({
-      authorDid: postIdx.post.authorDid,
+      authorDid: replyIdx.reply.authorDid,
     });
 
     if (existingProfile) {
       // Only update existing profiles
       await db.models.Profile.findOneAndUpdate(
-        { authorDid: postIdx.post.authorDid },
+        { authorDid: replyIdx.reply.authorDid },
         { postsCount },
         { new: true },
       );
@@ -315,7 +340,7 @@ const updateAggregates = async (db: Database, postIdx: IndexedPost) => {
   }
 };
 
-export type PluginType = RecordProcessor<PostRecord, IndexedPost>;
+export type PluginType = RecordProcessor<ReplyRecord, IndexedReply>;
 
 export const makePlugin = (
   db: Database,
@@ -334,11 +359,41 @@ export const makePlugin = (
 
 export default makePlugin;
 
-function separateMedia(
-  media: PostRecord["media"],
-): Array<NonNullable<PostRecord["media"]>> {
-  if (!media) {
-    return [];
-  }
-  return [media];
+async function validateReply(
+  db: Database,
+  reply: ReplyRef,
+) {
+  const replyRefs = await getReplyRefs(db, reply);
+  const invalidReplyRoot = !replyRefs.parent ||
+    checkInvalidReplyRoot(reply, replyRefs.parent);
+  return {
+    invalidReplyRoot,
+  };
+}
+
+async function getReplyRefs(db: Database, reply: ReplyRef) {
+  const replyRoot = reply.root.uri;
+  const replyParent = reply.parent.uri;
+
+  const [root, parent] = await Promise.all([
+    db.models.Record.findOne({ uri: replyRoot }).lean(),
+    db.models.Record.findOne({ uri: replyParent }).lean(),
+  ]);
+
+  return {
+    root: root && root.json
+      ? {
+        uri: root.uri,
+        invalidReplyRoot: root.invalidReplyRoot ?? null,
+        record: jsonToLex(root.json) as ReplyRecord,
+      }
+      : null,
+    parent: parent && parent.json
+      ? {
+        uri: parent.uri,
+        invalidReplyRoot: parent.invalidReplyRoot ?? null,
+        record: jsonToLex(parent.json) as ReplyRecord,
+      }
+      : null,
+  };
 }

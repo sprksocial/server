@@ -1,7 +1,7 @@
 import {
-  Record as PostRecord,
+  Record as ReplyRecord,
   ReplyRef,
-} from "../lex/types/so/sprk/feed/post.ts";
+} from "../lex/types/so/sprk/feed/reply.ts";
 import { Database } from "./db/index.ts";
 import { DidDocument } from "@atp/identity";
 
@@ -45,9 +45,9 @@ export const getDescendents = async (
       const current = toProcess.shift()!;
       if (current.depth >= depth) continue;
 
-      const nestedReplies = await db.models.Post.find({
+      const nestedReplies = await db.models.Reply.find({
         "reply.parent.uri": current.uri,
-      }).select(["uri", "cid", "authorDid", "createdAt"]).lean();
+      }).lean();
 
       for (const reply of nestedReplies) {
         if (processedUris.has(reply.uri)) continue;
@@ -83,7 +83,7 @@ export const getAncestorsAndSelf = async (
   }> = [];
 
   // Start with the current post
-  const currentPost = await db.models.Post.findOne({ uri }).lean();
+  const currentPost = await db.models.Reply.findOne({ uri }).lean();
   if (!currentPost) return ancestors;
 
   ancestors.push({
@@ -96,15 +96,16 @@ export const getAncestorsAndSelf = async (
   let height = 1;
 
   while (currentUri && height <= parentHeight) {
-    const parentPost = await db.models.Post.findOne({ uri: currentUri }).lean();
-    if (!parentPost) break;
+    const parentReply = await db.models.Reply.findOne({ uri: currentUri })
+      .lean();
+    if (!parentReply) break;
 
     ancestors.push({
-      uri: parentPost.uri,
+      uri: parentReply.uri,
       height,
     });
 
-    currentUri = parentPost.reply?.parent?.uri;
+    currentUri = parentReply.reply?.parent?.uri;
     height++;
   }
 
@@ -114,7 +115,7 @@ export const getAncestorsAndSelf = async (
 export const invalidReplyRoot = (
   reply: ReplyRef,
   parent: {
-    record: PostRecord;
+    record: ReplyRecord;
     invalidReplyRoot: boolean | null;
   },
 ) => {

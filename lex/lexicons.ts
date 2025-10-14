@@ -11182,217 +11182,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkEmbedDefs": {
-    "lexicon": 1,
-    "id": "so.sprk.embed.defs",
-    "defs": {
-      "aspectRatio": {
-        "type": "object",
-        "description":
-          "width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.",
-        "required": [
-          "width",
-          "height",
-        ],
-        "properties": {
-          "width": {
-            "type": "integer",
-            "minimum": 1,
-          },
-          "height": {
-            "type": "integer",
-            "minimum": 1,
-          },
-        },
-      },
-    },
-  },
-  "SoSprkEmbedImages": {
-    "lexicon": 1,
-    "id": "so.sprk.embed.images",
-    "description": "A set of images embedded in a Spark record (eg, a post).",
-    "defs": {
-      "main": {
-        "type": "object",
-        "required": [
-          "images",
-        ],
-        "properties": {
-          "images": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:so.sprk.embed.images#image",
-            },
-            "maxLength": 12,
-          },
-        },
-      },
-      "image": {
-        "type": "object",
-        "required": [
-          "image",
-          "alt",
-        ],
-        "properties": {
-          "image": {
-            "type": "blob",
-            "accept": [
-              "image/*",
-            ],
-            "maxSize": 5242880,
-          },
-          "alt": {
-            "type": "string",
-            "description":
-              "Alt text description of the image, for accessibility.",
-          },
-          "aspectRatio": {
-            "type": "ref",
-            "ref": "lex:so.sprk.embed.defs#aspectRatio",
-          },
-        },
-      },
-      "view": {
-        "type": "object",
-        "required": [
-          "images",
-        ],
-        "properties": {
-          "images": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:so.sprk.embed.images#viewImage",
-            },
-            "maxLength": 12,
-          },
-        },
-      },
-      "viewImage": {
-        "type": "object",
-        "required": [
-          "thumb",
-          "fullsize",
-          "alt",
-        ],
-        "properties": {
-          "thumb": {
-            "type": "string",
-            "format": "uri",
-            "description":
-              "Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.",
-          },
-          "fullsize": {
-            "type": "string",
-            "format": "uri",
-            "description":
-              "Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.",
-          },
-          "alt": {
-            "type": "string",
-            "description":
-              "Alt text description of the image, for accessibility.",
-          },
-          "aspectRatio": {
-            "type": "ref",
-            "ref": "lex:so.sprk.embed.defs#aspectRatio",
-          },
-        },
-      },
-    },
-  },
-  "SoSprkEmbedVideo": {
-    "lexicon": 1,
-    "id": "so.sprk.embed.video",
-    "description": "A video embedded in a Spark record (eg, a post).",
-    "defs": {
-      "main": {
-        "type": "object",
-        "required": [
-          "video",
-        ],
-        "properties": {
-          "video": {
-            "type": "blob",
-            "accept": [
-              "video/mp4",
-            ],
-            "maxSize": 314572800,
-          },
-          "captions": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:so.sprk.embed.video#caption",
-            },
-            "maxLength": 20,
-          },
-          "alt": {
-            "type": "string",
-            "description":
-              "Alt text description of the video, for accessibility.",
-            "maxGraphemes": 1000,
-            "maxLength": 10000,
-          },
-          "aspectRatio": {
-            "type": "ref",
-            "ref": "lex:so.sprk.embed.defs#aspectRatio",
-          },
-        },
-      },
-      "caption": {
-        "type": "object",
-        "required": [
-          "lang",
-          "file",
-        ],
-        "properties": {
-          "lang": {
-            "type": "string",
-            "format": "language",
-          },
-          "file": {
-            "type": "blob",
-            "accept": [
-              "text/vtt",
-            ],
-            "maxSize": 20000,
-          },
-        },
-      },
-      "view": {
-        "type": "object",
-        "required": [
-          "cid",
-          "playlist",
-        ],
-        "properties": {
-          "cid": {
-            "type": "string",
-            "format": "cid",
-          },
-          "playlist": {
-            "type": "string",
-            "format": "uri",
-          },
-          "thumbnail": {
-            "type": "string",
-            "format": "uri",
-          },
-          "alt": {
-            "type": "string",
-            "maxGraphemes": 1000,
-            "maxLength": 10000,
-          },
-          "aspectRatio": {
-            "type": "ref",
-            "ref": "lex:so.sprk.embed.defs#aspectRatio",
-          },
-        },
-      },
-    },
-  },
   "SoSprkNotificationRegisterPush": {
     "lexicon": 1,
     "id": "so.sprk.notification.registerPush",
@@ -13840,122 +13629,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkFeedMusic": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.music",
-    "description": "A music record usable in a Spark record (e.g, a post)",
-    "defs": {
-      "main": {
-        "type": "record",
-        "key": "tid",
-        "record": {
-          "type": "object",
-          "required": [
-            "sound",
-            "title",
-            "author",
-            "releaseDate",
-            "createdAt",
-          ],
-          "properties": {
-            "sound": {
-              "type": "blob",
-              "accept": [
-                "audio/mp3",
-              ],
-              "maxSize": 10485760,
-            },
-            "title": {
-              "type": "string",
-              "maxLength": 1000,
-              "maxGraphemes": 100,
-              "description": "The music's title.",
-            },
-            "releaseDate": {
-              "type": "string",
-              "format": "datetime",
-            },
-            "album": {
-              "type": "string",
-              "maxLength": 1000,
-              "maxGraphemes": 100,
-              "description": "The music's album name.",
-            },
-            "recordLabel": {
-              "type": "string",
-              "maxLength": 1000,
-              "maxGraphemes": 100,
-              "description": "The music's record label.",
-            },
-            "cover": {
-              "type": "blob",
-              "description":
-                "Image to be displayed in music's page. AKA, 'cover image'",
-              "accept": [
-                "image/png",
-                "image/jpeg",
-              ],
-              "maxSize": 5242880,
-            },
-            "author": {
-              "type": "string",
-              "maxLength": 1000,
-              "maxGraphemes": 100,
-              "description": "The music's author.",
-            },
-            "text": {
-              "type": "string",
-              "maxLength": 3000,
-              "maxGraphemes": 300,
-              "description": "The music's description.",
-            },
-            "copyright": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "maxLength": 3000,
-                "maxGraphemes": 300,
-              },
-              "minLength": 1,
-            },
-            "facets": {
-              "type": "array",
-              "description":
-                "Annotations of text (mentions, URLs, hashtags, etc)",
-              "items": {
-                "type": "ref",
-                "ref": "lex:so.sprk.richtext.facet",
-              },
-            },
-            "labels": {
-              "type": "union",
-              "description":
-                "Self-label values for this music. Effectively content warnings.",
-              "refs": [
-                "lex:com.atproto.label.defs#selfLabels",
-              ],
-            },
-            "tags": {
-              "type": "array",
-              "description": "The music's Hashtags",
-              "maxLength": 8,
-              "items": {
-                "type": "string",
-                "maxLength": 640,
-                "maxGraphemes": 64,
-              },
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "datetime",
-              "description":
-                "Client-declared timestamp when this post was originally created.",
-            },
-          },
-        },
-      },
-    },
-  },
   "SoSprkFeedSendInteractions": {
     "lexicon": 1,
     "id": "so.sprk.feed.sendInteractions",
@@ -13996,7 +13669,7 @@ export const schemaDict = {
     "lexicon": 1,
     "id": "so.sprk.feed.defs",
     "defs": {
-      "storyView": {
+      "postView": {
         "type": "object",
         "required": [
           "uri",
@@ -14024,46 +13697,9 @@ export const schemaDict = {
           "media": {
             "type": "union",
             "refs": [
-              "lex:so.sprk.embed.images#view",
-              "lex:so.sprk.embed.video#view",
-            ],
-          },
-          "indexedAt": {
-            "type": "string",
-            "format": "datetime",
-          },
-        },
-      },
-      "postView": {
-        "type": "object",
-        "required": [
-          "uri",
-          "cid",
-          "author",
-          "record",
-          "indexedAt",
-        ],
-        "properties": {
-          "uri": {
-            "type": "string",
-            "format": "at-uri",
-          },
-          "cid": {
-            "type": "string",
-            "format": "cid",
-          },
-          "author": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
-          },
-          "record": {
-            "type": "unknown",
-          },
-          "embed": {
-            "type": "union",
-            "refs": [
-              "lex:so.sprk.embed.images#view",
-              "lex:so.sprk.embed.video#view",
+              "lex:so.sprk.media.image#view",
+              "lex:so.sprk.media.images#view",
+              "lex:so.sprk.media.video#view",
             ],
           },
           "sound": {
@@ -14097,6 +13733,58 @@ export const schemaDict = {
           "threadgate": {
             "type": "ref",
             "ref": "lex:so.sprk.feed.defs#threadgateView",
+          },
+        },
+      },
+      "replyView": {
+        "type": "object",
+        "required": [
+          "uri",
+          "cid",
+          "author",
+          "record",
+          "indexedAt",
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "cid": {
+            "type": "string",
+            "format": "cid",
+          },
+          "author": {
+            "type": "ref",
+            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
+          },
+          "record": {
+            "type": "unknown",
+          },
+          "image": {
+            "type": "ref",
+            "ref": "lex:so.sprk.media.image#view",
+          },
+          "replyCount": {
+            "type": "integer",
+          },
+          "likeCount": {
+            "type": "integer",
+          },
+          "indexedAt": {
+            "type": "string",
+            "format": "datetime",
+          },
+          "viewer": {
+            "type": "ref",
+            "ref": "lex:so.sprk.feed.defs#viewerState",
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:com.atproto.label.defs#label",
+            },
           },
         },
       },
@@ -14148,10 +13836,6 @@ export const schemaDict = {
             "type": "ref",
             "ref": "lex:so.sprk.feed.defs#postView",
           },
-          "reply": {
-            "type": "ref",
-            "ref": "lex:so.sprk.feed.defs#replyRef",
-          },
           "reason": {
             "type": "union",
             "refs": [
@@ -14164,69 +13848,6 @@ export const schemaDict = {
             "description":
               "Context provided by feed generator that may be passed back alongside interactions.",
             "maxLength": 2000,
-          },
-        },
-      },
-      "feedViewStory": {
-        "type": "object",
-        "required": [
-          "story",
-        ],
-        "properties": {
-          "story": {
-            "type": "ref",
-            "ref": "lex:so.sprk.feed.defs#storyView",
-          },
-        },
-      },
-      "storiesByAuthor": {
-        "type": "object",
-        "required": [
-          "author",
-          "stories",
-        ],
-        "properties": {
-          "author": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
-          },
-          "stories": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:so.sprk.feed.defs#storyView",
-            },
-          },
-        },
-      },
-      "replyRef": {
-        "type": "object",
-        "required": [
-          "root",
-          "parent",
-        ],
-        "properties": {
-          "root": {
-            "type": "union",
-            "refs": [
-              "lex:so.sprk.feed.defs#postView",
-              "lex:so.sprk.feed.defs#notFoundPost",
-              "lex:so.sprk.feed.defs#blockedPost",
-            ],
-          },
-          "parent": {
-            "type": "union",
-            "refs": [
-              "lex:so.sprk.feed.defs#postView",
-              "lex:so.sprk.feed.defs#notFoundPost",
-              "lex:so.sprk.feed.defs#blockedPost",
-            ],
-          },
-          "grandparentAuthor": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
-            "description":
-              "When parent is a reply to another post, this is the author of that post.",
           },
         },
       },
@@ -14251,23 +13872,27 @@ export const schemaDict = {
         "type": "object",
         "properties": {},
       },
-      "threadViewPost": {
+      "threadViewReply": {
         "type": "object",
         "required": [
-          "post",
+          "reply",
         ],
         "properties": {
-          "post": {
+          "reply": {
             "type": "ref",
-            "ref": "lex:so.sprk.feed.defs#postView",
+            "ref": "lex:so.sprk.feed.defs#replyView",
           },
           "parent": {
             "type": "union",
             "refs": [
-              "lex:so.sprk.feed.defs#threadViewPost",
+              "lex:so.sprk.feed.defs#threadViewReply",
               "lex:so.sprk.feed.defs#notFoundPost",
               "lex:so.sprk.feed.defs#blockedPost",
             ],
+          },
+          "root": {
+            "type": "ref",
+            "ref": "lex:so.sprk.feed.defs#feedViewPost",
           },
           "replies": {
             "type": "array",
@@ -14504,7 +14129,6 @@ export const schemaDict = {
               "so.sprk.feed.defs#interactionLike",
               "so.sprk.feed.defs#interactionRepost",
               "so.sprk.feed.defs#interactionReply",
-              "so.sprk.feed.defs#interactionQuote",
               "so.sprk.feed.defs#interactionShare",
             ],
           },
@@ -14543,16 +14167,6 @@ export const schemaDict = {
         "description":
           "User clicked through to the embedded content of the feed item",
       },
-      "contentModeUnspecified": {
-        "type": "token",
-        "description":
-          "Declares the feed generator returns any types of posts.",
-      },
-      "contentModeVideo": {
-        "type": "token",
-        "description":
-          "Declares the feed generator returns posts containing so.sprk.embed.video embeds.",
-      },
       "interactionSeen": {
         "type": "token",
         "description": "Feed item was seen by user",
@@ -14568,10 +14182,6 @@ export const schemaDict = {
       "interactionReply": {
         "type": "token",
         "description": "User replied to the feed item",
-      },
-      "interactionQuote": {
-        "type": "token",
-        "description": "User quoted the feed item",
       },
       "interactionShare": {
         "type": "token",
@@ -15295,62 +14905,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkFeedStory": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.story",
-    "defs": {
-      "main": {
-        "type": "record",
-        "description": "Record containing a Spark story.",
-        "key": "tid",
-        "record": {
-          "type": "object",
-          "required": [
-            "createdAt",
-            "media",
-          ],
-          "properties": {
-            "media": {
-              "type": "union",
-              "refs": [
-                "lex:so.sprk.embed.images",
-                "lex:so.sprk.embed.video",
-              ],
-            },
-            "sound": {
-              "type": "ref",
-              "ref": "lex:com.atproto.repo.strongRef",
-            },
-            "labels": {
-              "type": "union",
-              "description":
-                "Self-label values for this story. Effectively content warnings.",
-              "refs": [
-                "lex:com.atproto.label.defs#selfLabels",
-              ],
-            },
-            "tags": {
-              "type": "array",
-              "description":
-                "Additional hashtags, in addition to any included in story text and facets.",
-              "maxLength": 8,
-              "items": {
-                "type": "string",
-                "maxLength": 640,
-                "maxGraphemes": 64,
-              },
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "datetime",
-              "description":
-                "Client-declared timestamp when this story was originally created.",
-            },
-          },
-        },
-      },
-    },
-  },
   "SoSprkFeedDescribeFeedGenerator": {
     "lexicon": 1,
     "id": "so.sprk.feed.describeFeedGenerator",
@@ -15592,52 +15146,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkFeedGetStories": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.getStories",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Gets story views for a specified list of stories (by AT-URI). This is sometimes referred to as 'hydrating' a story reference list.",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "uris",
-          ],
-          "properties": {
-            "uris": {
-              "type": "array",
-              "description":
-                "List of story AT-URIs to return hydrated views for.",
-              "items": {
-                "type": "string",
-                "format": "at-uri",
-              },
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "stories",
-            ],
-            "properties": {
-              "stories": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.defs#storyView",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
   "SoSprkFeedGetQuotes": {
     "lexicon": 1,
     "id": "so.sprk.feed.getQuotes",
@@ -15706,47 +15214,85 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkFeedGetStoriesTimeline": {
+  "SoSprkFeedReply": {
     "lexicon": 1,
-    "id": "so.sprk.feed.getStoriesTimeline",
+    "id": "so.sprk.feed.reply",
     "defs": {
       "main": {
-        "type": "query",
-        "description":
-          "Get a view of the requesting account's stories timeline grouped by author.",
-        "parameters": {
-          "type": "params",
+        "type": "record",
+        "description": "Record containing a Spark reply.",
+        "key": "tid",
+        "record": {
+          "type": "object",
+          "required": [
+            "createdAt",
+            "reply",
+          ],
           "properties": {
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
+            "text": {
               "type": "string",
+              "maxLength": 3000,
+              "maxGraphemes": 300,
+              "description": "The reply text.",
+            },
+            "facets": {
+              "type": "array",
+              "description":
+                "Annotations of text (mentions, URLs, hashtags, etc)",
+              "items": {
+                "type": "ref",
+                "ref": "lex:so.sprk.richtext.facet",
+              },
+            },
+            "reply": {
+              "type": "ref",
+              "ref": "lex:so.sprk.feed.reply#replyRef",
+            },
+            "image": {
+              "type": "ref",
+              "ref": "lex:so.sprk.media.image",
+            },
+            "langs": {
+              "type": "array",
+              "description":
+                "Indicates human language of post primary text content.",
+              "maxLength": 3,
+              "items": {
+                "type": "string",
+                "format": "language",
+              },
+            },
+            "labels": {
+              "type": "union",
+              "description":
+                "Self-label values for this post. Effectively content warnings.",
+              "refs": [
+                "lex:com.atproto.label.defs#selfLabels",
+              ],
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "datetime",
+              "description":
+                "Client-declared timestamp when this post was originally created.",
             },
           },
         },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "storiesByAuthor",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "storiesByAuthor": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.defs#storiesByAuthor",
-                },
-              },
-            },
+      },
+      "replyRef": {
+        "type": "object",
+        "required": [
+          "root",
+          "parent",
+        ],
+        "properties": {
+          "root": {
+            "type": "ref",
+            "ref": "lex:com.atproto.repo.strongRef",
+          },
+          "parent": {
+            "type": "ref",
+            "ref": "lex:com.atproto.repo.strongRef",
           },
         },
       },
@@ -15982,32 +15528,19 @@ export const schemaDict = {
           "type": "object",
           "required": [
             "createdAt",
+            "media",
           ],
           "properties": {
-            "text": {
-              "type": "string",
-              "maxLength": 3000,
-              "maxGraphemes": 300,
-              "description": "The post description.",
-            },
-            "facets": {
-              "type": "array",
-              "description":
-                "Annotations of text (mentions, URLs, hashtags, etc)",
-              "items": {
-                "type": "ref",
-                "ref": "lex:so.sprk.richtext.facet",
-              },
-            },
-            "reply": {
+            "caption": {
               "type": "ref",
-              "ref": "lex:so.sprk.feed.post#replyRef",
+              "ref": "lex:so.sprk.feed.post#captionRef",
             },
-            "embed": {
+            "media": {
               "type": "union",
               "refs": [
-                "lex:so.sprk.embed.images",
-                "lex:so.sprk.embed.video",
+                "lex:so.sprk.media.image",
+                "lex:so.sprk.media.images",
+                "lex:so.sprk.media.video",
               ],
             },
             "sound": {
@@ -16052,20 +15585,26 @@ export const schemaDict = {
           },
         },
       },
-      "replyRef": {
+      "captionRef": {
         "type": "object",
         "required": [
-          "root",
-          "parent",
+          "text",
         ],
         "properties": {
-          "root": {
-            "type": "ref",
-            "ref": "lex:com.atproto.repo.strongRef",
+          "text": {
+            "type": "string",
+            "maxLength": 3000,
+            "maxGraphemes": 300,
+            "description": "The post description.",
           },
-          "parent": {
-            "type": "ref",
-            "ref": "lex:com.atproto.repo.strongRef",
+          "facets": {
+            "type": "array",
+            "description":
+              "Annotations of text (mentions, URLs, hashtags, etc)",
+            "items": {
+              "type": "ref",
+              "ref": "lex:so.sprk.richtext.facet",
+            },
           },
         },
       },
@@ -17457,6 +16996,229 @@ export const schemaDict = {
       },
     },
   },
+  "SoSprkStoryDefs": {
+    "lexicon": 1,
+    "id": "so.sprk.story.defs",
+    "defs": {
+      "storyView": {
+        "type": "object",
+        "required": [
+          "uri",
+          "cid",
+          "author",
+          "record",
+          "indexedAt",
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "cid": {
+            "type": "string",
+            "format": "cid",
+          },
+          "author": {
+            "type": "ref",
+            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
+          },
+          "record": {
+            "type": "unknown",
+          },
+          "media": {
+            "type": "union",
+            "refs": [
+              "lex:so.sprk.media.image#view",
+              "lex:so.sprk.media.video#view",
+            ],
+          },
+          "indexedAt": {
+            "type": "string",
+            "format": "datetime",
+          },
+        },
+      },
+      "storiesByAuthor": {
+        "type": "object",
+        "required": [
+          "author",
+          "stories",
+        ],
+        "properties": {
+          "author": {
+            "type": "ref",
+            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
+          },
+          "stories": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:so.sprk.story.defs#storyView",
+            },
+          },
+        },
+      },
+      "interaction": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "event": {
+            "type": "string",
+            "knownValues": [
+              "so.sprk.feed.defs#clickthroughItem",
+              "so.sprk.feed.defs#clickthroughAuthor",
+              "so.sprk.feed.defs#clickthroughReposter",
+              "so.sprk.feed.defs#clickthroughEmbed",
+              "so.sprk.feed.defs#interactionSeen",
+              "so.sprk.feed.defs#interactionLike",
+              "so.sprk.feed.defs#interactionRepost",
+              "so.sprk.feed.defs#interactionShare",
+            ],
+          },
+        },
+      },
+    },
+  },
+  "SoSprkStoryGetTimeline": {
+    "lexicon": 1,
+    "id": "so.sprk.story.getTimeline",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Get a view of the requesting account's stories timeline grouped by author.",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+            },
+            "cursor": {
+              "type": "string",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "storiesByAuthor",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "storiesByAuthor": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.story.defs#storiesByAuthor",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkStoryGetStories": {
+    "lexicon": 1,
+    "id": "so.sprk.story.getStories",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Gets story views for a specified list of stories (by AT-URI). This is sometimes referred to as 'hydrating' a story reference list.",
+        "parameters": {
+          "type": "params",
+          "required": [
+            "uris",
+          ],
+          "properties": {
+            "uris": {
+              "type": "array",
+              "description":
+                "List of story AT-URIs to return hydrated views for.",
+              "items": {
+                "type": "string",
+                "format": "at-uri",
+              },
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "stories",
+            ],
+            "properties": {
+              "stories": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.story.defs#storyView",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkStoryPost": {
+    "lexicon": 1,
+    "id": "so.sprk.story.post",
+    "defs": {
+      "main": {
+        "type": "record",
+        "description": "Record containing a Spark story.",
+        "key": "tid",
+        "record": {
+          "type": "object",
+          "required": [
+            "createdAt",
+            "media",
+          ],
+          "properties": {
+            "media": {
+              "type": "union",
+              "refs": [
+                "lex:so.sprk.media.image",
+                "lex:so.sprk.media.video",
+              ],
+            },
+            "sound": {
+              "type": "ref",
+              "ref": "lex:com.atproto.repo.strongRef",
+            },
+            "labels": {
+              "type": "union",
+              "description":
+                "Self-label values for this story. Effectively content warnings.",
+              "refs": [
+                "lex:com.atproto.label.defs#selfLabels",
+              ],
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "datetime",
+              "description":
+                "Client-declared timestamp when this story was originally created.",
+            },
+          },
+        },
+      },
+    },
+  },
   "SoSprkLabelerDefs": {
     "lexicon": 1,
     "id": "so.sprk.labeler.defs",
@@ -17678,6 +17440,226 @@ export const schemaDict = {
                 },
               },
             },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkMediaDefs": {
+    "lexicon": 1,
+    "id": "so.sprk.media.defs",
+    "defs": {
+      "aspectRatio": {
+        "type": "object",
+        "description":
+          "width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.",
+        "required": [
+          "width",
+          "height",
+        ],
+        "properties": {
+          "width": {
+            "type": "integer",
+            "minimum": 1,
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1,
+          },
+        },
+      },
+    },
+  },
+  "SoSprkMediaImages": {
+    "lexicon": 1,
+    "id": "so.sprk.media.images",
+    "description": "A set of multiple images in a Spark post.",
+    "defs": {
+      "main": {
+        "type": "object",
+        "required": [
+          "images",
+        ],
+        "properties": {
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:so.sprk.media.image",
+            },
+            "minLength": 2,
+            "maxLength": 12,
+          },
+        },
+      },
+      "view": {
+        "type": "object",
+        "required": [
+          "images",
+        ],
+        "properties": {
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:so.sprk.media.image#view",
+            },
+            "minLength": 2,
+            "maxLength": 12,
+          },
+        },
+      },
+    },
+  },
+  "SoSprkMediaVideo": {
+    "lexicon": 1,
+    "id": "so.sprk.media.video",
+    "description": "A video in a Spark post.",
+    "defs": {
+      "main": {
+        "type": "object",
+        "required": [
+          "video",
+        ],
+        "properties": {
+          "video": {
+            "type": "blob",
+            "accept": [
+              "video/mp4",
+            ],
+            "maxSize": 314572800,
+          },
+          "captions": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:so.sprk.media.video#caption",
+            },
+            "maxLength": 20,
+          },
+          "alt": {
+            "type": "string",
+            "description":
+              "Alt text description of the video, for accessibility.",
+            "maxGraphemes": 1000,
+            "maxLength": 10000,
+          },
+          "aspectRatio": {
+            "type": "ref",
+            "ref": "lex:so.sprk.media.defs#aspectRatio",
+          },
+        },
+      },
+      "caption": {
+        "type": "object",
+        "required": [
+          "lang",
+          "file",
+        ],
+        "properties": {
+          "lang": {
+            "type": "string",
+            "format": "language",
+          },
+          "file": {
+            "type": "blob",
+            "accept": [
+              "text/vtt",
+            ],
+            "maxSize": 20000,
+          },
+        },
+      },
+      "view": {
+        "type": "object",
+        "required": [
+          "cid",
+          "playlist",
+        ],
+        "properties": {
+          "cid": {
+            "type": "string",
+            "format": "cid",
+          },
+          "playlist": {
+            "type": "string",
+            "format": "uri",
+          },
+          "thumbnail": {
+            "type": "string",
+            "format": "uri",
+          },
+          "alt": {
+            "type": "string",
+            "maxGraphemes": 1000,
+            "maxLength": 10000,
+          },
+          "aspectRatio": {
+            "type": "ref",
+            "ref": "lex:so.sprk.media.defs#aspectRatio",
+          },
+        },
+      },
+    },
+  },
+  "SoSprkMediaImage": {
+    "lexicon": 1,
+    "id": "so.sprk.media.image",
+    "description": "An image in a Spark record.",
+    "defs": {
+      "main": {
+        "type": "object",
+        "required": [
+          "image",
+          "alt",
+        ],
+        "properties": {
+          "image": {
+            "type": "blob",
+            "accept": [
+              "image/*",
+            ],
+            "maxSize": 5242880,
+          },
+          "alt": {
+            "type": "string",
+            "description":
+              "Alt text description of the image, for accessibility.",
+          },
+          "aspectRatio": {
+            "type": "ref",
+            "ref": "lex:so.sprk.media.defs#aspectRatio",
+          },
+        },
+      },
+      "view": {
+        "type": "object",
+        "required": [
+          "thumb",
+          "fullsize",
+          "alt",
+        ],
+        "properties": {
+          "thumb": {
+            "type": "string",
+            "format": "uri",
+            "description":
+              "Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.",
+          },
+          "fullsize": {
+            "type": "string",
+            "format": "uri",
+            "description":
+              "Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.",
+          },
+          "alt": {
+            "type": "string",
+            "description":
+              "Alt text description of the image, for accessibility.",
+          },
+          "aspectRatio": {
+            "type": "ref",
+            "ref": "lex:so.sprk.media.defs#aspectRatio",
           },
         },
       },
@@ -21784,6 +21766,7 @@ export const schemaDict = {
             "rkey": {
               "type": "string",
               "description": "The Record Key.",
+              "format": "record-key",
             },
             "cid": {
               "type": "string",
@@ -22463,9 +22446,6 @@ export const ids = {
   SoSprkVideoDefs: "so.sprk.video.defs",
   SoSprkVideoGetJobStatus: "so.sprk.video.getJobStatus",
   SoSprkVideoGetUploadLimits: "so.sprk.video.getUploadLimits",
-  SoSprkEmbedDefs: "so.sprk.embed.defs",
-  SoSprkEmbedImages: "so.sprk.embed.images",
-  SoSprkEmbedVideo: "so.sprk.embed.video",
   SoSprkNotificationRegisterPush: "so.sprk.notification.registerPush",
   SoSprkNotificationPutPreferences: "so.sprk.notification.putPreferences",
   SoSprkNotificationUpdateSeen: "so.sprk.notification.updateSeen",
@@ -22513,7 +22493,6 @@ export const ids = {
   SoSprkGraphUnmuteActor: "so.sprk.graph.unmuteActor",
   SoSprkGraphGetList: "so.sprk.graph.getList",
   SoSprkFeedGenerator: "so.sprk.feed.generator",
-  SoSprkFeedMusic: "so.sprk.feed.music",
   SoSprkFeedSendInteractions: "so.sprk.feed.sendInteractions",
   SoSprkFeedDefs: "so.sprk.feed.defs",
   SoSprkFeedGetFeedGenerators: "so.sprk.feed.getFeedGenerators",
@@ -22528,14 +22507,12 @@ export const ids = {
   SoSprkFeedLike: "so.sprk.feed.like",
   SoSprkFeedGetRepostedBy: "so.sprk.feed.getRepostedBy",
   SoSprkFeedRepost: "so.sprk.feed.repost",
-  SoSprkFeedStory: "so.sprk.feed.story",
   SoSprkFeedDescribeFeedGenerator: "so.sprk.feed.describeFeedGenerator",
   SoSprkFeedSearchPosts: "so.sprk.feed.searchPosts",
   SoSprkFeedGetPosts: "so.sprk.feed.getPosts",
   SoSprkFeedGetFeed: "so.sprk.feed.getFeed",
-  SoSprkFeedGetStories: "so.sprk.feed.getStories",
   SoSprkFeedGetQuotes: "so.sprk.feed.getQuotes",
-  SoSprkFeedGetStoriesTimeline: "so.sprk.feed.getStoriesTimeline",
+  SoSprkFeedReply: "so.sprk.feed.reply",
   SoSprkFeedGetFeedSkeleton: "so.sprk.feed.getFeedSkeleton",
   SoSprkFeedGetListFeed: "so.sprk.feed.getListFeed",
   SoSprkFeedGetSuggestedFeeds: "so.sprk.feed.getSuggestedFeeds",
@@ -22557,9 +22534,17 @@ export const ids = {
   SoSprkActorGetProfiles: "so.sprk.actor.getProfiles",
   SoSprkActorGetPreferences: "so.sprk.actor.getPreferences",
   SoSprkActorProfile: "so.sprk.actor.profile",
+  SoSprkStoryDefs: "so.sprk.story.defs",
+  SoSprkStoryGetTimeline: "so.sprk.story.getTimeline",
+  SoSprkStoryGetStories: "so.sprk.story.getStories",
+  SoSprkStoryPost: "so.sprk.story.post",
   SoSprkLabelerDefs: "so.sprk.labeler.defs",
   SoSprkLabelerService: "so.sprk.labeler.service",
   SoSprkLabelerGetServices: "so.sprk.labeler.getServices",
+  SoSprkMediaDefs: "so.sprk.media.defs",
+  SoSprkMediaImages: "so.sprk.media.images",
+  SoSprkMediaVideo: "so.sprk.media.video",
+  SoSprkMediaImage: "so.sprk.media.image",
   ComAtprotoTempAddReservedHandle: "com.atproto.temp.addReservedHandle",
   ComAtprotoTempCheckSignupQueue: "com.atproto.temp.checkSignupQueue",
   ComAtprotoTempRequestPhoneVerification:

@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "so.sprk.feed.story",
+  "id": "so.sprk.story.post",
   "defs": {
     "main": {
       "type": "record",
@@ -12,10 +12,7 @@
         "properties": {
           "media": {
             "type": "union",
-            "refs": [
-              "so.sprk.embed.images",
-              "so.sprk.embed.video"
-            ]
+            "refs": ["so.sprk.media.image", "so.sprk.media.video"]
           },
           "sound": {
             "type": "ref",
@@ -25,12 +22,6 @@
             "type": "union",
             "description": "Self-label values for this story. Effectively content warnings.",
             "refs": ["com.atproto.label.defs#selfLabels"]
-          },
-          "tags": {
-            "type": "array",
-            "description": "Additional hashtags, in addition to any included in story text and facets.",
-            "maxLength": 8,
-            "items": { "type": "string", "maxLength": 640, "maxGraphemes": 64 }
           },
           "createdAt": {
             "type": "string",

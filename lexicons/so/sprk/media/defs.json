@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "so.sprk.embed.defs",
+  "id": "so.sprk.media.defs",
   "defs": {
     "aspectRatio": {
       "type": "object",

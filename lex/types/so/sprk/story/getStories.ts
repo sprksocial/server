@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import type * as SoSprkFeedDefs from "./defs.ts";
+import type * as SoSprkStoryDefs from "./defs.ts";
 
 export type QueryParams = {
   /** List of story AT-URIs to return hydrated views for. */
@@ -10,7 +10,7 @@ export type QueryParams = {
 export type InputSchema = undefined;
 
 export interface OutputSchema {
-  stories: (SoSprkFeedDefs.StoryView)[];
+  stories: (SoSprkStoryDefs.StoryView)[];
 }
 
 export type HandlerInput = void;

@@ -1,7 +1,7 @@
 {
   "lexicon": 1,
-  "id": "so.sprk.embed.video",
-  "description": "A video embedded in a Spark record (eg, a post).",
+  "id": "so.sprk.media.video",
+  "description": "A video in a Spark post.",
   "defs": {
     "main": {
       "type": "object",
@@ -25,7 +25,7 @@
         },
         "aspectRatio": {
           "type": "ref",
-          "ref": "so.sprk.embed.defs#aspectRatio"
+          "ref": "so.sprk.media.defs#aspectRatio"
         }
       }
     },
@@ -58,7 +58,7 @@
         },
         "aspectRatio": {
           "type": "ref",
-          "ref": "so.sprk.embed.defs#aspectRatio"
+          "ref": "so.sprk.media.defs#aspectRatio"
         }
       }
     }

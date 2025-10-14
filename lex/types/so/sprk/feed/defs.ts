@@ -5,8 +5,9 @@ import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import { type $Typed } from "../../../../util.ts";
 import type * as SoSprkActorDefs from "../actor/defs.ts";
-import type * as SoSprkEmbedImages from "../embed/images.ts";
-import type * as SoSprkEmbedVideo from "../embed/video.ts";
+import type * as SoSprkMediaImage from "../media/image.ts";
+import type * as SoSprkMediaImages from "../media/images.ts";
+import type * as SoSprkMediaVideo from "../media/video.ts";
 import type * as SoSprkSoundDefs from "../sound/defs.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 import type * as SoSprkRichtextFacet from "../richtext/facet.ts";
@@ -15,37 +16,17 @@ import type * as SoSprkGraphDefs from "../graph/defs.ts";
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.feed.defs";
 
-export interface StoryView {
-  $type?: "so.sprk.feed.defs#storyView";
-  uri: string;
-  cid: string;
-  author: SoSprkActorDefs.ProfileViewBasic;
-  record: { [_ in string]: unknown };
-  media?: $Typed<SoSprkEmbedImages.View> | $Typed<SoSprkEmbedVideo.View> | {
-    $type: string;
-  };
-  indexedAt: string;
-}
-
-const hashStoryView = "storyView";
-
-export function isStoryView<V>(v: V) {
-  return is$typed(v, id, hashStoryView);
-}
-
-export function validateStoryView<V>(v: V) {
-  return validate<StoryView & V>(v, id, hashStoryView);
-}
-
 export interface PostView {
   $type?: "so.sprk.feed.defs#postView";
   uri: string;
   cid: string;
   author: SoSprkActorDefs.ProfileViewBasic;
   record: { [_ in string]: unknown };
-  embed?: $Typed<SoSprkEmbedImages.View> | $Typed<SoSprkEmbedVideo.View> | {
-    $type: string;
-  };
+  media?:
+    | $Typed<SoSprkMediaImage.View>
+    | $Typed<SoSprkMediaImages.View>
+    | $Typed<SoSprkMediaVideo.View>
+    | { $type: string };
   sound?: SoSprkSoundDefs.AudioView;
   replyCount?: number;
   repostCount?: number;
@@ -64,6 +45,30 @@ export function isPostView<V>(v: V) {
 
 export function validatePostView<V>(v: V) {
   return validate<PostView & V>(v, id, hashPostView);
+}
+
+export interface ReplyView {
+  $type?: "so.sprk.feed.defs#replyView";
+  uri: string;
+  cid: string;
+  author: SoSprkActorDefs.ProfileViewBasic;
+  record: { [_ in string]: unknown };
+  image?: SoSprkMediaImage.View;
+  replyCount?: number;
+  likeCount?: number;
+  indexedAt: string;
+  viewer?: ViewerState;
+  labels?: (ComAtprotoLabelDefs.Label)[];
+}
+
+const hashReplyView = "replyView";
+
+export function isReplyView<V>(v: V) {
+  return is$typed(v, id, hashReplyView);
+}
+
+export function validateReplyView<V>(v: V) {
+  return validate<ReplyView & V>(v, id, hashReplyView);
 }
 
 /** Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests. */
@@ -106,7 +111,6 @@ export function validateThreadContext<V>(v: V) {
 export interface FeedViewPost {
   $type?: "so.sprk.feed.defs#feedViewPost";
   post: PostView;
-  reply?: ReplyRef;
   reason?: $Typed<ReasonRepost> | $Typed<ReasonPin> | { $type: string };
   /** Context provided by feed generator that may be passed back alongside interactions. */
   feedContext?: string;
@@ -120,58 +124,6 @@ export function isFeedViewPost<V>(v: V) {
 
 export function validateFeedViewPost<V>(v: V) {
   return validate<FeedViewPost & V>(v, id, hashFeedViewPost);
-}
-
-export interface FeedViewStory {
-  $type?: "so.sprk.feed.defs#feedViewStory";
-  story: StoryView;
-}
-
-const hashFeedViewStory = "feedViewStory";
-
-export function isFeedViewStory<V>(v: V) {
-  return is$typed(v, id, hashFeedViewStory);
-}
-
-export function validateFeedViewStory<V>(v: V) {
-  return validate<FeedViewStory & V>(v, id, hashFeedViewStory);
-}
-
-export interface StoriesByAuthor {
-  $type?: "so.sprk.feed.defs#storiesByAuthor";
-  author: SoSprkActorDefs.ProfileViewBasic;
-  stories: (StoryView)[];
-}
-
-const hashStoriesByAuthor = "storiesByAuthor";
-
-export function isStoriesByAuthor<V>(v: V) {
-  return is$typed(v, id, hashStoriesByAuthor);
-}
-
-export function validateStoriesByAuthor<V>(v: V) {
-  return validate<StoriesByAuthor & V>(v, id, hashStoriesByAuthor);
-}
-
-export interface ReplyRef {
-  $type?: "so.sprk.feed.defs#replyRef";
-  root: $Typed<PostView> | $Typed<NotFoundPost> | $Typed<BlockedPost> | {
-    $type: string;
-  };
-  parent: $Typed<PostView> | $Typed<NotFoundPost> | $Typed<BlockedPost> | {
-    $type: string;
-  };
-  grandparentAuthor?: SoSprkActorDefs.ProfileViewBasic;
-}
-
-const hashReplyRef = "replyRef";
-
-export function isReplyRef<V>(v: V) {
-  return is$typed(v, id, hashReplyRef);
-}
-
-export function validateReplyRef<V>(v: V) {
-  return validate<ReplyRef & V>(v, id, hashReplyRef);
 }
 
 export interface ReasonRepost {
@@ -204,14 +156,15 @@ export function validateReasonPin<V>(v: V) {
   return validate<ReasonPin & V>(v, id, hashReasonPin);
 }
 
-export interface ThreadViewPost {
-  $type?: "so.sprk.feed.defs#threadViewPost";
-  post: PostView;
+export interface ThreadViewReply {
+  $type?: "so.sprk.feed.defs#threadViewReply";
+  reply: ReplyView;
   parent?:
-    | $Typed<ThreadViewPost>
+    | $Typed<ThreadViewReply>
     | $Typed<NotFoundPost>
     | $Typed<BlockedPost>
     | { $type: string };
+  root?: FeedViewPost;
   replies?:
     ($Typed<ThreadViewPost> | $Typed<NotFoundPost> | $Typed<BlockedPost> | {
       $type: string;
@@ -219,14 +172,14 @@ export interface ThreadViewPost {
   threadContext?: ThreadContext;
 }
 
-const hashThreadViewPost = "threadViewPost";
+const hashThreadViewReply = "threadViewReply";
 
-export function isThreadViewPost<V>(v: V) {
-  return is$typed(v, id, hashThreadViewPost);
+export function isThreadViewReply<V>(v: V) {
+  return is$typed(v, id, hashThreadViewReply);
 }
 
-export function validateThreadViewPost<V>(v: V) {
-  return validate<ThreadViewPost & V>(v, id, hashThreadViewPost);
+export function validateThreadViewReply<V>(v: V) {
+  return validate<ThreadViewReply & V>(v, id, hashThreadViewReply);
 }
 
 export interface NotFoundPost {
@@ -401,7 +354,6 @@ export interface Interaction {
     | "so.sprk.feed.defs#interactionLike"
     | "so.sprk.feed.defs#interactionRepost"
     | "so.sprk.feed.defs#interactionReply"
-    | "so.sprk.feed.defs#interactionQuote"
     | "so.sprk.feed.defs#interactionShare"
     | (string & globalThis.Record<PropertyKey, never>);
   /** Context on a feed item that was originally supplied by the feed generator on getFeedSkeleton. */
@@ -430,10 +382,6 @@ export const CLICKTHROUGHAUTHOR = `${id}#clickthroughAuthor`;
 export const CLICKTHROUGHREPOSTER = `${id}#clickthroughReposter`;
 /** User clicked through to the embedded content of the feed item */
 export const CLICKTHROUGHEMBED = `${id}#clickthroughEmbed`;
-/** Declares the feed generator returns any types of posts. */
-export const CONTENTMODEUNSPECIFIED = `${id}#contentModeUnspecified`;
-/** Declares the feed generator returns posts containing so.sprk.embed.video embeds. */
-export const CONTENTMODEVIDEO = `${id}#contentModeVideo`;
 /** Feed item was seen by user */
 export const INTERACTIONSEEN = `${id}#interactionSeen`;
 /** User liked the feed item */
@@ -442,7 +390,5 @@ export const INTERACTIONLIKE = `${id}#interactionLike`;
 export const INTERACTIONREPOST = `${id}#interactionRepost`;
 /** User replied to the feed item */
 export const INTERACTIONREPLY = `${id}#interactionReply`;
-/** User quoted the feed item */
-export const INTERACTIONQUOTE = `${id}#interactionQuote`;
 /** User shared the feed item */
 export const INTERACTIONSHARE = `${id}#interactionShare`;

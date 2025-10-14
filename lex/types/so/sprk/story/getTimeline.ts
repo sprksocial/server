@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import type * as SoSprkFeedDefs from "./defs.ts";
+import type * as SoSprkStoryDefs from "./defs.ts";
 
 export type QueryParams = {
   limit: number;
@@ -11,7 +11,7 @@ export type InputSchema = undefined;
 
 export interface OutputSchema {
   cursor?: string;
-  storiesByAuthor: (SoSprkFeedDefs.StoriesByAuthor)[];
+  storiesByAuthor: (SoSprkStoryDefs.StoriesByAuthor)[];
 }
 
 export type HandlerInput = void;
