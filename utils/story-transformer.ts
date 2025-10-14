@@ -2,7 +2,7 @@ import type * as SoSprkFeedDefs from "../lex/types/so/sprk/feed/defs.ts";
 import { StoryDocument } from "../data-plane/db/models.ts";
 import { transformEmbed } from "./embed-transformer.ts";
 import { createProfileViewBasic } from "./profile-helper.ts";
-import { AppContext } from "../main.ts";
+import { AppContext } from "../context.ts";
 
 // Transform DB story to StoryView format
 export async function transformStoryToStoryView(
@@ -15,9 +15,16 @@ export async function transformStoryToStoryView(
     ctx,
   );
 
-  const embedView = transformEmbed(story.media, story.authorDid, null, {
-    firstImageOnly: true,
-  }, true);
+  const embedView = transformEmbed(
+    story.media,
+    story.authorDid,
+    ctx.cfg,
+    null,
+    {
+      firstImageOnly: true,
+    },
+    true,
+  );
 
   return {
     uri: story.uri,
@@ -59,9 +66,16 @@ export async function transformStoriesToStoryViews(
   return stories.map((story) => {
     const authorView = authorsMap.get(story.authorDid)!;
 
-    const embedView = transformEmbed(story.media, story.authorDid, null, {
-      firstImageOnly: true,
-    }, true);
+    const embedView = transformEmbed(
+      story.media,
+      story.authorDid,
+      ctx.cfg,
+      null,
+      {
+        firstImageOnly: true,
+      },
+      true,
+    );
 
     return {
       uri: story.uri,

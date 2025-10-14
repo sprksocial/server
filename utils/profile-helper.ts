@@ -9,10 +9,11 @@ import type * as ComAtprotoRepoStrongRef from "../lex/types/com/atproto/repo/str
 import type { StoryDocument } from "../data-plane/db/models.ts";
 import type { Label } from "../lex/types/com/atproto/label/defs.ts";
 import { ensureValidDid, isValidHandle } from "@atp/syntax";
-import { AppContext } from "../main.ts";
+import { AppContext } from "../context.ts";
 import { XRPCError } from "@atp/xrpc-server";
 
-// Helper function to create ProfileViewBasic with stories
+// Helper function to resolve an actor identifier (handle or DID),
+// fetch profile data, and return a detailed profile view or null if not found
 export async function createProfileViewBasic(
   authorDid: string,
   ctx: AppContext,
@@ -82,13 +83,14 @@ export async function getProfileView(
   actorDid: string,
   viewerDid?: string,
 ): Promise<ProfileView> {
-  const { db, resolver } = ctx;
+  const { db, idResolver } = ctx;
 
   const profile = await db.models.Profile.findOne({ authorDid: actorDid });
   const actor = await db.models.Actor.findOne({ did: actorDid });
 
   const handle = actor?.handle ??
-    (await resolver.resolveDidToHandle(actorDid)) ?? "unknown.invalid";
+    (await idResolver.did.resolveAtprotoData(actorDid)).handle ??
+    "unknown.invalid";
 
   const baseView: ProfileView = {
     $type: "so.sprk.actor.defs#profileView",
@@ -185,7 +187,8 @@ export async function getProfileViews(
       const actor = actorMap.get(actorDid);
 
       const handle = actor?.handle ??
-        (await ctx.resolver.resolveDidToHandle(actorDid)) ?? "unknown.invalid";
+        (await ctx.idResolver.did.resolveAtprotoData(actorDid)).handle ??
+        "unknown.invalid";
 
       const baseView: ProfileView = {
         $type: "so.sprk.actor.defs#profileView",
@@ -256,9 +259,6 @@ export async function getProfiles(
   if (!actorParams || actorParams.length === 0) {
     return [];
   }
-
-  const now = new Date().toISOString();
-
   // Helper function to get a single profile data
   const getProfileData = async (
     actorParam: string,
@@ -267,11 +267,15 @@ export async function getProfiles(
       // Resolve actor identifier to DID
       let actorDidDoc;
       if (isValidHandle(actorParam)) {
-        actorDidDoc = await ctx.resolver.resolveHandleToDidDoc(actorParam);
+        const did = await ctx.idResolver.handle.resolve(actorParam);
+        if (!did) {
+          return null; // Invalid handle, skip
+        }
+        actorDidDoc = await ctx.idResolver.did.resolveAtprotoData(did);
       } else {
         try {
           ensureValidDid(actorParam);
-          actorDidDoc = await ctx.resolver.resolveDidToDidDoc(actorParam);
+          actorDidDoc = await ctx.idResolver.did.resolveAtprotoData(actorParam);
         } catch (_err) {
           return null; // Invalid actor, skip
         }
@@ -285,46 +289,20 @@ export async function getProfiles(
         ctx.db.models.Profile.findOne({ authorDid: actorDid }),
       ]);
 
-      // If actor doesn't exist, try to index and refetch
-      let finalActorDoc = actorDoc;
-      let finalProfile = profile;
-
       if (!actorDoc) {
-        try {
-          ctx.logger.info(
-            "No actor found, attempting to index",
-            { did: actorDid },
-          );
-          await ctx.sub.indexingSvc.indexHandle(actorDid, now, true);
-
-          // Refetch both actor and profile after indexing
-          const [refetchedActor, refetchedProfile] = await Promise.all([
-            ctx.db.models.Actor.findOne({ did: actorDid }),
-            ctx.db.models.Profile.findOne({ authorDid: actorDid }),
-          ]);
-
-          finalActorDoc = refetchedActor;
-          finalProfile = refetchedProfile;
-        } catch (error) {
-          ctx.logger.error("Failed to index handle", { error, did: actorDid });
-          return null;
-        }
-      }
-
-      if (!finalActorDoc) {
         return null; // Actor not found, skip
       }
 
       // Handle case where actor exists but profile doesn't
-      if (!finalProfile) {
+      if (!profile) {
         ctx.logger.info(
           "Actor found but no profile record, creating basic profile view",
           { did: actorDid },
         );
 
         // Get handle
-        const handle = finalActorDoc.handle ||
-          (await ctx.resolver.resolveDidToHandle(actorDid));
+        const handle = actorDoc.handle ||
+          ((await ctx.idResolver.did.resolveAtprotoData(actorDid)).handle);
 
         // Convert to detailed format with minimal data
         return {
@@ -334,8 +312,8 @@ export async function getProfiles(
       }
 
       // Get actor's handle and preferences
-      const handle = finalActorDoc.handle ||
-        (await ctx.resolver.resolveDidToHandle(actorDid));
+      const handle = actorDoc.handle ||
+        (await ctx.idResolver.did.resolveAtprotoData(actorDid)).handle;
 
       // Twenty-four hours ago for recent stories
       const twentyFourHoursAgo = new Date();
@@ -451,11 +429,11 @@ export async function getProfiles(
 
       try {
         if (
-          finalProfile.avatar && typeof finalProfile.avatar === "object" &&
-          finalProfile.avatar.ref && finalProfile.avatar.ref.$link
+          profile.avatar && typeof profile.avatar === "object" &&
+          profile.avatar.ref && profile.avatar.ref.$link
         ) {
           avatar =
-            `https://media.sprk.so/avatar/tiny/${actorDid}/${finalProfile.avatar.ref.$link}/webp`;
+            `https://media.sprk.so/avatar/tiny/${actorDid}/${profile.avatar.ref.$link}/webp`;
         }
       } catch (error) {
         console.warn(`Failed to construct avatar URL for ${actorDid}:`, error);
@@ -463,11 +441,11 @@ export async function getProfiles(
 
       try {
         if (
-          finalProfile.banner && typeof finalProfile.banner === "object" &&
-          finalProfile.banner.ref && finalProfile.banner.ref.$link
+          profile.banner && typeof profile.banner === "object" &&
+          profile.banner.ref && profile.banner.ref.$link
         ) {
           banner =
-            `https://media.sprk.so/img/tiny/${actorDid}/${finalProfile.banner.ref.$link}/webp`;
+            `https://media.sprk.so/img/tiny/${actorDid}/${profile.banner.ref.$link}/webp`;
         }
       } catch (error) {
         console.warn(`Failed to construct banner URL for ${actorDid}:`, error);
@@ -475,16 +453,16 @@ export async function getProfiles(
 
       // Convert labels to the correct type if it exists
       let labels: Label[] | undefined = undefined;
-      if (finalProfile.labels) {
-        labels = Array.isArray(finalProfile.labels)
-          ? (finalProfile.labels as Label[])
+      if (profile.labels) {
+        labels = Array.isArray(profile.labels)
+          ? (profile.labels as Label[])
           : undefined;
       }
 
       // Convert pinnedPost to the correct type if it exists
       let pinnedPost: ComAtprotoRepoStrongRef.Main | undefined = undefined;
-      if (finalProfile.pinnedPost) {
-        pinnedPost = finalProfile
+      if (profile.pinnedPost) {
+        pinnedPost = profile
           .pinnedPost as unknown as ComAtprotoRepoStrongRef.Main;
       }
 
@@ -501,16 +479,16 @@ export async function getProfiles(
       const profileView: ProfileViewDetailed = {
         did: actorDid,
         handle: handle,
-        displayName: finalProfile.displayName,
-        description: finalProfile.description,
+        displayName: profile.displayName,
+        description: profile.description,
         avatar,
         banner,
         followersCount: typeof followersCount === "number" ? followersCount : 0,
         followsCount: typeof followsCount === "number" ? followsCount : 0,
         postsCount: typeof postsCount === "number" ? postsCount : 0,
         associated: Object.keys(associated).length > 0 ? associated : undefined,
-        indexedAt: finalProfile.indexedAt,
-        createdAt: finalProfile.createdAt,
+        indexedAt: profile.indexedAt,
+        createdAt: profile.createdAt,
         viewer: Object.keys(viewer).length > 0 ? viewer : undefined,
         labels,
         pinnedPost,

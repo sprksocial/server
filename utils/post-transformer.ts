@@ -2,7 +2,7 @@ import { PostDocument } from "../data-plane/db/models.ts";
 import type { Label } from "../lex/types/com/atproto/label/defs.ts";
 import type * as SoSprkFeedDefs from "../lex/types/so/sprk/feed/defs.ts";
 import type * as SoSprkFeedPost from "../lex/types/so/sprk/feed/post.ts";
-import { AppContext } from "../main.ts";
+import { AppContext } from "../context.ts";
 import { transformAudiosToAudioViews } from "./audio-transformer.ts";
 import { transformEmbed } from "./embed-transformer.ts";
 import { createProfileViewBasic } from "./profile-helper.ts";
@@ -120,6 +120,7 @@ export async function transformPostsToPostViews(
     const embed = transformEmbed(
       post.embed,
       post.authorDid,
+      ctx.cfg,
       videoMapping,
     );
 

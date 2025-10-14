@@ -1,5 +1,5 @@
 import { Server } from "../../../../lex/index.ts";
-import { AppContext } from "../../../../main.ts";
+import { AppContext } from "../../../../context.ts";
 import { OutputSchema } from "../../../../lex/types/so/sprk/feed/getStories.ts";
 import { transformStoriesToStoryViews } from "../../../../utils/story-transformer.ts";
 import { StoryDocument } from "../../../../data-plane/db/models.ts";

@@ -21,21 +21,16 @@ enabled available at `http://localhost:4000`.
 
 ```
 # Database
-DB_HOST=localhost
-DB_PORT=27017
-DB_NAME=dev
-DB_USER=mongo
-DB_PASSWORD=mongo
+SPRK_DB_URI=mongodb://mongo:mongo@localhost:27017
 
 # Server
-HOST=0.0.0.0
 NODE_ENV=development
-PORT=4000
-PUBLIC_URL=http://localhost:3000
-SERVICE_DID=did:web:localhost
+SPRK_PORT=4000
+SPRK_PUBLIC_URL=http://localhost:3000
+SPRK_SERVER_DID=did:web:localhost
 
 # Keys, generate these with openssl ecparam --name secp256k1 --genkey --noout --outform DER | tail --bytes=+8 | head --bytes=32 | xxd --plain --cols 32
 # On Mac: openssl ecparam -name secp256k1 -genkey -noout -outform DER | tail --bytes=+8 | head --bytes=32 | xxd --plain --cols 32
-APPVIEW_K256_PRIVATE_KEY_HEX=keyhex
-ADMIN_PASSWORD=password
+SPRK_PRIVATE_KEY=keyhex
+SPRK_ADMIN_PASSWORDS=password1,password2
 ```

@@ -1,9 +1,9 @@
 import mongoose, { Connection } from "mongoose";
 import { IdResolver, MemoryCache } from "@atp/identity";
-import { env } from "../../utils/env.ts";
 import * as models from "./models.ts";
 import { getResultFromDoc } from "../util.ts";
 import { getLogger } from "@logtape/logtape";
+import { ServerConfig } from "../../config.ts";
 
 const HOUR = 60 * 60 * 1000;
 const DAY = HOUR * 24;
@@ -14,30 +14,23 @@ export class Database {
   public logger = getLogger(["appview", "database"]);
   public idResolver: IdResolver;
 
-  constructor() {
+  constructor(private cfg: ServerConfig) {
     this.idResolver = new IdResolver({
       didCache: new MemoryCache(HOUR, DAY),
     });
   }
 
   connect() {
-    const { DB_URI, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = env;
-
-    const uri = DB_URI ||
-      `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/?appName=appview`;
-
-    this.logger.info(
-      DB_URI
-        ? `Connecting to MongoDB using provided URI`
-        : `Connecting to MongoDB at ${DB_HOST}:${DB_PORT}/?appName=appview`,
-    );
+    const uri = this.cfg.dbUri;
+    if (!uri) {
+      throw new Error("No database URI provided");
+    }
+    this.logger.info(`Connecting to ${uri}`);
 
     try {
       this.connection = mongoose.createConnection(uri, {
         autoIndex: true,
         autoCreate: true,
-        dbName: DB_NAME,
-        maxPoolSize: env.MONGO_MAX_POOL_SIZE,
       });
 
       // Attach basic listeners for visibility
@@ -139,28 +132,11 @@ export class Database {
         ),
       };
 
-      this.logger.info("Connected to MongoDB");
+      this.logger.info("Started connection to MongoDB");
     } catch (error) {
-      this.logger.error("Failed to connect to MongoDB", { error });
+      this.logger.error("Failed to start connection to MongoDB", { error });
       throw error;
     }
-  }
-
-  isConnected(): boolean {
-    return !!this.connection && this.connection.readyState === 1; // 1 = connected
-  }
-
-  async waitForConnection(timeoutMs = 30000, pollMs = 250): Promise<boolean> {
-    if (this.isConnected()) return true;
-    const start = Date.now();
-    return await new Promise((resolve) => {
-      const check = () => {
-        if (this.isConnected()) return resolve(true);
-        if (Date.now() - start >= timeoutMs) return resolve(false);
-        setTimeout(check, pollMs);
-      };
-      check();
-    });
   }
 
   async disconnect(): Promise<void> {

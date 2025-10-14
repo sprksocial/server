@@ -1,5 +1,5 @@
 import { Server } from "../../../../lex/index.ts";
-import { AppContext } from "../../../../main.ts";
+import { AppContext } from "../../../../context.ts";
 import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts";
 import * as SoSprkFeedDefs from "../../../../lex/types/so/sprk/feed/defs.ts";
 import { OutputSchema } from "../../../../lex/types/so/sprk/feed/searchPosts.ts";

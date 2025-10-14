@@ -1,5 +1,5 @@
 import { Server } from "../../../../lex/index.ts";
-import { AppContext } from "../../../../main.ts";
+import { AppContext } from "../../../../context.ts";
 import { transformAudiosToAudioViews } from "../../../../utils/audio-transformer.ts";
 import { AudioDocument } from "../../../../data-plane/db/models.ts";
 

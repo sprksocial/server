@@ -1,7 +1,7 @@
 import * as ident from "@atp/syntax";
 import { InvalidRequestError } from "@atp/xrpc-server";
 import { Server } from "../../../../lex/index.ts";
-import { AppContext } from "../../../../main.ts";
+import { AppContext } from "../../../../context.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.com.atproto.identity.resolveHandle({

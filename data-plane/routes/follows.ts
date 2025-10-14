@@ -40,14 +40,12 @@ export class Follows {
 
   async getFollowers(actorDid: string, limit = 50, cursor?: string) {
     // Build query for followers (people who follow this actor)
-    const followersQuery = this.db.models.Follow.find({ subject: actorDid })
-      .populate("actor", "did handle indexedAt takedownRef upstreamStatus");
+    const followersQuery = this.db.models.Follow.find({ subject: actorDid });
 
     // Apply pagination using TimeCidKeyset
     const paginatedQuery = this.timeCidKeyset.paginate(followersQuery, {
       limit,
       cursor,
-      direction: "desc",
     });
 
     const followers = await paginatedQuery.exec();
@@ -74,8 +72,7 @@ export class Follows {
 
   async getFollows(actorDid: string, limit = 50, cursor?: string) {
     // Build query for follows (people this actor follows)
-    const followsQuery = this.db.models.Follow.find({ authorDid: actorDid })
-      .populate("actor", "did handle indexedAt takedownRef upstreamStatus");
+    const followsQuery = this.db.models.Follow.find({ authorDid: actorDid });
 
     // Apply pagination using TimeCidKeyset
     const paginatedQuery = this.timeCidKeyset.paginate(followsQuery, {

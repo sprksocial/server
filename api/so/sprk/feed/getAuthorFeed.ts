@@ -1,6 +1,6 @@
 import { mapDefined } from "@atp/common";
 import { InvalidRequestError } from "@atp/xrpc-server";
-import { AppContext } from "../../../../main.ts";
+import { AppContext } from "../../../../context.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
 import { Actor } from "../../../../hydration/actor.ts";
 import { FeedItem, Post } from "../../../../hydration/feed.ts";

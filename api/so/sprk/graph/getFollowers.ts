@@ -1,80 +1,145 @@
-import { Server } from "../../../../lex/index.ts";
-import { AppContext } from "../../../../main.ts";
-import { FollowDocument } from "../../../../data-plane/db/models.ts";
-import { ensureValidDid, isValidHandle } from "@atp/syntax";
-import { RootFilterQuery } from "mongoose";
-import { XRPCError } from "@atp/xrpc-server";
-import { OutputSchema } from "../../../../lex/types/so/sprk/graph/getFollowers.ts";
+import { mapDefined } from "@atp/common";
+import { InvalidRequestError } from "@atp/xrpc-server";
+import { AppContext } from "../../../../context.ts";
 import {
-  getProfileView,
-  getProfileViews,
-} from "../../../../utils/profile-helper.ts";
+  HydrateCtx,
+  Hydrator,
+  mergeStates,
+} from "../../../../hydration/index.ts";
+import { Server } from "../../../../lex/index.ts";
+import { QueryParams } from "../../../../lex/types/so/sprk/graph/getFollowers.ts";
+import {
+  createPipeline,
+  HydrationFnInput,
+  PresentationFnInput,
+  RulesFnInput,
+  SkeletonFnInput,
+} from "../../../../pipeline.ts";
+import { uriToDid as didFromUri } from "../../../../utils/uris.ts";
+import { Views } from "../../../../views/index.ts";
+import { clearlyBadCursor, resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
+  const getFollowers = createPipeline(
+    skeleton,
+    hydration,
+    noBlocks,
+    presentation,
+  );
   server.so.sprk.graph.getFollowers({
-    auth: ctx.authVerifier.standardOptional,
+    auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth }) => {
-      const { actor } = params;
-      const limit = params.limit;
-      const cursor = params.cursor;
-      const viewerDid = auth.credentials.type === "standard"
-        ? auth.credentials.iss
-        : undefined;
+      const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
+      const hydrateCtx = ctx.hydrator.createContext({
+        viewer,
+        includeTakedowns,
+      });
 
-      let actorDid;
+      const result = await getFollowers({ ...params, hydrateCtx }, ctx);
 
-      if (isValidHandle(actor)) {
-        const actorDidDoc = await ctx.resolver.resolveHandleToDidDoc(actor);
-        actorDid = actorDidDoc.did;
-      } else {
-        try {
-          ensureValidDid(actor);
-          actorDid = actor;
-        } catch (error) {
-          ctx.logger.warn(
-            "Failed to ensure valid DID",
-            { did: actor, error: (error as Error).message },
-          );
-          throw new XRPCError(400, "Invalid actor DID");
-        }
-      }
-
-      const query: RootFilterQuery<FollowDocument> = {
-        subject: actorDid,
-      };
-
-      if (cursor) {
-        query._id = { $gt: cursor };
-      }
-
-      // Get followers with pagination and subject profile concurrently
-      const [followers, subjectProfileView] = await Promise.all([
-        ctx.db.models.Follow.find(query)
-          .sort({ _id: 1 })
-          .limit(limit)
-          .lean(),
-        getProfileView(ctx, actorDid, viewerDid),
-      ]);
-
-      // Get next cursor
-      const nextCursor = followers.length === limit
-        ? followers[followers.length - 1]._id.toString()
-        : undefined;
-
-      // Extract follower DIDs and batch fetch profile views
-      const followerDids = followers.map((follow) => follow.authorDid);
-      const profileViews = await getProfileViews(ctx, followerDids, viewerDid);
-
-      const res = {
+      return {
         encoding: "application/json",
-        body: {
-          subject: subjectProfileView,
-          followers: profileViews,
-          cursor: nextCursor,
-        } satisfies OutputSchema,
-      } as const;
-
-      return res;
+        body: result,
+        headers: resHeaders({}),
+      };
     },
   });
 }
+
+const skeleton = async (input: SkeletonFnInput<Context, Params>) => {
+  const { params, ctx } = input;
+  const [subjectDid] = await ctx.hydrator.actor.getDidsDefined([params.actor]);
+  if (!subjectDid) {
+    throw new InvalidRequestError(`Actor not found: ${params.actor}`);
+  }
+  if (clearlyBadCursor(params.cursor)) {
+    return { subjectDid, followUris: [] };
+  }
+  const { followers, cursor } = await ctx.hydrator.graph.getActorFollowers({
+    did: subjectDid,
+    cursor: params.cursor,
+    limit: params.limit,
+  });
+  return {
+    subjectDid,
+    followUris: followers.map((f) => f.uri),
+    cursor: cursor || undefined,
+  };
+};
+
+const hydration = async (
+  input: HydrationFnInput<Context, Params, SkeletonState>,
+) => {
+  const { ctx, params, skeleton } = input;
+  const { followUris, subjectDid } = skeleton;
+  const followState = await ctx.hydrator.hydrateFollows(
+    followUris,
+  );
+  const dids = [subjectDid];
+  if (followState.follows) {
+    for (const [uri, follow] of followState.follows) {
+      if (follow) {
+        dids.push(didFromUri(uri));
+      }
+    }
+  }
+  const profileState = await ctx.hydrator.hydrateProfiles(
+    dids,
+    params.hydrateCtx,
+  );
+  return mergeStates(followState, profileState);
+};
+
+const noBlocks = (input: RulesFnInput<Context, Params, SkeletonState>) => {
+  const { skeleton, params, hydration, ctx } = input;
+  const viewer = params.hydrateCtx.viewer;
+  skeleton.followUris = skeleton.followUris.filter((followUri) => {
+    const followerDid = didFromUri(followUri);
+    return (
+      !hydration.followBlocks?.get(followUri) &&
+      (!viewer || !ctx.views.viewerBlockExists(followerDid, hydration))
+    );
+  });
+  return skeleton;
+};
+
+const presentation = (
+  input: PresentationFnInput<Context, Params, SkeletonState>,
+) => {
+  const { ctx, hydration, skeleton, params } = input;
+  const { subjectDid, followUris, cursor } = skeleton;
+  const isNoHosted = (did: string) => ctx.views.actorIsNoHosted(did, hydration);
+
+  const subject = ctx.views.profile(subjectDid, hydration);
+  if (
+    !subject ||
+    (!params.hydrateCtx.includeTakedowns && isNoHosted(subjectDid))
+  ) {
+    throw new InvalidRequestError(`Actor not found: ${params.actor}`);
+  }
+
+  const followers = mapDefined(followUris, (followUri) => {
+    const followerDid = didFromUri(followUri);
+    if (!params.hydrateCtx.includeTakedowns && isNoHosted(followerDid)) {
+      return;
+    }
+    return ctx.views.profile(didFromUri(followUri), hydration);
+  });
+
+  return { followers, subject, cursor };
+};
+
+type Context = {
+  hydrator: Hydrator;
+  views: Views;
+};
+
+type Params = QueryParams & {
+  hydrateCtx: HydrateCtx;
+};
+
+type SkeletonState = {
+  subjectDid: string;
+  followUris: string[];
+  cursor?: string;
+};

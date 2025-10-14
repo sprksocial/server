@@ -1,6 +1,6 @@
 import { InvalidRequestError } from "@atp/xrpc-server";
 import { Server } from "../../../../lex/index.ts";
-import { AppContext } from "../../../../main.ts";
+import { AppContext } from "../../../../context.ts";
 import { transformStoriesToStoryViews } from "../../../../utils/story-transformer.ts";
 import { decodeBase64, encodeBase64 } from "@std/encoding";
 import type { ProfileViewBasic } from "../../../../lex/types/so/sprk/actor/defs.ts";

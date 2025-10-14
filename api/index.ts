@@ -1,5 +1,5 @@
 import { Server } from "../lex/index.ts";
-import { AppContext } from "../main.ts";
+import { AppContext } from "../context.ts";
 import getAccountInfos from "./com/atproto/admin/getAccountInfos.ts";
 import getSubjectStatus from "./com/atproto/admin/getSubjectStatus.ts";
 import updateSubjectStatus from "./com/atproto/admin/updateSubjectStatus.ts";
