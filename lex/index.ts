@@ -132,7 +132,6 @@ import * as SoSprkNotificationPutPreferences from "./types/so/sprk/notification/
 import * as SoSprkNotificationUpdateSeen from "./types/so/sprk/notification/updateSeen.ts";
 import * as SoSprkNotificationListNotifications from "./types/so/sprk/notification/listNotifications.ts";
 import * as SoSprkNotificationGetUnreadCount from "./types/so/sprk/notification/getUnreadCount.ts";
-import * as SoSprkUnspeccedSearchStarterPacksSkeleton from "./types/so/sprk/unspecced/searchStarterPacksSkeleton.ts";
 import * as SoSprkUnspeccedSearchActorsSkeleton from "./types/so/sprk/unspecced/searchActorsSkeleton.ts";
 import * as SoSprkUnspeccedGetSuggestionsSkeleton from "./types/so/sprk/unspecced/getSuggestionsSkeleton.ts";
 import * as SoSprkUnspeccedSearchPostsSkeleton from "./types/so/sprk/unspecced/searchPostsSkeleton.ts";
@@ -140,36 +139,26 @@ import * as SoSprkUnspeccedGetPopularFeedGenerators from "./types/so/sprk/unspec
 import * as SoSprkUnspeccedGetTrendingTopics from "./types/so/sprk/unspecced/getTrendingTopics.ts";
 import * as SoSprkUnspeccedGetTaggedSuggestions from "./types/so/sprk/unspecced/getTaggedSuggestions.ts";
 import * as SoSprkUnspeccedGetConfig from "./types/so/sprk/unspecced/getConfig.ts";
-import * as SoSprkGraphGetStarterPacks from "./types/so/sprk/graph/getStarterPacks.ts";
 import * as SoSprkGraphGetSuggestedFollowsByActor from "./types/so/sprk/graph/getSuggestedFollowsByActor.ts";
-import * as SoSprkGraphUnmuteActorList from "./types/so/sprk/graph/unmuteActorList.ts";
-import * as SoSprkGraphGetListBlocks from "./types/so/sprk/graph/getListBlocks.ts";
-import * as SoSprkGraphGetStarterPack from "./types/so/sprk/graph/getStarterPack.ts";
-import * as SoSprkGraphMuteActorList from "./types/so/sprk/graph/muteActorList.ts";
 import * as SoSprkGraphMuteThread from "./types/so/sprk/graph/muteThread.ts";
-import * as SoSprkGraphSearchStarterPacks from "./types/so/sprk/graph/searchStarterPacks.ts";
-import * as SoSprkGraphGetActorStarterPacks from "./types/so/sprk/graph/getActorStarterPacks.ts";
-import * as SoSprkGraphGetLists from "./types/so/sprk/graph/getLists.ts";
 import * as SoSprkGraphGetFollowers from "./types/so/sprk/graph/getFollowers.ts";
 import * as SoSprkGraphUnmuteThread from "./types/so/sprk/graph/unmuteThread.ts";
 import * as SoSprkGraphMuteActor from "./types/so/sprk/graph/muteActor.ts";
 import * as SoSprkGraphGetMutes from "./types/so/sprk/graph/getMutes.ts";
 import * as SoSprkGraphGetKnownFollowers from "./types/so/sprk/graph/getKnownFollowers.ts";
-import * as SoSprkGraphGetListMutes from "./types/so/sprk/graph/getListMutes.ts";
 import * as SoSprkGraphGetFollows from "./types/so/sprk/graph/getFollows.ts";
 import * as SoSprkGraphGetBlocks from "./types/so/sprk/graph/getBlocks.ts";
 import * as SoSprkGraphGetRelationships from "./types/so/sprk/graph/getRelationships.ts";
 import * as SoSprkGraphUnmuteActor from "./types/so/sprk/graph/unmuteActor.ts";
-import * as SoSprkGraphGetList from "./types/so/sprk/graph/getList.ts";
 import * as SoSprkFeedSendInteractions from "./types/so/sprk/feed/sendInteractions.ts";
 import * as SoSprkFeedGetFeedGenerators from "./types/so/sprk/feed/getFeedGenerators.ts";
 import * as SoSprkFeedGetTimeline from "./types/so/sprk/feed/getTimeline.ts";
 import * as SoSprkFeedGetFeedGenerator from "./types/so/sprk/feed/getFeedGenerator.ts";
 import * as SoSprkFeedGetAuthorFeed from "./types/so/sprk/feed/getAuthorFeed.ts";
 import * as SoSprkFeedGetLikes from "./types/so/sprk/feed/getLikes.ts";
-import * as SoSprkFeedGetPostThread from "./types/so/sprk/feed/getPostThread.ts";
 import * as SoSprkFeedGetActorLikes from "./types/so/sprk/feed/getActorLikes.ts";
 import * as SoSprkFeedGetRepostedBy from "./types/so/sprk/feed/getRepostedBy.ts";
+import * as SoSprkFeedGetThread from "./types/so/sprk/feed/getThread.ts";
 import * as SoSprkFeedDescribeFeedGenerator from "./types/so/sprk/feed/describeFeedGenerator.ts";
 import * as SoSprkFeedSearchPosts from "./types/so/sprk/feed/searchPosts.ts";
 import * as SoSprkFeedGetPosts from "./types/so/sprk/feed/getPosts.ts";
@@ -301,11 +290,6 @@ export const APP_BSKY_FEED = {
   DefsInteractionReply: "app.bsky.feed.defs#interactionReply",
   DefsInteractionQuote: "app.bsky.feed.defs#interactionQuote",
   DefsInteractionShare: "app.bsky.feed.defs#interactionShare",
-};
-export const SO_SPRK_GRAPH = {
-  DefsModlist: "so.sprk.graph.defs#modlist",
-  DefsCuratelist: "so.sprk.graph.defs#curatelist",
-  DefsReferencelist: "so.sprk.graph.defs#referencelist",
 };
 export const SO_SPRK_FEED = {
   DefsRequestLess: "so.sprk.feed.defs#requestLess",
@@ -2123,18 +2107,6 @@ export class SoSprkUnspeccedNS {
     this._server = server;
   }
 
-  searchStarterPacksSkeleton<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkUnspeccedSearchStarterPacksSkeleton.QueryParams,
-      SoSprkUnspeccedSearchStarterPacksSkeleton.HandlerInput,
-      SoSprkUnspeccedSearchStarterPacksSkeleton.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.unspecced.searchStarterPacksSkeleton"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
   searchActorsSkeleton<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -2227,18 +2199,6 @@ export class SoSprkGraphNS {
     this._server = server;
   }
 
-  getStarterPacks<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkGraphGetStarterPacks.QueryParams,
-      SoSprkGraphGetStarterPacks.HandlerInput,
-      SoSprkGraphGetStarterPacks.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.graph.getStarterPacks"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
   getSuggestedFollowsByActor<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -2251,54 +2211,6 @@ export class SoSprkGraphNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
-  unmuteActorList<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkGraphUnmuteActorList.QueryParams,
-      SoSprkGraphUnmuteActorList.HandlerInput,
-      SoSprkGraphUnmuteActorList.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.graph.unmuteActorList"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
-  getListBlocks<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkGraphGetListBlocks.QueryParams,
-      SoSprkGraphGetListBlocks.HandlerInput,
-      SoSprkGraphGetListBlocks.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.graph.getListBlocks"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
-  getStarterPack<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkGraphGetStarterPack.QueryParams,
-      SoSprkGraphGetStarterPack.HandlerInput,
-      SoSprkGraphGetStarterPack.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.graph.getStarterPack"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
-  muteActorList<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkGraphMuteActorList.QueryParams,
-      SoSprkGraphMuteActorList.HandlerInput,
-      SoSprkGraphMuteActorList.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.graph.muteActorList"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
   muteThread<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -2308,42 +2220,6 @@ export class SoSprkGraphNS {
     >,
   ) {
     const nsid = "so.sprk.graph.muteThread"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
-  searchStarterPacks<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkGraphSearchStarterPacks.QueryParams,
-      SoSprkGraphSearchStarterPacks.HandlerInput,
-      SoSprkGraphSearchStarterPacks.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.graph.searchStarterPacks"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
-  getActorStarterPacks<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkGraphGetActorStarterPacks.QueryParams,
-      SoSprkGraphGetActorStarterPacks.HandlerInput,
-      SoSprkGraphGetActorStarterPacks.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.graph.getActorStarterPacks"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
-  getLists<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkGraphGetLists.QueryParams,
-      SoSprkGraphGetLists.HandlerInput,
-      SoSprkGraphGetLists.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.graph.getLists"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2407,18 +2283,6 @@ export class SoSprkGraphNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
-  getListMutes<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkGraphGetListMutes.QueryParams,
-      SoSprkGraphGetListMutes.HandlerInput,
-      SoSprkGraphGetListMutes.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.graph.getListMutes"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
   getFollows<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -2464,18 +2328,6 @@ export class SoSprkGraphNS {
     >,
   ) {
     const nsid = "so.sprk.graph.unmuteActor"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
-  getList<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkGraphGetList.QueryParams,
-      SoSprkGraphGetList.HandlerInput,
-      SoSprkGraphGetList.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.graph.getList"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -2559,18 +2411,6 @@ export class SoSprkFeedNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
-  getPostThread<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkFeedGetPostThread.QueryParams,
-      SoSprkFeedGetPostThread.HandlerInput,
-      SoSprkFeedGetPostThread.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.feed.getPostThread"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
   getActorLikes<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -2592,6 +2432,18 @@ export class SoSprkFeedNS {
     >,
   ) {
     const nsid = "so.sprk.feed.getRepostedBy"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getThread<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      SoSprkFeedGetThread.QueryParams,
+      SoSprkFeedGetThread.HandlerInput,
+      SoSprkFeedGetThread.HandlerOutput
+    >,
+  ) {
+    const nsid = "so.sprk.feed.getThread"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 

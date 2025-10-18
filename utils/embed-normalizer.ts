@@ -59,7 +59,7 @@ export function normalizeEmbed(embed: unknown): unknown {
   const embedObj = embed as Record<string, unknown>;
 
   if (
-    embedObj.$type === "so.sprk.embed.video" && embedObj.video &&
+    embedObj.$type === "so.sprk.media.video" && embedObj.video &&
     typeof embedObj.video === "object"
   ) {
     const video = embedObj.video as Record<string, unknown>;
@@ -77,7 +77,7 @@ export function normalizeEmbed(embed: unknown): unknown {
           const cidString = toStringFn.call(ref);
           // Return cleaned up structure without 'original' field
           return {
-            $type: "so.sprk.embed.video",
+            $type: "so.sprk.media.video",
             video: {
               $type: "blob",
               ref: { $link: cidString },
@@ -92,7 +92,7 @@ export function normalizeEmbed(embed: unknown): unknown {
       } else if ((ref as CidRef).$link) {
         // Already normalized, return cleaned up structure
         return {
-          $type: "so.sprk.embed.video",
+          $type: "so.sprk.media.video",
           video: {
             $type: "blob",
             ref: { $link: (ref as CidRef).$link },
@@ -105,7 +105,7 @@ export function normalizeEmbed(embed: unknown): unknown {
   }
 
   if (
-    embedObj.$type === "so.sprk.embed.images" && Array.isArray(embedObj.images)
+    embedObj.$type === "so.sprk.media.images" && Array.isArray(embedObj.images)
   ) {
     const normalizedImages = embedObj.images.map((img: unknown) => {
       if (
@@ -162,7 +162,7 @@ export function normalizeEmbed(embed: unknown): unknown {
     });
 
     return {
-      $type: "so.sprk.embed.images",
+      $type: "so.sprk.media.images",
       images: normalizedImages,
     };
   }

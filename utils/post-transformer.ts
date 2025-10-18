@@ -4,7 +4,7 @@ import type * as SoSprkFeedDefs from "../lex/types/so/sprk/feed/defs.ts";
 import type * as SoSprkFeedPost from "../lex/types/so/sprk/feed/post.ts";
 import { AppContext } from "../context.ts";
 import { transformAudiosToAudioViews } from "./audio-transformer.ts";
-import { transformEmbed } from "./embed-transformer.ts";
+import { transformMedia } from "./media-transformer.ts";
 import { createProfileViewBasic } from "./profile-helper.ts";
 
 // Transform DB posts to PostView format
@@ -61,8 +61,8 @@ export async function transformPostsToPostViews(
     ctx.db.models.VideoMapping.find({
       key: {
         $in: posts
-          .filter((p) => p.embed?.$type === "so.sprk.embed.video")
-          .map((p) => `${p.authorDid}-${p.embed?.video?.ref.$link}`),
+          .filter((p) => p.media?.$type === "so.sprk.embed.video")
+          .map((p) => `${p.authorDid}-${p.media?.video?.ref.$link}`),
       },
     }),
     // Get viewer likes
@@ -111,14 +111,14 @@ export async function transformPostsToPostViews(
   const audioViewsMap = new Map(audioViews.map((av) => [av.uri, av]));
 
   return posts.map((post) => {
-    const videoMapping = post.embed?.$type === "so.sprk.embed.video"
+    const videoMapping = post.media?.$type === "so.sprk.media.video"
       ? videoMappingsMap.get(
-        `${post.authorDid}-${post.embed.video?.ref.$link}`,
+        `${post.authorDid}-${post.media.video?.ref.$link}`,
       ) || null
       : null;
 
-    const embed = transformEmbed(
-      post.embed,
+    const embed = transformMedia(
+      post.media,
       post.authorDid,
       ctx.cfg,
       videoMapping,
@@ -140,9 +140,11 @@ export async function transformPostsToPostViews(
       author: authorsMap.get(post.authorDid)!,
       record: {
         $type: "so.sprk.feed.post",
-        text: post.text,
-        embed: post.embed as SoSprkFeedPost.Record["embed"],
-        facets: post.facets,
+        caption: {
+          text: post.caption?.text,
+          facets: post.caption?.facets,
+        },
+        media: post.media as SoSprkFeedPost.Record["media"],
         langs: post.langs,
         tags: post.tags,
         createdAt: post.createdAt,

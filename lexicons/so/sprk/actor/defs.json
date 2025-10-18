@@ -89,10 +89,6 @@
           "type": "ref",
           "ref": "#profileAssociated"
         },
-        "joinedViaStarterPack": {
-          "type": "ref",
-          "ref": "so.sprk.graph.defs#starterPackViewBasic"
-        },
         "indexedAt": { "type": "string", "format": "datetime" },
         "createdAt": { "type": "string", "format": "datetime" },
         "viewer": { "type": "ref", "ref": "#viewerState" },
@@ -117,9 +113,7 @@
     "profileAssociated": {
       "type": "object",
       "properties": {
-        "lists": { "type": "integer" },
         "feedgens": { "type": "integer" },
-        "starterPacks": { "type": "integer" },
         "labeler": { "type": "boolean" },
         "chat": { "type": "ref", "ref": "#profileAssociatedChat" }
       }
@@ -139,16 +133,8 @@
       "description": "Metadata about the requesting account's relationship with the subject account. Only has meaningful content for authed requests.",
       "properties": {
         "muted": { "type": "boolean" },
-        "mutedByList": {
-          "type": "ref",
-          "ref": "so.sprk.graph.defs#listViewBasic"
-        },
         "blockedBy": { "type": "boolean" },
         "blocking": { "type": "string", "format": "at-uri" },
-        "blockingByList": {
-          "type": "ref",
-          "ref": "so.sprk.graph.defs#listViewBasic"
-        },
         "following": { "type": "string", "format": "at-uri" },
         "followedBy": { "type": "string", "format": "at-uri" },
         "knownFollowers": {
@@ -225,7 +211,7 @@
         },
         "type": {
           "type": "string",
-          "knownValues": ["feed", "list", "timeline"]
+          "knownValues": ["feed", "timeline"]
         },
         "value": {
           "type": "string"
@@ -427,8 +413,7 @@
             "refs": [
               "so.sprk.feed.threadgate#mentionRule",
               "so.sprk.feed.threadgate#followerRule",
-              "so.sprk.feed.threadgate#followingRule",
-              "so.sprk.feed.threadgate#listRule"
+              "so.sprk.feed.threadgate#followingRule"
             ]
           }
         }

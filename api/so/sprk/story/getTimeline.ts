@@ -4,7 +4,7 @@ import { AppContext } from "../../../../context.ts";
 import { transformStoriesToStoryViews } from "../../../../utils/story-transformer.ts";
 import { decodeBase64, encodeBase64 } from "@std/encoding";
 import type { ProfileViewBasic } from "../../../../lex/types/so/sprk/actor/defs.ts";
-import type * as SoSprkFeedDefs from "../../../../lex/types/so/sprk/feed/defs.ts";
+import type * as SoSprkStoryDefs from "../../../../lex/types/so/sprk/story/defs.ts";
 
 // Constants
 const MAX_LIMIT = 100;
@@ -18,7 +18,7 @@ interface CursorData {
 
 interface AuthorStoryGroup {
   author: ProfileViewBasic;
-  stories: SoSprkFeedDefs.StoryView[];
+  stories: SoSprkStoryDefs.StoryView[];
 }
 
 // Helper function to parse cursor
@@ -117,8 +117,8 @@ function buildStoriesQuery(
 
 // Efficiently group stories by author with proper sorting
 function groupStoriesByAuthor(
-  storyViews: SoSprkFeedDefs.StoryView[],
-): SoSprkFeedDefs.StoriesByAuthor[] {
+  storyViews: SoSprkStoryDefs.StoryView[],
+): SoSprkStoryDefs.StoriesByAuthor[] {
   if (storyViews.length === 0) {
     return [];
   }
@@ -165,7 +165,7 @@ function groupStoriesByAuthor(
 }
 
 export default function (server: Server, ctx: AppContext) {
-  server.so.sprk.feed.getStoriesTimeline({
+  server.so.sprk.story.getTimeline({
     auth: ctx.authVerifier.standard,
     handler: async ({ params, auth }) => {
       const { limit: limitParam = DEFAULT_LIMIT, cursor } = params;

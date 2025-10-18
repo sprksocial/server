@@ -87,6 +87,25 @@
         }
       }
     },
+    "replyRef": {
+      "type": "object",
+      "required": ["root", "parent"],
+      "properties": {
+        "root": {
+          "type": "union",
+          "refs": ["#postView", "#notFoundPost", "#blockedPost"]
+        },
+        "parent": {
+          "type": "union",
+          "refs": ["#postView", "#replyView", "#notFoundPost", "#blockedPost"]
+        },
+        "grandparentAuthor": {
+          "type": "ref",
+          "ref": "so.sprk.actor.defs#profileViewBasic",
+          "description": "When parent is a reply to another post, this is the author of that post."
+        }
+      }
+    },
     "reasonRepost": {
       "type": "object",
       "required": ["by", "indexedAt"],
@@ -99,6 +118,21 @@
       "type": "object",
       "properties": {}
     },
+    "threadViewPost": {
+      "type": "object",
+      "required": ["post"],
+      "properties": {
+        "post": { "type": "ref", "ref": "#postView" },
+        "replies": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": ["#threadViewReply", "#notFoundPost", "#blockedPost"]
+          }
+        },
+        "threadContext": { "type": "ref", "ref": "#threadContext" }
+      }
+    },
     "threadViewReply": {
       "type": "object",
       "required": ["reply"],
@@ -106,17 +140,18 @@
         "reply": { "type": "ref", "ref": "#replyView" },
         "parent": {
           "type": "union",
-          "refs": ["#threadViewReply", "#notFoundPost", "#blockedPost"]
-        },
-        "root": {
-          "type": "ref",
-          "ref": "#feedViewPost"
+          "refs": [
+            "#threadViewReply",
+            "#threadViewPost",
+            "#notFoundPost",
+            "#blockedPost"
+          ]
         },
         "replies": {
           "type": "array",
           "items": {
             "type": "union",
-            "refs": ["#threadViewPost", "#notFoundPost", "#blockedPost"]
+            "refs": ["#threadViewReply", "#notFoundPost", "#blockedPost"]
           }
         },
         "threadContext": { "type": "ref", "ref": "#threadContext" }
@@ -214,11 +249,7 @@
       "properties": {
         "uri": { "type": "string", "format": "at-uri" },
         "cid": { "type": "string", "format": "cid" },
-        "record": { "type": "unknown" },
-        "lists": {
-          "type": "array",
-          "items": { "type": "ref", "ref": "so.sprk.graph.defs#listViewBasic" }
-        }
+        "record": { "type": "unknown" }
       }
     },
     "interaction": {

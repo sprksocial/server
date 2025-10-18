@@ -4,7 +4,6 @@
 import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import { type $Typed } from "../../../../util.ts";
-import type * as SoSprkMediaImage from "../media/image.ts";
 import type * as SoSprkMediaImages from "../media/images.ts";
 import type * as SoSprkMediaVideo from "../media/video.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef.ts";
@@ -17,11 +16,9 @@ const id = "so.sprk.feed.post";
 export interface Record {
   $type: "so.sprk.feed.post";
   caption?: CaptionRef;
-  media:
-    | $Typed<SoSprkMediaImage.Main>
-    | $Typed<SoSprkMediaImages.Main>
-    | $Typed<SoSprkMediaVideo.Main>
-    | { $type: string };
+  media: $Typed<SoSprkMediaImages.Main> | $Typed<SoSprkMediaVideo.Main> | {
+    $type: string;
+  };
   sound?: ComAtprotoRepoStrongRef.Main;
   /** Indicates human language of post primary text content. */
   langs?: (string)[];
@@ -46,7 +43,7 @@ export function validateRecord<V>(v: V) {
 export interface CaptionRef {
   $type?: "so.sprk.feed.post#captionRef";
   /** The post description. */
-  text: string;
+  text?: string;
   /** Annotations of text (mentions, URLs, hashtags, etc) */
   facets?: (SoSprkRichtextFacet.Main)[];
 }

@@ -3,12 +3,19 @@ import { HydrationState } from "../hydration/index.ts";
 import {
   FeedViewPost,
   isPostView,
+  isReplyView,
   PostView,
   ReasonPin,
   ReasonRepost,
   ReplyRef,
+  ReplyView,
+  ThreadContext,
 } from "../lex/types/so/sprk/feed/defs.ts";
-import { isRecord as isPostRecord } from "../lex/types/so/sprk/feed/post.ts";
+import {
+  isRecord as isReplyRecord,
+  Record as ReplyRecord,
+} from "../lex/types/so/sprk/feed/reply.ts";
+import { ids } from "../lex/lexicons.ts";
 import {
   KnownFollowers,
   ProfileView,
@@ -18,23 +25,31 @@ import {
 } from "../lex/types/so/sprk/actor/defs.ts";
 import {
   BlockedPost,
-  Embed,
-  EmbedView,
-  ImagesEmbed,
-  ImagesEmbedView,
-  isImagesEmbed,
-  isVideoEmbed,
+  ImagesMedia,
+  ImagesMediaView,
+  isImagesMedia,
+  isVideoMedia,
   MaybePostView,
+  Media,
+  MediaView,
   NotFoundPost,
-  VideoEmbed,
-  VideoEmbedView,
+  VideoMedia,
+  VideoMediaView,
 } from "./types.ts";
+import {
+  Main as ImageMedia,
+  View as ImageView,
+} from "../lex/types/so/sprk/media/image.ts";
 import { INVALID_HANDLE } from "@atp/syntax";
 import { cidFromBlobJson } from "./util.ts";
 import { uriToDid } from "../utils/uris.ts";
 import { mapDefined } from "@atp/common";
 import { FeedItem, Repost } from "../hydration/feed.ts";
-import { $Typed } from "../lex/util.ts";
+import {
+  QueryParams as GetThreadQueryParams,
+  ThreadItem,
+} from "../lex/types/so/sprk/feed/getThread.ts";
+import { $Typed, Un$Typed } from "../lex/util.ts";
 
 export class Views {
   public indexedAtEpoch?: Date | undefined;
@@ -59,31 +74,190 @@ export class Views {
     this.mediaCdn = opts?.mediaCdn;
   }
 
+  thread(
+    skeleton: { anchor: string; uris: string[] },
+    state: HydrationState,
+    opts: {
+      depth?: GetThreadQueryParams["depth"];
+    } = {},
+  ): ThreadItem[] {
+    const maxDepth = opts.depth !== undefined && opts.depth >= 0
+      ? opts.depth
+      : undefined;
+    const depthCache = new Map<string, number>();
+    depthCache.set(skeleton.anchor, 0);
+
+    const computeDepth = (uri: string, stack = new Set<string>()): number => {
+      const cached = depthCache.get(uri);
+      if (cached !== undefined) return cached;
+
+      if (stack.has(uri)) {
+        depthCache.set(uri, 0);
+        return 0;
+      }
+
+      stack.add(uri);
+
+      const replyInfo = state.replies?.get(uri) ?? undefined;
+      const parentUri = replyInfo?.record.reply?.parent.uri;
+      if (!parentUri) {
+        depthCache.set(uri, 0);
+        stack.delete(uri);
+        return 0;
+      }
+
+      const depth = computeDepth(parentUri, stack) + 1;
+      depthCache.set(uri, depth);
+      stack.delete(uri);
+      return depth;
+    };
+
+    const items: ThreadItem[] = [];
+    for (const uri of skeleton.uris) {
+      const depth = computeDepth(uri);
+      if (!Number.isFinite(depth)) continue;
+      if (maxDepth !== undefined && depth > maxDepth) continue;
+
+      const value = this.threadViewItem(uri, state, depth);
+      items.push({
+        $type: "so.sprk.feed.getThread#threadItem",
+        uri,
+        depth,
+        value,
+      });
+    }
+
+    return items;
+  }
+
+  threadViewItem(
+    uri: string,
+    state: HydrationState,
+    depth: number,
+  ): ThreadItem["value"] {
+    const authorDid = uriToDid(uri);
+
+    if (!state.ctx?.include3pBlocks) {
+      const blockInfo = state.postBlocks?.get(uri) ?? undefined;
+      if (blockInfo && (blockInfo.parent || blockInfo.root)) {
+        return this.blockedPost(uri, authorDid, state);
+      }
+    }
+
+    if (this.viewerBlockExists(authorDid, state)) {
+      return this.blockedPost(uri, authorDid, state);
+    }
+
+    const replyView = this.reply(uri, state, depth);
+    if (replyView) {
+      return {
+        $type: "so.sprk.feed.defs#threadViewReply",
+        reply: replyView,
+        threadContext: this.threadContext(uri, state),
+      };
+    }
+
+    const postView = this.post(uri, state, depth);
+    if (postView) {
+      return {
+        $type: "so.sprk.feed.defs#threadViewPost",
+        post: postView,
+        threadContext: this.threadContext(uri, state),
+      };
+    }
+
+    return this.notFoundPost(uri);
+  }
+
+  threadContext(
+    uri: string,
+    state: HydrationState,
+  ): ThreadContext | undefined {
+    const context = state.threadContexts?.get(uri) ?? undefined;
+    if (!context) return undefined;
+    const { like } = context;
+    return {
+      $type: "so.sprk.feed.defs#threadContext",
+      ...(like ? { rootAuthorLike: like } : {}),
+    };
+  }
+
   post(
     uri: string,
     state: HydrationState,
     depth = 0,
-  ): PostView | undefined {
-    const post = state.posts?.get(uri);
-    if (!post) return;
+  ): Un$Typed<PostView> | undefined {
+    const recordInfo = state.posts?.get(uri) ?? state.replies?.get(uri);
+    if (!recordInfo) return;
+
+    const parsedUri = new AtUri(uri);
+    const collection = parsedUri.collection;
+    const isReply = collection === ids.SoSprkFeedReply;
+    const authorDid = parsedUri.hostname;
+    const author = this.profileBasic(authorDid, state);
+    if (!author) return;
+
+    const postAgg = state.postAggs?.get(uri);
+    const replyAgg = state.replyAggs?.get(uri);
+    const repliesCount = isReply
+      ? replyAgg?.replies ?? 0
+      : postAgg?.replies ?? 0;
+    const likeCount = isReply ? replyAgg?.likes ?? 0 : postAgg?.likes ?? 0;
+    const repostCount = !isReply ? postAgg?.reposts ?? 0 : undefined;
+    const viewer = state.postViewers?.get(uri);
+    const mediaRecord = !isReply && "media" in recordInfo.record
+      ? recordInfo.record.media
+      : undefined;
+
+    return {
+      uri,
+      cid: recordInfo.cid,
+      author,
+      record: recordInfo.record,
+      media: mediaRecord && depth < 2
+        ? this.media(uri, mediaRecord as Media, state)
+        : undefined,
+      replyCount: repliesCount,
+      repostCount,
+      likeCount,
+      indexedAt: this.indexedAt(recordInfo)?.toISOString() ??
+        new Date().toISOString(),
+      viewer: viewer
+        ? {
+          repost: viewer.repost,
+          like: viewer.like,
+        }
+        : undefined,
+    };
+  }
+
+  reply(
+    uri: string,
+    state: HydrationState,
+    depth = 0,
+  ): Un$Typed<ReplyView> | undefined {
+    const replyInfo = state.replies?.get(uri);
+    if (!replyInfo) return;
+
     const parsedUri = new AtUri(uri);
     const authorDid = parsedUri.hostname;
     const author = this.profileBasic(authorDid, state);
     if (!author) return;
-    const aggs = state.postAggs?.get(uri);
+
+    const aggs = state.replyAggs?.get(uri);
     const viewer = state.postViewers?.get(uri);
+
     return {
       uri,
-      cid: post.cid,
+      cid: replyInfo.cid,
       author,
-      record: post.record,
-      embed: depth < 2 && post.record.embed
-        ? this.embed(uri, post.record.embed, state)
+      record: replyInfo.record,
+      image: depth < 2 && replyInfo.record.image
+        ? this.imageMedia(uri, replyInfo.record.image)
         : undefined,
       replyCount: aggs?.replies ?? 0,
-      repostCount: aggs?.reposts ?? 0,
       likeCount: aggs?.likes ?? 0,
-      indexedAt: this.indexedAt(post)?.toISOString() ??
+      indexedAt: this.indexedAt(replyInfo)?.toISOString() ??
         new Date().toISOString(),
       viewer: viewer
         ? {
@@ -110,43 +284,54 @@ export class Views {
     }
     const post = this.post(item.post.uri, state);
     if (!post) return;
-    const reply = this.replyRef(item.post.uri, state);
     return {
       post,
       reason,
-      reply,
     };
   }
 
   replyRef(uri: string, state: HydrationState): ReplyRef | undefined {
-    const postRecord = state.posts?.get(uri.toString())?.record;
-    if (!postRecord?.reply) return;
-    let root = this.maybePost(postRecord.reply.root.uri, state);
-    let parent = this.maybePost(postRecord.reply.parent.uri, state);
+    const replyRecord = state.replies?.get(uri)?.record;
+    if (!replyRecord?.reply) return;
+
+    let root = this.maybePost(replyRecord.reply.root.uri, state);
+    let parent = this.maybePost(replyRecord.reply.parent.uri, state);
+    const parentForContext = parent;
+
     if (!state.ctx?.include3pBlocks) {
-      const childBlocks = state.postBlocks?.get(uri);
-      const parentBlocks = state.postBlocks?.get(parent.uri);
-      // if child blocks parent, block parent
-      if (isPostView(parent) && childBlocks?.parent) {
+      const childBlocks = state.postBlocks?.get(uri) ?? undefined;
+      const parentBlocks = state.postBlocks?.get(parent.uri) ?? undefined;
+
+      if (
+        (isPostView(parent) || isReplyView(parent)) &&
+        childBlocks?.parent
+      ) {
         parent = this.blockedPost(parent.uri, parent.author.did, state);
       }
-      // if child or parent blocks root, block root
-      if (isPostView(root) && (childBlocks?.root || parentBlocks?.root)) {
+
+      if (
+        (isPostView(root) || isReplyView(root)) &&
+        (childBlocks?.root || parentBlocks?.root)
+      ) {
         root = this.blockedPost(root.uri, root.author.did, state);
       }
     }
+
     let grandparentAuthor: ProfileViewBasic | undefined;
     if (
-      isPostView(parent) &&
-      isPostRecord(parent.record) &&
-      parent.record.reply
+      isReplyView(parentForContext) &&
+      isReplyRecord(parentForContext.record)
     ) {
-      grandparentAuthor = this.profileBasic(
-        // @ts-expect-error isValidPostRecord(parent.record) should be used but the "parent" is not IPDL decoded
-        creatorFromUri(parent.record.reply.parent.uri),
-        state,
-      );
+      const grandparentUri =
+        (parentForContext.record as ReplyRecord).reply.parent.uri;
+      if (grandparentUri) {
+        grandparentAuthor = this.profileBasic(
+          uriToDid(grandparentUri),
+          state,
+        );
+      }
     }
+
     return {
       root,
       parent,
@@ -176,6 +361,17 @@ export class Views {
   }
 
   maybePost(uri: string, state: HydrationState): $Typed<MaybePostView> {
+    const reply = this.reply(uri, state);
+    if (reply) {
+      if (this.viewerBlockExists(reply.author.did, state)) {
+        return this.blockedPost(uri, reply.author.did, state);
+      }
+      return {
+        ...reply,
+        $type: "so.sprk.feed.defs#replyView",
+      };
+    }
+
     const post = this.post(uri, state);
     if (!post) {
       return this.notFoundPost(uri);
@@ -221,25 +417,15 @@ export class Views {
     originatorBlocked: boolean;
     authorMuted: boolean;
     authorBlocked: boolean;
-    ancestorAuthorBlocked: boolean;
   } {
     const authorDid = uriToDid(item.post.uri);
     const originatorDid = item.repost ? uriToDid(item.repost.uri) : authorDid;
-    const post = state.posts?.get(item.post.uri);
-    const parentUri = post?.record.reply?.parent.uri;
-    const parentAuthorDid = parentUri && uriToDid(parentUri);
-    const parent = parentUri ? state.posts?.get(parentUri) : undefined;
-    const grandparentUri = parent?.record.reply?.parent.uri;
-    const grandparentAuthorDid = grandparentUri && uriToDid(grandparentUri);
+
     return {
       originatorMuted: this.viewerMuteExists(originatorDid, state),
       originatorBlocked: this.viewerBlockExists(originatorDid, state),
       authorMuted: this.viewerMuteExists(authorDid, state),
       authorBlocked: this.viewerBlockExists(authorDid, state),
-      ancestorAuthorBlocked:
-        (!!parentAuthorDid && this.viewerBlockExists(parentAuthorDid, state)) ||
-        (!!grandparentAuthorDid &&
-          this.viewerBlockExists(grandparentAuthorDid, state)),
     };
   }
 
@@ -368,29 +554,43 @@ export class Views {
     return { count: knownFollowers.count, followers };
   }
 
-  embed(
+  media(
     postUri: string,
-    embed: Embed | { $type: string },
+    media: Media | { $type: string },
     state?: HydrationState,
-  ): (EmbedView & { $type: string }) | undefined {
-    if (isImagesEmbed(embed)) {
-      return this.imagesEmbed(uriToDid(postUri), embed);
-    } else if (isVideoEmbed(embed)) {
+  ): (MediaView & { $type: string }) | undefined {
+    if (isImagesMedia(media)) {
+      return this.imagesMedia(uriToDid(postUri), media);
+    } else if (isVideoMedia(media)) {
       const authorDid = uriToDid(postUri);
-      const videoCid = embed.video ? cidFromBlobJson(embed.video) : "";
+      const videoCid = media.video ? cidFromBlobJson(media.video) : "";
       const videoMappingKey = `${authorDid}-${videoCid}`;
       const videoMapping = state?.videoMappings?.get(videoMappingKey) || null;
-      return this.videoEmbed(authorDid, embed, videoMapping);
+      return this.videoMedia(authorDid, media, videoMapping);
     } else {
       return undefined;
     }
   }
 
-  imagesEmbed(
+  imageMedia(
     did: string,
-    embed: ImagesEmbed,
-  ): ImagesEmbedView & { $type: string } {
-    const imgViews = embed.images.map((img) => ({
+    image: ImageMedia,
+  ): ImageView & { $type: string } {
+    const cid = cidFromBlobJson(image.image);
+    return {
+      $type: "so.sprk.media.image#view" as const,
+      thumb: `${this.mediaCdn}/img/medium/${did}/${cid}/webp`,
+      fullsize: `${this.mediaCdn}/img/full/${did}/${cid}/webp`,
+      alt: image.alt,
+      aspectRatio: image.aspectRatio,
+    };
+  }
+
+  imagesMedia(
+    did: string,
+    media: ImagesMedia,
+  ): ImagesMediaView & { $type: string } {
+    const imgViews = media.images.map((img) => ({
       thumb: `${this.mediaCdn}/img/medium/${did}/${
         cidFromBlobJson(img.image)
       }/webp`,
@@ -401,17 +601,17 @@ export class Views {
       aspectRatio: img.aspectRatio,
     }));
     return {
-      $type: "so.sprk.embed.images#view" as const,
+      $type: "so.sprk.media.images#view" as const,
       images: imgViews,
     };
   }
 
-  videoEmbed(
+  videoMedia(
     did: string,
-    embed: VideoEmbed,
+    media: VideoMedia,
     videoMapping?: { bunnyGuid: string } | null,
-  ): VideoEmbedView & { $type: string } {
-    const cid = cidFromBlobJson(embed.video);
+  ): VideoMediaView & { $type: string } {
+    const cid = cidFromBlobJson(media.video);
 
     let playlist: string;
     let thumbnail: string;
@@ -425,12 +625,12 @@ export class Views {
     }
 
     return {
-      $type: "so.sprk.embed.video#view" as const,
+      $type: "so.sprk.media.video#view",
       cid,
       playlist,
       thumbnail,
-      alt: embed.alt,
-      aspectRatio: embed.aspectRatio,
+      alt: media.alt,
+      aspectRatio: media.aspectRatio,
     };
   }
   indexedAt({ sortedAt, indexedAt }: { sortedAt: Date; indexedAt: Date }) {

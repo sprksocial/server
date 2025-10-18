@@ -6,7 +6,6 @@ import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { ProfileDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
-import { normalizeProfile } from "../../../utils/embed-normalizer.ts";
 
 const lexId = lex.ids.SoSprkActorProfile;
 type IndexedProfile = ProfileDocument;
@@ -20,20 +19,16 @@ const insertFn = async (
 ): Promise<IndexedProfile | null> => {
   if (uri.rkey !== "self") return null;
 
-  const normalizedProfile = normalizeProfile(obj) as
-    | Record<string, unknown>
-    | null;
-
   const profile = {
     uri: uri.toString(),
     cid: cid.toString(),
     authorDid: uri.host,
-    displayName: normalizedProfile?.displayName || null,
-    description: normalizedProfile?.description || null,
-    avatar: normalizedProfile?.avatar || null,
-    banner: normalizedProfile?.banner || null,
-    pinnedPost: normalizedProfile?.pinnedPost || null,
-    createdAt: normalizedProfile?.createdAt || new Date().toISOString(),
+    displayName: obj?.displayName,
+    description: obj?.description,
+    avatar: obj?.avatar,
+    banner: obj?.banner,
+    pinnedPost: obj?.pinnedPost,
+    createdAt: obj?.createdAt || new Date().toISOString(),
     indexedAt: timestamp,
   };
 

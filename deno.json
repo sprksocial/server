@@ -35,9 +35,9 @@
     "multiformats": "npm:multiformats@^13.4.1",
     "p-queue": "npm:p-queue@^8.1.1"
   },
-  "compilerOptions": {
-    "jsx": "precompile",
-    "jsxImportSource": "hono/jsx"
-  },
-  "unstable": ["sloppy-imports"]
+  "test": {
+    "permissions": {
+      "env": true
+    }
+  }
 }

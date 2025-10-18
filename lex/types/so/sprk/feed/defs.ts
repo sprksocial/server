@@ -5,13 +5,12 @@ import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import { type $Typed } from "../../../../util.ts";
 import type * as SoSprkActorDefs from "../actor/defs.ts";
-import type * as SoSprkMediaImage from "../media/image.ts";
 import type * as SoSprkMediaImages from "../media/images.ts";
 import type * as SoSprkMediaVideo from "../media/video.ts";
 import type * as SoSprkSoundDefs from "../sound/defs.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
+import type * as SoSprkMediaImage from "../media/image.ts";
 import type * as SoSprkRichtextFacet from "../richtext/facet.ts";
-import type * as SoSprkGraphDefs from "../graph/defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.feed.defs";
@@ -22,11 +21,9 @@ export interface PostView {
   cid: string;
   author: SoSprkActorDefs.ProfileViewBasic;
   record: { [_ in string]: unknown };
-  media?:
-    | $Typed<SoSprkMediaImage.View>
-    | $Typed<SoSprkMediaImages.View>
-    | $Typed<SoSprkMediaVideo.View>
-    | { $type: string };
+  media?: $Typed<SoSprkMediaImages.View> | $Typed<SoSprkMediaVideo.View> | {
+    $type: string;
+  };
   sound?: SoSprkSoundDefs.AudioView;
   replyCount?: number;
   repostCount?: number;
@@ -126,6 +123,30 @@ export function validateFeedViewPost<V>(v: V) {
   return validate<FeedViewPost & V>(v, id, hashFeedViewPost);
 }
 
+export interface ReplyRef {
+  $type?: "so.sprk.feed.defs#replyRef";
+  root: $Typed<PostView> | $Typed<NotFoundPost> | $Typed<BlockedPost> | {
+    $type: string;
+  };
+  parent:
+    | $Typed<PostView>
+    | $Typed<ReplyView>
+    | $Typed<NotFoundPost>
+    | $Typed<BlockedPost>
+    | { $type: string };
+  grandparentAuthor?: SoSprkActorDefs.ProfileViewBasic;
+}
+
+const hashReplyRef = "replyRef";
+
+export function isReplyRef<V>(v: V) {
+  return is$typed(v, id, hashReplyRef);
+}
+
+export function validateReplyRef<V>(v: V) {
+  return validate<ReplyRef & V>(v, id, hashReplyRef);
+}
+
 export interface ReasonRepost {
   $type?: "so.sprk.feed.defs#reasonRepost";
   by: SoSprkActorDefs.ProfileViewBasic;
@@ -156,17 +177,37 @@ export function validateReasonPin<V>(v: V) {
   return validate<ReasonPin & V>(v, id, hashReasonPin);
 }
 
+export interface ThreadViewPost {
+  $type?: "so.sprk.feed.defs#threadViewPost";
+  post: PostView;
+  replies?:
+    ($Typed<ThreadViewReply> | $Typed<NotFoundPost> | $Typed<BlockedPost> | {
+      $type: string;
+    })[];
+  threadContext?: ThreadContext;
+}
+
+const hashThreadViewPost = "threadViewPost";
+
+export function isThreadViewPost<V>(v: V) {
+  return is$typed(v, id, hashThreadViewPost);
+}
+
+export function validateThreadViewPost<V>(v: V) {
+  return validate<ThreadViewPost & V>(v, id, hashThreadViewPost);
+}
+
 export interface ThreadViewReply {
   $type?: "so.sprk.feed.defs#threadViewReply";
   reply: ReplyView;
   parent?:
     | $Typed<ThreadViewReply>
+    | $Typed<ThreadViewPost>
     | $Typed<NotFoundPost>
     | $Typed<BlockedPost>
     | { $type: string };
-  root?: FeedViewPost;
   replies?:
-    ($Typed<ThreadViewPost> | $Typed<NotFoundPost> | $Typed<BlockedPost> | {
+    ($Typed<ThreadViewReply> | $Typed<NotFoundPost> | $Typed<BlockedPost> | {
       $type: string;
     })[];
   threadContext?: ThreadContext;
@@ -327,7 +368,6 @@ export interface ThreadgateView {
   uri?: string;
   cid?: string;
   record?: { [_ in string]: unknown };
-  lists?: (SoSprkGraphDefs.ListViewBasic)[];
 }
 
 const hashThreadgateView = "threadgateView";

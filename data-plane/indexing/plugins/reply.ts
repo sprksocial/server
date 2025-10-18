@@ -20,10 +20,6 @@ import {
   invalidReplyRoot as checkInvalidReplyRoot,
 } from "../../util.ts";
 import { RecordProcessor } from "../processor.ts";
-import {
-  normalizeEmbed,
-  normalizeObject,
-} from "../../../utils/embed-normalizer.ts";
 import { jsonToLex } from "@atp/lexicon";
 
 type PostAncestor = {
@@ -49,7 +45,7 @@ type IndexedReply = {
   threadgate?: GateRecord;
 };
 
-const lexId = lex.ids.SoSprkFeedPost;
+const lexId = lex.ids.SoSprkFeedReply;
 
 const REPLY_NOTIF_DEPTH = 5;
 
@@ -70,15 +66,7 @@ const insertFn = async (
     );
   }
 
-  console.log("DEBUG: Post embed:", JSON.stringify(obj.embed, null, 2));
-
-  const normalizedEmbed = normalizeEmbed(obj.embed);
-  console.log(
-    "DEBUG: Normalized embed:",
-    JSON.stringify(normalizedEmbed, null, 2),
-  );
-
-  const post = {
+  const reply = {
     uri: uri.toString(),
     cid: cid.toString(),
     authorDid: uri.host,
@@ -96,8 +84,7 @@ const insertFn = async (
         },
       }
       : null,
-    embed: normalizedEmbed || null,
-    sound: normalizeObject(obj.sound) || null,
+    image: obj.image,
     langs: obj.langs || [],
     labels: obj.labels || null,
     tags: obj.tags || [],
@@ -107,9 +94,9 @@ const insertFn = async (
 
   // Use findOneAndUpdate with upsert to handle potential duplicate key errors
   try {
-    const insertedPost = await db.models.Post.findOneAndUpdate(
-      { uri: post.uri },
-      post,
+    const insertedReply = await db.models.Reply.findOneAndUpdate(
+      { uri: reply.uri },
+      reply,
       { upsert: true, new: true },
     );
 
@@ -119,9 +106,9 @@ const insertFn = async (
         obj.reply,
       );
       if (invalidReplyRoot) {
-        Object.assign(insertedPost, { invalidReplyRoot });
-        await db.models.Post.updateOne(
-          { uri: post.uri },
+        Object.assign(insertedReply, { invalidReplyRoot });
+        await db.models.Reply.updateOne(
+          { uri: reply.uri },
           { invalidReplyRoot },
         );
       }
@@ -161,16 +148,16 @@ const insertFn = async (
     }
 
     const ancestors = await getAncestorsAndSelf(db, {
-      uri: post.uri,
+      uri: reply.uri,
       parentHeight: REPLY_NOTIF_DEPTH,
     });
     const descendents = await getDescendents(db, {
-      uri: post.uri,
+      uri: reply.uri,
       depth: REPLY_NOTIF_DEPTH,
     });
 
     return {
-      reply: insertedPost,
+      reply: insertedReply,
       facets,
       image,
       ancestors,
@@ -232,7 +219,7 @@ const notifsForInsert = (obj: IndexedReply) => {
 
   // reply notifications
   for (const ancestor of obj.ancestors ?? []) {
-    if (ancestor.uri === obj.reply.uri) continue; // no need to notify for own post
+    if (ancestor.uri === obj.reply.uri) continue;
     if (ancestor.height < REPLY_NOTIF_DEPTH) {
       const ancestorUri = new AtUri(ancestor.uri);
       maybeNotify({
@@ -250,7 +237,7 @@ const notifsForInsert = (obj: IndexedReply) => {
   }
 
   // descendents indicate out-of-order indexing: need to notify
-  // the current post and upwards.
+  // everything upwards of the current reply
   for (const descendent of obj.descendents ?? []) {
     for (const ancestor of obj.ancestors ?? []) {
       const totalHeight = descendent.depth + ancestor.height;
@@ -277,7 +264,7 @@ const deleteFn = async (
   uri: AtUri,
 ): Promise<IndexedReply | null> => {
   const uriStr = uri.toString();
-  const deleted = await db.models.Post.findOneAndDelete({ uri: uriStr });
+  const deleted = await db.models.Reply.findOneAndDelete({ uri: uriStr });
 
   if (!deleted) {
     return null;
@@ -303,40 +290,30 @@ const notifsForDelete = (
 const updateAggregates = async (db: Database, replyIdx: IndexedReply) => {
   // Update reply count for parent post
   if (replyIdx.reply.reply?.parent?.uri) {
-    const replyCount = await db.models.Post.countDocuments({
+    const parentPost = await db.models.Post.findOne({
+      uri: replyIdx.reply.reply?.parent.uri,
+    });
+    const parentReply = await db.models.Reply.findOne({
+      uri: replyIdx.reply.reply?.parent.uri,
+    });
+
+    const replyCount = await db.models.Reply.countDocuments({
       "reply.parent.uri": replyIdx.reply.reply.parent.uri,
-      violatesThreadGate: { $ne: true },
     });
 
-    await db.models.Post.findOneAndUpdate(
-      { uri: replyIdx.reply.reply?.parent.uri },
-      { replyCount },
-      { upsert: true, new: true },
-    );
-  }
-
-  try {
-    // Update posts count for author
-    const postsCount = await db.models.Post.countDocuments({
-      authorDid: replyIdx.reply.authorDid,
-    });
-
-    // First check if profile exists to avoid creating one with null URI
-    const existingProfile = await db.models.Profile.findOne({
-      authorDid: replyIdx.reply.authorDid,
-    });
-
-    if (existingProfile) {
-      // Only update existing profiles
-      await db.models.Profile.findOneAndUpdate(
-        { authorDid: replyIdx.reply.authorDid },
-        { postsCount },
-        { new: true },
+    if (parentPost) {
+      await db.models.Post.findOneAndUpdate(
+        { uri: replyIdx.reply.reply?.parent.uri },
+        { replyCount },
+        { upsert: true, new: true },
+      );
+    } else if (parentReply) {
+      await db.models.Reply.findOneAndUpdate(
+        { uri: replyIdx.reply.reply?.parent.uri },
+        { replyCount },
+        { upsert: true, new: true },
       );
     }
-  } catch (error) {
-    console.error("Error updating post aggregates:", error);
-    // Don't throw - allow processing to continue even if aggregates update fails
   }
 };
 

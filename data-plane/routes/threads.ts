@@ -1,4 +1,5 @@
 import { Database } from "../db/index.ts";
+import { Code, DataPlaneError } from "../util.ts";
 
 // Parameter validation
 function validateThreadParams(above: number, below: number) {
@@ -11,36 +12,10 @@ function validateThreadParams(above: number, below: number) {
   }
 }
 
-// Helper function to get ancestors (parent posts going up the thread)
-async function getAncestors(
-  db: Database,
-  postUri: string,
-  maxDepth: number,
-): Promise<string[]> {
-  const ancestors: string[] = [];
-  let currentUri = postUri;
-  let depth = 0;
-
-  while (depth < maxDepth) {
-    const post = await db.models.Post.findOne({ uri: currentUri });
-
-    if (!post || !post.reply?.parent?.uri) {
-      break;
-    }
-
-    const parentUri = post.reply.parent.uri;
-    ancestors.unshift(parentUri); // Add to beginning to maintain order
-    currentUri = parentUri;
-    depth++;
-  }
-
-  return ancestors;
-}
-
-// Helper function to get descendants (child posts going down the thread)
+// Helper function to get descendants (child replies going down the thread)
 async function getDescendants(
   db: Database,
-  postUri: string,
+  parentUri: string,
   maxDepth: number,
 ): Promise<string[]> {
   const descendants: string[] = [];
@@ -48,7 +23,7 @@ async function getDescendants(
 
   // Use BFS to traverse descendants
   const queue: Array<{ uri: string; depth: number }> = [{
-    uri: postUri,
+    uri: parentUri,
     depth: 0,
   }];
 
@@ -61,8 +36,8 @@ async function getDescendants(
 
     visited.add(currentUri);
 
-    // Find all replies to this post
-    const replies = await db.models.Post.find({
+    // Find all replies to this post/reply
+    const replies = await db.models.Reply.find({
       "reply.parent.uri": currentUri,
     })
       .sort({ createdAt: -1 }); // Most recent first
@@ -93,23 +68,20 @@ export class Threads {
     validateThreadParams(above, below);
 
     try {
-      // Get ancestors (parents going up) and descendants (replies going down) in parallel
-      const [ancestors, descendants] = await Promise.all([
-        getAncestors(this.db, postUri, above),
-        getDescendants(this.db, postUri, below),
-      ]);
-
-      // Verify the original post exists
+      // Verify the original post exists and is a root post (posts can't have ancestors)
       const originalPost = await this.db.models.Post.findOne({ uri: postUri });
 
       if (!originalPost) {
-        throw new Error("Post not found");
+        throw new DataPlaneError(Code.NotFound);
       }
 
-      // Combine all URIs: ancestors + self + descendants
+      // Posts are always root - they don't have ancestors by design
+      // So we only get descendants (replies)
+      const descendants = await getDescendants(this.db, postUri, below);
+
+      // The thread is just the root post + all its descendant replies
       const uris = [
-        ...ancestors,
-        postUri, // The original post
+        postUri, // The original post (always root)
         ...descendants,
       ];
 
@@ -119,14 +91,14 @@ export class Threads {
       return {
         uris: uniqueUris,
         meta: {
-          ancestorCount: ancestors.length,
+          ancestorCount: 0, // Posts never have ancestors
           descendantCount: descendants.length,
           totalCount: uniqueUris.length,
         },
       };
     } catch (error) {
       console.error("Error fetching thread:", error);
-      throw new Error("Failed to fetch thread");
+      throw new DataPlaneError(Code.InternalError);
     }
   }
 
@@ -142,26 +114,11 @@ export class Threads {
       const originalPost = await this.db.models.Post.findOne({ uri: postUri });
 
       if (!originalPost) {
-        throw new Error("Post not found");
+        throw new DataPlaneError(Code.NotFound);
       }
 
-      // Get ancestors with metadata
+      // Posts don't have ancestors - they are always roots
       const ancestors: Array<{ uri: string; depth: number }> = [];
-      let currentUri = postUri;
-      let depth = 0;
-
-      while (depth < above) {
-        const post = await this.db.models.Post.findOne({ uri: currentUri });
-
-        if (!post || !post.reply?.parent?.uri) {
-          break;
-        }
-
-        const parentUri = post.reply.parent.uri;
-        ancestors.unshift({ uri: parentUri, depth: depth + 1 });
-        currentUri = parentUri;
-        depth++;
-      }
 
       // Get descendants with metadata using BFS
       const descendants: Array<
@@ -179,7 +136,8 @@ export class Threads {
           continue;
         }
 
-        const replies = await this.db.models.Post.find({
+        // Find replies to this post/reply
+        const replies = await this.db.models.Reply.find({
           "reply.parent.uri": currentUri,
         })
           .sort({ createdAt: -1 });
@@ -209,16 +167,14 @@ export class Threads {
       return {
         root: {
           uri: postUri,
-          isRoot: !originalPost.reply?.parent?.uri,
+          isRoot: true, // Posts are always roots
         },
-        ancestors: ancestors.reverse(), // Top ancestor first
+        ancestors, // Always empty for posts
         descendants,
         meta: {
-          ancestorCount: ancestors.length,
+          ancestorCount: 0, // Posts never have ancestors
           descendantCount: descendants.length,
-          maxAncestorDepth: ancestors.length > 0
-            ? Math.max(...ancestors.map((a) => a.depth))
-            : 0,
+          maxAncestorDepth: 0, // Posts never have ancestors
           maxDescendantDepth: descendants.length > 0
             ? Math.max(...descendants.map((d) => d.depth))
             : 0,
@@ -226,7 +182,58 @@ export class Threads {
       };
     } catch (error) {
       console.error("Error fetching thread structure:", error);
-      throw new Error("Failed to fetch thread structure");
+      throw new DataPlaneError(Code.InternalError);
+    }
+  }
+
+  // New method: Get thread starting from a reply (if needed for UI purposes)
+  // This would find the root post and then build the full thread
+  async getThreadFromReply(replyUri: string, below: number = 50) {
+    validateThreadParams(0, below); // No ancestors needed
+
+    try {
+      // Find the reply
+      const reply = await this.db.models.Reply.findOne({ uri: replyUri });
+
+      if (!reply) {
+        throw new DataPlaneError(Code.NotFound);
+      }
+
+      // Walk up to find the root post
+      let currentUri = replyUri;
+      let rootUri: string | null = null;
+
+      // Keep going up until we find a post (not a reply)
+      while (rootUri === null) {
+        const currentReply = await this.db.models.Reply.findOne({
+          uri: currentUri,
+        });
+
+        if (!currentReply || !currentReply.reply?.parent?.uri) {
+          // This shouldn't happen if data integrity is maintained
+          throw new DataPlaneError(Code.NotFound);
+        }
+
+        const parentUri = currentReply.reply.parent.uri;
+
+        // Check if parent is a post (root) or another reply
+        const parentPost = await this.db.models.Post.findOne({
+          uri: parentUri,
+        });
+
+        if (parentPost) {
+          rootUri = parentUri;
+        } else {
+          // Parent is another reply, keep going up
+          currentUri = parentUri;
+        }
+      }
+
+      // Now get the full thread starting from the root post
+      return this.getThread(rootUri, 0, below);
+    } catch (error) {
+      console.error("Error fetching thread from reply:", error);
+      throw new Error("Failed to fetch thread from reply");
     }
   }
 }

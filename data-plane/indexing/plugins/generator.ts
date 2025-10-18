@@ -1,14 +1,14 @@
 import { CID } from "multiformats/cid";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
-import * as lex from "../../../../lex/lexicons.ts";
-import * as FeedGenerator from "../../../../lex/types/so/sprk/feed/generator.ts";
-import { BackgroundQueue } from "../../../background.ts";
-import { Database } from "../../../db/index.ts";
-import { SprkGeneratorDocument } from "../../../db/models.ts";
-import { RecordProcessor } from "../../processor.ts";
+import * as lex from "../../../lex/lexicons.ts";
+import * as FeedGenerator from "../../../lex/types/so/sprk/feed/generator.ts";
+import { BackgroundQueue } from "../../background.ts";
+import { Database } from "../../db/index.ts";
+import { GeneratorDocument } from "../../db/models.ts";
+import { RecordProcessor } from "../processor.ts";
 
 const lexId = lex.ids.SoSprkFeedGenerator;
-type IndexedFeedGenerator = SprkGeneratorDocument;
+type IndexedFeedGenerator = GeneratorDocument;
 
 const insertFn = async (
   db: Database,
@@ -42,7 +42,7 @@ const insertFn = async (
 
   // Use findOneAndUpdate with upsert to handle potential duplicate key errors
   try {
-    const insertedGenerator = await db.models.SprkGenerator.findOneAndUpdate(
+    const insertedGenerator = await db.models.Generator.findOneAndUpdate(
       { uri: generator.uri },
       generator,
       { upsert: true, new: true },
@@ -70,7 +70,7 @@ const deleteFn = async (
   db: Database,
   uri: AtUri,
 ): Promise<IndexedFeedGenerator | null> => {
-  const deleted = await db.models.SprkGenerator.findOneAndDelete({
+  const deleted = await db.models.Generator.findOneAndDelete({
     uri: uri.toString(),
   });
   return deleted;

@@ -165,3 +165,23 @@ export const getResultFromDoc = (doc: DidDocument) => {
     updated: new Date(),
   };
 };
+
+export enum Code {
+  NotFound = "Not Found",
+  InvalidRequest = "Invalid Request",
+  InternalError = "Internal Error",
+}
+
+export class DataPlaneError extends Error {
+  public code: Code;
+
+  constructor(message: Code) {
+    super();
+    this.name = "DataPlaneError";
+    this.code = message;
+  }
+}
+
+export function isDataPlaneError(error: unknown, code?: Code): boolean {
+  return error instanceof DataPlaneError && (!code || error.code === code);
+}

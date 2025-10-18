@@ -1,29 +1,30 @@
 import {
-  Main as ImagesEmbed,
-  View as ImagesEmbedView,
-} from "../lex/types/so/sprk/embed/images.ts";
+  Main as ImagesMedia,
+  View as ImagesMediaView,
+} from "../lex/types/so/sprk/media/images.ts";
 import {
-  Main as VideoEmbed,
-  View as VideoEmbedView,
-} from "../lex/types/so/sprk/embed/video.ts";
+  Main as VideoMedia,
+  View as VideoMediaView,
+} from "../lex/types/so/sprk/media/video.ts";
 import {
   BlockedPost,
   GeneratorView,
   NotFoundPost,
   PostView,
+  ReplyView,
 } from "../lex/types/so/sprk/feed/defs.ts";
 import { LabelerView } from "../lex/types/app/bsky/labeler/defs.ts";
 
-export type {
-  Main as ImagesEmbed,
-  View as ImagesEmbedView,
-} from "../lex/types/so/sprk/embed/images.ts";
-export { isMain as isImagesEmbed } from "../lex/types/so/sprk/embed/images.ts";
-export type {
-  Main as VideoEmbed,
-  View as VideoEmbedView,
-} from "../lex/types/so/sprk/embed/video.ts";
-export { isMain as isVideoEmbed } from "../lex/types/so/sprk/embed/video.ts";
+export {
+  isMain as isImagesMedia,
+  type Main as ImagesMedia,
+  type View as ImagesMediaView,
+} from "../lex/types/so/sprk/media/images.ts";
+export {
+  isMain as isVideoMedia,
+  type Main as VideoMedia,
+  type View as VideoMediaView,
+} from "../lex/types/so/sprk/media/video.ts";
 export type {
   BlockedPost,
   GeneratorView,
@@ -31,16 +32,16 @@ export type {
   PostView,
 } from "../lex/types/so/sprk/feed/defs.ts";
 
-export type Embed =
-  | ImagesEmbed
-  | VideoEmbed;
+export type Media =
+  | ImagesMedia
+  | VideoMedia;
 
-export type EmbedView =
-  | ImagesEmbedView
-  | VideoEmbedView;
+export type MediaView =
+  | ImagesMediaView
+  | VideoMediaView;
 
-export type MaybePostView = PostView | NotFoundPost | BlockedPost;
+export type MaybePostView = PostView | ReplyView | NotFoundPost | BlockedPost;
 
-export type RecordEmbedViewInternal =
+export type RecordMediaViewInternal =
   | GeneratorView
   | LabelerView;

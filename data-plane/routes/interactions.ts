@@ -94,7 +94,7 @@ export class Interactions {
         { $group: { _id: "$authorDid", count: { $sum: 1 } } },
       ]),
       // Count generators for each DID
-      this.db.models.BskyGenerator.aggregate([
+      this.db.models.Generator.aggregate([
         { $match: { authorDid: { $in: dids } } },
         { $group: { _id: "$authorDid", count: { $sum: 1 } } },
       ]),

@@ -21,10 +21,6 @@ import { Database } from "../../db/index.ts";
 import { PostDocument } from "../../db/models.ts";
 import { getDescendents } from "../../util.ts";
 import { RecordProcessor } from "../processor.ts";
-import {
-  normalizeEmbed,
-  normalizeObject,
-} from "../../../utils/embed-normalizer.ts";
 
 type PostAncestor = {
   uri: string;
@@ -75,20 +71,14 @@ const insertFn = async (
 
   console.log("DEBUG: Post media:", JSON.stringify(obj.media, null, 2));
 
-  const normalizedMedia = normalizeEmbed(obj.media);
-  console.log(
-    "DEBUG: Normalized media:",
-    JSON.stringify(normalizedMedia, null, 2),
-  );
-
   const post = {
     uri: uri.toString(),
     cid: cid.toString(),
     authorDid: uri.host,
     text: obj.text || "",
     facets: obj.facets || [],
-    media: normalizedMedia || null,
-    sound: normalizeObject(obj.sound) || null,
+    media: obj.media || null,
+    sound: obj.sound || null,
     langs: obj.langs || [],
     labels: obj.labels || null,
     tags: obj.tags || [],

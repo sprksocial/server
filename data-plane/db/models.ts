@@ -40,18 +40,16 @@ export interface MediaRef {
   ref: { $link: string };
 }
 
-export interface ImageMedia {
+export interface ImageMedia extends MediaRef {
   alt: string;
-  image: MediaRef;
   aspectRatio: {
     width: number;
     height: number;
   };
 }
 
-export interface VideoMedia {
+export interface VideoMedia extends MediaRef {
   alt: string;
-  video: MediaRef;
   aspectRatio: {
     width: number;
     height: number;
@@ -239,7 +237,6 @@ export const repostSchema = new Schema<RepostDocument>({
 
 export interface PostMedia {
   $type: string;
-  alt?: string;
   video?: VideoMedia;
   images?: ImageMedia[];
 }

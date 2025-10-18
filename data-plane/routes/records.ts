@@ -2,6 +2,7 @@ import { Database } from "../db/index.ts";
 import { AtUri } from "@atp/syntax";
 import { ids } from "../../lex/lexicons.ts";
 import { keyBy } from "@atp/common";
+import { Code, DataPlaneError } from "../util.ts";
 
 export type Record = {
   record: string;
@@ -78,6 +79,25 @@ async function getPostRecords(
   return { records };
 }
 
+// Helper function to get reply records with metadata
+async function getReplyRecords(
+  db: Database,
+  uris: string[],
+): Promise<{
+  records: Array<Record>;
+}> {
+  const [{ records }] = await Promise.all([
+    getRecords(db, uris, ids.SoSprkFeedReply),
+    uris.length
+      ? db.models.Reply.find({
+        uri: { $in: uris },
+      })
+      : [],
+  ]);
+
+  return { records };
+}
+
 // Helper function for composite time
 export function compositeTime(ts1?: string, ts2?: string): string | undefined {
   if (!ts1) return ts2;
@@ -106,7 +126,7 @@ export class Records {
       return result;
     } catch (error) {
       console.error("Error fetching feed generator records:", error);
-      throw new Error("Failed to fetch records");
+      throw new DataPlaneError(Code.InternalError);
     }
   }
 
@@ -121,7 +141,7 @@ export class Records {
       return result;
     } catch (error) {
       console.error("Error fetching like records:", error);
-      throw new Error("Failed to fetch records");
+      throw new DataPlaneError(Code.InternalError);
     }
   }
 
@@ -131,7 +151,17 @@ export class Records {
       return result;
     } catch (error) {
       console.error("Error fetching post records:", error);
-      throw new Error("Failed to fetch records");
+      throw new DataPlaneError(Code.InternalError);
+    }
+  }
+
+  async getReplyRecords(uris: string[]) {
+    try {
+      const result = await getReplyRecords(this.db, uris);
+      return result;
+    } catch (error) {
+      console.error("Error fetching reply records:", error);
+      throw new DataPlaneError(Code.InternalError);
     }
   }
 
@@ -141,7 +171,7 @@ export class Records {
       return result;
     } catch (error) {
       console.error("Error fetching profile records:", error);
-      throw new Error("Failed to fetch records");
+      throw new DataPlaneError(Code.InternalError);
     }
   }
 
@@ -151,7 +181,7 @@ export class Records {
       return result;
     } catch (error) {
       console.error("Error fetching repost records:", error);
-      throw new Error("Failed to fetch records");
+      throw new DataPlaneError(Code.InternalError);
     }
   }
 
@@ -161,7 +191,7 @@ export class Records {
       return result;
     } catch (error) {
       console.error("Error fetching records:", error);
-      throw new Error("Failed to fetch records");
+      throw new DataPlaneError(Code.InternalError);
     }
   }
 }

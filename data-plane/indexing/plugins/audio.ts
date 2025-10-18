@@ -6,7 +6,6 @@ import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { AudioDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
-import { normalizeObject } from "../../../utils/embed-normalizer.ts";
 
 const lexId = lex.ids.SoSprkSoundAudio;
 type IndexedAudio = AudioDocument;
@@ -22,7 +21,7 @@ const insertFn = async (
     uri: uri.toString(),
     cid: cid.toString(),
     authorDid: uri.host,
-    sound: normalizeObject(obj.sound) || null,
+    sound: obj.sound || null,
     origin: obj.origin ? { uri: obj.origin.uri, cid: obj.origin.cid } : null,
     title: obj.title,
     labels: obj.labels || null,
