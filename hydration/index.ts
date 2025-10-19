@@ -28,6 +28,8 @@ import {
   Reply,
   ReplyAggs,
   Reposts,
+  SoundAggs,
+  Sounds,
   ThreadContexts,
   ThreadRef,
   VideoMappings,
@@ -84,6 +86,8 @@ export type HydrationState = {
   replyAggs?: ReplyAggs;
   postViewers?: PostViewerStates;
   threadContexts?: ThreadContexts;
+  sounds?: Sounds;
+  soundAggs?: SoundAggs;
 
   postBlocks?: PostBlocks;
   reposts?: Reposts;
@@ -584,6 +588,22 @@ export class Hydrator {
     return mergeStates(profileState, { reposts, ctx });
   }
 
+  // so.sprk.sound.defs#audioView
+  // - sound
+  //   - profile
+  //     - list basic
+  async hydrateSounds(
+    uris: string[],
+    ctx: HydrateCtx,
+  ): Promise<HydrationState> {
+    const [sounds, soundAggs, profileState] = await Promise.all([
+      this.feed.getSounds(uris, ctx.includeTakedowns),
+      this.feed.getSoundAggregates(uris.map((uri) => ({ uri }))),
+      this.hydrateProfiles(uris.map(didFromUri), ctx),
+    ]);
+    return mergeStates(profileState, { sounds, soundAggs, ctx });
+  }
+
   // provides partial hydration state within getFollows / getFollowers, mainly for applying rules
   async hydrateFollows(
     uris: string[],
@@ -670,6 +690,11 @@ export class Hydrator {
     } else if (collection === ids.SoSprkFeedLike) {
       return (
         (await this.feed.getLikes([uri], includeTakedowns)).get(uri) ??
+          undefined
+      );
+    } else if (collection === ids.SoSprkSoundAudio) {
+      return (
+        (await this.feed.getSounds([uri], includeTakedowns)).get(uri) ??
           undefined
       );
     } else if (collection === ids.AppBskyGraphFollow) {
@@ -781,6 +806,8 @@ export const mergeStates = (
     replyAggs: mergeMaps(stateA.replyAggs, stateB.replyAggs),
     postViewers: mergeMaps(stateA.postViewers, stateB.postViewers),
     threadContexts: mergeMaps(stateA.threadContexts, stateB.threadContexts),
+    sounds: mergeMaps(stateA.sounds, stateB.sounds),
+    soundAggs: mergeMaps(stateA.soundAggs, stateB.soundAggs),
     postBlocks: mergeMaps(stateA.postBlocks, stateB.postBlocks),
     reposts: mergeMaps(stateA.reposts, stateB.reposts),
     follows: mergeMaps(stateA.follows, stateB.follows),

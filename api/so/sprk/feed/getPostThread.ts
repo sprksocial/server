@@ -9,7 +9,7 @@ import { isNotFoundPost } from "../../../../lex/types/app/bsky/feed/defs.ts";
 import {
   OutputSchema,
   QueryParams,
-} from "../../../../lex/types/so/sprk/feed/getThread.ts";
+} from "../../../../lex/types/so/sprk/feed/getPostThread.ts";
 import {
   createPipeline,
   HydrationFnInput,
@@ -27,7 +27,7 @@ export default function (server: Server, ctx: AppContext) {
     noRules, // handled in presentation: 3p block-violating replies are turned to #blockedPost, viewer blocks turned to #notFoundPost.
     presentation,
   );
-  server.so.sprk.feed.getThread({
+  server.so.sprk.feed.getPostThread({
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth, res }) => {
       const { viewer, includeTakedowns, include3pBlocks } = ctx.authVerifier

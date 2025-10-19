@@ -6,7 +6,7 @@ import updateSubjectStatus from "./com/atproto/admin/updateSubjectStatus.ts";
 import getPosts from "./so/sprk/feed/getPosts.ts";
 import getProfile from "./so/sprk/actor/getProfile.ts";
 import getAuthorFeed from "./so/sprk/feed/getAuthorFeed.ts";
-import getPostThread from "./so/sprk/feed/getThread.ts";
+import getPostThread from "./so/sprk/feed/getPostThread.ts";
 import getAudios from "./so/sprk/sound/getAudios.ts";
 import getAudioPosts from "./so/sprk/sound/getAudioPosts.ts";
 import getFollows from "./so/sprk/graph/getFollows.ts";

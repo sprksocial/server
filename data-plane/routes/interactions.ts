@@ -121,4 +121,24 @@ export class Interactions {
       feeds: dids.map((did) => feedsMap.get(did) ?? 0),
     };
   }
+
+  async getSoundUsageCounts(uris: string[]) {
+    if (uris.length === 0) {
+      return { uses: [] };
+    }
+
+    // Count how many posts reference each sound URI
+    const usageAgg = await this.db.models.Post.aggregate([
+      { $match: { "sound.uri": { $in: uris } } },
+      { $group: { _id: "$sound.uri", count: { $sum: 1 } } },
+    ]);
+
+    const usageMap = new Map(
+      usageAgg.map((item: AggregationResult) => [item._id, item.count]),
+    );
+
+    return {
+      uses: uris.map((uri) => usageMap.get(uri) ?? 0),
+    };
+  }
 }
