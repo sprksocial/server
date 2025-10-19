@@ -10,7 +10,7 @@ const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.feed.getThread";
 
 export type QueryParams = {
-  /** Reference (AT-URI) to post record. */
+  /** Reference (AT-URI) to anchor post record. */
   anchor: string;
   limit: number;
   cursor?: string;
@@ -58,7 +58,6 @@ export interface ThreadItem {
   /** The nesting level of this item in the thread. Depth 0 means the anchor item. */
   depth: number;
   value:
-    | $Typed<SoSprkFeedDefs.ThreadViewReply>
     | $Typed<SoSprkFeedDefs.ThreadViewPost>
     | $Typed<SoSprkFeedDefs.NotFoundPost>
     | $Typed<SoSprkFeedDefs.BlockedPost>

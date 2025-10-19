@@ -50,7 +50,7 @@ export interface ReplyView {
   cid: string;
   author: SoSprkActorDefs.ProfileViewBasic;
   record: { [_ in string]: unknown };
-  image?: SoSprkMediaImage.View;
+  media?: $Typed<SoSprkMediaImage.View> | { $type: string };
   replyCount?: number;
   likeCount?: number;
   indexedAt: string;
@@ -179,9 +179,14 @@ export function validateReasonPin<V>(v: V) {
 
 export interface ThreadViewPost {
   $type?: "so.sprk.feed.defs#threadViewPost";
-  post: PostView;
+  post: $Typed<PostView> | $Typed<ReplyView> | { $type: string };
+  parent?:
+    | $Typed<ThreadViewPost>
+    | $Typed<NotFoundPost>
+    | $Typed<BlockedPost>
+    | { $type: string };
   replies?:
-    ($Typed<ThreadViewReply> | $Typed<NotFoundPost> | $Typed<BlockedPost> | {
+    ($Typed<ThreadViewPost> | $Typed<NotFoundPost> | $Typed<BlockedPost> | {
       $type: string;
     })[];
   threadContext?: ThreadContext;
@@ -195,32 +200,6 @@ export function isThreadViewPost<V>(v: V) {
 
 export function validateThreadViewPost<V>(v: V) {
   return validate<ThreadViewPost & V>(v, id, hashThreadViewPost);
-}
-
-export interface ThreadViewReply {
-  $type?: "so.sprk.feed.defs#threadViewReply";
-  reply: ReplyView;
-  parent?:
-    | $Typed<ThreadViewReply>
-    | $Typed<ThreadViewPost>
-    | $Typed<NotFoundPost>
-    | $Typed<BlockedPost>
-    | { $type: string };
-  replies?:
-    ($Typed<ThreadViewReply> | $Typed<NotFoundPost> | $Typed<BlockedPost> | {
-      $type: string;
-    })[];
-  threadContext?: ThreadContext;
-}
-
-const hashThreadViewReply = "threadViewReply";
-
-export function isThreadViewReply<V>(v: V) {
-  return is$typed(v, id, hashThreadViewReply);
-}
-
-export function validateThreadViewReply<V>(v: V) {
-  return validate<ThreadViewReply & V>(v, id, hashThreadViewReply);
 }
 
 export interface NotFoundPost {

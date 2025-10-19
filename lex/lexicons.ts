@@ -12755,9 +12755,11 @@ export const schemaDict = {
           "record": {
             "type": "unknown",
           },
-          "image": {
-            "type": "ref",
-            "ref": "lex:so.sprk.media.image#view",
+          "media": {
+            "type": "union",
+            "refs": [
+              "lex:so.sprk.media.image#view",
+            ],
           },
           "replyCount": {
             "type": "integer",
@@ -12905,40 +12907,15 @@ export const schemaDict = {
         ],
         "properties": {
           "post": {
-            "type": "ref",
-            "ref": "lex:so.sprk.feed.defs#postView",
-          },
-          "replies": {
-            "type": "array",
-            "items": {
-              "type": "union",
-              "refs": [
-                "lex:so.sprk.feed.defs#threadViewReply",
-                "lex:so.sprk.feed.defs#notFoundPost",
-                "lex:so.sprk.feed.defs#blockedPost",
-              ],
-            },
-          },
-          "threadContext": {
-            "type": "ref",
-            "ref": "lex:so.sprk.feed.defs#threadContext",
-          },
-        },
-      },
-      "threadViewReply": {
-        "type": "object",
-        "required": [
-          "reply",
-        ],
-        "properties": {
-          "reply": {
-            "type": "ref",
-            "ref": "lex:so.sprk.feed.defs#replyView",
+            "type": "union",
+            "refs": [
+              "lex:so.sprk.feed.defs#postView",
+              "lex:so.sprk.feed.defs#replyView",
+            ],
           },
           "parent": {
             "type": "union",
             "refs": [
-              "lex:so.sprk.feed.defs#threadViewReply",
               "lex:so.sprk.feed.defs#threadViewPost",
               "lex:so.sprk.feed.defs#notFoundPost",
               "lex:so.sprk.feed.defs#blockedPost",
@@ -12949,7 +12926,7 @@ export const schemaDict = {
             "items": {
               "type": "union",
               "refs": [
-                "lex:so.sprk.feed.defs#threadViewReply",
+                "lex:so.sprk.feed.defs#threadViewPost",
                 "lex:so.sprk.feed.defs#notFoundPost",
                 "lex:so.sprk.feed.defs#blockedPost",
               ],
@@ -13883,7 +13860,7 @@ export const schemaDict = {
             "anchor": {
               "type": "string",
               "format": "at-uri",
-              "description": "Reference (AT-URI) to post record.",
+              "description": "Reference (AT-URI) to anchor post record.",
             },
             "limit": {
               "type": "integer",
@@ -13981,7 +13958,6 @@ export const schemaDict = {
           "value": {
             "type": "union",
             "refs": [
-              "lex:so.sprk.feed.defs#threadViewReply",
               "lex:so.sprk.feed.defs#threadViewPost",
               "lex:so.sprk.feed.defs#NotFoundPost",
               "lex:so.sprk.feed.defs#BlockedPost",
@@ -14334,9 +14310,11 @@ export const schemaDict = {
               "type": "ref",
               "ref": "lex:so.sprk.feed.reply#replyRef",
             },
-            "image": {
-              "type": "ref",
-              "ref": "lex:so.sprk.media.image",
+            "media": {
+              "type": "union",
+              "refs": [
+                "lex:so.sprk.media.image",
+              ],
             },
             "langs": {
               "type": "array",

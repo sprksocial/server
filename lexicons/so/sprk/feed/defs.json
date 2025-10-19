@@ -41,9 +41,9 @@
           "ref": "so.sprk.actor.defs#profileViewBasic"
         },
         "record": { "type": "unknown" },
-        "image": {
-          "type": "ref",
-          "ref": "so.sprk.media.image#view"
+        "media": {
+          "type": "union",
+          "refs": ["so.sprk.media.image#view"]
         },
         "replyCount": { "type": "integer" },
         "likeCount": { "type": "integer" },
@@ -122,26 +122,10 @@
       "type": "object",
       "required": ["post"],
       "properties": {
-        "post": { "type": "ref", "ref": "#postView" },
-        "replies": {
-          "type": "array",
-          "items": {
-            "type": "union",
-            "refs": ["#threadViewReply", "#notFoundPost", "#blockedPost"]
-          }
-        },
-        "threadContext": { "type": "ref", "ref": "#threadContext" }
-      }
-    },
-    "threadViewReply": {
-      "type": "object",
-      "required": ["reply"],
-      "properties": {
-        "reply": { "type": "ref", "ref": "#replyView" },
+        "post": { "type": "union", "refs": ["#postView", "#replyView"] },
         "parent": {
           "type": "union",
           "refs": [
-            "#threadViewReply",
             "#threadViewPost",
             "#notFoundPost",
             "#blockedPost"
@@ -151,7 +135,7 @@
           "type": "array",
           "items": {
             "type": "union",
-            "refs": ["#threadViewReply", "#notFoundPost", "#blockedPost"]
+            "refs": ["#threadViewPost", "#notFoundPost", "#blockedPost"]
           }
         },
         "threadContext": { "type": "ref", "ref": "#threadContext" }

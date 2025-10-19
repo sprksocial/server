@@ -22,11 +22,11 @@ import {
 import { RecordProcessor } from "../processor.ts";
 import { jsonToLex } from "@atp/lexicon";
 
-type PostAncestor = {
+type Ancestor = {
   uri: string;
   height: number;
 };
-type PostDescendent = {
+type Descendent = {
   uri: string;
   depth: number;
   cid: string;
@@ -40,8 +40,8 @@ type IndexedReply = {
     cid?: string;
     alt?: string | null;
   };
-  ancestors?: PostAncestor[];
-  descendents?: PostDescendent[];
+  ancestors?: Ancestor[];
+  descendents?: Descendent[];
   threadgate?: GateRecord;
 };
 
@@ -138,13 +138,13 @@ const insertFn = async (
       cid?: string;
       alt?: string;
     } = {};
-    if (isMediaImage(obj.image)) {
-      const imageEmbed = {
+    if (isMediaImage(obj.media)) {
+      const imageMedia = {
         postUri: uri.toString(),
-        cid: obj.image.image.ref.toString(),
+        cid: obj.media.image.ref.toString(),
         alt: obj.alt as string,
       };
-      image = imageEmbed;
+      image = imageMedia;
     }
 
     const ancestors = await getAncestorsAndSelf(db, {

@@ -22,10 +22,7 @@
             "items": { "type": "ref", "ref": "so.sprk.richtext.facet" }
           },
           "reply": { "type": "ref", "ref": "#replyRef" },
-          "image": {
-            "type": "ref",
-            "ref": "so.sprk.media.image"
-          },
+          "media": { "type": "union", "refs": ["so.sprk.media.image"] },
           "langs": {
             "type": "array",
             "description": "Indicates human language of post primary text content.",

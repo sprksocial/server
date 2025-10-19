@@ -12,7 +12,7 @@
           "anchor": {
             "type": "string",
             "format": "at-uri",
-            "description": "Reference (AT-URI) to post record."
+            "description": "Reference (AT-URI) to anchor post record."
           },
           "limit": {
             "type": "integer",
@@ -87,7 +87,6 @@
         "value": {
           "type": "union",
           "refs": [
-            "so.sprk.feed.defs#threadViewReply",
             "so.sprk.feed.defs#threadViewPost",
             "so.sprk.feed.defs#NotFoundPost",
             "so.sprk.feed.defs#BlockedPost"

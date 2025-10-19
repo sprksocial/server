@@ -19,7 +19,7 @@ export interface Record {
   /** Annotations of text (mentions, URLs, hashtags, etc) */
   facets?: (SoSprkRichtextFacet.Main)[];
   reply: ReplyRef;
-  image?: SoSprkMediaImage.Main;
+  media?: $Typed<SoSprkMediaImage.Main> | { $type: string };
   /** Indicates human language of post primary text content. */
   langs?: (string)[];
   labels?: $Typed<ComAtprotoLabelDefs.SelfLabels> | { $type: string };

@@ -10,6 +10,7 @@ import {
   ReplyRef,
   ReplyView,
   ThreadContext,
+  ThreadViewPost,
 } from "../lex/types/so/sprk/feed/defs.ts";
 import {
   isRecord as isReplyRecord,
@@ -118,7 +119,7 @@ export class Views {
       if (!Number.isFinite(depth)) continue;
       if (maxDepth !== undefined && depth > maxDepth) continue;
 
-      const value = this.threadViewItem(uri, state, depth);
+      const value = this.threadItemValue(uri, state);
       items.push({
         $type: "so.sprk.feed.getThread#threadItem",
         uri,
@@ -130,10 +131,9 @@ export class Views {
     return items;
   }
 
-  threadViewItem(
+  threadItemValue(
     uri: string,
     state: HydrationState,
-    depth: number,
   ): ThreadItem["value"] {
     const authorDid = uriToDid(uri);
 
@@ -148,25 +148,26 @@ export class Views {
       return this.blockedPost(uri, authorDid, state);
     }
 
-    const replyView = this.reply(uri, state, depth);
-    if (replyView) {
-      return {
-        $type: "so.sprk.feed.defs#threadViewReply",
-        reply: replyView,
-        threadContext: this.threadContext(uri, state),
-      };
+    const threadViewPost = this.threadViewPost(uri, state);
+    if (threadViewPost) {
+      return threadViewPost;
     }
+    return this.notFoundPost(uri);
+  }
 
-    const postView = this.post(uri, state, depth);
+  threadViewPost(
+    uri: string,
+    state: HydrationState,
+  ): $Typed<ThreadViewPost> | undefined {
+    const postView = this.post(uri, state) ??
+      this.reply(uri, state);
     if (postView) {
       return {
         $type: "so.sprk.feed.defs#threadViewPost",
         post: postView,
         threadContext: this.threadContext(uri, state),
-      };
+      } as $Typed<ThreadViewPost>;
     }
-
-    return this.notFoundPost(uri);
   }
 
   threadContext(
@@ -185,7 +186,6 @@ export class Views {
   post(
     uri: string,
     state: HydrationState,
-    depth = 0,
   ): Un$Typed<PostView> | undefined {
     const recordInfo = state.posts?.get(uri) ?? state.replies?.get(uri);
     if (!recordInfo) return;
@@ -214,7 +214,7 @@ export class Views {
       cid: recordInfo.cid,
       author,
       record: recordInfo.record,
-      media: mediaRecord && depth < 2
+      media: mediaRecord
         ? this.media(uri, mediaRecord as Media, state)
         : undefined,
       replyCount: repliesCount,
@@ -234,7 +234,6 @@ export class Views {
   reply(
     uri: string,
     state: HydrationState,
-    depth = 0,
   ): Un$Typed<ReplyView> | undefined {
     const replyInfo = state.replies?.get(uri);
     if (!replyInfo) return;
@@ -252,8 +251,8 @@ export class Views {
       cid: replyInfo.cid,
       author,
       record: replyInfo.record,
-      image: depth < 2 && replyInfo.record.image
-        ? this.imageMedia(uri, replyInfo.record.image)
+      media: replyInfo.record.media
+        ? this.imageMedia(uri, replyInfo.record.media as ImageMedia)
         : undefined,
       replyCount: aggs?.replies ?? 0,
       likeCount: aggs?.likes ?? 0,
