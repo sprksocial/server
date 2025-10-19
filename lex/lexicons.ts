@@ -13648,6 +13648,130 @@ export const schemaDict = {
       },
     },
   },
+  "SoSprkFeedGetPostThread": {
+    "lexicon": 1,
+    "id": "so.sprk.feed.getPostThread",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Get posts in a thread. Does not require auth, but additional metadata and filtering will be applied for authed requests.",
+        "parameters": {
+          "type": "params",
+          "required": [
+            "anchor",
+          ],
+          "properties": {
+            "anchor": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "Reference (AT-URI) to anchor post record.",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+            },
+            "cursor": {
+              "type": "string",
+            },
+            "depth": {
+              "type": "integer",
+              "description":
+                "How many levels of reply depth should be included in response.",
+              "default": 6,
+              "minimum": 0,
+              "maximum": 1000,
+            },
+            "parentHeight": {
+              "type": "integer",
+              "description":
+                "How many levels of parent (and grandparent, etc) post to include.",
+              "default": 80,
+              "minimum": 0,
+              "maximum": 1000,
+            },
+            "prioritizeFollowedUsers": {
+              "type": "boolean",
+              "description":
+                "Whether to prioritize posts from followed users. It only has effect when the user is authenticated.",
+              "default": false,
+            },
+            "sort": {
+              "type": "string",
+              "description": "Sorting for the thread replies.",
+              "knownValues": [
+                "newest",
+                "oldest",
+                "top",
+              ],
+              "default": "oldest",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "thread",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "thread": {
+                "type": "array",
+                "description":
+                  "A flat list of thread items. The depth of each item is indicated by the depth property inside the item.",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.feed.getPostThread#threadItem",
+                },
+              },
+              "threadgate": {
+                "type": "ref",
+                "ref": "lex:so.sprk.feed.defs#threadgateView",
+              },
+            },
+          },
+        },
+        "errors": [
+          {
+            "name": "NotFound",
+          },
+        ],
+      },
+      "threadItem": {
+        "type": "object",
+        "required": [
+          "uri",
+          "depth",
+          "value",
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "depth": {
+            "type": "integer",
+            "description":
+              "The nesting level of this item in the thread. Depth 0 means the anchor item.",
+          },
+          "value": {
+            "type": "union",
+            "refs": [
+              "lex:so.sprk.feed.defs#threadViewPost",
+              "lex:so.sprk.feed.defs#NotFoundPost",
+              "lex:so.sprk.feed.defs#BlockedPost",
+            ],
+          },
+        },
+      },
+    },
+  },
   "SoSprkFeedGetActorLikes": {
     "lexicon": 1,
     "id": "so.sprk.feed.getActorLikes",
@@ -13838,130 +13962,6 @@ export const schemaDict = {
               "type": "ref",
               "ref": "lex:com.atproto.repo.strongRef",
             },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkFeedGetThread": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.getThread",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Get posts in a thread. Does not require auth, but additional metadata and filtering will be applied for authed requests.",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "anchor",
-          ],
-          "properties": {
-            "anchor": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "Reference (AT-URI) to anchor post record.",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-            "depth": {
-              "type": "integer",
-              "description":
-                "How many levels of reply depth should be included in response.",
-              "default": 6,
-              "minimum": 0,
-              "maximum": 1000,
-            },
-            "parentHeight": {
-              "type": "integer",
-              "description":
-                "How many levels of parent (and grandparent, etc) post to include.",
-              "default": 80,
-              "minimum": 0,
-              "maximum": 1000,
-            },
-            "prioritizeFollowedUsers": {
-              "type": "boolean",
-              "description":
-                "Whether to prioritize posts from followed users. It only has effect when the user is authenticated.",
-              "default": false,
-            },
-            "sort": {
-              "type": "string",
-              "description": "Sorting for the thread replies.",
-              "knownValues": [
-                "newest",
-                "oldest",
-                "top",
-              ],
-              "default": "oldest",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "thread",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "thread": {
-                "type": "array",
-                "description":
-                  "A flat list of thread items. The depth of each item is indicated by the depth property inside the item.",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.getThread#threadItem",
-                },
-              },
-              "threadgate": {
-                "type": "ref",
-                "ref": "lex:so.sprk.feed.defs#threadgateView",
-              },
-            },
-          },
-        },
-        "errors": [
-          {
-            "name": "NotFound",
-          },
-        ],
-      },
-      "threadItem": {
-        "type": "object",
-        "required": [
-          "uri",
-          "depth",
-          "value",
-        ],
-        "properties": {
-          "uri": {
-            "type": "string",
-            "format": "at-uri",
-          },
-          "depth": {
-            "type": "integer",
-            "description":
-              "The nesting level of this item in the thread. Depth 0 means the anchor item.",
-          },
-          "value": {
-            "type": "union",
-            "refs": [
-              "lex:so.sprk.feed.defs#threadViewPost",
-              "lex:so.sprk.feed.defs#NotFoundPost",
-              "lex:so.sprk.feed.defs#BlockedPost",
-            ],
           },
         },
       },
@@ -21524,11 +21524,11 @@ export const ids = {
   SoSprkFeedGetLikes: "so.sprk.feed.getLikes",
   SoSprkFeedPostgate: "so.sprk.feed.postgate",
   SoSprkFeedThreadgate: "so.sprk.feed.threadgate",
+  SoSprkFeedGetPostThread: "so.sprk.feed.getPostThread",
   SoSprkFeedGetActorLikes: "so.sprk.feed.getActorLikes",
   SoSprkFeedLike: "so.sprk.feed.like",
   SoSprkFeedGetRepostedBy: "so.sprk.feed.getRepostedBy",
   SoSprkFeedRepost: "so.sprk.feed.repost",
-  SoSprkFeedGetThread: "so.sprk.feed.getThread",
   SoSprkFeedDescribeFeedGenerator: "so.sprk.feed.describeFeedGenerator",
   SoSprkFeedSearchPosts: "so.sprk.feed.searchPosts",
   SoSprkFeedGetPosts: "so.sprk.feed.getPosts",

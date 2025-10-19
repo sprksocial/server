@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "so.sprk.feed.getThread",
+  "id": "so.sprk.feed.getPostThread",
   "defs": {
     "main": {
       "type": "query",

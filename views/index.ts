@@ -41,6 +41,7 @@ import {
   Main as ImageMedia,
   View as ImageView,
 } from "../lex/types/so/sprk/media/image.ts";
+import { AudioView } from "../lex/types/so/sprk/sound/defs.ts";
 import { INVALID_HANDLE } from "@atp/syntax";
 import { cidFromBlobJson } from "./util.ts";
 import { uriToDid } from "../utils/uris.ts";
@@ -49,8 +50,9 @@ import { FeedItem, Repost } from "../hydration/feed.ts";
 import {
   QueryParams as GetThreadQueryParams,
   ThreadItem,
-} from "../lex/types/so/sprk/feed/getThread.ts";
+} from "../lex/types/so/sprk/feed/getPostThread.ts";
 import { $Typed, Un$Typed } from "../lex/util.ts";
+import { BlobRef } from "@atp/lexicon";
 
 export class Views {
   public indexedAtEpoch?: Date | undefined;
@@ -121,7 +123,7 @@ export class Views {
 
       const value = this.threadItemValue(uri, state);
       items.push({
-        $type: "so.sprk.feed.getThread#threadItem",
+        $type: "so.sprk.feed.getPostThread#threadItem",
         uri,
         depth,
         value,
@@ -630,6 +632,40 @@ export class Views {
       thumbnail,
       alt: media.alt,
       aspectRatio: media.aspectRatio,
+    };
+  }
+
+  soundView(
+    uri: string,
+    state: HydrationState,
+  ): Un$Typed<AudioView> | undefined {
+    const soundInfo = state.sounds?.get(uri);
+    if (!soundInfo) return;
+
+    const parsedUri = new AtUri(uri);
+    const authorDid = parsedUri.hostname;
+    const author = this.profileBasic(authorDid, state);
+    if (!author) return;
+
+    const soundAgg = state.soundAggs?.get(uri);
+    const coverArtCid = cidFromBlobJson(soundInfo.record.coverArt as BlobRef);
+
+    return {
+      uri,
+      cid: soundInfo.cid,
+      author,
+      record: soundInfo.record,
+      useCount: soundAgg?.uses ?? 0,
+      title: soundInfo.record.title,
+      coverArt: `${this.mediaCdn}/img/medium/${authorDid}/${coverArtCid}/webp`,
+      details: soundInfo.record.details
+        ? {
+          artist: soundInfo.record.details.artist,
+          title: soundInfo.record.details.title,
+        }
+        : undefined,
+      indexedAt: this.indexedAt(soundInfo)?.toISOString() ??
+        new Date().toISOString(),
     };
   }
   indexedAt({ sortedAt, indexedAt }: { sortedAt: Date; indexedAt: Date }) {

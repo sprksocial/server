@@ -156,9 +156,9 @@ import * as SoSprkFeedGetTimeline from "./types/so/sprk/feed/getTimeline.ts";
 import * as SoSprkFeedGetFeedGenerator from "./types/so/sprk/feed/getFeedGenerator.ts";
 import * as SoSprkFeedGetAuthorFeed from "./types/so/sprk/feed/getAuthorFeed.ts";
 import * as SoSprkFeedGetLikes from "./types/so/sprk/feed/getLikes.ts";
+import * as SoSprkFeedGetPostThread from "./types/so/sprk/feed/getPostThread.ts";
 import * as SoSprkFeedGetActorLikes from "./types/so/sprk/feed/getActorLikes.ts";
 import * as SoSprkFeedGetRepostedBy from "./types/so/sprk/feed/getRepostedBy.ts";
-import * as SoSprkFeedGetThread from "./types/so/sprk/feed/getThread.ts";
 import * as SoSprkFeedDescribeFeedGenerator from "./types/so/sprk/feed/describeFeedGenerator.ts";
 import * as SoSprkFeedSearchPosts from "./types/so/sprk/feed/searchPosts.ts";
 import * as SoSprkFeedGetPosts from "./types/so/sprk/feed/getPosts.ts";
@@ -2411,6 +2411,18 @@ export class SoSprkFeedNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
+  getPostThread<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      SoSprkFeedGetPostThread.QueryParams,
+      SoSprkFeedGetPostThread.HandlerInput,
+      SoSprkFeedGetPostThread.HandlerOutput
+    >,
+  ) {
+    const nsid = "so.sprk.feed.getPostThread"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
   getActorLikes<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -2432,18 +2444,6 @@ export class SoSprkFeedNS {
     >,
   ) {
     const nsid = "so.sprk.feed.getRepostedBy"; // @ts-ignore - dynamically generated
-    return this._server.xrpc.method(nsid, cfg);
-  }
-
-  getThread<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      SoSprkFeedGetThread.QueryParams,
-      SoSprkFeedGetThread.HandlerInput,
-      SoSprkFeedGetThread.HandlerOutput
-    >,
-  ) {
-    const nsid = "so.sprk.feed.getThread"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 

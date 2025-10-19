@@ -7,7 +7,7 @@ import { type $Typed } from "../../../../util.ts";
 import type * as SoSprkFeedDefs from "./defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
-const id = "so.sprk.feed.getThread";
+const id = "so.sprk.feed.getPostThread";
 
 export type QueryParams = {
   /** Reference (AT-URI) to anchor post record. */
@@ -53,7 +53,7 @@ export interface HandlerError {
 export type HandlerOutput = HandlerError | HandlerSuccess;
 
 export interface ThreadItem {
-  $type?: "so.sprk.feed.getThread#threadItem";
+  $type?: "so.sprk.feed.getPostThread#threadItem";
   uri: string;
   /** The nesting level of this item in the thread. Depth 0 means the anchor item. */
   depth: number;
