@@ -358,7 +358,6 @@ export async function getProfiles(
         // Count posts
         await ctx.db.models.Post.countDocuments({
           authorDid: actorDid,
-          reply: null,
         }),
 
         // Check for feed generators (bsky + sprk combined)

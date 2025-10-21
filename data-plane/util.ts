@@ -24,7 +24,7 @@ export const getDescendents = async (
   // Get direct replies (depth 1)
   const directReplies = await db.models.Post.find({
     "reply.parent.uri": uri,
-  }).select(["uri", "cid", "authorDid", "createdAt"]).lean();
+  }).lean();
 
   for (const reply of directReplies) {
     descendents.push({

@@ -300,7 +300,7 @@ export interface ReplyDocument extends AuthoredDocument {
     root: RecordRef;
     parent: RecordRef;
   };
-  image?: ImageMedia;
+  media?: ImageMedia;
   langs?: string[];
   labels?: Label[];
   likeCount: number;
@@ -324,7 +324,7 @@ export const replySchema = new Schema<ReplyDocument>({
     },
     required: false,
   },
-  image: { type: Object, required: false },
+  media: { type: Object, required: false },
   langs: { type: [String], required: false, default: [] },
   labels: { type: [Object], required: false, default: [] },
   likeCount: { type: Number, required: true, default: 0 },

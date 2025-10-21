@@ -36,7 +36,7 @@ type Descendent = {
 type IndexedReply = {
   reply: ReplyDocument;
   facets?: { type: "mention" | "link"; value: string }[];
-  image?: {
+  media?: {
     cid?: string;
     alt?: string | null;
   };
@@ -84,7 +84,7 @@ const insertFn = async (
         },
       }
       : null,
-    image: obj.image,
+    media: obj.media,
     langs: obj.langs || [],
     labels: obj.labels || null,
     tags: obj.tags || [],
@@ -133,7 +133,7 @@ const insertFn = async (
       });
 
     // Embed processing - embeds are stored inline in the Post model
-    let image: {
+    let media: {
       postUri?: string;
       cid?: string;
       alt?: string;
@@ -142,9 +142,9 @@ const insertFn = async (
       const imageMedia = {
         postUri: uri.toString(),
         cid: obj.media.image.ref.toString(),
-        alt: obj.alt as string,
+        alt: obj.media.alt as string,
       };
-      image = imageMedia;
+      media = imageMedia;
     }
 
     const ancestors = await getAncestorsAndSelf(db, {
@@ -159,7 +159,7 @@ const insertFn = async (
     return {
       reply: insertedReply,
       facets,
-      image,
+      media,
       ancestors,
       descendents,
     };
