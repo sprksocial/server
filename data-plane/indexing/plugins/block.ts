@@ -1,13 +1,13 @@
 import { CID } from "multiformats/cid";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
 import * as lex from "../../../lex/lexicons.ts";
-import * as Block from "../../../lex/types/app/bsky/graph/block.ts";
+import * as Block from "../../../lex/types/so/sprk/graph/block.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { BlockDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexId = lex.ids.AppBskyGraphBlock;
+const lexId = lex.ids.SoSprkGraphBlock;
 type IndexedBlock = BlockDocument;
 
 const insertFn = async (

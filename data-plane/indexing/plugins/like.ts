@@ -147,25 +147,13 @@ const updateAggregates = async (db: Database, like: IndexedLike) => {
     const subjectUri = new AtUri(like.subject);
 
     // Check if this is a feed generator
-    if (subjectUri.collection === "app.bsky.feed.generator") {
-      const existingGenerator = await db.models.BskyGenerator.findOne({
+    if (subjectUri.collection === "so.sprk.feed.generator") {
+      const existingGenerator = await db.models.Generator.findOne({
         uri: like.subject,
       });
 
       if (existingGenerator) {
-        await db.models.BskyGenerator.findOneAndUpdate(
-          { uri: like.subject },
-          { $set: { likeCount } },
-          { new: true },
-        );
-      }
-    } else if (subjectUri.collection === "so.sprk.feed.generator") {
-      const existingSprkGenerator = await db.models.SprkGenerator.findOne({
-        uri: like.subject,
-      });
-
-      if (existingSprkGenerator) {
-        await db.models.SprkGenerator.findOneAndUpdate(
+        await db.models.Generator.findOneAndUpdate(
           { uri: like.subject },
           { $set: { likeCount } },
           { new: true },

@@ -6,7 +6,6 @@ import { is$typed as _is$typed } from "../../../../util.ts";
 import { type $Typed } from "../../../../util.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef.ts";
-import type * as SoSprkGraphDefs from "../graph/defs.ts";
 import type * as SoSprkFeedThreadgate from "../feed/threadgate.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -72,7 +71,6 @@ export interface ProfileViewDetailed {
   followsCount?: number;
   postsCount?: number;
   associated?: ProfileAssociated;
-  joinedViaStarterPack?: SoSprkGraphDefs.StarterPackViewBasic;
   indexedAt?: string;
   createdAt?: string;
   viewer?: ViewerState;
@@ -94,9 +92,7 @@ export function validateProfileViewDetailed<V>(v: V) {
 
 export interface ProfileAssociated {
   $type?: "so.sprk.actor.defs#profileAssociated";
-  lists?: number;
   feedgens?: number;
-  starterPacks?: number;
   labeler?: boolean;
   chat?: ProfileAssociatedChat;
 }
@@ -134,10 +130,8 @@ export function validateProfileAssociatedChat<V>(v: V) {
 export interface ViewerState {
   $type?: "so.sprk.actor.defs#viewerState";
   muted?: boolean;
-  mutedByList?: SoSprkGraphDefs.ListViewBasic;
   blockedBy?: boolean;
   blocking?: string;
-  blockingByList?: SoSprkGraphDefs.ListViewBasic;
   following?: string;
   followedBy?: string;
   knownFollowers?: KnownFollowers;
@@ -226,11 +220,7 @@ export function validateContentLabelPref<V>(v: V) {
 export interface SavedFeed {
   $type?: "so.sprk.actor.defs#savedFeed";
   id: string;
-  type:
-    | "feed"
-    | "list"
-    | "timeline"
-    | (string & globalThis.Record<PropertyKey, never>);
+  type: "feed" | "timeline" | (string & globalThis.Record<PropertyKey, never>);
   value: string;
   pinned: boolean;
 }
@@ -447,7 +437,6 @@ export interface PostInteractionSettingsPref {
     | $Typed<SoSprkFeedThreadgate.MentionRule>
     | $Typed<SoSprkFeedThreadgate.FollowerRule>
     | $Typed<SoSprkFeedThreadgate.FollowingRule>
-    | $Typed<SoSprkFeedThreadgate.ListRule>
     | { $type: string }
   )[];
 }

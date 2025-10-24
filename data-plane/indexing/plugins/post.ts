@@ -1,12 +1,16 @@
 import { CID } from "multiformats/cid";
 import { AtUri } from "@atp/syntax";
 import * as lex from "../../../lex/lexicons.ts";
-import { isMain as isEmbedImage } from "../../../lex/types/so/sprk/embed/images.ts";
-import { isMain as isEmbedVideo } from "../../../lex/types/so/sprk/embed/video.ts";
 import {
-  Record as PostRecord,
-  ReplyRef,
-} from "../../../lex/types/so/sprk/feed/post.ts";
+  isMain as isMediaImages,
+  Main as MediaImages,
+} from "../../../lex/types/so/sprk/media/images.ts";
+import { Main as MediaImage } from "../../../lex/types/so/sprk/media/image.ts";
+import {
+  isMain as isMediaVideo,
+  Main as MediaVideo,
+} from "../../../lex/types/so/sprk/media/video.ts";
+import { Record as PostRecord } from "../../../lex/types/so/sprk/feed/post.ts";
 import { Record as GateRecord } from "../../../lex/types/so/sprk/feed/threadgate.ts";
 import {
   isLink,
@@ -15,17 +19,8 @@ import {
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { PostDocument } from "../../db/models.ts";
-import {
-  getAncestorsAndSelf,
-  getDescendents,
-  invalidReplyRoot as checkInvalidReplyRoot,
-} from "../../util.ts";
+import { getDescendents } from "../../util.ts";
 import { RecordProcessor } from "../processor.ts";
-import {
-  normalizeEmbed,
-  normalizeObject,
-} from "../../../utils/embed-normalizer.ts";
-import { jsonToLex } from "@atp/lexicon";
 
 type PostAncestor = {
   uri: string;
@@ -41,17 +36,11 @@ type PostDescendent = {
 type IndexedPost = {
   post: PostDocument;
   facets?: { type: "mention" | "link"; value: string }[];
-  embeds?: Array<{
-    postUri: string;
+  medias?: Array<{
     position?: number;
     imageCid?: string;
     alt?: string | null;
-    uri?: string;
-    title?: string;
-    description?: string;
     thumbCid?: string | null;
-    embedUri?: string;
-    embedCid?: string;
     videoCid?: string;
   }>;
   ancestors?: PostAncestor[];
@@ -80,34 +69,16 @@ const insertFn = async (
     );
   }
 
-  console.log("DEBUG: Post embed:", JSON.stringify(obj.embed, null, 2));
-
-  const normalizedEmbed = normalizeEmbed(obj.embed);
-  console.log(
-    "DEBUG: Normalized embed:",
-    JSON.stringify(normalizedEmbed, null, 2),
-  );
+  console.log("DEBUG: Post media:", JSON.stringify(obj.media, null, 2));
 
   const post = {
     uri: uri.toString(),
     cid: cid.toString(),
     authorDid: uri.host,
-    text: obj.text || "",
-    facets: obj.facets || [],
-    reply: obj.reply
-      ? {
-        root: {
-          uri: obj.reply.root.uri,
-          cid: obj.reply.root.cid,
-        },
-        parent: {
-          uri: obj.reply.parent.uri,
-          cid: obj.reply.parent.cid,
-        },
-      }
-      : null,
-    embed: normalizedEmbed || null,
-    sound: normalizeObject(obj.sound) || null,
+    text: obj.caption?.text || "",
+    facets: obj.caption?.facets || [],
+    media: obj.media || null,
+    sound: obj.sound || null,
     langs: obj.langs || [],
     labels: obj.labels || null,
     tags: obj.tags || [],
@@ -123,21 +94,7 @@ const insertFn = async (
       { upsert: true, new: true },
     );
 
-    if (obj.reply) {
-      const { invalidReplyRoot } = await validateReply(
-        db,
-        obj.reply,
-      );
-      if (invalidReplyRoot) {
-        Object.assign(insertedPost, { invalidReplyRoot });
-        await db.models.Post.updateOne(
-          { uri: post.uri },
-          { invalidReplyRoot },
-        );
-      }
-    }
-
-    const facets = (obj.facets || [])
+    const facets = (obj.caption?.facets || [])
       .flatMap((facet) => facet.features)
       .flatMap((feature) => {
         if (isMention(feature)) {
@@ -155,52 +112,38 @@ const insertFn = async (
         return [];
       });
 
-    // Embed processing - embeds are stored inline in the Post model
-    const embeds: Array<{
-      postUri: string;
+    // Media processing - medias are stored inline in the Post model
+    const medias: Array<{
       position?: number;
       imageCid?: string;
       alt?: string | null;
-      uri?: string;
-      title?: string;
-      description?: string;
       thumbCid?: string | null;
-      embedUri?: string;
-      embedCid?: string;
       videoCid?: string;
     }> = [];
-    const postEmbeds = separateEmbeds(obj.embed);
-    for (const postEmbed of postEmbeds) {
-      if (isEmbedImage(postEmbed)) {
-        const { images } = postEmbed;
-        const imagesEmbed = images.map((
-          img: { image: { ref: { toString: () => string } }; alt: string },
+    const postMedias = separateMedia(obj.media);
+    for (const postMedia of postMedias) {
+      if (isMediaImages(postMedia)) {
+        const { images } = postMedia as MediaImages;
+        const imagesMedia = images.map((
+          img: MediaImage,
           i: number,
         ) => ({
-          postUri: uri.toString(),
           position: i,
           imageCid: img.image.ref.toString(),
           alt: img.alt,
         }));
-        embeds.push(...imagesEmbed);
-      } else if (isEmbedVideo(postEmbed)) {
-        const embed = postEmbed as {
-          video: { ref: { toString: () => string } };
-          alt?: string;
-        };
-        const videoEmbed = {
+        medias.push(...imagesMedia);
+      } else if (isMediaVideo(postMedia)) {
+        const media = postMedia as MediaVideo;
+        const videoMedia = {
           postUri: uri.toString(),
-          videoCid: embed.video.ref.toString(),
-          alt: embed.alt ?? null,
+          videoCid: media.video.ref.toString(),
+          alt: media.alt ?? null,
         };
-        embeds.push(videoEmbed);
+        medias.push(videoMedia);
       }
     }
 
-    const ancestors = await getAncestorsAndSelf(db, {
-      uri: post.uri,
-      parentHeight: REPLY_NOTIF_DEPTH,
-    });
     const descendents = await getDescendents(db, {
       uri: post.uri,
       depth: REPLY_NOTIF_DEPTH,
@@ -209,8 +152,7 @@ const insertFn = async (
     return {
       post: insertedPost,
       facets,
-      embeds,
-      ancestors,
+      medias,
       descendents,
     };
   } catch (err) {
@@ -320,25 +262,9 @@ const deleteFn = async (
     return null;
   }
 
-  const deletedEmbeds: Array<{
-    postUri: string;
-    position?: number;
-    imageCid?: string;
-    alt?: string | null;
-    uri?: string;
-    title?: string;
-    description?: string;
-    thumbCid?: string | null;
-    embedUri?: string;
-    embedCid?: string;
-    videoCid?: string;
-  }> = [];
-  // Note: Embed tables not present in current schemas, embeds are stored inline
-
   return {
     post: deleted,
-    facets: [], // Not used
-    embeds: deletedEmbeds,
+    facets: [],
   };
 };
 
@@ -354,20 +280,6 @@ const notifsForDelete = (
 };
 
 const updateAggregates = async (db: Database, postIdx: IndexedPost) => {
-  // Update reply count for parent post
-  if (postIdx.post.reply?.parent?.uri) {
-    const replyCount = await db.models.Post.countDocuments({
-      "reply.parent.uri": postIdx.post.reply.parent.uri,
-      violatesThreadGate: { $ne: true },
-    });
-
-    await db.models.Post.findOneAndUpdate(
-      { uri: postIdx.post.reply.parent.uri },
-      { replyCount },
-      { upsert: true, new: true },
-    );
-  }
-
   try {
     // Update posts count for author
     const postsCount = await db.models.Post.countDocuments({
@@ -412,50 +324,11 @@ export const makePlugin = (
 
 export default makePlugin;
 
-function separateEmbeds(
-  embed: PostRecord["embed"],
-): Array<NonNullable<PostRecord["embed"]>> {
-  if (!embed) {
+function separateMedia(
+  media: PostRecord["media"],
+): Array<NonNullable<PostRecord["media"]>> {
+  if (!media) {
     return [];
   }
-  return [embed];
-}
-
-async function validateReply(
-  db: Database,
-  reply: ReplyRef,
-) {
-  const replyRefs = await getReplyRefs(db, reply);
-  const invalidReplyRoot = !replyRefs.parent ||
-    checkInvalidReplyRoot(reply, replyRefs.parent);
-  return {
-    invalidReplyRoot,
-  };
-}
-
-async function getReplyRefs(db: Database, reply: ReplyRef) {
-  const replyRoot = reply.root.uri;
-  const replyParent = reply.parent.uri;
-
-  const [root, parent] = await Promise.all([
-    db.models.Record.findOne({ uri: replyRoot }).lean(),
-    db.models.Record.findOne({ uri: replyParent }).lean(),
-  ]);
-
-  return {
-    root: root && root.json
-      ? {
-        uri: root.uri,
-        invalidReplyRoot: root.invalidReplyRoot ?? null,
-        record: jsonToLex(root.json) as PostRecord,
-      }
-      : null,
-    parent: parent && parent.json
-      ? {
-        uri: parent.uri,
-        invalidReplyRoot: parent.invalidReplyRoot ?? null,
-        record: jsonToLex(parent.json) as PostRecord,
-      }
-      : null,
-  };
+  return [media];
 }

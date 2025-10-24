@@ -40,16 +40,15 @@ export interface MediaRef {
   ref: { $link: string };
 }
 
-export interface EmbedImage {
+export interface ImageMedia extends MediaRef {
   alt: string;
-  image: MediaRef;
   aspectRatio: {
     width: number;
     height: number;
   };
 }
 
-export interface EmbedVideo extends MediaRef {
+export interface VideoMedia extends MediaRef {
   alt: string;
   aspectRatio: {
     width: number;
@@ -165,7 +164,7 @@ export const blockSchema = new Schema<BlockDocument>({
   subject: { type: String, required: true, index: true },
 });
 
-interface PinnedPost {
+interface RecordRef {
   uri: string;
   cid: string;
 }
@@ -176,7 +175,7 @@ export interface ProfileDocument extends AuthoredDocument {
   avatar?: MediaRef;
   banner?: MediaRef;
   labels?: Label[];
-  pinnedPost?: PinnedPost;
+  pinnedPost?: RecordRef;
   postsCount: number;
   followersCount: number;
   followsCount: number;
@@ -203,10 +202,7 @@ profileSchema.index({
 
 export interface AudioDocument extends AuthoredDocument {
   sound: MediaRef;
-  origin?: {
-    uri: string;
-    cid: string;
-  };
+  origin?: RecordRef;
   title: string;
   details?: {
     artist?: string;
@@ -219,10 +215,7 @@ export interface AudioDocument extends AuthoredDocument {
 export const audioSchema = new Schema<AudioDocument>({
   ...authoredSchema,
   sound: { type: Object, required: true },
-  origin: {
-    uri: { type: String, required: true },
-    cid: { type: String, required: true },
-  },
+  origin: { type: Object, required: false },
   title: { type: String, required: true },
   details: { type: Object, required: false },
   labels: { type: [Object], required: false },
@@ -230,105 +223,41 @@ export const audioSchema = new Schema<AudioDocument>({
 });
 
 export interface RepostDocument extends AuthoredDocument {
-  subject: {
-    uri: string;
-    cid: string;
-  };
+  subject: RecordRef;
   via?: string | null;
   viaCid?: string | null;
 }
 
 export const repostSchema = new Schema<RepostDocument>({
   ...authoredSchema,
-  subject: {
-    uri: { type: String, required: true },
-    cid: { type: String, required: true },
-  },
+  subject: { type: Object, required: true },
   via: { type: String, required: false },
   viaCid: { type: String, required: false },
 });
 
-export interface MusicDocument extends AuthoredDocument {
-  sound: string;
-  title: string;
-  author: string;
-  releaseDate: string;
-  album?: string;
-  recordLabel?: string;
-  cover?: string;
-  text?: string;
-  copyright?: string[];
-  facets?: Facet[];
-  labels?: Label[];
-  tags?: string[];
+export interface PostMedia {
+  $type: string;
+  video?: VideoMedia;
+  images?: ImageMedia[];
 }
 
-export const musicSchema = new Schema<MusicDocument>({
-  ...authoredSchema,
-  sound: { type: String, required: true },
-  title: { type: String, required: true },
-  author: { type: String, required: true },
-  releaseDate: { type: String, required: true },
-  album: { type: String, required: false },
-  recordLabel: { type: String, required: false },
-  cover: { type: String, required: false },
-  text: { type: String, required: false },
-  copyright: { type: [String], required: false },
-  facets: { type: [Object], required: false },
-  labels: { type: [Object], required: false },
-  tags: { type: [String], required: false },
-});
-
-export interface PostEmbed {
+export interface StoryMedia {
   $type: string;
-  record?: {
-    uri: string;
-    cid: string;
-  };
-  alt?: string;
-  video?: EmbedVideo;
-  images?: Array<EmbedImage>;
-  external?: {
-    uri: string;
-    title: string;
-    description: string;
-    thumb?: MediaRef;
-  };
-  recordWithMedia?: {
-    record: {
-      uri: string;
-      cid: string;
-    };
-    media: {
-      $type: string;
-      images?: Array<{
-        alt: string;
-        image: MediaRef;
-      }>;
-    };
-  };
+  video?: VideoMedia;
+  image?: ImageMedia;
+}
+
+export interface Caption {
+  text: string;
+  facets?: Facet[];
 }
 
 export interface PostDocument extends AuthoredDocument {
-  text?: string;
-  facets?: Facet[];
-  reply: {
-    root: {
-      uri: string;
-      cid: string;
-    };
-    parent: {
-      uri: string;
-      cid: string;
-    };
-  } | null;
-  embed: PostEmbed | null;
-  sound: {
-    uri: string;
-    cid: string;
-  } | null;
+  caption?: Caption;
+  media?: PostMedia;
+  sound?: RecordRef;
   langs?: string[];
-  labels: Label[] | null;
+  labels?: Label[];
   tags?: string[];
   likeCount: number;
   replyCount: number;
@@ -336,6 +265,49 @@ export interface PostDocument extends AuthoredDocument {
 }
 
 export const postSchema = new Schema<PostDocument>({
+  ...authoredSchema,
+  caption: {
+    type: {
+      text: { type: String, required: true },
+      facets: { type: [Object], required: false, default: [] },
+    },
+    required: false,
+  },
+  media: { type: Object, required: false },
+  sound: {
+    type: {
+      uri: { type: String, required: true },
+      cid: { type: String, required: true },
+    },
+    required: false,
+  },
+  langs: { type: [String], required: false, default: [] },
+  labels: { type: [Object], required: false, default: [] },
+  tags: { type: [String], required: false, default: [] },
+  likeCount: { type: Number, required: true, default: 0 },
+  replyCount: { type: Number, required: true, default: 0 },
+  repostCount: { type: Number, required: true, default: 0 },
+});
+
+// Compound indexes for more efficient queries
+postSchema.index({ authorDid: 1, createdAt: -1 });
+postSchema.index({ tags: 1, createdAt: -1 });
+
+export interface ReplyDocument extends AuthoredDocument {
+  text?: string;
+  facets?: Facet[];
+  reply?: {
+    root: RecordRef;
+    parent: RecordRef;
+  };
+  media?: ImageMedia;
+  langs?: string[];
+  labels?: Label[];
+  likeCount: number;
+  replyCount: number;
+}
+
+export const replySchema = new Schema<ReplyDocument>({
   ...authoredSchema,
   text: { type: String, required: false },
   facets: { type: [Object], required: false, default: [] },
@@ -351,52 +323,33 @@ export const postSchema = new Schema<PostDocument>({
       },
     },
     required: false,
-    default: null,
   },
-  embed: { type: Object, required: false, default: null },
-  sound: {
-    type: {
-      uri: { type: String, required: true },
-      cid: { type: String, required: true },
-    },
-    required: false,
-    default: null,
-  },
+  media: { type: Object, required: false },
   langs: { type: [String], required: false, default: [] },
-  labels: { type: [Object], required: false, default: null },
-  tags: { type: [String], required: false, default: [] },
+  labels: { type: [Object], required: false, default: [] },
   likeCount: { type: Number, required: true, default: 0 },
   replyCount: { type: Number, required: true, default: 0 },
-  repostCount: { type: Number, required: true, default: 0 },
 });
 
-// Compound indexes for more efficient queries
-postSchema.index({ authorDid: 1, createdAt: -1 });
-postSchema.index({ tags: 1, createdAt: -1 });
+replySchema.index({ reply: 1, createdAt: -1 });
 
 export interface StoryDocument extends AuthoredDocument {
-  media: PostEmbed | null;
-  sound: {
-    uri: string;
-    cid: string;
-  } | null;
-  labels: Label[] | null;
-  tags: string[];
+  media: StoryMedia;
+  sound?: RecordRef;
+  labels?: Label[];
 }
 
 export const storySchema = new Schema<StoryDocument>({
   ...authoredSchema,
-  media: { type: Object, required: false, default: null },
+  media: { type: Object, required: true },
   sound: {
     type: {
       uri: { type: String, required: true },
       cid: { type: String, required: true },
     },
     required: false,
-    default: null,
   },
-  labels: { type: [Object], required: false, default: null },
-  tags: { type: [String], required: false, default: [] },
+  labels: { type: [Object], required: false, default: [] },
 });
 
 storySchema.index({ authorDid: 1, createdAt: -1 });
@@ -414,44 +367,7 @@ audioSchema.index({ useCount: -1, createdAt: -1 });
 repostSchema.index({ authorDid: 1, createdAt: -1 });
 repostSchema.index({ "subject.uri": 1, createdAt: -1 });
 
-musicSchema.index({ authorDid: 1, createdAt: -1 });
-musicSchema.index({ tags: 1, createdAt: -1 });
-
-export interface BskyGeneratorDocument extends AuthoredDocument {
-  displayName: string;
-  description?: string;
-  descriptionFacets?: Facet[];
-  avatar?: MediaRef;
-  acceptsInteractions?: boolean;
-  contentMode?: "video" | "unspecified";
-  labels?: Label[];
-  likeCount: number;
-}
-
-export const bskyGeneratorSchema = new Schema<BskyGeneratorDocument>({
-  ...authoredSchema,
-  displayName: { type: String, required: true },
-  description: { type: String, required: false },
-  descriptionFacets: { type: [Object], required: false },
-  avatar: { type: Object, required: false },
-  acceptsInteractions: { type: Boolean, required: false },
-  contentMode: {
-    type: String,
-    enum: ["video", "unspecified"],
-    required: false,
-  },
-  labels: { type: [Object], required: false },
-  likeCount: { type: Number, required: false, default: 0 },
-});
-
-// Add compound indexes for Generator
-bskyGeneratorSchema.index({ authorDid: 1, createdAt: -1 });
-
-// @TODO: Currently this is almost identical to bskyGeneratorSchema but
-// as we make the feed lex meaningfully different from Bsky's feed lex,
-// we will add more fields and different behavior such as feed modes &
-// custom user values.
-export interface SprkGeneratorDocument extends AuthoredDocument {
+export interface GeneratorDocument extends AuthoredDocument {
   displayName: string;
   description?: string;
   descriptionFacets?: Facet[];
@@ -461,7 +377,7 @@ export interface SprkGeneratorDocument extends AuthoredDocument {
   likeCount: number;
 }
 
-export const sprkGeneratorSchema = new Schema<SprkGeneratorDocument>({
+export const generatorSchema = new Schema<GeneratorDocument>({
   ...authoredSchema,
   displayName: { type: String, required: true },
   description: { type: String, required: false },
@@ -473,7 +389,7 @@ export const sprkGeneratorSchema = new Schema<SprkGeneratorDocument>({
 });
 
 // Add compound indexes for Generator
-sprkGeneratorSchema.index({ authorDid: 1, createdAt: -1 });
+generatorSchema.index({ authorDid: 1, createdAt: -1 });
 
 export interface TakedownDocument extends Document {
   targetUri: string;
@@ -608,13 +524,12 @@ export const videoMappingSchema = new Schema<VideoMappingDocument>({
   profileSchema,
   likeSchema,
   postSchema,
+  replySchema,
   repostSchema,
   followSchema,
   blockSchema,
-  bskyGeneratorSchema,
-  sprkGeneratorSchema,
+  generatorSchema,
   audioSchema,
-  musicSchema,
   storySchema,
 ] as Schema[]).forEach((s) => s.plugin(addAuthor));
 
@@ -623,15 +538,14 @@ export interface DatabaseModels {
   DuplicateRecord: Model<DuplicateRecordDocument>;
   Like: Model<LikeDocument>;
   Post: Model<PostDocument>;
+  Reply: Model<ReplyDocument>;
   Story: Model<StoryDocument>;
   Follow: Model<FollowDocument>;
   Block: Model<BlockDocument>;
   Profile: Model<ProfileDocument>;
   Audio: Model<AudioDocument>;
   Repost: Model<RepostDocument>;
-  Music: Model<MusicDocument>;
-  BskyGenerator: Model<BskyGeneratorDocument>;
-  SprkGenerator: Model<SprkGeneratorDocument>;
+  Generator: Model<GeneratorDocument>;
   Takedown: Model<TakedownDocument>;
   RepoTakedown: Model<RepoTakedownDocument>;
   BlobTakedown: Model<BlobTakedownDocument>;

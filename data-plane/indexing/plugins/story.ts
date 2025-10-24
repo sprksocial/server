@@ -1,7 +1,7 @@
 import { CID } from "multiformats/cid";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
 import * as lex from "../../../lex/lexicons.ts";
-import * as Story from "../../../lex/types/so/sprk/feed/story.ts";
+import * as Story from "../../../lex/types/so/sprk/story/post.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { StoryDocument } from "../../db/models.ts";
@@ -11,7 +11,7 @@ import {
   normalizeObject,
 } from "../../../utils/embed-normalizer.ts";
 
-const lexId = lex.ids.SoSprkFeedStory;
+const lexId = lex.ids.SoSprkStoryPost;
 type IndexedStory = StoryDocument;
 
 const insertFn = async (

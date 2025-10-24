@@ -2,7 +2,7 @@
   "lexicon": 1,
   "id": "so.sprk.feed.defs",
   "defs": {
-    "storyView": {
+    "postView": {
       "type": "object",
       "required": ["uri", "cid", "author", "record", "indexedAt"],
       "properties": {
@@ -15,25 +15,7 @@
         "record": { "type": "unknown" },
         "media": {
           "type": "union",
-          "refs": ["so.sprk.embed.images#view", "so.sprk.embed.video#view"]
-        },
-        "indexedAt": { "type": "string", "format": "datetime" }
-      }
-    },
-    "postView": {
-      "type": "object",
-      "required": ["uri", "cid", "author", "record", "indexedAt"],
-      "properties": {
-        "uri": { "type": "string", "format": "at-uri" },
-        "cid": { "type": "string", "format": "cid" },
-        "author": {
-          "type": "ref",
-          "ref": "so.sprk.actor.defs#profileViewBasic"
-        },
-        "record": { "type": "unknown" },
-        "embed": {
-          "type": "union",
-          "refs": ["so.sprk.embed.images#view", "so.sprk.embed.video#view"]
+          "refs": ["so.sprk.media.images#view", "so.sprk.media.video#view"]
         },
         "sound": { "type": "ref", "ref": "so.sprk.sound.defs#audioView" },
         "replyCount": { "type": "integer" },
@@ -46,6 +28,31 @@
           "items": { "type": "ref", "ref": "com.atproto.label.defs#label" }
         },
         "threadgate": { "type": "ref", "ref": "#threadgateView" }
+      }
+    },
+    "replyView": {
+      "type": "object",
+      "required": ["uri", "cid", "author", "record", "indexedAt"],
+      "properties": {
+        "uri": { "type": "string", "format": "at-uri" },
+        "cid": { "type": "string", "format": "cid" },
+        "author": {
+          "type": "ref",
+          "ref": "so.sprk.actor.defs#profileViewBasic"
+        },
+        "record": { "type": "unknown" },
+        "media": {
+          "type": "union",
+          "refs": ["so.sprk.media.image#view"]
+        },
+        "replyCount": { "type": "integer" },
+        "likeCount": { "type": "integer" },
+        "indexedAt": { "type": "string", "format": "datetime" },
+        "viewer": { "type": "ref", "ref": "#viewerState" },
+        "labels": {
+          "type": "array",
+          "items": { "type": "ref", "ref": "com.atproto.label.defs#label" }
+        }
       }
     },
     "viewerState": {
@@ -72,33 +79,11 @@
       "required": ["post"],
       "properties": {
         "post": { "type": "ref", "ref": "#postView" },
-        "reply": { "type": "ref", "ref": "#replyRef" },
         "reason": { "type": "union", "refs": ["#reasonRepost", "#reasonPin"] },
         "feedContext": {
           "type": "string",
           "description": "Context provided by feed generator that may be passed back alongside interactions.",
           "maxLength": 2000
-        }
-      }
-    },
-    "feedViewStory": {
-      "type": "object",
-      "required": ["story"],
-      "properties": {
-        "story": { "type": "ref", "ref": "#storyView" }
-      }
-    },
-    "storiesByAuthor": {
-      "type": "object",
-      "required": ["author", "stories"],
-      "properties": {
-        "author": {
-          "type": "ref",
-          "ref": "so.sprk.actor.defs#profileViewBasic"
-        },
-        "stories": {
-          "type": "array",
-          "items": { "type": "ref", "ref": "#storyView" }
         }
       }
     },
@@ -112,7 +97,7 @@
         },
         "parent": {
           "type": "union",
-          "refs": ["#postView", "#notFoundPost", "#blockedPost"]
+          "refs": ["#postView", "#replyView", "#notFoundPost", "#blockedPost"]
         },
         "grandparentAuthor": {
           "type": "ref",
@@ -137,10 +122,14 @@
       "type": "object",
       "required": ["post"],
       "properties": {
-        "post": { "type": "ref", "ref": "#postView" },
+        "post": { "type": "union", "refs": ["#postView", "#replyView"] },
         "parent": {
           "type": "union",
-          "refs": ["#threadViewPost", "#notFoundPost", "#blockedPost"]
+          "refs": [
+            "#threadViewPost",
+            "#notFoundPost",
+            "#blockedPost"
+          ]
         },
         "replies": {
           "type": "array",
@@ -244,11 +233,7 @@
       "properties": {
         "uri": { "type": "string", "format": "at-uri" },
         "cid": { "type": "string", "format": "cid" },
-        "record": { "type": "unknown" },
-        "lists": {
-          "type": "array",
-          "items": { "type": "ref", "ref": "so.sprk.graph.defs#listViewBasic" }
-        }
+        "record": { "type": "unknown" }
       }
     },
     "interaction": {
@@ -268,7 +253,6 @@
             "so.sprk.feed.defs#interactionLike",
             "so.sprk.feed.defs#interactionRepost",
             "so.sprk.feed.defs#interactionReply",
-            "so.sprk.feed.defs#interactionQuote",
             "so.sprk.feed.defs#interactionShare"
           ]
         },
@@ -303,14 +287,6 @@
       "type": "token",
       "description": "User clicked through to the embedded content of the feed item"
     },
-    "contentModeUnspecified": {
-      "type": "token",
-      "description": "Declares the feed generator returns any types of posts."
-    },
-    "contentModeVideo": {
-      "type": "token",
-      "description": "Declares the feed generator returns posts containing so.sprk.embed.video embeds."
-    },
     "interactionSeen": {
       "type": "token",
       "description": "Feed item was seen by user"
@@ -326,10 +302,6 @@
     "interactionReply": {
       "type": "token",
       "description": "User replied to the feed item"
-    },
-    "interactionQuote": {
-      "type": "token",
-      "description": "User quoted the feed item"
     },
     "interactionShare": {
       "type": "token",

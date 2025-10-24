@@ -2,7 +2,9 @@ import { Record as FeedGenRecord } from "../lex/types/so/sprk/feed/generator.ts"
 import { Record as BskyFeedGenRecord } from "../lex/types/app/bsky/feed/generator.ts";
 import { Record as LikeRecord } from "../lex/types/so/sprk/feed/like.ts";
 import { Record as PostRecord } from "../lex/types/so/sprk/feed/post.ts";
+import { Record as ReplyRecord } from "../lex/types/so/sprk/feed/reply.ts";
 import { Record as RepostRecord } from "../lex/types/app/bsky/feed/repost.ts";
+import { Record as AudioRecord } from "../lex/types/so/sprk/sound/audio.ts";
 import { VideoMappingDocument } from "../data-plane/db/models.ts";
 import { uriToDid as didFromUri } from "../utils/uris.ts";
 import {
@@ -17,6 +19,17 @@ import { DataPlane } from "../data-plane/index.ts";
 
 export type Post = RecordInfo<PostRecord>;
 export type Posts = HydrationMap<Post>;
+export type Reply = RecordInfo<ReplyRecord>;
+export type Replies = HydrationMap<Reply>;
+
+export type Sound = RecordInfo<AudioRecord>;
+export type Sounds = HydrationMap<Sound>;
+
+export type SoundAgg = {
+  uses: number;
+};
+
+export type SoundAggs = HydrationMap<SoundAgg>;
 
 export type VideoMapping = VideoMappingDocument;
 export type VideoMappings = HydrationMap<VideoMapping>;
@@ -24,7 +37,6 @@ export type VideoMappings = HydrationMap<VideoMapping>;
 export type PostViewerState = {
   like?: string;
   repost?: string;
-  threadMuted?: boolean;
 };
 
 export type PostViewerStates = HydrationMap<PostViewerState>;
@@ -43,6 +55,13 @@ export type PostAgg = {
 };
 
 export type PostAggs = HydrationMap<PostAgg>;
+
+export type ReplyAgg = {
+  likes: number;
+  replies: number;
+};
+
+export type ReplyAggs = HydrationMap<ReplyAgg>;
 
 export type Like = RecordInfo<LikeRecord>;
 export type Likes = HydrationMap<Like>;
@@ -107,6 +126,50 @@ export class FeedHydrator {
 
     return need.reduce((acc, uri, i) => {
       const record = parseRecord<PostRecord>(res.records[i], includeTakedowns);
+      return acc.set(
+        uri,
+        record ? record : null,
+      );
+    }, base);
+  }
+
+  async getReplies(
+    uris: string[],
+    includeTakedowns = false,
+    given = new HydrationMap<Reply>(),
+  ): Promise<Replies> {
+    const [have, need] = split(uris, (uri) => given.has(uri));
+    const base = have.reduce(
+      (acc, uri) => acc.set(uri, given.get(uri) ?? null),
+      new HydrationMap<Reply>(),
+    );
+    if (!need.length) return base;
+    const res = await this.dataplane.records.getReplyRecords(need);
+
+    return need.reduce((acc, uri, i) => {
+      const record = parseRecord<ReplyRecord>(res.records[i], includeTakedowns);
+      return acc.set(
+        uri,
+        record ? record : null,
+      );
+    }, base);
+  }
+
+  async getSounds(
+    uris: string[],
+    includeTakedowns = false,
+    given = new HydrationMap<Sound>(),
+  ): Promise<Sounds> {
+    const [have, need] = split(uris, (uri) => given.has(uri));
+    const base = have.reduce(
+      (acc, uri) => acc.set(uri, given.get(uri) ?? null),
+      new HydrationMap<Sound>(),
+    );
+    if (!need.length) return base;
+    const res = await this.dataplane.records.getRecords(need);
+
+    return need.reduce((acc, uri, i) => {
+      const record = parseRecord<AudioRecord>(res.records[i], includeTakedowns);
       return acc.set(
         uri,
         record ? record : null,
@@ -185,6 +248,32 @@ export class FeedHydrator {
         replies: counts.replies[i] ?? 0,
       });
     }, new HydrationMap<PostAgg>());
+  }
+
+  async getReplyAggregates(
+    refs: ItemRef[],
+  ): Promise<ReplyAggs> {
+    if (!refs.length) return new HydrationMap<ReplyAgg>();
+    const counts = await this.dataplane.interactions.getInteractionCounts(refs);
+    return refs.reduce((acc, { uri }, i) => {
+      return acc.set(uri, {
+        likes: counts.likes[i] ?? 0,
+        replies: counts.replies[i] ?? 0,
+      });
+    }, new HydrationMap<ReplyAgg>());
+  }
+
+  async getSoundAggregates(
+    refs: ItemRef[],
+  ): Promise<SoundAggs> {
+    if (!refs.length) return new HydrationMap<SoundAgg>();
+    const uris = refs.map((ref) => ref.uri);
+    const counts = await this.dataplane.interactions.getSoundUsageCounts(uris);
+    return refs.reduce((acc, { uri }, i) => {
+      return acc.set(uri, {
+        uses: counts.uses[i] ?? 0,
+      });
+    }, new HydrationMap<SoundAgg>());
   }
 
   async getFeedGens(

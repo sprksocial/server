@@ -3,7 +3,7 @@ import { InvalidRequestError } from "@atp/xrpc-server";
 import { AppContext } from "../../../../context.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
 import { Actor } from "../../../../hydration/actor.ts";
-import { FeedItem, Post } from "../../../../hydration/feed.ts";
+import { FeedItem } from "../../../../hydration/feed.ts";
 import {
   HydrateCtx,
   HydrationState,
@@ -130,19 +130,13 @@ const noBlocksOrMutedReposts = (inputs: {
 }): Skeleton => {
   const { ctx, skeleton, hydration } = inputs;
   const relationship = hydration.profileViewers?.get(skeleton.actor.did);
-  if (
-    relationship &&
-    (relationship.blocking)
-  ) {
+  if (relationship && relationship.blocking) {
     throw new InvalidRequestError(
       `Requester has blocked actor: ${skeleton.actor.did}`,
       "BlockedActor",
     );
   }
-  if (
-    relationship &&
-    (relationship.blockedBy)
-  ) {
+  if (relationship && relationship.blockedBy) {
     throw new InvalidRequestError(
       `Requester is blocked by actor: ${skeleton.actor.did}`,
       "BlockedByActor",
@@ -233,12 +227,12 @@ class SelfThreadTracker {
       loop.add(uri);
     }
     // cache through the result
-    const result = this._ok(uri, loop);
+    const result = this._ok(uri);
     this.cache.set(uri, result);
     return result;
   }
 
-  private _ok(uri: string, loop: Set<string>): boolean {
+  private _ok(uri: string): boolean {
     // must be in the feed to be in a self-thread
     if (!this.feedUris.has(uri)) {
       return false;
@@ -248,16 +242,6 @@ class SelfThreadTracker {
     if (!post) {
       return false;
     }
-    // root posts (no parent) are trivial case of self-thread
-    const parentUri = getParentUri(post);
-    if (parentUri === null) {
-      return true;
-    }
-    // recurse w/ cache: this post is in a self-thread if its parent is.
-    return this.ok(parentUri, loop);
+    return true;
   }
-}
-
-function getParentUri(post: Post) {
-  return post.record.reply?.parent.uri ?? null;
 }

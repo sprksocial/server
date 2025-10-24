@@ -28,6 +28,7 @@ export class RepoSubscription {
     this.background = new BackgroundQueue(db, this.logger);
     this.indexingSvc = new IndexingService(
       db,
+      cfg,
       idResolver,
       this.background,
       this.logger,
@@ -199,9 +200,7 @@ function createFirehose(opts: {
     },
     filterCollections: [
       "so.sprk.*",
-      "app.bsky.graph.follow",
       "app.bsky.graph.block",
-      "app.bsky.feed.generator",
     ],
   });
   return { firehose, runner };

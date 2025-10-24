@@ -16,57 +16,58 @@ import { BackgroundQueue } from "../background.ts";
 import { Database } from "../db/index.ts";
 import { ActorDocument } from "../db/models.ts";
 import * as Block from "./plugins/block.ts";
-import * as Generator from "./plugins/generator/index.ts";
+import * as Generator from "./plugins/generator.ts";
 import * as Follow from "./plugins/follow.ts";
 import * as Like from "./plugins/like.ts";
 import * as Post from "./plugins/post.ts";
+import * as Reply from "./plugins/reply.ts";
 import * as Profile from "./plugins/profile.ts";
 import * as Repost from "./plugins/repost.ts";
 import * as Story from "./plugins/story.ts";
 import * as Audio from "./plugins/audio.ts";
-import * as Music from "./plugins/music.ts";
 import { RecordProcessor } from "./processor.ts";
 import { Logger } from "@logtape/logtape";
+import { ServerConfig } from "../../config.ts";
 
 export class IndexingService {
   records: {
     post: Post.PluginType;
+    reply: Reply.PluginType;
     like: Like.PluginType;
     repost: Repost.PluginType;
     follow: Follow.PluginType;
     profile: Profile.PluginType;
     block: Block.PluginType;
-    bskyGenerator: Generator.Bsky.PluginType;
-    sprkGenerator: Generator.Sprk.PluginType;
+    generator: Generator.PluginType;
     story: Story.PluginType;
     audio: Audio.PluginType;
-    music: Music.PluginType;
   };
 
   constructor(
     public db: Database,
+    public cfg: ServerConfig,
     public idResolver: IdResolver,
     public background: BackgroundQueue,
     public logger: Logger,
   ) {
     this.records = {
       post: Post.makePlugin(this.db, this.background),
+      reply: Reply.makePlugin(this.db, this.background),
       like: Like.makePlugin(this.db, this.background),
       repost: Repost.makePlugin(this.db, this.background),
       follow: Follow.makePlugin(this.db, this.background),
       profile: Profile.makePlugin(this.db, this.background),
       block: Block.makePlugin(this.db, this.background),
-      bskyGenerator: Generator.Bsky.makePlugin(this.db, this.background),
-      sprkGenerator: Generator.Sprk.makePlugin(this.db, this.background),
+      generator: Generator.makePlugin(this.db, this.background),
       story: Story.makePlugin(this.db, this.background),
       audio: Audio.makePlugin(this.db, this.background),
-      music: Music.makePlugin(this.db, this.background),
     };
   }
 
   transact(txn: Database) {
     return new IndexingService(
       txn,
+      this.cfg,
       this.idResolver,
       this.background,
       this.logger,
@@ -303,13 +304,12 @@ export class IndexingService {
     await this.db.models.Follow.deleteMany({ authorDid: did });
     await this.db.models.Repost.deleteMany({ authorDid: did });
     await this.db.models.Like.deleteMany({ authorDid: did });
-    await this.db.models.BskyGenerator.deleteMany({ authorDid: did });
-    await this.db.models.SprkGenerator.deleteMany({ authorDid: did });
+    await this.db.models.Generator.deleteMany({ authorDid: did });
     await this.db.models.Story.deleteMany({ authorDid: did });
     await this.db.models.Audio.deleteMany({ authorDid: did });
-    await this.db.models.Music.deleteMany({ authorDid: did });
     await this.db.models.Block.deleteMany({ authorDid: did });
     await this.db.models.Post.deleteMany({ authorDid: did });
+    await this.db.models.Reply.deleteMany({ authorDid: did });
   }
 }
 

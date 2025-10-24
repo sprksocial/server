@@ -1,6 +1,6 @@
-import type * as SoSprkFeedDefs from "../lex/types/so/sprk/feed/defs.ts";
+import type * as SoSprkStoryDefs from "../lex/types/so/sprk/story/defs.ts";
 import { StoryDocument } from "../data-plane/db/models.ts";
-import { transformEmbed } from "./embed-transformer.ts";
+import { transformMedia } from "./media-transformer.ts";
 import { createProfileViewBasic } from "./profile-helper.ts";
 import { AppContext } from "../context.ts";
 
@@ -8,14 +8,14 @@ import { AppContext } from "../context.ts";
 export async function transformStoryToStoryView(
   story: StoryDocument,
   ctx: AppContext,
-): Promise<SoSprkFeedDefs.StoryView> {
+): Promise<SoSprkStoryDefs.StoryView> {
   // Create the author object with stories
   const authorView = await createProfileViewBasic(
     story.authorDid,
     ctx,
   );
 
-  const embedView = transformEmbed(
+  const embedView = transformMedia(
     story.media,
     story.authorDid,
     ctx.cfg,
@@ -35,7 +35,6 @@ export async function transformStoryToStoryView(
       media: story.media,
       sound: story.sound,
       labels: story.labels,
-      tags: story.tags,
       createdAt: story.createdAt,
     },
     indexedAt: story.indexedAt,
@@ -46,7 +45,7 @@ export async function transformStoryToStoryView(
 export async function transformStoriesToStoryViews(
   stories: StoryDocument[],
   ctx: AppContext,
-): Promise<SoSprkFeedDefs.StoryView[]> {
+): Promise<SoSprkStoryDefs.StoryView[]> {
   if (stories.length === 0) {
     return [];
   }
@@ -66,7 +65,7 @@ export async function transformStoriesToStoryViews(
   return stories.map((story) => {
     const authorView = authorsMap.get(story.authorDid)!;
 
-    const embedView = transformEmbed(
+    const embedView = transformMedia(
       story.media,
       story.authorDid,
       ctx.cfg,
@@ -86,7 +85,6 @@ export async function transformStoriesToStoryViews(
         media: story.media,
         sound: story.sound,
         labels: story.labels,
-        tags: story.tags,
         createdAt: story.createdAt,
       },
       indexedAt: story.indexedAt,

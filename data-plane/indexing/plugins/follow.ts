@@ -1,13 +1,13 @@
 import { CID } from "multiformats/cid";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
 import * as lex from "../../../lex/lexicons.ts";
-import * as Follow from "../../../lex/types/app/bsky/graph/follow.ts";
+import * as Follow from "../../../lex/types/so/sprk/graph/follow.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { FollowDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexId = lex.ids.AppBskyGraphFollow;
+const lexId = lex.ids.SoSprkGraphFollow;
 type IndexedFollow = FollowDocument;
 
 const insertFn = async (

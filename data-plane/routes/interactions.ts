@@ -94,7 +94,7 @@ export class Interactions {
         { $group: { _id: "$authorDid", count: { $sum: 1 } } },
       ]),
       // Count generators for each DID
-      this.db.models.BskyGenerator.aggregate([
+      this.db.models.Generator.aggregate([
         { $match: { authorDid: { $in: dids } } },
         { $group: { _id: "$authorDid", count: { $sum: 1 } } },
       ]),
@@ -119,6 +119,26 @@ export class Interactions {
       following: dids.map((did) => followingMap.get(did) ?? 0),
       posts: dids.map((did) => postsMap.get(did) ?? 0),
       feeds: dids.map((did) => feedsMap.get(did) ?? 0),
+    };
+  }
+
+  async getSoundUsageCounts(uris: string[]) {
+    if (uris.length === 0) {
+      return { uses: [] };
+    }
+
+    // Count how many posts reference each sound URI
+    const usageAgg = await this.db.models.Post.aggregate([
+      { $match: { "sound.uri": { $in: uris } } },
+      { $group: { _id: "$sound.uri", count: { $sum: 1 } } },
+    ]);
+
+    const usageMap = new Map(
+      usageAgg.map((item: AggregationResult) => [item._id, item.count]),
+    );
+
+    return {
+      uses: uris.map((uri) => usageMap.get(uri) ?? 0),
     };
   }
 }

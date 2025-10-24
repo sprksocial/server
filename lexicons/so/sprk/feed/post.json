@@ -8,26 +8,12 @@
       "key": "tid",
       "record": {
         "type": "object",
-        "required": ["createdAt"],
+        "required": ["createdAt", "media"],
         "properties": {
-          "text": {
-            "type": "string",
-            "maxLength": 3000,
-            "maxGraphemes": 300,
-            "description": "The post description."
-          },
-          "facets": {
-            "type": "array",
-            "description": "Annotations of text (mentions, URLs, hashtags, etc)",
-            "items": { "type": "ref", "ref": "so.sprk.richtext.facet" }
-          },
-          "reply": { "type": "ref", "ref": "#replyRef" },
-          "embed": {
+          "caption": { "type": "ref", "ref": "#captionRef" },
+          "media": {
             "type": "union",
-            "refs": [
-              "so.sprk.embed.images",
-              "so.sprk.embed.video"
-            ]
+            "refs": ["so.sprk.media.images", "so.sprk.media.video"]
           },
           "sound": {
             "type": "ref",
@@ -58,12 +44,20 @@
         }
       }
     },
-    "replyRef": {
+    "captionRef": {
       "type": "object",
-      "required": ["root", "parent"],
       "properties": {
-        "root": { "type": "ref", "ref": "com.atproto.repo.strongRef" },
-        "parent": { "type": "ref", "ref": "com.atproto.repo.strongRef" }
+        "text": {
+          "type": "string",
+          "maxLength": 3000,
+          "maxGraphemes": 300,
+          "description": "The post description."
+        },
+        "facets": {
+          "type": "array",
+          "description": "Annotations of text (mentions, URLs, hashtags, etc)",
+          "items": { "type": "ref", "ref": "so.sprk.richtext.facet" }
+        }
       }
     }
   }

@@ -11182,217 +11182,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkEmbedDefs": {
-    "lexicon": 1,
-    "id": "so.sprk.embed.defs",
-    "defs": {
-      "aspectRatio": {
-        "type": "object",
-        "description":
-          "width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.",
-        "required": [
-          "width",
-          "height",
-        ],
-        "properties": {
-          "width": {
-            "type": "integer",
-            "minimum": 1,
-          },
-          "height": {
-            "type": "integer",
-            "minimum": 1,
-          },
-        },
-      },
-    },
-  },
-  "SoSprkEmbedImages": {
-    "lexicon": 1,
-    "id": "so.sprk.embed.images",
-    "description": "A set of images embedded in a Spark record (eg, a post).",
-    "defs": {
-      "main": {
-        "type": "object",
-        "required": [
-          "images",
-        ],
-        "properties": {
-          "images": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:so.sprk.embed.images#image",
-            },
-            "maxLength": 12,
-          },
-        },
-      },
-      "image": {
-        "type": "object",
-        "required": [
-          "image",
-          "alt",
-        ],
-        "properties": {
-          "image": {
-            "type": "blob",
-            "accept": [
-              "image/*",
-            ],
-            "maxSize": 5242880,
-          },
-          "alt": {
-            "type": "string",
-            "description":
-              "Alt text description of the image, for accessibility.",
-          },
-          "aspectRatio": {
-            "type": "ref",
-            "ref": "lex:so.sprk.embed.defs#aspectRatio",
-          },
-        },
-      },
-      "view": {
-        "type": "object",
-        "required": [
-          "images",
-        ],
-        "properties": {
-          "images": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:so.sprk.embed.images#viewImage",
-            },
-            "maxLength": 12,
-          },
-        },
-      },
-      "viewImage": {
-        "type": "object",
-        "required": [
-          "thumb",
-          "fullsize",
-          "alt",
-        ],
-        "properties": {
-          "thumb": {
-            "type": "string",
-            "format": "uri",
-            "description":
-              "Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.",
-          },
-          "fullsize": {
-            "type": "string",
-            "format": "uri",
-            "description":
-              "Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.",
-          },
-          "alt": {
-            "type": "string",
-            "description":
-              "Alt text description of the image, for accessibility.",
-          },
-          "aspectRatio": {
-            "type": "ref",
-            "ref": "lex:so.sprk.embed.defs#aspectRatio",
-          },
-        },
-      },
-    },
-  },
-  "SoSprkEmbedVideo": {
-    "lexicon": 1,
-    "id": "so.sprk.embed.video",
-    "description": "A video embedded in a Spark record (eg, a post).",
-    "defs": {
-      "main": {
-        "type": "object",
-        "required": [
-          "video",
-        ],
-        "properties": {
-          "video": {
-            "type": "blob",
-            "accept": [
-              "video/mp4",
-            ],
-            "maxSize": 314572800,
-          },
-          "captions": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:so.sprk.embed.video#caption",
-            },
-            "maxLength": 20,
-          },
-          "alt": {
-            "type": "string",
-            "description":
-              "Alt text description of the video, for accessibility.",
-            "maxGraphemes": 1000,
-            "maxLength": 10000,
-          },
-          "aspectRatio": {
-            "type": "ref",
-            "ref": "lex:so.sprk.embed.defs#aspectRatio",
-          },
-        },
-      },
-      "caption": {
-        "type": "object",
-        "required": [
-          "lang",
-          "file",
-        ],
-        "properties": {
-          "lang": {
-            "type": "string",
-            "format": "language",
-          },
-          "file": {
-            "type": "blob",
-            "accept": [
-              "text/vtt",
-            ],
-            "maxSize": 20000,
-          },
-        },
-      },
-      "view": {
-        "type": "object",
-        "required": [
-          "cid",
-          "playlist",
-        ],
-        "properties": {
-          "cid": {
-            "type": "string",
-            "format": "cid",
-          },
-          "playlist": {
-            "type": "string",
-            "format": "uri",
-          },
-          "thumbnail": {
-            "type": "string",
-            "format": "uri",
-          },
-          "alt": {
-            "type": "string",
-            "maxGraphemes": 1000,
-            "maxLength": 10000,
-          },
-          "aspectRatio": {
-            "type": "ref",
-            "ref": "lex:so.sprk.embed.defs#aspectRatio",
-          },
-        },
-      },
-    },
-  },
   "SoSprkNotificationRegisterPush": {
     "lexicon": 1,
     "id": "so.sprk.notification.registerPush",
@@ -11655,639 +11444,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkUnspeccedSearchStarterPacksSkeleton": {
-    "lexicon": 1,
-    "id": "so.sprk.unspecced.searchStarterPacksSkeleton",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description": "Backend Starter Pack search, returns only skeleton.",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "q",
-          ],
-          "properties": {
-            "q": {
-              "type": "string",
-              "description":
-                "Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended.",
-            },
-            "viewer": {
-              "type": "string",
-              "format": "did",
-              "description":
-                "DID of the account making the request (not included for public/unauthenticated queries).",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 25,
-            },
-            "cursor": {
-              "type": "string",
-              "description":
-                "Optional pagination mechanism; may not necessarily allow scrolling through entire result set.",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "starterPacks",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "hitsTotal": {
-                "type": "integer",
-                "description":
-                  "Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.",
-              },
-              "starterPacks": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.unspecced.defs#skeletonSearchStarterPack",
-                },
-              },
-            },
-          },
-        },
-        "errors": [
-          {
-            "name": "BadQueryString",
-          },
-        ],
-      },
-    },
-  },
-  "SoSprkUnspeccedDefs": {
-    "lexicon": 1,
-    "id": "so.sprk.unspecced.defs",
-    "defs": {
-      "skeletonSearchPost": {
-        "type": "object",
-        "required": [
-          "uri",
-        ],
-        "properties": {
-          "uri": {
-            "type": "string",
-            "format": "at-uri",
-          },
-        },
-      },
-      "skeletonSearchActor": {
-        "type": "object",
-        "required": [
-          "did",
-        ],
-        "properties": {
-          "did": {
-            "type": "string",
-            "format": "did",
-          },
-        },
-      },
-      "skeletonSearchStarterPack": {
-        "type": "object",
-        "required": [
-          "uri",
-        ],
-        "properties": {
-          "uri": {
-            "type": "string",
-            "format": "at-uri",
-          },
-        },
-      },
-      "trendingTopic": {
-        "type": "object",
-        "required": [
-          "topic",
-          "link",
-        ],
-        "properties": {
-          "topic": {
-            "type": "string",
-          },
-          "displayName": {
-            "type": "string",
-          },
-          "description": {
-            "type": "string",
-          },
-          "link": {
-            "type": "string",
-          },
-        },
-      },
-    },
-  },
-  "SoSprkUnspeccedSearchActorsSkeleton": {
-    "lexicon": 1,
-    "id": "so.sprk.unspecced.searchActorsSkeleton",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Backend Actors (profile) search, returns only skeleton.",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "q",
-          ],
-          "properties": {
-            "q": {
-              "type": "string",
-              "description":
-                "Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended. For typeahead search, only simple term match is supported, not full syntax.",
-            },
-            "viewer": {
-              "type": "string",
-              "format": "did",
-              "description":
-                "DID of the account making the request (not included for public/unauthenticated queries). Used to boost followed accounts in ranking.",
-            },
-            "typeahead": {
-              "type": "boolean",
-              "description": "If true, acts as fast/simple 'typeahead' query.",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 25,
-            },
-            "cursor": {
-              "type": "string",
-              "description":
-                "Optional pagination mechanism; may not necessarily allow scrolling through entire result set.",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "actors",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "hitsTotal": {
-                "type": "integer",
-                "description":
-                  "Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.",
-              },
-              "actors": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.unspecced.defs#skeletonSearchActor",
-                },
-              },
-            },
-          },
-        },
-        "errors": [
-          {
-            "name": "BadQueryString",
-          },
-        ],
-      },
-    },
-  },
-  "SoSprkUnspeccedGetSuggestionsSkeleton": {
-    "lexicon": 1,
-    "id": "so.sprk.unspecced.getSuggestionsSkeleton",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Get a skeleton of suggested actors. Intended to be called and then hydrated through so.sprk.actor.getSuggestions",
-        "parameters": {
-          "type": "params",
-          "properties": {
-            "viewer": {
-              "type": "string",
-              "format": "did",
-              "description":
-                "DID of the account making the request (not included for public/unauthenticated queries). Used to boost followed accounts in ranking.",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-            "relativeToDid": {
-              "type": "string",
-              "format": "did",
-              "description":
-                "DID of the account to get suggestions relative to. If not provided, suggestions will be based on the viewer.",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "actors",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "actors": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.unspecced.defs#skeletonSearchActor",
-                },
-              },
-              "relativeToDid": {
-                "type": "string",
-                "format": "did",
-                "description":
-                  "DID of the account these suggestions are relative to. If this is returned undefined, suggestions are based on the viewer.",
-              },
-              "recId": {
-                "type": "integer",
-                "description":
-                  "Snowflake for this recommendation, use when submitting recommendation events.",
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkUnspeccedSearchPostsSkeleton": {
-    "lexicon": 1,
-    "id": "so.sprk.unspecced.searchPostsSkeleton",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description": "Backend Posts search, returns only skeleton",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "q",
-          ],
-          "properties": {
-            "q": {
-              "type": "string",
-              "description":
-                "Search query string; syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended.",
-            },
-            "sort": {
-              "type": "string",
-              "knownValues": [
-                "top",
-                "latest",
-              ],
-              "default": "latest",
-              "description": "Specifies the ranking order of results.",
-            },
-            "since": {
-              "type": "string",
-              "description":
-                "Filter results for posts after the indicated datetime (inclusive). Expected to use 'sortAt' timestamp, which may not match 'createdAt'. Can be a datetime, or just an ISO date (YYYY-MM-DD).",
-            },
-            "until": {
-              "type": "string",
-              "description":
-                "Filter results for posts before the indicated datetime (not inclusive). Expected to use 'sortAt' timestamp, which may not match 'createdAt'. Can be a datetime, or just an ISO date (YYY-MM-DD).",
-            },
-            "mentions": {
-              "type": "string",
-              "format": "at-identifier",
-              "description":
-                "Filter to posts which mention the given account. Handles are resolved to DID before query-time. Only matches rich-text facet mentions.",
-            },
-            "author": {
-              "type": "string",
-              "format": "at-identifier",
-              "description":
-                "Filter to posts by the given account. Handles are resolved to DID before query-time.",
-            },
-            "lang": {
-              "type": "string",
-              "format": "language",
-              "description":
-                "Filter to posts in the given language. Expected to be based on post language field, though server may override language detection.",
-            },
-            "domain": {
-              "type": "string",
-              "description":
-                "Filter to posts with URLs (facet links or embeds) linking to the given domain (hostname). Server may apply hostname normalization.",
-            },
-            "url": {
-              "type": "string",
-              "format": "uri",
-              "description":
-                "Filter to posts with links (facet links or embeds) pointing to this URL. Server may apply URL normalization or fuzzy matching.",
-            },
-            "tag": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "maxLength": 640,
-                "maxGraphemes": 64,
-              },
-              "description":
-                "Filter to posts with the given tag (hashtag), based on rich-text facet or tag field. Do not include the hash (#) prefix. Multiple tags can be specified, with 'AND' matching.",
-            },
-            "viewer": {
-              "type": "string",
-              "format": "did",
-              "description":
-                "DID of the account making the request (not included for public/unauthenticated queries). Used for 'from:me' queries.",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 25,
-            },
-            "cursor": {
-              "type": "string",
-              "description":
-                "Optional pagination mechanism; may not necessarily allow scrolling through entire result set.",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "posts",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "hitsTotal": {
-                "type": "integer",
-                "description":
-                  "Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.",
-              },
-              "posts": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.unspecced.defs#skeletonSearchPost",
-                },
-              },
-            },
-          },
-        },
-        "errors": [
-          {
-            "name": "BadQueryString",
-          },
-        ],
-      },
-    },
-  },
-  "SoSprkUnspeccedGetPopularFeedGenerators": {
-    "lexicon": 1,
-    "id": "so.sprk.unspecced.getPopularFeedGenerators",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description": "An unspecced view of globally popular feed generators.",
-        "parameters": {
-          "type": "params",
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-            "query": {
-              "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "feeds",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "feeds": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.defs#generatorView",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkUnspeccedGetTrendingTopics": {
-    "lexicon": 1,
-    "id": "so.sprk.unspecced.getTrendingTopics",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description": "Get a list of trending topics",
-        "parameters": {
-          "type": "params",
-          "properties": {
-            "viewer": {
-              "type": "string",
-              "format": "did",
-              "description":
-                "DID of the account making the request (not included for public/unauthenticated queries). Used to boost followed accounts in ranking.",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 25,
-              "default": 10,
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "topics",
-              "suggested",
-            ],
-            "properties": {
-              "topics": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.unspecced.defs#trendingTopic",
-                },
-              },
-              "suggested": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.unspecced.defs#trendingTopic",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkUnspeccedGetTaggedSuggestions": {
-    "lexicon": 1,
-    "id": "so.sprk.unspecced.getTaggedSuggestions",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Get a list of suggestions (feeds and users) tagged with categories",
-        "parameters": {
-          "type": "params",
-          "properties": {},
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "suggestions",
-            ],
-            "properties": {
-              "suggestions": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref":
-                    "lex:so.sprk.unspecced.getTaggedSuggestions#suggestion",
-                },
-              },
-            },
-          },
-        },
-      },
-      "suggestion": {
-        "type": "object",
-        "required": [
-          "tag",
-          "subjectType",
-          "subject",
-        ],
-        "properties": {
-          "tag": {
-            "type": "string",
-          },
-          "subjectType": {
-            "type": "string",
-            "knownValues": [
-              "actor",
-              "feed",
-            ],
-          },
-          "subject": {
-            "type": "string",
-            "format": "uri",
-          },
-        },
-      },
-    },
-  },
-  "SoSprkUnspeccedGetConfig": {
-    "lexicon": 1,
-    "id": "so.sprk.unspecced.getConfig",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description": "Get miscellaneous runtime configuration.",
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [],
-            "properties": {
-              "checkEmailConfirmed": {
-                "type": "boolean",
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkGraphGetStarterPacks": {
-    "lexicon": 1,
-    "id": "so.sprk.graph.getStarterPacks",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description": "Get views for a list of starter packs.",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "uris",
-          ],
-          "properties": {
-            "uris": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "at-uri",
-              },
-              "maxLength": 25,
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "starterPacks",
-            ],
-            "properties": {
-              "starterPacks": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.graph.defs#starterPackViewBasic",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
   "SoSprkGraphGetSuggestedFollowsByActor": {
     "lexicon": 1,
     "id": "so.sprk.graph.getSuggestedFollowsByActor",
@@ -12403,294 +11559,6 @@ export const schemaDict = {
     "lexicon": 1,
     "id": "so.sprk.graph.defs",
     "defs": {
-      "listViewBasic": {
-        "type": "object",
-        "required": [
-          "uri",
-          "cid",
-          "name",
-          "purpose",
-        ],
-        "properties": {
-          "uri": {
-            "type": "string",
-            "format": "at-uri",
-          },
-          "cid": {
-            "type": "string",
-            "format": "cid",
-          },
-          "name": {
-            "type": "string",
-            "maxLength": 64,
-            "minLength": 1,
-          },
-          "purpose": {
-            "type": "ref",
-            "ref": "lex:so.sprk.graph.defs#listPurpose",
-          },
-          "avatar": {
-            "type": "string",
-            "format": "uri",
-          },
-          "listItemCount": {
-            "type": "integer",
-            "minimum": 0,
-          },
-          "labels": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:com.atproto.label.defs#label",
-            },
-          },
-          "viewer": {
-            "type": "ref",
-            "ref": "lex:so.sprk.graph.defs#listViewerState",
-          },
-          "indexedAt": {
-            "type": "string",
-            "format": "datetime",
-          },
-        },
-      },
-      "listView": {
-        "type": "object",
-        "required": [
-          "uri",
-          "cid",
-          "creator",
-          "name",
-          "purpose",
-          "indexedAt",
-        ],
-        "properties": {
-          "uri": {
-            "type": "string",
-            "format": "at-uri",
-          },
-          "cid": {
-            "type": "string",
-            "format": "cid",
-          },
-          "creator": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileView",
-          },
-          "name": {
-            "type": "string",
-            "maxLength": 64,
-            "minLength": 1,
-          },
-          "purpose": {
-            "type": "ref",
-            "ref": "lex:so.sprk.graph.defs#listPurpose",
-          },
-          "description": {
-            "type": "string",
-            "maxGraphemes": 300,
-            "maxLength": 3000,
-          },
-          "descriptionFacets": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:so.sprk.richtext.facet",
-            },
-          },
-          "avatar": {
-            "type": "string",
-            "format": "uri",
-          },
-          "listItemCount": {
-            "type": "integer",
-            "minimum": 0,
-          },
-          "labels": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:com.atproto.label.defs#label",
-            },
-          },
-          "viewer": {
-            "type": "ref",
-            "ref": "lex:so.sprk.graph.defs#listViewerState",
-          },
-          "indexedAt": {
-            "type": "string",
-            "format": "datetime",
-          },
-        },
-      },
-      "listItemView": {
-        "type": "object",
-        "required": [
-          "uri",
-          "subject",
-        ],
-        "properties": {
-          "uri": {
-            "type": "string",
-            "format": "at-uri",
-          },
-          "subject": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileView",
-          },
-        },
-      },
-      "starterPackView": {
-        "type": "object",
-        "required": [
-          "uri",
-          "cid",
-          "record",
-          "creator",
-          "indexedAt",
-        ],
-        "properties": {
-          "uri": {
-            "type": "string",
-            "format": "at-uri",
-          },
-          "cid": {
-            "type": "string",
-            "format": "cid",
-          },
-          "record": {
-            "type": "unknown",
-          },
-          "creator": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
-          },
-          "list": {
-            "type": "ref",
-            "ref": "lex:so.sprk.graph.defs#listViewBasic",
-          },
-          "listItemsSample": {
-            "type": "array",
-            "maxLength": 12,
-            "items": {
-              "type": "ref",
-              "ref": "lex:so.sprk.graph.defs#listItemView",
-            },
-          },
-          "feeds": {
-            "type": "array",
-            "maxLength": 3,
-            "items": {
-              "type": "ref",
-              "ref": "lex:so.sprk.feed.defs#generatorView",
-            },
-          },
-          "joinedWeekCount": {
-            "type": "integer",
-            "minimum": 0,
-          },
-          "joinedAllTimeCount": {
-            "type": "integer",
-            "minimum": 0,
-          },
-          "labels": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:com.atproto.label.defs#label",
-            },
-          },
-          "indexedAt": {
-            "type": "string",
-            "format": "datetime",
-          },
-        },
-      },
-      "starterPackViewBasic": {
-        "type": "object",
-        "required": [
-          "uri",
-          "cid",
-          "record",
-          "creator",
-          "indexedAt",
-        ],
-        "properties": {
-          "uri": {
-            "type": "string",
-            "format": "at-uri",
-          },
-          "cid": {
-            "type": "string",
-            "format": "cid",
-          },
-          "record": {
-            "type": "unknown",
-          },
-          "creator": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
-          },
-          "listItemCount": {
-            "type": "integer",
-            "minimum": 0,
-          },
-          "joinedWeekCount": {
-            "type": "integer",
-            "minimum": 0,
-          },
-          "joinedAllTimeCount": {
-            "type": "integer",
-            "minimum": 0,
-          },
-          "labels": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:com.atproto.label.defs#label",
-            },
-          },
-          "indexedAt": {
-            "type": "string",
-            "format": "datetime",
-          },
-        },
-      },
-      "listPurpose": {
-        "type": "string",
-        "knownValues": [
-          "so.sprk.graph.defs#modlist",
-          "so.sprk.graph.defs#curatelist",
-          "so.sprk.graph.defs#referencelist",
-        ],
-      },
-      "modlist": {
-        "type": "token",
-        "description":
-          "A list of actors to apply an aggregate moderation action (mute/block) on.",
-      },
-      "curatelist": {
-        "type": "token",
-        "description":
-          "A list of actors used for curation purposes such as list feeds or interaction gating.",
-      },
-      "referencelist": {
-        "type": "token",
-        "description":
-          "A list of actors used for only for reference purposes such as within a starter pack.",
-      },
-      "listViewerState": {
-        "type": "object",
-        "properties": {
-          "muted": {
-            "type": "boolean",
-          },
-          "blocked": {
-            "type": "string",
-            "format": "at-uri",
-          },
-        },
-      },
       "notFoundActor": {
         "type": "object",
         "description": "indicates that a handle or DID could not be resolved",
@@ -12737,241 +11605,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkGraphUnmuteActorList": {
-    "lexicon": 1,
-    "id": "so.sprk.graph.unmuteActorList",
-    "defs": {
-      "main": {
-        "type": "procedure",
-        "description": "Unmutes the specified list of accounts. Requires auth.",
-        "input": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "list",
-            ],
-            "properties": {
-              "list": {
-                "type": "string",
-                "format": "at-uri",
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkGraphGetListBlocks": {
-    "lexicon": 1,
-    "id": "so.sprk.graph.getListBlocks",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Get mod lists that the requesting account (actor) is blocking. Requires auth.",
-        "parameters": {
-          "type": "params",
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "lists",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "lists": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.graph.defs#listView",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkGraphListblock": {
-    "lexicon": 1,
-    "id": "so.sprk.graph.listblock",
-    "defs": {
-      "main": {
-        "type": "record",
-        "description":
-          "Record representing a block relationship against an entire an entire list of accounts (actors).",
-        "key": "tid",
-        "record": {
-          "type": "object",
-          "required": [
-            "subject",
-            "createdAt",
-          ],
-          "properties": {
-            "subject": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "Reference (AT-URI) to the mod list record.",
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "datetime",
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkGraphGetStarterPack": {
-    "lexicon": 1,
-    "id": "so.sprk.graph.getStarterPack",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description": "Gets a view of a starter pack.",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "starterPack",
-          ],
-          "properties": {
-            "starterPack": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "Reference (AT-URI) of the starter pack record.",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "starterPack",
-            ],
-            "properties": {
-              "starterPack": {
-                "type": "ref",
-                "ref": "lex:so.sprk.graph.defs#starterPackView",
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkGraphStarterpack": {
-    "lexicon": 1,
-    "id": "so.sprk.graph.starterpack",
-    "defs": {
-      "main": {
-        "type": "record",
-        "description":
-          "Record defining a starter pack of actors and feeds for new users.",
-        "key": "tid",
-        "record": {
-          "type": "object",
-          "required": [
-            "name",
-            "list",
-            "createdAt",
-          ],
-          "properties": {
-            "name": {
-              "type": "string",
-              "maxGraphemes": 50,
-              "maxLength": 500,
-              "minLength": 1,
-              "description": "Display name for starter pack; can not be empty.",
-            },
-            "description": {
-              "type": "string",
-              "maxGraphemes": 300,
-              "maxLength": 3000,
-            },
-            "descriptionFacets": {
-              "type": "array",
-              "items": {
-                "type": "ref",
-                "ref": "lex:so.sprk.richtext.facet",
-              },
-            },
-            "list": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "Reference (AT-URI) to the list record.",
-            },
-            "feeds": {
-              "type": "array",
-              "maxLength": 3,
-              "items": {
-                "type": "ref",
-                "ref": "lex:so.sprk.graph.starterpack#feedItem",
-              },
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "datetime",
-            },
-          },
-        },
-      },
-      "feedItem": {
-        "type": "object",
-        "required": [
-          "uri",
-        ],
-        "properties": {
-          "uri": {
-            "type": "string",
-            "format": "at-uri",
-          },
-        },
-      },
-    },
-  },
-  "SoSprkGraphMuteActorList": {
-    "lexicon": 1,
-    "id": "so.sprk.graph.muteActorList",
-    "defs": {
-      "main": {
-        "type": "procedure",
-        "description":
-          "Creates a mute relationship for the specified list of accounts. Mutes are private in Spark. Requires auth.",
-        "input": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "list",
-            ],
-            "properties": {
-              "list": {
-                "type": "string",
-                "format": "at-uri",
-              },
-            },
-          },
-        },
-      },
-    },
-  },
   "SoSprkGraphMuteThread": {
     "lexicon": 1,
     "id": "so.sprk.graph.muteThread",
@@ -12991,166 +11624,6 @@ export const schemaDict = {
               "root": {
                 "type": "string",
                 "format": "at-uri",
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkGraphSearchStarterPacks": {
-    "lexicon": 1,
-    "id": "so.sprk.graph.searchStarterPacks",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Find starter packs matching search criteria. Does not require auth.",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "q",
-          ],
-          "properties": {
-            "q": {
-              "type": "string",
-              "description":
-                "Search query string. Syntax, phrase, boolean, and faceting is unspecified, but Lucene query syntax is recommended.",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 25,
-            },
-            "cursor": {
-              "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "starterPacks",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "starterPacks": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.graph.defs#starterPackViewBasic",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkGraphGetActorStarterPacks": {
-    "lexicon": 1,
-    "id": "so.sprk.graph.getActorStarterPacks",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description": "Get a list of starter packs created by the actor.",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "actor",
-          ],
-          "properties": {
-            "actor": {
-              "type": "string",
-              "format": "at-identifier",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "starterPacks",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "starterPacks": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.graph.defs#starterPackViewBasic",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkGraphGetLists": {
-    "lexicon": 1,
-    "id": "so.sprk.graph.getLists",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Enumerates the lists created by a specified account (actor).",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "actor",
-          ],
-          "properties": {
-            "actor": {
-              "type": "string",
-              "format": "at-identifier",
-              "description": "The account (actor) to enumerate lists from.",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "lists",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "lists": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.graph.defs#listView",
-                },
               },
             },
           },
@@ -13313,107 +11786,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkGraphListitem": {
-    "lexicon": 1,
-    "id": "so.sprk.graph.listitem",
-    "defs": {
-      "main": {
-        "type": "record",
-        "description":
-          "Record representing an account's inclusion on a specific list. The AppView will ignore duplicate listitem records.",
-        "key": "tid",
-        "record": {
-          "type": "object",
-          "required": [
-            "subject",
-            "list",
-            "createdAt",
-          ],
-          "properties": {
-            "subject": {
-              "type": "string",
-              "format": "did",
-              "description": "The account which is included on the list.",
-            },
-            "list": {
-              "type": "string",
-              "format": "at-uri",
-              "description":
-                "Reference (AT-URI) to the list record (so.sprk.graph.list).",
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "datetime",
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkGraphList": {
-    "lexicon": 1,
-    "id": "so.sprk.graph.list",
-    "defs": {
-      "main": {
-        "type": "record",
-        "description":
-          "Record representing a list of accounts (actors). Scope includes both moderation-oriented lists and curration-oriented lists.",
-        "key": "tid",
-        "record": {
-          "type": "object",
-          "required": [
-            "name",
-            "purpose",
-            "createdAt",
-          ],
-          "properties": {
-            "purpose": {
-              "type": "ref",
-              "description":
-                "Defines the purpose of the list (aka, moderation-oriented or curration-oriented)",
-              "ref": "lex:so.sprk.graph.defs#listPurpose",
-            },
-            "name": {
-              "type": "string",
-              "maxLength": 64,
-              "minLength": 1,
-              "description": "Display name for list; can not be empty.",
-            },
-            "description": {
-              "type": "string",
-              "maxGraphemes": 300,
-              "maxLength": 3000,
-            },
-            "descriptionFacets": {
-              "type": "array",
-              "items": {
-                "type": "ref",
-                "ref": "lex:so.sprk.richtext.facet",
-              },
-            },
-            "avatar": {
-              "type": "blob",
-              "accept": [
-                "image/png",
-                "image/jpeg",
-              ],
-              "maxSize": 1048576,
-            },
-            "labels": {
-              "type": "union",
-              "refs": [
-                "lex:com.atproto.label.defs#selfLabels",
-              ],
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "datetime",
-            },
-          },
-        },
-      },
-    },
-  },
   "SoSprkGraphGetKnownFollowers": {
     "lexicon": 1,
     "id": "so.sprk.graph.getKnownFollowers",
@@ -13464,52 +11836,6 @@ export const schemaDict = {
                 "items": {
                   "type": "ref",
                   "ref": "lex:so.sprk.actor.defs#profileView",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkGraphGetListMutes": {
-    "lexicon": 1,
-    "id": "so.sprk.graph.getListMutes",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Enumerates mod lists that the requesting account (actor) currently has muted. Requires auth.",
-        "parameters": {
-          "type": "params",
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "lists",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "lists": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.graph.defs#listView",
                 },
               },
             },
@@ -13713,66 +12039,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkGraphGetList": {
-    "lexicon": 1,
-    "id": "so.sprk.graph.getList",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Gets a 'view' (with additional context) of a specified list.",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "list",
-          ],
-          "properties": {
-            "list": {
-              "type": "string",
-              "format": "at-uri",
-              "description":
-                "Reference (AT-URI) of the list record to hydrate.",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "list",
-              "items",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "list": {
-                "type": "ref",
-                "ref": "lex:so.sprk.graph.defs#listView",
-              },
-              "items": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.graph.defs#listItemView",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
   "SoSprkFeedGenerator": {
     "lexicon": 1,
     "id": "so.sprk.feed.generator",
@@ -13840,122 +12106,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkFeedMusic": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.music",
-    "description": "A music record usable in a Spark record (e.g, a post)",
-    "defs": {
-      "main": {
-        "type": "record",
-        "key": "tid",
-        "record": {
-          "type": "object",
-          "required": [
-            "sound",
-            "title",
-            "author",
-            "releaseDate",
-            "createdAt",
-          ],
-          "properties": {
-            "sound": {
-              "type": "blob",
-              "accept": [
-                "audio/mp3",
-              ],
-              "maxSize": 10485760,
-            },
-            "title": {
-              "type": "string",
-              "maxLength": 1000,
-              "maxGraphemes": 100,
-              "description": "The music's title.",
-            },
-            "releaseDate": {
-              "type": "string",
-              "format": "datetime",
-            },
-            "album": {
-              "type": "string",
-              "maxLength": 1000,
-              "maxGraphemes": 100,
-              "description": "The music's album name.",
-            },
-            "recordLabel": {
-              "type": "string",
-              "maxLength": 1000,
-              "maxGraphemes": 100,
-              "description": "The music's record label.",
-            },
-            "cover": {
-              "type": "blob",
-              "description":
-                "Image to be displayed in music's page. AKA, 'cover image'",
-              "accept": [
-                "image/png",
-                "image/jpeg",
-              ],
-              "maxSize": 5242880,
-            },
-            "author": {
-              "type": "string",
-              "maxLength": 1000,
-              "maxGraphemes": 100,
-              "description": "The music's author.",
-            },
-            "text": {
-              "type": "string",
-              "maxLength": 3000,
-              "maxGraphemes": 300,
-              "description": "The music's description.",
-            },
-            "copyright": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "maxLength": 3000,
-                "maxGraphemes": 300,
-              },
-              "minLength": 1,
-            },
-            "facets": {
-              "type": "array",
-              "description":
-                "Annotations of text (mentions, URLs, hashtags, etc)",
-              "items": {
-                "type": "ref",
-                "ref": "lex:so.sprk.richtext.facet",
-              },
-            },
-            "labels": {
-              "type": "union",
-              "description":
-                "Self-label values for this music. Effectively content warnings.",
-              "refs": [
-                "lex:com.atproto.label.defs#selfLabels",
-              ],
-            },
-            "tags": {
-              "type": "array",
-              "description": "The music's Hashtags",
-              "maxLength": 8,
-              "items": {
-                "type": "string",
-                "maxLength": 640,
-                "maxGraphemes": 64,
-              },
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "datetime",
-              "description":
-                "Client-declared timestamp when this post was originally created.",
-            },
-          },
-        },
-      },
-    },
-  },
   "SoSprkFeedSendInteractions": {
     "lexicon": 1,
     "id": "so.sprk.feed.sendInteractions",
@@ -13996,7 +12146,7 @@ export const schemaDict = {
     "lexicon": 1,
     "id": "so.sprk.feed.defs",
     "defs": {
-      "storyView": {
+      "postView": {
         "type": "object",
         "required": [
           "uri",
@@ -14024,46 +12174,8 @@ export const schemaDict = {
           "media": {
             "type": "union",
             "refs": [
-              "lex:so.sprk.embed.images#view",
-              "lex:so.sprk.embed.video#view",
-            ],
-          },
-          "indexedAt": {
-            "type": "string",
-            "format": "datetime",
-          },
-        },
-      },
-      "postView": {
-        "type": "object",
-        "required": [
-          "uri",
-          "cid",
-          "author",
-          "record",
-          "indexedAt",
-        ],
-        "properties": {
-          "uri": {
-            "type": "string",
-            "format": "at-uri",
-          },
-          "cid": {
-            "type": "string",
-            "format": "cid",
-          },
-          "author": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
-          },
-          "record": {
-            "type": "unknown",
-          },
-          "embed": {
-            "type": "union",
-            "refs": [
-              "lex:so.sprk.embed.images#view",
-              "lex:so.sprk.embed.video#view",
+              "lex:so.sprk.media.images#view",
+              "lex:so.sprk.media.video#view",
             ],
           },
           "sound": {
@@ -14097,6 +12209,60 @@ export const schemaDict = {
           "threadgate": {
             "type": "ref",
             "ref": "lex:so.sprk.feed.defs#threadgateView",
+          },
+        },
+      },
+      "replyView": {
+        "type": "object",
+        "required": [
+          "uri",
+          "cid",
+          "author",
+          "record",
+          "indexedAt",
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "cid": {
+            "type": "string",
+            "format": "cid",
+          },
+          "author": {
+            "type": "ref",
+            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
+          },
+          "record": {
+            "type": "unknown",
+          },
+          "media": {
+            "type": "union",
+            "refs": [
+              "lex:so.sprk.media.image#view",
+            ],
+          },
+          "replyCount": {
+            "type": "integer",
+          },
+          "likeCount": {
+            "type": "integer",
+          },
+          "indexedAt": {
+            "type": "string",
+            "format": "datetime",
+          },
+          "viewer": {
+            "type": "ref",
+            "ref": "lex:so.sprk.feed.defs#viewerState",
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:com.atproto.label.defs#label",
+            },
           },
         },
       },
@@ -14148,10 +12314,6 @@ export const schemaDict = {
             "type": "ref",
             "ref": "lex:so.sprk.feed.defs#postView",
           },
-          "reply": {
-            "type": "ref",
-            "ref": "lex:so.sprk.feed.defs#replyRef",
-          },
           "reason": {
             "type": "union",
             "refs": [
@@ -14164,38 +12326,6 @@ export const schemaDict = {
             "description":
               "Context provided by feed generator that may be passed back alongside interactions.",
             "maxLength": 2000,
-          },
-        },
-      },
-      "feedViewStory": {
-        "type": "object",
-        "required": [
-          "story",
-        ],
-        "properties": {
-          "story": {
-            "type": "ref",
-            "ref": "lex:so.sprk.feed.defs#storyView",
-          },
-        },
-      },
-      "storiesByAuthor": {
-        "type": "object",
-        "required": [
-          "author",
-          "stories",
-        ],
-        "properties": {
-          "author": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
-          },
-          "stories": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:so.sprk.feed.defs#storyView",
-            },
           },
         },
       },
@@ -14218,6 +12348,7 @@ export const schemaDict = {
             "type": "union",
             "refs": [
               "lex:so.sprk.feed.defs#postView",
+              "lex:so.sprk.feed.defs#replyView",
               "lex:so.sprk.feed.defs#notFoundPost",
               "lex:so.sprk.feed.defs#blockedPost",
             ],
@@ -14258,8 +12389,11 @@ export const schemaDict = {
         ],
         "properties": {
           "post": {
-            "type": "ref",
-            "ref": "lex:so.sprk.feed.defs#postView",
+            "type": "union",
+            "refs": [
+              "lex:so.sprk.feed.defs#postView",
+              "lex:so.sprk.feed.defs#replyView",
+            ],
           },
           "parent": {
             "type": "union",
@@ -14475,13 +12609,6 @@ export const schemaDict = {
           "record": {
             "type": "unknown",
           },
-          "lists": {
-            "type": "array",
-            "items": {
-              "type": "ref",
-              "ref": "lex:so.sprk.graph.defs#listViewBasic",
-            },
-          },
         },
       },
       "interaction": {
@@ -14504,7 +12631,6 @@ export const schemaDict = {
               "so.sprk.feed.defs#interactionLike",
               "so.sprk.feed.defs#interactionRepost",
               "so.sprk.feed.defs#interactionReply",
-              "so.sprk.feed.defs#interactionQuote",
               "so.sprk.feed.defs#interactionShare",
             ],
           },
@@ -14543,16 +12669,6 @@ export const schemaDict = {
         "description":
           "User clicked through to the embedded content of the feed item",
       },
-      "contentModeUnspecified": {
-        "type": "token",
-        "description":
-          "Declares the feed generator returns any types of posts.",
-      },
-      "contentModeVideo": {
-        "type": "token",
-        "description":
-          "Declares the feed generator returns posts containing so.sprk.embed.video embeds.",
-      },
       "interactionSeen": {
         "type": "token",
         "description": "Feed item was seen by user",
@@ -14568,10 +12684,6 @@ export const schemaDict = {
       "interactionReply": {
         "type": "token",
         "description": "User replied to the feed item",
-      },
-      "interactionQuote": {
-        "type": "token",
-        "description": "User quoted the feed item",
       },
       "interactionShare": {
         "type": "token",
@@ -14982,7 +13094,6 @@ export const schemaDict = {
                   "lex:so.sprk.feed.threadgate#mentionRule",
                   "lex:so.sprk.feed.threadgate#followerRule",
                   "lex:so.sprk.feed.threadgate#followingRule",
-                  "lex:so.sprk.feed.threadgate#listRule",
                 ],
               },
             },
@@ -15017,19 +13128,6 @@ export const schemaDict = {
         "description": "Allow replies from actors you follow.",
         "properties": {},
       },
-      "listRule": {
-        "type": "object",
-        "description": "Allow replies from actors on a list.",
-        "required": [
-          "list",
-        ],
-        "properties": {
-          "list": {
-            "type": "string",
-            "format": "at-uri",
-          },
-        },
-      },
     },
   },
   "SoSprkFeedGetPostThread": {
@@ -15043,13 +13141,22 @@ export const schemaDict = {
         "parameters": {
           "type": "params",
           "required": [
-            "uri",
+            "anchor",
           ],
           "properties": {
-            "uri": {
+            "anchor": {
               "type": "string",
               "format": "at-uri",
-              "description": "Reference (AT-URI) to post record.",
+              "description": "Reference (AT-URI) to anchor post record.",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+            },
+            "cursor": {
+              "type": "string",
             },
             "depth": {
               "type": "integer",
@@ -15067,6 +13174,22 @@ export const schemaDict = {
               "minimum": 0,
               "maximum": 1000,
             },
+            "prioritizeFollowedUsers": {
+              "type": "boolean",
+              "description":
+                "Whether to prioritize posts from followed users. It only has effect when the user is authenticated.",
+              "default": false,
+            },
+            "sort": {
+              "type": "string",
+              "description": "Sorting for the thread replies.",
+              "knownValues": [
+                "newest",
+                "oldest",
+                "top",
+              ],
+              "default": "oldest",
+            },
           },
         },
         "output": {
@@ -15077,13 +13200,17 @@ export const schemaDict = {
               "thread",
             ],
             "properties": {
+              "cursor": {
+                "type": "string",
+              },
               "thread": {
-                "type": "union",
-                "refs": [
-                  "lex:so.sprk.feed.defs#threadViewPost",
-                  "lex:so.sprk.feed.defs#notFoundPost",
-                  "lex:so.sprk.feed.defs#blockedPost",
-                ],
+                "type": "array",
+                "description":
+                  "A flat list of thread items. The depth of each item is indicated by the depth property inside the item.",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.feed.getPostThread#threadItem",
+                },
               },
               "threadgate": {
                 "type": "ref",
@@ -15097,6 +13224,33 @@ export const schemaDict = {
             "name": "NotFound",
           },
         ],
+      },
+      "threadItem": {
+        "type": "object",
+        "required": [
+          "uri",
+          "depth",
+          "value",
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "depth": {
+            "type": "integer",
+            "description":
+              "The nesting level of this item in the thread. Depth 0 means the anchor item.",
+          },
+          "value": {
+            "type": "union",
+            "refs": [
+              "lex:so.sprk.feed.defs#threadViewPost",
+              "lex:so.sprk.feed.defs#NotFoundPost",
+              "lex:so.sprk.feed.defs#BlockedPost",
+            ],
+          },
+        },
       },
     },
   },
@@ -15289,62 +13443,6 @@ export const schemaDict = {
             "via": {
               "type": "ref",
               "ref": "lex:com.atproto.repo.strongRef",
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkFeedStory": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.story",
-    "defs": {
-      "main": {
-        "type": "record",
-        "description": "Record containing a Spark story.",
-        "key": "tid",
-        "record": {
-          "type": "object",
-          "required": [
-            "createdAt",
-            "media",
-          ],
-          "properties": {
-            "media": {
-              "type": "union",
-              "refs": [
-                "lex:so.sprk.embed.images",
-                "lex:so.sprk.embed.video",
-              ],
-            },
-            "sound": {
-              "type": "ref",
-              "ref": "lex:com.atproto.repo.strongRef",
-            },
-            "labels": {
-              "type": "union",
-              "description":
-                "Self-label values for this story. Effectively content warnings.",
-              "refs": [
-                "lex:com.atproto.label.defs#selfLabels",
-              ],
-            },
-            "tags": {
-              "type": "array",
-              "description":
-                "Additional hashtags, in addition to any included in story text and facets.",
-              "maxLength": 8,
-              "items": {
-                "type": "string",
-                "maxLength": 640,
-                "maxGraphemes": 64,
-              },
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "datetime",
-              "description":
-                "Client-declared timestamp when this story was originally created.",
             },
           },
         },
@@ -15592,161 +13690,87 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkFeedGetStories": {
+  "SoSprkFeedReply": {
     "lexicon": 1,
-    "id": "so.sprk.feed.getStories",
+    "id": "so.sprk.feed.reply",
     "defs": {
       "main": {
-        "type": "query",
-        "description":
-          "Gets story views for a specified list of stories (by AT-URI). This is sometimes referred to as 'hydrating' a story reference list.",
-        "parameters": {
-          "type": "params",
+        "type": "record",
+        "description": "Record containing a Spark reply.",
+        "key": "tid",
+        "record": {
+          "type": "object",
           "required": [
-            "uris",
+            "createdAt",
+            "reply",
           ],
           "properties": {
-            "uris": {
+            "text": {
+              "type": "string",
+              "maxLength": 3000,
+              "maxGraphemes": 300,
+              "description": "The reply text.",
+            },
+            "facets": {
               "type": "array",
               "description":
-                "List of story AT-URIs to return hydrated views for.",
+                "Annotations of text (mentions, URLs, hashtags, etc)",
+              "items": {
+                "type": "ref",
+                "ref": "lex:so.sprk.richtext.facet",
+              },
+            },
+            "reply": {
+              "type": "ref",
+              "ref": "lex:so.sprk.feed.reply#replyRef",
+            },
+            "media": {
+              "type": "union",
+              "refs": [
+                "lex:so.sprk.media.image",
+              ],
+            },
+            "langs": {
+              "type": "array",
+              "description":
+                "Indicates human language of post primary text content.",
+              "maxLength": 3,
               "items": {
                 "type": "string",
-                "format": "at-uri",
+                "format": "language",
               },
             },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "stories",
-            ],
-            "properties": {
-              "stories": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.defs#storyView",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "SoSprkFeedGetQuotes": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.getQuotes",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description": "Get a list of quotes for a given post.",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "uri",
-          ],
-          "properties": {
-            "uri": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "Reference (AT-URI) of post record",
-            },
-            "cid": {
-              "type": "string",
-              "format": "cid",
+            "labels": {
+              "type": "union",
               "description":
-                "If supplied, filters to quotes of specific version (by CID) of the post record.",
+                "Self-label values for this post. Effectively content warnings.",
+              "refs": [
+                "lex:com.atproto.label.defs#selfLabels",
+              ],
             },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
+            "createdAt": {
               "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "uri",
-              "posts",
-            ],
-            "properties": {
-              "uri": {
-                "type": "string",
-                "format": "at-uri",
-              },
-              "cid": {
-                "type": "string",
-                "format": "cid",
-              },
-              "cursor": {
-                "type": "string",
-              },
-              "posts": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.defs#postView",
-                },
-              },
+              "format": "datetime",
+              "description":
+                "Client-declared timestamp when this post was originally created.",
             },
           },
         },
       },
-    },
-  },
-  "SoSprkFeedGetStoriesTimeline": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.getStoriesTimeline",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Get a view of the requesting account's stories timeline grouped by author.",
-        "parameters": {
-          "type": "params",
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
+      "replyRef": {
+        "type": "object",
+        "required": [
+          "root",
+          "parent",
+        ],
+        "properties": {
+          "root": {
+            "type": "ref",
+            "ref": "lex:com.atproto.repo.strongRef",
           },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "storiesByAuthor",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "storiesByAuthor": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.defs#storiesByAuthor",
-                },
-              },
-            },
+          "parent": {
+            "type": "ref",
+            "ref": "lex:com.atproto.repo.strongRef",
           },
         },
       },
@@ -15807,65 +13831,6 @@ export const schemaDict = {
         "errors": [
           {
             "name": "UnknownFeed",
-          },
-        ],
-      },
-    },
-  },
-  "SoSprkFeedGetListFeed": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.getListFeed",
-    "defs": {
-      "main": {
-        "type": "query",
-        "description":
-          "Get a feed of recent posts from a list (posts and reposts from any actors on the list). Does not require auth.",
-        "parameters": {
-          "type": "params",
-          "required": [
-            "list",
-          ],
-          "properties": {
-            "list": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "Reference (AT-URI) to the list record.",
-            },
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-            },
-            "cursor": {
-              "type": "string",
-            },
-          },
-        },
-        "output": {
-          "encoding": "application/json",
-          "schema": {
-            "type": "object",
-            "required": [
-              "feed",
-            ],
-            "properties": {
-              "cursor": {
-                "type": "string",
-              },
-              "feed": {
-                "type": "array",
-                "items": {
-                  "type": "ref",
-                  "ref": "lex:so.sprk.feed.defs#feedViewPost",
-                },
-              },
-            },
-          },
-        },
-        "errors": [
-          {
-            "name": "UnknownList",
           },
         ],
       },
@@ -15982,32 +13947,18 @@ export const schemaDict = {
           "type": "object",
           "required": [
             "createdAt",
+            "media",
           ],
           "properties": {
-            "text": {
-              "type": "string",
-              "maxLength": 3000,
-              "maxGraphemes": 300,
-              "description": "The post description.",
-            },
-            "facets": {
-              "type": "array",
-              "description":
-                "Annotations of text (mentions, URLs, hashtags, etc)",
-              "items": {
-                "type": "ref",
-                "ref": "lex:so.sprk.richtext.facet",
-              },
-            },
-            "reply": {
+            "caption": {
               "type": "ref",
-              "ref": "lex:so.sprk.feed.post#replyRef",
+              "ref": "lex:so.sprk.feed.post#captionRef",
             },
-            "embed": {
+            "media": {
               "type": "union",
               "refs": [
-                "lex:so.sprk.embed.images",
-                "lex:so.sprk.embed.video",
+                "lex:so.sprk.media.images",
+                "lex:so.sprk.media.video",
               ],
             },
             "sound": {
@@ -16052,20 +14003,23 @@ export const schemaDict = {
           },
         },
       },
-      "replyRef": {
+      "captionRef": {
         "type": "object",
-        "required": [
-          "root",
-          "parent",
-        ],
         "properties": {
-          "root": {
-            "type": "ref",
-            "ref": "lex:com.atproto.repo.strongRef",
+          "text": {
+            "type": "string",
+            "maxLength": 3000,
+            "maxGraphemes": 300,
+            "description": "The post description.",
           },
-          "parent": {
-            "type": "ref",
-            "ref": "lex:com.atproto.repo.strongRef",
+          "facets": {
+            "type": "array",
+            "description":
+              "Annotations of text (mentions, URLs, hashtags, etc)",
+            "items": {
+              "type": "ref",
+              "ref": "lex:so.sprk.richtext.facet",
+            },
           },
         },
       },
@@ -16696,10 +14650,6 @@ export const schemaDict = {
             "type": "ref",
             "ref": "lex:so.sprk.actor.defs#profileAssociated",
           },
-          "joinedViaStarterPack": {
-            "type": "ref",
-            "ref": "lex:so.sprk.graph.defs#starterPackViewBasic",
-          },
           "indexedAt": {
             "type": "string",
             "format": "datetime",
@@ -16736,13 +14686,7 @@ export const schemaDict = {
       "profileAssociated": {
         "type": "object",
         "properties": {
-          "lists": {
-            "type": "integer",
-          },
           "feedgens": {
-            "type": "integer",
-          },
-          "starterPacks": {
             "type": "integer",
           },
           "labeler": {
@@ -16778,20 +14722,12 @@ export const schemaDict = {
           "muted": {
             "type": "boolean",
           },
-          "mutedByList": {
-            "type": "ref",
-            "ref": "lex:so.sprk.graph.defs#listViewBasic",
-          },
           "blockedBy": {
             "type": "boolean",
           },
           "blocking": {
             "type": "string",
             "format": "at-uri",
-          },
-          "blockingByList": {
-            "type": "ref",
-            "ref": "lex:so.sprk.graph.defs#listViewBasic",
           },
           "following": {
             "type": "string",
@@ -16903,7 +14839,6 @@ export const schemaDict = {
             "type": "string",
             "knownValues": [
               "feed",
-              "list",
               "timeline",
             ],
           },
@@ -17150,7 +15085,6 @@ export const schemaDict = {
                 "lex:so.sprk.feed.threadgate#mentionRule",
                 "lex:so.sprk.feed.threadgate#followerRule",
                 "lex:so.sprk.feed.threadgate#followingRule",
-                "lex:so.sprk.feed.threadgate#listRule",
               ],
             },
           },
@@ -17457,6 +15391,229 @@ export const schemaDict = {
       },
     },
   },
+  "SoSprkStoryDefs": {
+    "lexicon": 1,
+    "id": "so.sprk.story.defs",
+    "defs": {
+      "storyView": {
+        "type": "object",
+        "required": [
+          "uri",
+          "cid",
+          "author",
+          "record",
+          "indexedAt",
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "cid": {
+            "type": "string",
+            "format": "cid",
+          },
+          "author": {
+            "type": "ref",
+            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
+          },
+          "record": {
+            "type": "unknown",
+          },
+          "media": {
+            "type": "union",
+            "refs": [
+              "lex:so.sprk.media.image#view",
+              "lex:so.sprk.media.video#view",
+            ],
+          },
+          "indexedAt": {
+            "type": "string",
+            "format": "datetime",
+          },
+        },
+      },
+      "storiesByAuthor": {
+        "type": "object",
+        "required": [
+          "author",
+          "stories",
+        ],
+        "properties": {
+          "author": {
+            "type": "ref",
+            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
+          },
+          "stories": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:so.sprk.story.defs#storyView",
+            },
+          },
+        },
+      },
+      "interaction": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "event": {
+            "type": "string",
+            "knownValues": [
+              "so.sprk.feed.defs#clickthroughItem",
+              "so.sprk.feed.defs#clickthroughAuthor",
+              "so.sprk.feed.defs#clickthroughReposter",
+              "so.sprk.feed.defs#clickthroughEmbed",
+              "so.sprk.feed.defs#interactionSeen",
+              "so.sprk.feed.defs#interactionLike",
+              "so.sprk.feed.defs#interactionRepost",
+              "so.sprk.feed.defs#interactionShare",
+            ],
+          },
+        },
+      },
+    },
+  },
+  "SoSprkStoryGetTimeline": {
+    "lexicon": 1,
+    "id": "so.sprk.story.getTimeline",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Get a view of the requesting account's stories timeline grouped by author.",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+            },
+            "cursor": {
+              "type": "string",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "storiesByAuthor",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "storiesByAuthor": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.story.defs#storiesByAuthor",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkStoryGetStories": {
+    "lexicon": 1,
+    "id": "so.sprk.story.getStories",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Gets story views for a specified list of stories (by AT-URI). This is sometimes referred to as 'hydrating' a story reference list.",
+        "parameters": {
+          "type": "params",
+          "required": [
+            "uris",
+          ],
+          "properties": {
+            "uris": {
+              "type": "array",
+              "description":
+                "List of story AT-URIs to return hydrated views for.",
+              "items": {
+                "type": "string",
+                "format": "at-uri",
+              },
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "stories",
+            ],
+            "properties": {
+              "stories": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.story.defs#storyView",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkStoryPost": {
+    "lexicon": 1,
+    "id": "so.sprk.story.post",
+    "defs": {
+      "main": {
+        "type": "record",
+        "description": "Record containing a Spark story.",
+        "key": "tid",
+        "record": {
+          "type": "object",
+          "required": [
+            "createdAt",
+            "media",
+          ],
+          "properties": {
+            "media": {
+              "type": "union",
+              "refs": [
+                "lex:so.sprk.media.image",
+                "lex:so.sprk.media.video",
+              ],
+            },
+            "sound": {
+              "type": "ref",
+              "ref": "lex:com.atproto.repo.strongRef",
+            },
+            "labels": {
+              "type": "union",
+              "description":
+                "Self-label values for this story. Effectively content warnings.",
+              "refs": [
+                "lex:com.atproto.label.defs#selfLabels",
+              ],
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "datetime",
+              "description":
+                "Client-declared timestamp when this story was originally created.",
+            },
+          },
+        },
+      },
+    },
+  },
   "SoSprkLabelerDefs": {
     "lexicon": 1,
     "id": "so.sprk.labeler.defs",
@@ -17678,6 +15835,224 @@ export const schemaDict = {
                 },
               },
             },
+          },
+        },
+      },
+    },
+  },
+  "SoSprkMediaDefs": {
+    "lexicon": 1,
+    "id": "so.sprk.media.defs",
+    "defs": {
+      "aspectRatio": {
+        "type": "object",
+        "description":
+          "width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.",
+        "required": [
+          "width",
+          "height",
+        ],
+        "properties": {
+          "width": {
+            "type": "integer",
+            "minimum": 1,
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1,
+          },
+        },
+      },
+    },
+  },
+  "SoSprkMediaImages": {
+    "lexicon": 1,
+    "id": "so.sprk.media.images",
+    "description": "A set of multiple images in a Spark post.",
+    "defs": {
+      "main": {
+        "type": "object",
+        "required": [
+          "images",
+        ],
+        "properties": {
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:so.sprk.media.image",
+            },
+            "maxLength": 12,
+          },
+        },
+      },
+      "view": {
+        "type": "object",
+        "required": [
+          "images",
+        ],
+        "properties": {
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:so.sprk.media.image#view",
+            },
+            "maxLength": 12,
+          },
+        },
+      },
+    },
+  },
+  "SoSprkMediaVideo": {
+    "lexicon": 1,
+    "id": "so.sprk.media.video",
+    "description": "A video in a Spark post.",
+    "defs": {
+      "main": {
+        "type": "object",
+        "required": [
+          "video",
+        ],
+        "properties": {
+          "video": {
+            "type": "blob",
+            "accept": [
+              "video/mp4",
+            ],
+            "maxSize": 314572800,
+          },
+          "captions": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:so.sprk.media.video#caption",
+            },
+            "maxLength": 20,
+          },
+          "alt": {
+            "type": "string",
+            "description":
+              "Alt text description of the video, for accessibility.",
+            "maxGraphemes": 1000,
+            "maxLength": 10000,
+          },
+          "aspectRatio": {
+            "type": "ref",
+            "ref": "lex:so.sprk.media.defs#aspectRatio",
+          },
+        },
+      },
+      "caption": {
+        "type": "object",
+        "required": [
+          "lang",
+          "file",
+        ],
+        "properties": {
+          "lang": {
+            "type": "string",
+            "format": "language",
+          },
+          "file": {
+            "type": "blob",
+            "accept": [
+              "text/vtt",
+            ],
+            "maxSize": 20000,
+          },
+        },
+      },
+      "view": {
+        "type": "object",
+        "required": [
+          "cid",
+          "playlist",
+        ],
+        "properties": {
+          "cid": {
+            "type": "string",
+            "format": "cid",
+          },
+          "playlist": {
+            "type": "string",
+            "format": "uri",
+          },
+          "thumbnail": {
+            "type": "string",
+            "format": "uri",
+          },
+          "alt": {
+            "type": "string",
+            "maxGraphemes": 1000,
+            "maxLength": 10000,
+          },
+          "aspectRatio": {
+            "type": "ref",
+            "ref": "lex:so.sprk.media.defs#aspectRatio",
+          },
+        },
+      },
+    },
+  },
+  "SoSprkMediaImage": {
+    "lexicon": 1,
+    "id": "so.sprk.media.image",
+    "description": "An image in a Spark record.",
+    "defs": {
+      "main": {
+        "type": "object",
+        "required": [
+          "image",
+          "alt",
+        ],
+        "properties": {
+          "image": {
+            "type": "blob",
+            "accept": [
+              "image/*",
+            ],
+            "maxSize": 5242880,
+          },
+          "alt": {
+            "type": "string",
+            "description":
+              "Alt text description of the image, for accessibility.",
+          },
+          "aspectRatio": {
+            "type": "ref",
+            "ref": "lex:so.sprk.media.defs#aspectRatio",
+          },
+        },
+      },
+      "view": {
+        "type": "object",
+        "required": [
+          "thumb",
+          "fullsize",
+          "alt",
+        ],
+        "properties": {
+          "thumb": {
+            "type": "string",
+            "format": "uri",
+            "description":
+              "Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.",
+          },
+          "fullsize": {
+            "type": "string",
+            "format": "uri",
+            "description":
+              "Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.",
+          },
+          "alt": {
+            "type": "string",
+            "description":
+              "Alt text description of the image, for accessibility.",
+          },
+          "aspectRatio": {
+            "type": "ref",
+            "ref": "lex:so.sprk.media.defs#aspectRatio",
           },
         },
       },
@@ -21784,6 +20159,7 @@ export const schemaDict = {
             "rkey": {
               "type": "string",
               "description": "The Record Key.",
+              "format": "record-key",
             },
             "cid": {
               "type": "string",
@@ -22463,57 +20839,27 @@ export const ids = {
   SoSprkVideoDefs: "so.sprk.video.defs",
   SoSprkVideoGetJobStatus: "so.sprk.video.getJobStatus",
   SoSprkVideoGetUploadLimits: "so.sprk.video.getUploadLimits",
-  SoSprkEmbedDefs: "so.sprk.embed.defs",
-  SoSprkEmbedImages: "so.sprk.embed.images",
-  SoSprkEmbedVideo: "so.sprk.embed.video",
   SoSprkNotificationRegisterPush: "so.sprk.notification.registerPush",
   SoSprkNotificationPutPreferences: "so.sprk.notification.putPreferences",
   SoSprkNotificationUpdateSeen: "so.sprk.notification.updateSeen",
   SoSprkNotificationListNotifications: "so.sprk.notification.listNotifications",
   SoSprkNotificationGetUnreadCount: "so.sprk.notification.getUnreadCount",
-  SoSprkUnspeccedSearchStarterPacksSkeleton:
-    "so.sprk.unspecced.searchStarterPacksSkeleton",
-  SoSprkUnspeccedDefs: "so.sprk.unspecced.defs",
-  SoSprkUnspeccedSearchActorsSkeleton: "so.sprk.unspecced.searchActorsSkeleton",
-  SoSprkUnspeccedGetSuggestionsSkeleton:
-    "so.sprk.unspecced.getSuggestionsSkeleton",
-  SoSprkUnspeccedSearchPostsSkeleton: "so.sprk.unspecced.searchPostsSkeleton",
-  SoSprkUnspeccedGetPopularFeedGenerators:
-    "so.sprk.unspecced.getPopularFeedGenerators",
-  SoSprkUnspeccedGetTrendingTopics: "so.sprk.unspecced.getTrendingTopics",
-  SoSprkUnspeccedGetTaggedSuggestions: "so.sprk.unspecced.getTaggedSuggestions",
-  SoSprkUnspeccedGetConfig: "so.sprk.unspecced.getConfig",
-  SoSprkGraphGetStarterPacks: "so.sprk.graph.getStarterPacks",
   SoSprkGraphGetSuggestedFollowsByActor:
     "so.sprk.graph.getSuggestedFollowsByActor",
   SoSprkGraphBlock: "so.sprk.graph.block",
   SoSprkGraphFollow: "so.sprk.graph.follow",
   SoSprkGraphDefs: "so.sprk.graph.defs",
-  SoSprkGraphUnmuteActorList: "so.sprk.graph.unmuteActorList",
-  SoSprkGraphGetListBlocks: "so.sprk.graph.getListBlocks",
-  SoSprkGraphListblock: "so.sprk.graph.listblock",
-  SoSprkGraphGetStarterPack: "so.sprk.graph.getStarterPack",
-  SoSprkGraphStarterpack: "so.sprk.graph.starterpack",
-  SoSprkGraphMuteActorList: "so.sprk.graph.muteActorList",
   SoSprkGraphMuteThread: "so.sprk.graph.muteThread",
-  SoSprkGraphSearchStarterPacks: "so.sprk.graph.searchStarterPacks",
-  SoSprkGraphGetActorStarterPacks: "so.sprk.graph.getActorStarterPacks",
-  SoSprkGraphGetLists: "so.sprk.graph.getLists",
   SoSprkGraphGetFollowers: "so.sprk.graph.getFollowers",
   SoSprkGraphUnmuteThread: "so.sprk.graph.unmuteThread",
   SoSprkGraphMuteActor: "so.sprk.graph.muteActor",
   SoSprkGraphGetMutes: "so.sprk.graph.getMutes",
-  SoSprkGraphListitem: "so.sprk.graph.listitem",
-  SoSprkGraphList: "so.sprk.graph.list",
   SoSprkGraphGetKnownFollowers: "so.sprk.graph.getKnownFollowers",
-  SoSprkGraphGetListMutes: "so.sprk.graph.getListMutes",
   SoSprkGraphGetFollows: "so.sprk.graph.getFollows",
   SoSprkGraphGetBlocks: "so.sprk.graph.getBlocks",
   SoSprkGraphGetRelationships: "so.sprk.graph.getRelationships",
   SoSprkGraphUnmuteActor: "so.sprk.graph.unmuteActor",
-  SoSprkGraphGetList: "so.sprk.graph.getList",
   SoSprkFeedGenerator: "so.sprk.feed.generator",
-  SoSprkFeedMusic: "so.sprk.feed.music",
   SoSprkFeedSendInteractions: "so.sprk.feed.sendInteractions",
   SoSprkFeedDefs: "so.sprk.feed.defs",
   SoSprkFeedGetFeedGenerators: "so.sprk.feed.getFeedGenerators",
@@ -22528,16 +20874,12 @@ export const ids = {
   SoSprkFeedLike: "so.sprk.feed.like",
   SoSprkFeedGetRepostedBy: "so.sprk.feed.getRepostedBy",
   SoSprkFeedRepost: "so.sprk.feed.repost",
-  SoSprkFeedStory: "so.sprk.feed.story",
   SoSprkFeedDescribeFeedGenerator: "so.sprk.feed.describeFeedGenerator",
   SoSprkFeedSearchPosts: "so.sprk.feed.searchPosts",
   SoSprkFeedGetPosts: "so.sprk.feed.getPosts",
   SoSprkFeedGetFeed: "so.sprk.feed.getFeed",
-  SoSprkFeedGetStories: "so.sprk.feed.getStories",
-  SoSprkFeedGetQuotes: "so.sprk.feed.getQuotes",
-  SoSprkFeedGetStoriesTimeline: "so.sprk.feed.getStoriesTimeline",
+  SoSprkFeedReply: "so.sprk.feed.reply",
   SoSprkFeedGetFeedSkeleton: "so.sprk.feed.getFeedSkeleton",
-  SoSprkFeedGetListFeed: "so.sprk.feed.getListFeed",
   SoSprkFeedGetSuggestedFeeds: "so.sprk.feed.getSuggestedFeeds",
   SoSprkFeedGetActorFeeds: "so.sprk.feed.getActorFeeds",
   SoSprkFeedPost: "so.sprk.feed.post",
@@ -22557,9 +20899,17 @@ export const ids = {
   SoSprkActorGetProfiles: "so.sprk.actor.getProfiles",
   SoSprkActorGetPreferences: "so.sprk.actor.getPreferences",
   SoSprkActorProfile: "so.sprk.actor.profile",
+  SoSprkStoryDefs: "so.sprk.story.defs",
+  SoSprkStoryGetTimeline: "so.sprk.story.getTimeline",
+  SoSprkStoryGetStories: "so.sprk.story.getStories",
+  SoSprkStoryPost: "so.sprk.story.post",
   SoSprkLabelerDefs: "so.sprk.labeler.defs",
   SoSprkLabelerService: "so.sprk.labeler.service",
   SoSprkLabelerGetServices: "so.sprk.labeler.getServices",
+  SoSprkMediaDefs: "so.sprk.media.defs",
+  SoSprkMediaImages: "so.sprk.media.images",
+  SoSprkMediaVideo: "so.sprk.media.video",
+  SoSprkMediaImage: "so.sprk.media.image",
   ComAtprotoTempAddReservedHandle: "com.atproto.temp.addReservedHandle",
   ComAtprotoTempCheckSignupQueue: "com.atproto.temp.checkSignupQueue",
   ComAtprotoTempRequestPhoneVerification:

@@ -356,27 +356,14 @@ export async function getProfiles(
         }),
 
         // Count posts
-        ctx.db.models.Post.countDocuments({
+        await ctx.db.models.Post.countDocuments({
           authorDid: actorDid,
-          reply: null,
         }),
 
         // Check for feed generators (bsky + sprk combined)
-        (async () => {
-          try {
-            const [bskyCount, sprkCount] = await Promise.all([
-              ctx.db.models.BskyGenerator.countDocuments({
-                authorDid: actorDid,
-              }),
-              ctx.db.models.SprkGenerator.countDocuments({
-                authorDid: actorDid,
-              }),
-            ]);
-            return bskyCount + sprkCount;
-          } catch (_error) {
-            return 0;
-          }
-        })(),
+        await ctx.db.models.Generator.countDocuments({
+          authorDid: actorDid,
+        }),
 
         // Viewer state queries (only if viewer is authenticated)
         viewerDid

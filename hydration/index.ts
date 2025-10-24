@@ -24,24 +24,24 @@ import {
   PostAggs,
   Posts,
   PostViewerStates,
+  Replies,
+  Reply,
+  ReplyAggs,
   Reposts,
+  SoundAggs,
+  Sounds,
   ThreadContexts,
   ThreadRef,
   VideoMappings,
 } from "./feed.ts";
+
 import {
   BlockEntry,
   Follows,
   GraphHydrator,
   RelationshipPair,
 } from "./graph.ts";
-import {
-  HydrationMap,
-  ItemRef,
-  mergeManyMaps,
-  mergeMaps,
-  RecordInfo,
-} from "./util.ts";
+import { HydrationMap, ItemRef, mergeMaps, RecordInfo } from "./util.ts";
 import { getLogger } from "@logtape/logtape";
 
 export class HydrateCtx {
@@ -81,9 +81,14 @@ export type HydrationState = {
   profileViewers?: ProfileViewerStates;
   profileAggs?: ProfileAggs;
   posts?: Posts;
+  replies?: Replies;
   postAggs?: PostAggs;
+  replyAggs?: ReplyAggs;
   postViewers?: PostViewerStates;
   threadContexts?: ThreadContexts;
+  sounds?: Sounds;
+  soundAggs?: SoundAggs;
+
   postBlocks?: PostBlocks;
   reposts?: Reposts;
   follows?: Follows;
@@ -247,72 +252,111 @@ export class Hydrator {
     ctx: HydrateCtx,
     state: HydrationState = {},
   ): Promise<HydrationState> {
-    const uris = refs.map((ref) => ref.uri);
+    const postRefs = refs.filter((ref) =>
+      new AtUri(ref.uri).collection === ids.SoSprkFeedPost
+    );
+    const replyRefs = refs.filter((ref) =>
+      new AtUri(ref.uri).collection === ids.SoSprkFeedReply
+    );
 
     state.posts ??= new HydrationMap<Post>();
-    const addPostsToHydrationState = (posts: Posts) => {
-      posts.forEach((post, uri) => {
-        state.posts ??= new HydrationMap<Post>();
-        state.posts.set(uri, post);
-      });
-    };
+    state.replies ??= new HydrationMap<Reply>();
 
-    // layer 0: the posts in the thread
-    const postsLayer0 = await this.feed.getPosts(
-      uris,
-      ctx.includeTakedowns,
-      state.posts,
+    const [postsLayer0, repliesLayer0] = await Promise.all([
+      this.feed.getPosts(
+        postRefs.map((ref) => ref.uri),
+        ctx.includeTakedowns,
+        state.posts,
+      ),
+      this.feed.getReplies(
+        replyRefs.map((ref) => ref.uri),
+        ctx.includeTakedowns,
+        state.replies,
+      ),
+    ]);
+
+    postsLayer0.forEach((post, uri) => {
+      state.posts!.set(uri, post);
+    });
+    repliesLayer0.forEach((reply, uri) => {
+      state.replies!.set(uri, reply);
+    });
+
+    const additionalRootUris = rootUrisFromReplies(repliesLayer0).filter(
+      (uri) => !state.posts!.has(uri),
     );
-    addPostsToHydrationState(postsLayer0);
 
-    const additionalRootUris = rootUrisFromPosts(postsLayer0); // supports computing threadgates
-    const threadRootUris = new Set<string>();
-    for (const [uri, post] of postsLayer0) {
-      if (post) {
-        threadRootUris.add(rootUriFromPost(post) ?? uri);
-      }
-    }
-
-    // fetch additional root URIs for threadgates
     const postsLayer1 = await this.feed.getPosts(
       additionalRootUris,
       ctx.includeTakedowns,
       state.posts,
     );
-    addPostsToHydrationState(postsLayer1);
+    postsLayer1.forEach((post, uri) => {
+      state.posts!.set(uri, post);
+    });
 
-    const posts = mergeManyMaps(postsLayer0, postsLayer1) ?? postsLayer0;
-    const allPostUris = [...posts.keys()];
-    const allRefs = refs;
-    const threadRefs = allRefs.map((ref) => ({
-      ...ref,
-      threadRoot: posts.get(ref.uri)?.record.reply?.root.uri ?? ref.uri,
-    }));
+    const threadRefs: ThreadRef[] = [];
+    for (const ref of refs) {
+      const collection = new AtUri(ref.uri).collection;
+      if (collection === ids.SoSprkFeedPost) {
+        const post = state.posts!.get(ref.uri);
+        if (!post) continue;
+        threadRefs.push({
+          uri: ref.uri,
+          cid: post.cid,
+          threadRoot: ref.uri,
+        });
+      } else if (collection === ids.SoSprkFeedReply) {
+        const reply = state.replies!.get(ref.uri);
+        if (!reply) continue;
+        const rootUri = reply.record.reply?.root.uri ?? ref.uri;
+        threadRefs.push({
+          uri: ref.uri,
+          cid: reply.cid,
+          threadRoot: rootUri,
+        });
+      }
+    }
+
+    const authorUris = Array.from(
+      new Set<string>([
+        ...state.posts!.keys(),
+        ...state.replies!.keys(),
+      ]),
+    );
+    const authorDids = authorUris.map(didFromUri);
 
     const [
       postAggs,
+      replyAggs,
       postViewers,
       postBlocks,
       profileState,
       feedGenState,
+      threadContexts,
     ] = await Promise.all([
-      this.feed.getPostAggregates(allRefs),
+      this.feed.getPostAggregates(postRefs),
+      this.feed.getReplyAggregates(replyRefs),
       ctx.viewer
         ? this.feed.getPostViewerStates(threadRefs, ctx.viewer)
-        : undefined,
-      this.hydratePostBlocks(posts),
-      this.hydrateProfiles(allPostUris.map(didFromUri), ctx),
+        : Promise.resolve<PostViewerStates | undefined>(undefined),
+      this.hydratePostBlocks(state.posts!, state.replies!),
+      this.hydrateProfiles(authorDids, ctx),
       this.hydrateFeedGens([], ctx),
+      this.feed.getThreadContexts(threadRefs),
     ]);
-    // combine all hydration state
+
     return mergeManyStates(
       profileState,
       feedGenState,
       {
-        posts,
+        posts: state.posts,
+        replies: state.replies,
         postAggs,
+        replyAggs,
         postViewers,
         postBlocks,
+        threadContexts,
         ctx,
       },
     );
@@ -320,37 +364,45 @@ export class Hydrator {
 
   private async hydratePostBlocks(
     posts: Posts,
+    replies: Replies,
   ): Promise<PostBlocks> {
     const postBlocks = new HydrationMap<PostBlock>();
     const postBlocksPairs = new Map<string, PostBlockPairs>();
     const relationships: RelationshipPair[] = [];
+
     for (const [uri, item] of posts) {
       if (!item) continue;
-      const post = item.record;
+      postBlocksPairs.set(uri, {});
+    }
+
+    for (const [uri, item] of replies) {
+      if (!item) continue;
+      const reply = item.record;
       const creator = didFromUri(uri);
-      const postBlockPairs: PostBlockPairs = {};
-      postBlocksPairs.set(uri, postBlockPairs);
-      // 3p block for replies
-      const parentUri = post.reply?.parent.uri;
+      const pairs = postBlocksPairs.get(uri) ?? {};
+      postBlocksPairs.set(uri, pairs);
+
+      const parentUri = reply.reply?.parent.uri;
       const parentDid = parentUri && didFromUri(parentUri);
       if (parentDid && parentDid !== creator) {
         const pair: RelationshipPair = [creator, parentDid];
         relationships.push(pair);
-        postBlockPairs.parent = pair;
+        pairs.parent = pair;
       }
-      const rootUri = post.reply?.root.uri;
+
+      const rootUri = reply.reply?.root.uri;
       const rootDid = rootUri && didFromUri(rootUri);
       if (rootDid && rootDid !== creator) {
         const pair: RelationshipPair = [creator, rootDid];
         relationships.push(pair);
-        postBlockPairs.root = pair;
+        pairs.root = pair;
       }
-      // No embed blocking - nested record logic removed
     }
-    // replace embed/parent/root pairs with block state
+
     const blocks = await this.hydrateBidirectionalBlocks(
       pairsToMap(relationships),
     );
+
     for (const [uri, { embed, parent, root }] of postBlocksPairs) {
       postBlocks.set(uri, {
         embed: !!embed && !!isBlocked(blocks, embed),
@@ -358,6 +410,7 @@ export class Hydrator {
         root: !!root && !!isBlocked(blocks, root),
       });
     }
+
     return postBlocks;
   }
 
@@ -380,54 +433,72 @@ export class Hydrator {
     items: FeedItem[],
     ctx: HydrateCtx,
   ): Promise<HydrationState> {
-    // get posts, collect reply refs
-    const posts = await this.feed.getPosts(
-      items.map((item) => item.post.uri),
-      ctx.includeTakedowns,
-    );
-    const rootUris: string[] = [];
-    const parentUris: string[] = [];
-    const postAndReplyRefs: ItemRef[] = [];
-    posts.forEach((post, uri) => {
-      if (!post) return;
-      postAndReplyRefs.push({ uri, cid: post.cid });
-      if (post.record.reply) {
-        rootUris.push(post.record.reply.root.uri);
-        parentUris.push(post.record.reply.parent.uri);
-        postAndReplyRefs.push(post.record.reply.root, post.record.reply.parent);
+    const postUris: string[] = [];
+    const replyUris: string[] = [];
+    const replyRefs: ItemRef[] = [];
+
+    for (const { post } of items) {
+      const collection = new AtUri(post.uri).collection;
+      if (collection === ids.SoSprkFeedPost) {
+        postUris.push(post.uri);
+      } else if (collection === ids.SoSprkFeedReply) {
+        replyUris.push(post.uri);
+        replyRefs.push(post);
       }
+    }
+
+    const [posts, replies] = await Promise.all([
+      this.feed.getPosts(postUris, ctx.includeTakedowns),
+      this.feed.getReplies(replyUris, ctx.includeTakedowns),
+    ]);
+
+    const postAndReplyRefsMap = new Map<string, ItemRef>();
+    items.forEach((item) => {
+      postAndReplyRefsMap.set(item.post.uri, item.post);
     });
-    // get replies, collect reply parent authors
-    const replies = await this.feed.getPosts(
-      [...rootUris, ...parentUris],
-      ctx.includeTakedowns,
-    );
-    const replyParentAuthors: string[] = [];
-    parentUris.forEach((uri) => {
-      const parent = replies.get(uri);
-      if (!parent?.record.reply) return;
-      replyParentAuthors.push(didFromUri(parent.record.reply.parent.uri));
+
+    replies.forEach((reply) => {
+      if (!reply?.record.reply) return;
+      const { root, parent } = reply.record.reply;
+      postAndReplyRefsMap.set(root.uri, root);
+      postAndReplyRefsMap.set(parent.uri, parent);
     });
-    // hydrate state for all posts, reposts, authors of reposts + reply parent authors
+
+    const postAndReplyRefs = Array.from(postAndReplyRefsMap.values());
     const repostUris = mapDefined(items, (item) => item.repost?.uri);
-    const [postState, repostProfileState, reposts] = await Promise.all([
-      this.hydratePosts(postAndReplyRefs, ctx, {
-        posts: posts.merge(replies), // avoids refetches of posts
-      }),
+
+    const postState = await this.hydratePosts(postAndReplyRefs, ctx, {
+      posts,
+      replies,
+    });
+
+    const replyParentAuthors = Array.from(
+      new Set(
+        replyRefs
+          .map((ref) =>
+            postState.replies?.get(ref.uri)?.record.reply?.parent.uri
+          )
+          .filter((uri): uri is string => !!uri)
+          .map(didFromUri),
+      ),
+    );
+
+    const [repostProfileState, reposts] = await Promise.all([
       this.hydrateProfiles(
         [...repostUris.map(didFromUri), ...replyParentAuthors],
         ctx,
       ),
       this.feed.getReposts(repostUris, ctx.includeTakedowns),
     ]);
+
     return mergeManyStates(postState, repostProfileState, {
       reposts,
       ctx,
     });
   }
 
-  // so.sprk.feed.defs#threadViewPost
-  // - post
+  // so.sprk.feed.defs#threadViewReply
+  // - reply
   //   - profile
   //     - list basic
   //   - list
@@ -436,33 +507,11 @@ export class Hydrator {
   //   - feedgen
   //     - profile
   //       - list basic
-  async hydrateThreadPosts(
+  hydrateThreadPosts(
     refs: ItemRef[],
     ctx: HydrateCtx,
   ): Promise<HydrationState> {
-    const postsState = await this.hydratePosts(refs, ctx);
-
-    const { posts } = postsState;
-    const postsList = posts ? Array.from(posts.entries()) : [];
-
-    const isDefined = (
-      entry: [string, Post | null],
-    ): entry is [string, Post] => {
-      const [, post] = entry;
-      return !!post;
-    };
-
-    const threadRefs: ThreadRef[] = postsList
-      .filter(isDefined)
-      .map(([uri, post]) => ({
-        uri,
-        cid: post.cid,
-        threadRoot: post.record.reply?.root.uri ?? uri,
-      }));
-
-    const threadContexts = await this.feed.getThreadContexts(threadRefs);
-
-    return mergeStates(postsState, { threadContexts });
+    return this.hydratePosts(refs, ctx);
   }
 
   // so.sprk.feed.defs#generatorView
@@ -539,6 +588,22 @@ export class Hydrator {
     return mergeStates(profileState, { reposts, ctx });
   }
 
+  // so.sprk.sound.defs#audioView
+  // - sound
+  //   - profile
+  //     - list basic
+  async hydrateSounds(
+    uris: string[],
+    ctx: HydrateCtx,
+  ): Promise<HydrationState> {
+    const [sounds, soundAggs, profileState] = await Promise.all([
+      this.feed.getSounds(uris, ctx.includeTakedowns),
+      this.feed.getSoundAggregates(uris.map((uri) => ({ uri }))),
+      this.hydrateProfiles(uris.map(didFromUri), ctx),
+    ]);
+    return mergeStates(profileState, { sounds, soundAggs, ctx });
+  }
+
   // provides partial hydration state within getFollows / getFollowers, mainly for applying rules
   async hydrateFollows(
     uris: string[],
@@ -612,6 +677,11 @@ export class Hydrator {
         (await this.feed.getPosts([uri], includeTakedowns)).get(uri) ??
           undefined
       );
+    } else if (collection === ids.SoSprkFeedReply) {
+      return (
+        (await this.feed.getReplies([uri], includeTakedowns)).get(uri) ??
+          undefined
+      );
     } else if (collection === ids.AppBskyFeedRepost) {
       return (
         (await this.feed.getReposts([uri], includeTakedowns)).get(uri) ??
@@ -620,6 +690,11 @@ export class Hydrator {
     } else if (collection === ids.SoSprkFeedLike) {
       return (
         (await this.feed.getLikes([uri], includeTakedowns)).get(uri) ??
+          undefined
+      );
+    } else if (collection === ids.SoSprkSoundAudio) {
+      return (
+        (await this.feed.getSounds([uri], includeTakedowns)).get(uri) ??
           undefined
       );
     } else if (collection === ids.AppBskyGraphFollow) {
@@ -681,19 +756,19 @@ const serviceRefToDid = (serviceRef: string) => {
   return idx !== -1 ? serviceRef.slice(0, idx) : serviceRef;
 };
 
-const rootUrisFromPosts = (posts: Posts): string[] => {
-  const uris: string[] = [];
-  for (const item of posts.values()) {
-    const rootUri = item && rootUriFromPost(item);
+const rootUrisFromReplies = (replies: Replies): string[] => {
+  const uris = new Set<string>();
+  for (const item of replies.values()) {
+    const rootUri = item && rootUriFromReply(item);
     if (rootUri) {
-      uris.push(rootUri);
+      uris.add(rootUri);
     }
   }
-  return uris;
+  return Array.from(uris);
 };
 
-const rootUriFromPost = (post: Post): string | undefined => {
-  return post.record.reply?.root.uri;
+const rootUriFromReply = (reply: Reply): string | undefined => {
+  return reply.record.reply?.root.uri;
 };
 
 const isBlocked = (blocks: BidirectionalBlocks, [a, b]: RelationshipPair) => {
@@ -726,9 +801,13 @@ export const mergeStates = (
     profileAggs: mergeMaps(stateA.profileAggs, stateB.profileAggs),
     profileViewers: mergeMaps(stateA.profileViewers, stateB.profileViewers),
     posts: mergeMaps(stateA.posts, stateB.posts),
+    replies: mergeMaps(stateA.replies, stateB.replies),
     postAggs: mergeMaps(stateA.postAggs, stateB.postAggs),
+    replyAggs: mergeMaps(stateA.replyAggs, stateB.replyAggs),
     postViewers: mergeMaps(stateA.postViewers, stateB.postViewers),
     threadContexts: mergeMaps(stateA.threadContexts, stateB.threadContexts),
+    sounds: mergeMaps(stateA.sounds, stateB.sounds),
+    soundAggs: mergeMaps(stateA.soundAggs, stateB.soundAggs),
     postBlocks: mergeMaps(stateA.postBlocks, stateB.postBlocks),
     reposts: mergeMaps(stateA.reposts, stateB.reposts),
     follows: mergeMaps(stateA.follows, stateB.follows),

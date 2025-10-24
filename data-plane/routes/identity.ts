@@ -1,4 +1,5 @@
 import { DidDocument, getDid, getHandle, IdResolver } from "@atp/identity";
+import { Code, DataPlaneError } from "../util.ts";
 
 // Helper function to format DID document result
 function getResultFromDoc(doc: DidDocument) {
@@ -41,50 +42,50 @@ export class Identity {
 
   async getByDid(did: string) {
     if (!this.idResolver) {
-      throw new Error("ID resolver not available");
+      throw new DataPlaneError(Code.InternalError);
     }
 
     try {
       const doc = await this.idResolver.did.resolve(did);
       if (!doc) {
-        throw new Error("Identity not found");
+        throw new DataPlaneError(Code.NotFound);
       }
 
       const result = getResultFromDoc(doc);
       return result;
     } catch (error) {
       console.error("Error resolving DID:", error);
-      throw new Error("Failed to resolve identity");
+      throw new DataPlaneError(Code.InternalError);
     }
   }
 
   async getByHandle(handle: string) {
     if (!this.idResolver) {
-      throw new Error("ID resolver not available");
+      throw new DataPlaneError(Code.InternalError);
     }
 
     try {
       const did = await this.idResolver.handle.resolve(handle);
       if (!did) {
-        throw new Error("Identity not found");
+        throw new DataPlaneError(Code.NotFound);
       }
 
       const doc = await this.idResolver.did.resolve(did);
       if (!doc || did !== getDid(doc)) {
-        throw new Error("Identity not found");
+        throw new DataPlaneError(Code.NotFound);
       }
 
       const result = getResultFromDoc(doc);
       return result;
     } catch (error) {
       console.error("Error resolving handle:", error);
-      throw new Error("Failed to resolve identity");
+      throw new DataPlaneError(Code.InternalError);
     }
   }
 
   async resolve(identifier: string, type?: "did" | "handle") {
     if (!this.idResolver) {
-      throw new Error("ID resolver not available");
+      throw new DataPlaneError(Code.InternalError);
     }
 
     try {
@@ -106,7 +107,7 @@ export class Identity {
       }
 
       if (!doc || (resolvedDid && resolvedDid !== getDid(doc))) {
-        throw new Error("Identity not found");
+        throw new DataPlaneError(Code.NotFound);
       }
 
       const result = getResultFromDoc(doc);
@@ -119,7 +120,7 @@ export class Identity {
       };
     } catch (error) {
       console.error("Error resolving identity:", error);
-      throw new Error("Failed to resolve identity");
+      throw new DataPlaneError(Code.InternalError);
     }
   }
 
@@ -127,7 +128,7 @@ export class Identity {
     identifiers: Array<{ value: string; type?: "did" | "handle" }>,
   ) {
     if (!this.idResolver) {
-      throw new Error("ID resolver not available");
+      throw new DataPlaneError(Code.InternalError);
     }
 
     const results = await Promise.allSettled(
