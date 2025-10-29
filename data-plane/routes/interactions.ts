@@ -31,12 +31,6 @@ export class Interactions {
       ),
     ]);
 
-    // Count quotes by finding posts that have an embed.record.uri matching our URIs
-    const quotes = await this.db.models.Post.aggregate([
-      { $match: { "embed.record.uri": { $in: uris } } },
-      { $group: { _id: "$embed.record.uri", count: { $sum: 1 } } },
-    ]);
-
     // Create lookup maps from pre-computed counts
     const likesMap = new Map<string, number>();
     const repliesMap = new Map<string, number>();
@@ -51,18 +45,12 @@ export class Interactions {
     for (const reply of replies) {
       likesMap.set(reply.uri, reply.likeCount ?? 0);
       repliesMap.set(reply.uri, reply.replyCount ?? 0);
-      repostsMap.set(reply.uri, reply.repostCount ?? 0);
     }
-
-    const quotesMap = new Map(
-      quotes.map((item: AggregationResult) => [item._id, item.count]),
-    );
 
     return {
       likes: uris.map((uri) => likesMap.get(uri) ?? 0),
       replies: uris.map((uri) => repliesMap.get(uri) ?? 0),
       reposts: uris.map((uri) => repostsMap.get(uri) ?? 0),
-      quotes: uris.map((uri) => quotesMap.get(uri) ?? 0),
     };
   }
 
