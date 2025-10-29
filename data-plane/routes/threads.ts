@@ -68,20 +68,72 @@ export class Threads {
     validateThreadParams(above, below);
 
     try {
-      // Verify the original post exists and is a root post (posts can't have ancestors)
+      // Check if it's a post or reply
       const originalPost = await this.db.models.Post.findOne({ uri: postUri });
 
-      if (!originalPost) {
+      if (originalPost) {
+        // Posts are always root - they don't have ancestors by design
+        // So we only get descendants (replies)
+        const descendants = await getDescendants(this.db, postUri, below);
+
+        // The thread is just the root post + all its descendant replies
+        const uris = [
+          postUri, // The original post (always root)
+          ...descendants,
+        ];
+
+        // Remove duplicates while preserving order
+        const uniqueUris = Array.from(new Set(uris));
+
+        return {
+          uris: uniqueUris,
+          meta: {
+            ancestorCount: 0, // Posts never have ancestors
+            descendantCount: descendants.length,
+            totalCount: uniqueUris.length,
+          },
+        };
+      }
+
+      // Check if it's a reply
+      const originalReply = await this.db.models.Reply.findOne({
+        uri: postUri,
+      });
+
+      if (!originalReply) {
         throw new DataPlaneError(Code.NotFound);
       }
 
-      // Posts are always root - they don't have ancestors by design
-      // So we only get descendants (replies)
+      // Get ancestors (walking up the reply chain)
+      const ancestors: string[] = [];
+      let currentUri = postUri;
+      const visited = new Set<string>([currentUri]);
+
+      for (let i = 0; i < above; i++) {
+        const current = await this.db.models.Reply.findOne({ uri: currentUri });
+
+        if (!current?.reply?.parent?.uri) {
+          break;
+        }
+
+        const parentUri = current.reply.parent.uri;
+
+        if (visited.has(parentUri)) {
+          break;
+        }
+
+        visited.add(parentUri);
+        ancestors.unshift(parentUri); // Add to beginning to maintain order
+        currentUri = parentUri;
+      }
+
+      // Get descendants (replies to this reply)
       const descendants = await getDescendants(this.db, postUri, below);
 
-      // The thread is just the root post + all its descendant replies
+      // Build the full thread: ancestors + anchor + descendants
       const uris = [
-        postUri, // The original post (always root)
+        ...ancestors,
+        postUri, // The anchor reply
         ...descendants,
       ];
 
@@ -91,7 +143,7 @@ export class Threads {
       return {
         uris: uniqueUris,
         meta: {
-          ancestorCount: 0, // Posts never have ancestors
+          ancestorCount: ancestors.length,
           descendantCount: descendants.length,
           totalCount: uniqueUris.length,
         },

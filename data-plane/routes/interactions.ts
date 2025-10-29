@@ -19,24 +19,16 @@ export class Interactions {
       return { likes: [], replies: [], reposts: [], quotes: [] };
     }
 
-    // Get interaction counts for posts
-    const [likes, reposts] = await Promise.all([
-      // Count likes for each URI
-      this.db.models.Like.aggregate([
-        { $match: { "subject.uri": { $in: uris } } },
-        { $group: { _id: "$subject.uri", count: { $sum: 1 } } },
-      ]),
-      // Count reposts for each URI
-      this.db.models.Repost.aggregate([
-        { $match: { "subject.uri": { $in: uris } } },
-        { $group: { _id: "$subject.uri", count: { $sum: 1 } } },
-      ]),
-    ]);
-
-    // Count replies by finding posts that have a reply.parent.uri matching our URIs
-    const replies = await this.db.models.Post.aggregate([
-      { $match: { "reply.parent.uri": { $in: uris } } },
-      { $group: { _id: "$reply.parent.uri", count: { $sum: 1 } } },
+    // Get pre-computed counts from Post and Reply documents
+    const [posts, replies] = await Promise.all([
+      this.db.models.Post.find(
+        { uri: { $in: uris } },
+        { uri: 1, likeCount: 1, replyCount: 1, repostCount: 1 },
+      ),
+      this.db.models.Reply.find(
+        { uri: { $in: uris } },
+        { uri: 1, likeCount: 1, replyCount: 1, repostCount: 1 },
+      ),
     ]);
 
     // Count quotes by finding posts that have an embed.record.uri matching our URIs
@@ -45,16 +37,23 @@ export class Interactions {
       { $group: { _id: "$embed.record.uri", count: { $sum: 1 } } },
     ]);
 
-    // Create lookup maps
-    const likesMap = new Map(
-      likes.map((item: AggregationResult) => [item._id, item.count]),
-    );
-    const repliesMap = new Map(
-      replies.map((item: AggregationResult) => [item._id, item.count]),
-    );
-    const repostsMap = new Map(
-      reposts.map((item: AggregationResult) => [item._id, item.count]),
-    );
+    // Create lookup maps from pre-computed counts
+    const likesMap = new Map<string, number>();
+    const repliesMap = new Map<string, number>();
+    const repostsMap = new Map<string, number>();
+
+    for (const post of posts) {
+      likesMap.set(post.uri, post.likeCount ?? 0);
+      repliesMap.set(post.uri, post.replyCount ?? 0);
+      repostsMap.set(post.uri, post.repostCount ?? 0);
+    }
+
+    for (const reply of replies) {
+      likesMap.set(reply.uri, reply.likeCount ?? 0);
+      repliesMap.set(reply.uri, reply.replyCount ?? 0);
+      repostsMap.set(reply.uri, reply.repostCount ?? 0);
+    }
+
     const quotesMap = new Map(
       quotes.map((item: AggregationResult) => [item._id, item.count]),
     );

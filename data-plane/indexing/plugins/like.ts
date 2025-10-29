@@ -139,14 +139,12 @@ const notifsForDelete = (
 
 const updateAggregates = async (db: Database, like: IndexedLike) => {
   try {
-    // Update like count for the subject
     const likeCount = await db.models.Like.countDocuments({
       subject: like.subject,
     });
 
     const subjectUri = new AtUri(like.subject);
 
-    // Check if this is a feed generator
     if (subjectUri.collection === "so.sprk.feed.generator") {
       const existingGenerator = await db.models.Generator.findOne({
         uri: like.subject,
@@ -160,24 +158,32 @@ const updateAggregates = async (db: Database, like: IndexedLike) => {
         );
       }
     } else {
-      // Handle posts and other content types
       const existingPost = await db.models.Post.findOne({
         uri: like.subject,
       });
 
       if (existingPost) {
-        // Only update existing posts
         await db.models.Post.findOneAndUpdate(
           { uri: like.subject },
           { $set: { likeCount } },
           { new: true },
         );
       }
-      // We don't create a post if it doesn't exist, as we might lack required fields
+
+      const existingReply = await db.models.Reply.findOne({
+        uri: like.subject,
+      });
+
+      if (existingReply) {
+        await db.models.Reply.findOneAndUpdate(
+          { uri: like.subject },
+          { $set: { likeCount } },
+          { new: true },
+        );
+      }
     }
   } catch (error) {
     console.error("Error updating like aggregates:", error);
-    // Don't throw - allow processing to continue even if aggregates update fails
   }
 };
 
