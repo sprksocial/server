@@ -21,7 +21,6 @@ export type Post = RecordInfo<PostRecord>;
 export type Posts = HydrationMap<Post>;
 export type Reply = RecordInfo<ReplyRecord>;
 export type Replies = HydrationMap<Reply>;
-
 export type Sound = RecordInfo<AudioRecord>;
 export type Sounds = HydrationMap<Sound>;
 

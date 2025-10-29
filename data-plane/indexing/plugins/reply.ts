@@ -288,7 +288,6 @@ const notifsForDelete = (
 };
 
 const updateAggregates = async (db: Database, replyIdx: IndexedReply) => {
-  // Update reply count for parent post
   if (replyIdx.reply.reply?.parent?.uri) {
     const parentPost = await db.models.Post.findOne({
       uri: replyIdx.reply.reply?.parent.uri,
@@ -304,14 +303,14 @@ const updateAggregates = async (db: Database, replyIdx: IndexedReply) => {
     if (parentPost) {
       await db.models.Post.findOneAndUpdate(
         { uri: replyIdx.reply.reply?.parent.uri },
-        { replyCount },
-        { upsert: true, new: true },
+        { $set: { replyCount } },
+        { new: true },
       );
     } else if (parentReply) {
       await db.models.Reply.findOneAndUpdate(
         { uri: replyIdx.reply.reply?.parent.uri },
-        { replyCount },
-        { upsert: true, new: true },
+        { $set: { replyCount } },
+        { new: true },
       );
     }
   }

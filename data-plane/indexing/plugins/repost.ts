@@ -167,48 +167,39 @@ const notifsForDelete = (
 
 const updateAggregates = async (db: Database, repost: IndexedRepost) => {
   try {
-    // Update repost count for the subject
     const repostCount = await db.models.Repost.countDocuments({
       "subject.uri": repost.subject.uri,
     });
 
-    // First check if post exists to avoid creating one with missing fields
     const existingPost = await db.models.Post.findOne({
       uri: repost.subject.uri,
     });
 
     if (existingPost) {
-      // Only update existing posts
       await db.models.Post.findOneAndUpdate(
         { uri: repost.subject.uri },
-        { repostCount },
+        { $set: { repostCount } },
         { new: true },
       );
     }
-    // We don't create a post if it doesn't exist, as we might lack required fields
 
-    // Update repost count for the author (optional enhancement)
     const authorRepostCount = await db.models.Repost.countDocuments({
       authorDid: repost.authorDid,
     });
 
-    // First check if profile exists to avoid creating one with null URI
     const existingProfile = await db.models.Profile.findOne({
       authorDid: repost.authorDid,
     });
 
     if (existingProfile) {
-      // Only update existing profiles to avoid creating profiles with null URI
       await db.models.Profile.findOneAndUpdate(
         { authorDid: repost.authorDid },
-        { repostCount: authorRepostCount },
+        { $set: { repostCount: authorRepostCount } },
         { new: true },
       );
     }
-    // We don't create a profile if it doesn't exist, as we lack required URI field
   } catch (error) {
     console.error("Error updating repost aggregates:", error);
-    // Don't throw - allow processing to continue even if aggregates update fails
   }
 };
 
