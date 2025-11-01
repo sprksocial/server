@@ -31,7 +31,7 @@ const insertFn = async (
       authorDid: follow.authorDid,
       subject: follow.subject,
     },
-    follow,
+    { $set: follow },
     { upsert: true, new: true },
   );
   return insertedFollow;
