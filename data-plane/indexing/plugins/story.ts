@@ -6,10 +6,6 @@ import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { StoryDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
-import {
-  normalizeEmbed,
-  normalizeObject,
-} from "../../../utils/embed-normalizer.ts";
 
 const lexId = lex.ids.SoSprkStoryPost;
 type IndexedStory = StoryDocument;
@@ -25,8 +21,8 @@ const insertFn = async (
     uri: uri.toString(),
     cid: cid.toString(),
     authorDid: uri.host,
-    media: normalizeEmbed(obj.media) || null,
-    sound: normalizeObject(obj.sound) || null,
+    media: obj.media,
+    sound: obj.sound,
     labels: obj.labels || null,
     tags: obj.tags || [],
     createdAt: normalizeDatetimeAlways(obj.createdAt),
@@ -34,21 +30,12 @@ const insertFn = async (
   };
 
   // Use findOneAndUpdate with upsert to handle potential duplicate key errors
-  try {
-    const insertedStory = await db.models.Story.findOneAndUpdate(
-      { uri: story.uri },
-      story,
-      { upsert: true, new: true },
-    );
-    return insertedStory;
-  } catch (err) {
-    // Handle duplicate key errors gracefully
-    const mongoError = err as { code?: number };
-    if (mongoError.code === 11000) {
-      return null; // Silently skip duplicates
-    }
-    throw err;
-  }
+  const insertedStory = await db.models.Story.findOneAndUpdate(
+    { uri: story.uri },
+    story,
+    { upsert: true, new: true },
+  );
+  return insertedStory;
 };
 
 const findDuplicate = (): AtUri | null => {

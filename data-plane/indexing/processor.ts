@@ -85,19 +85,8 @@ export class RecordProcessor<T, S> {
     }
   }
 
-  assertValidRecord(obj: unknown, uri: AtUri): asserts obj is T {
-    if (!this.matchesCollection(uri)) {
-      throw new Error(
-        `Record collection mismatch: expected ${this.collection}, got ${uri.collection}`,
-      );
-    }
-    try {
-      lexicons.assertValidRecord(this.collection, obj);
-    } catch (err) {
-      throw new Error(
-        `Record validation failed for collection: ${this.collection}. Error: ${err}`,
-      );
-    }
+  assertValidRecord(obj: unknown): asserts obj is T {
+    lexicons.assertValidRecord(this.collection, obj);
   }
 
   // Helper method to get the lexId this processor handles
@@ -112,7 +101,7 @@ export class RecordProcessor<T, S> {
     timestamp: string,
     opts?: { disableNotifs?: boolean },
   ) {
-    this.assertValidRecord(obj, uri);
+    this.assertValidRecord(obj);
 
     // Insert or update record
     await this.db.models.Record.findOneAndUpdate(
@@ -170,7 +159,7 @@ export class RecordProcessor<T, S> {
     timestamp: string,
     opts?: { disableNotifs?: boolean },
   ) {
-    this.assertValidRecord(obj, uri);
+    this.assertValidRecord(obj);
 
     // Update record
     await this.db.models.Record.findOneAndUpdate(

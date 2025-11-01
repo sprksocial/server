@@ -26,7 +26,7 @@ import * as Repost from "./plugins/repost.ts";
 import * as Story from "./plugins/story.ts";
 import * as Audio from "./plugins/audio.ts";
 import { RecordProcessor } from "./processor.ts";
-import { Logger } from "@logtape/logtape";
+import { getLogger, Logger } from "@logtape/logtape";
 import { ServerConfig } from "../../config.ts";
 
 export class IndexingService {
@@ -42,14 +42,15 @@ export class IndexingService {
     story: Story.PluginType;
     audio: Audio.PluginType;
   };
+  logger: Logger;
 
   constructor(
     public db: Database,
     public cfg: ServerConfig,
     public idResolver: IdResolver,
     public background: BackgroundQueue,
-    public logger: Logger,
   ) {
+    this.logger = getLogger(["appview", "indexer"]);
     this.records = {
       post: Post.makePlugin(this.db, this.background),
       reply: Reply.makePlugin(this.db, this.background),
@@ -70,7 +71,6 @@ export class IndexingService {
       this.cfg,
       this.idResolver,
       this.background,
-      this.logger,
     );
   }
 
@@ -157,7 +157,7 @@ export class IndexingService {
 
     const actorExists = await this.db.models.Actor.findOne({ did }).lean();
     if (!actorExists) {
-      console.log(
+      this.logger.info(
         `indexRepo: No actor record found for ${did}, indexing handle first`,
       );
       await this.indexHandle(did, now);
@@ -179,7 +179,7 @@ export class IndexingService {
     const repoRecords = formatCheckout(did, verifiedRepo);
     const diff = findDiffFromCheckout(currRecords, repoRecords);
 
-    console.log(`Indexing ${diff.length} records for ${did}:`);
+    this.logger.info(`Indexing ${diff.length} records for ${did}:`);
 
     await Promise.all(
       diff.map(async (op) => {

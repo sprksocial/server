@@ -59,18 +59,6 @@ const insertFn = async (
   obj: PostRecord,
   timestamp: string,
 ): Promise<IndexedPost | null> => {
-  console.log("DEBUG: Post indexing started");
-  // Ensure actor record exists before creating post
-  const actorExists = await db.models.Actor.findOne({ did: uri.host }).lean();
-  if (!actorExists) {
-    // This should trigger actor indexing, but for now we'll just log
-    console.log(
-      `Post indexing: No actor record found for ${uri.host}, post may have missing handle`,
-    );
-  }
-
-  console.log("DEBUG: Post media:", JSON.stringify(obj.media, null, 2));
-
   const post = {
     uri: uri.toString(),
     cid: cid.toString(),
@@ -90,7 +78,7 @@ const insertFn = async (
   try {
     const insertedPost = await db.models.Post.findOneAndUpdate(
       { uri: post.uri },
-      post,
+      { $set: post },
       { upsert: true, new: true },
     );
 
@@ -280,28 +268,23 @@ const notifsForDelete = (
 };
 
 const updateAggregates = async (db: Database, postIdx: IndexedPost) => {
-  try {
-    // Update posts count for author
-    const postsCount = await db.models.Post.countDocuments({
-      authorDid: postIdx.post.authorDid,
-    });
+  // Update posts count for author
+  const postsCount = await db.models.Post.countDocuments({
+    authorDid: postIdx.post.authorDid,
+  });
 
-    // First check if profile exists to avoid creating one with null URI
-    const existingProfile = await db.models.Profile.findOne({
-      authorDid: postIdx.post.authorDid,
-    });
+  // First check if profile exists to avoid creating one with null URI
+  const existingProfile = await db.models.Profile.findOne({
+    authorDid: postIdx.post.authorDid,
+  });
 
-    if (existingProfile) {
-      // Only update existing profiles
-      await db.models.Profile.findOneAndUpdate(
-        { authorDid: postIdx.post.authorDid },
-        { postsCount },
-        { new: true },
-      );
-    }
-  } catch (error) {
-    console.error("Error updating post aggregates:", error);
-    // Don't throw - allow processing to continue even if aggregates update fails
+  if (existingProfile) {
+    // Only update existing profiles
+    await db.models.Profile.findOneAndUpdate(
+      { authorDid: postIdx.post.authorDid },
+      { $set: { postsCount } },
+      { new: true },
+    );
   }
 };
 

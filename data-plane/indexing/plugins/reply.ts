@@ -56,16 +56,6 @@ const insertFn = async (
   obj: ReplyRecord,
   timestamp: string,
 ): Promise<IndexedReply | null> => {
-  console.log("DEBUG: Post indexing started");
-  // Ensure actor record exists before creating post
-  const actorExists = await db.models.Actor.findOne({ did: uri.host }).lean();
-  if (!actorExists) {
-    // This should trigger actor indexing, but for now we'll just log
-    console.log(
-      `Post indexing: No actor record found for ${uri.host}, post may have missing handle`,
-    );
-  }
-
   const reply = {
     uri: uri.toString(),
     cid: cid.toString(),
@@ -93,84 +83,75 @@ const insertFn = async (
   };
 
   // Use findOneAndUpdate with upsert to handle potential duplicate key errors
-  try {
-    const insertedReply = await db.models.Reply.findOneAndUpdate(
-      { uri: reply.uri },
-      reply,
-      { upsert: true, new: true },
+  const insertedReply = await db.models.Reply.findOneAndUpdate(
+    { uri: reply.uri },
+    { $set: reply },
+    { upsert: true, new: true },
+  );
+
+  if (obj.reply) {
+    const { invalidReplyRoot } = await validateReply(
+      db,
+      obj.reply,
     );
-
-    if (obj.reply) {
-      const { invalidReplyRoot } = await validateReply(
-        db,
-        obj.reply,
+    if (invalidReplyRoot) {
+      Object.assign(insertedReply, { invalidReplyRoot });
+      await db.models.Reply.updateOne(
+        { uri: reply.uri },
+        { $set: { invalidReplyRoot } },
       );
-      if (invalidReplyRoot) {
-        Object.assign(insertedReply, { invalidReplyRoot });
-        await db.models.Reply.updateOne(
-          { uri: reply.uri },
-          { invalidReplyRoot },
-        );
-      }
     }
-
-    const facets = (obj.facets || [])
-      .flatMap((facet) => facet.features)
-      .flatMap((feature) => {
-        if (isMention(feature)) {
-          return {
-            type: "mention" as const,
-            value: feature.did,
-          };
-        }
-        if (isLink(feature)) {
-          return {
-            type: "link" as const,
-            value: feature.uri,
-          };
-        }
-        return [];
-      });
-
-    // Embed processing - embeds are stored inline in the Post model
-    let media: {
-      postUri?: string;
-      cid?: string;
-      alt?: string;
-    } = {};
-    if (isMediaImage(obj.media)) {
-      const imageMedia = {
-        postUri: uri.toString(),
-        cid: obj.media.image.ref.toString(),
-        alt: obj.media.alt as string,
-      };
-      media = imageMedia;
-    }
-
-    const ancestors = await getAncestorsAndSelf(db, {
-      uri: reply.uri,
-      parentHeight: REPLY_NOTIF_DEPTH,
-    });
-    const descendents = await getDescendents(db, {
-      uri: reply.uri,
-      depth: REPLY_NOTIF_DEPTH,
-    });
-
-    return {
-      reply: insertedReply,
-      facets,
-      media,
-      ancestors,
-      descendents,
-    };
-  } catch (err) {
-    // Handle duplicate key errors gracefully
-    const mongoError = err as { code?: number };
-    if (mongoError.code === 11000) {
-      return null; // Silently skip duplicates
-    }
-    throw err;
   }
+
+  const facets = (obj.facets || [])
+    .flatMap((facet) => facet.features)
+    .flatMap((feature) => {
+      if (isMention(feature)) {
+        return {
+          type: "mention" as const,
+          value: feature.did,
+        };
+      }
+      if (isLink(feature)) {
+        return {
+          type: "link" as const,
+          value: feature.uri,
+        };
+      }
+      return [];
+    });
+
+  // Embed processing - embeds are stored inline in the Post model
+  let media: {
+    postUri?: string;
+    cid?: string;
+    alt?: string;
+  } = {};
+  if (isMediaImage(obj.media)) {
+    const imageMedia = {
+      postUri: uri.toString(),
+      cid: obj.media.image.ref.toString(),
+      alt: obj.media.alt as string,
+    };
+    media = imageMedia;
+  }
+
+  const ancestors = await getAncestorsAndSelf(db, {
+    uri: reply.uri,
+    parentHeight: REPLY_NOTIF_DEPTH,
+  });
+  const descendents = await getDescendents(db, {
+    uri: reply.uri,
+    depth: REPLY_NOTIF_DEPTH,
+  });
+
+  return {
+    reply: insertedReply,
+    facets,
+    media,
+    ancestors,
+    descendents,
+  };
 };
 
 const findDuplicate = (): AtUri | null => {

@@ -45,18 +45,13 @@ export class Identity {
       throw new DataPlaneError(Code.InternalError);
     }
 
-    try {
-      const doc = await this.idResolver.did.resolve(did);
-      if (!doc) {
-        throw new DataPlaneError(Code.NotFound);
-      }
-
-      const result = getResultFromDoc(doc);
-      return result;
-    } catch (error) {
-      console.error("Error resolving DID:", error);
-      throw new DataPlaneError(Code.InternalError);
+    const doc = await this.idResolver.did.resolve(did);
+    if (!doc) {
+      throw new DataPlaneError(Code.NotFound);
     }
+
+    const result = getResultFromDoc(doc);
+    return result;
   }
 
   async getByHandle(handle: string) {
@@ -64,23 +59,18 @@ export class Identity {
       throw new DataPlaneError(Code.InternalError);
     }
 
-    try {
-      const did = await this.idResolver.handle.resolve(handle);
-      if (!did) {
-        throw new DataPlaneError(Code.NotFound);
-      }
-
-      const doc = await this.idResolver.did.resolve(did);
-      if (!doc || did !== getDid(doc)) {
-        throw new DataPlaneError(Code.NotFound);
-      }
-
-      const result = getResultFromDoc(doc);
-      return result;
-    } catch (error) {
-      console.error("Error resolving handle:", error);
-      throw new DataPlaneError(Code.InternalError);
+    const did = await this.idResolver.handle.resolve(handle);
+    if (!did) {
+      throw new DataPlaneError(Code.NotFound);
     }
+
+    const doc = await this.idResolver.did.resolve(did);
+    if (!doc || did !== getDid(doc)) {
+      throw new DataPlaneError(Code.NotFound);
+    }
+
+    const result = getResultFromDoc(doc);
+    return result;
   }
 
   async resolve(identifier: string, type?: "did" | "handle") {
@@ -88,40 +78,35 @@ export class Identity {
       throw new DataPlaneError(Code.InternalError);
     }
 
-    try {
-      let doc: DidDocument | null = null;
-      let resolvedDid: string | null = null;
+    let doc: DidDocument | null = null;
+    let resolvedDid: string | null = null;
 
-      // Auto-detect type if not specified
-      const identifierType = type ||
-        (identifier.startsWith("did:") ? "did" : "handle");
+    // Auto-detect type if not specified
+    const identifierType = type ||
+      (identifier.startsWith("did:") ? "did" : "handle");
 
-      if (identifierType === "did") {
-        doc = await this.idResolver.did.resolve(identifier);
-        resolvedDid = identifier;
-      } else {
-        resolvedDid = await this.idResolver.handle.resolve(identifier) || null;
-        if (resolvedDid) {
-          doc = await this.idResolver.did.resolve(resolvedDid);
-        }
+    if (identifierType === "did") {
+      doc = await this.idResolver.did.resolve(identifier);
+      resolvedDid = identifier;
+    } else {
+      resolvedDid = await this.idResolver.handle.resolve(identifier) || null;
+      if (resolvedDid) {
+        doc = await this.idResolver.did.resolve(resolvedDid);
       }
-
-      if (!doc || (resolvedDid && resolvedDid !== getDid(doc))) {
-        throw new DataPlaneError(Code.NotFound);
-      }
-
-      const result = getResultFromDoc(doc);
-      return {
-        ...result,
-        resolvedFrom: {
-          identifier,
-          type: identifierType,
-        },
-      };
-    } catch (error) {
-      console.error("Error resolving identity:", error);
-      throw new DataPlaneError(Code.InternalError);
     }
+
+    if (!doc || (resolvedDid && resolvedDid !== getDid(doc))) {
+      throw new DataPlaneError(Code.NotFound);
+    }
+
+    const result = getResultFromDoc(doc);
+    return {
+      ...result,
+      resolvedFrom: {
+        identifier,
+        type: identifierType,
+      },
+    };
   }
 
   async resolveBatch(
@@ -133,43 +118,32 @@ export class Identity {
 
     const results = await Promise.allSettled(
       identifiers.map(async ({ value, type }) => {
-        try {
-          let doc: DidDocument | null = null;
-          let resolvedDid: string | null = null;
+        let doc: DidDocument | null = null;
+        let resolvedDid: string | undefined;
 
-          const identifierType = type ||
-            (value.startsWith("did:") ? "did" : "handle");
+        const identifierType = type ||
+          (value.startsWith("did:") ? "did" : "handle");
+        if (identifierType === "did") {
+          doc = await this.idResolver!.did.resolve(value);
+          resolvedDid = value;
+        } else {
+          resolvedDid = await this.idResolver!.handle.resolve(value);
+          if (!resolvedDid) throw new DataPlaneError(Code.NotFound);
+          doc = await this.idResolver!.did.resolve(resolvedDid);
+        }
 
-          if (identifierType === "did") {
-            doc = await this.idResolver!.did.resolve(value);
-            resolvedDid = value;
-          } else {
-            resolvedDid = await this.idResolver!.handle.resolve(value) || null;
-            if (resolvedDid) {
-              doc = await this.idResolver!.did.resolve(resolvedDid);
-            }
-          }
-
-          if (!doc || (resolvedDid && resolvedDid !== getDid(doc))) {
-            return {
-              identifier: value,
-              type: identifierType,
-              error: "Identity not found",
-            };
-          }
-
+        if (!doc || (resolvedDid && resolvedDid !== getDid(doc))) {
           return {
             identifier: value,
             type: identifierType,
-            ...getResultFromDoc(doc),
-          };
-        } catch (_error) {
-          return {
-            identifier: value,
-            type: type || "unknown",
-            error: "Failed to resolve identity",
+            error: "Identity not found",
           };
         }
+        return {
+          identifier: value,
+          type: identifierType,
+          ...getResultFromDoc(doc),
+        };
       }),
     );
 

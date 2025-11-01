@@ -12868,13 +12868,8 @@ export const schemaDict = {
               "description":
                 "Combinations of post/repost types to include in response.",
               "knownValues": [
-                "posts_with_replies",
-                "posts_no_replies",
-                "posts_with_media",
-                "posts_and_author_threads",
                 "posts_with_video",
               ],
-              "default": "posts_with_replies",
             },
             "includePins": {
               "type": "boolean",

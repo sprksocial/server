@@ -36,7 +36,7 @@ const insertFn = async (
   try {
     const insertedProfile = await db.models.Profile.findOneAndUpdate(
       { uri: profile.uri },
-      profile,
+      { $set: profile },
       { upsert: true, new: true },
     );
     return insertedProfile;

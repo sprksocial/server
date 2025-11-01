@@ -8,11 +8,7 @@ export type QueryParams = {
   limit: number;
   cursor?: string;
   /** Combinations of post/repost types to include in response. */
-  filter:
-    | "posts_with_replies"
-    | "posts_no_replies"
-    | "posts_with_media"
-    | "posts_and_author_threads"
+  filter?:
     | "posts_with_video"
     | (string & globalThis.Record<PropertyKey, never>);
   includePins: boolean;

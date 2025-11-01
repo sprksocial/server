@@ -31,21 +31,12 @@ const insertFn = async (
   };
 
   // Use findOneAndUpdate with upsert to handle potential duplicate key errors
-  try {
-    const insertedAudio = await db.models.Audio.findOneAndUpdate(
-      { uri: audio.uri },
-      audio,
-      { upsert: true, new: true },
-    );
-    return insertedAudio;
-  } catch (err) {
-    // Handle duplicate key errors gracefully
-    const mongoError = err as { code?: number };
-    if (mongoError.code === 11000) {
-      return null; // Silently skip duplicates
-    }
-    throw err;
-  }
+  const insertedAudio = await db.models.Audio.findOneAndUpdate(
+    { uri: audio.uri },
+    { $set: audio },
+    { upsert: true, new: true },
+  );
+  return insertedAudio;
 };
 
 const findDuplicate = (): AtUri | null => {

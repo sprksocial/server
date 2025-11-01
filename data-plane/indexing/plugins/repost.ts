@@ -17,50 +17,34 @@ const insertFn = async (
   obj: Repost.Record,
   timestamp: string,
 ): Promise<IndexedRepost | null> => {
-  try {
-    // Handle via property safely with type assertion
-    const viaObj = obj.via as { uri: string; cid: string } | undefined;
-    const via = viaObj?.uri || null;
-    const viaCid = viaObj?.cid || null;
+  const viaObj = obj.via as { uri: string; cid: string } | undefined;
+  const via = viaObj?.uri || null;
+  const viaCid = viaObj?.cid || null;
 
-    const repost = {
-      uri: uri.toString(),
-      cid: cid.toString(),
-      authorDid: uri.host,
-      subject: {
-        uri: obj.subject.uri,
-        cid: obj.subject.cid,
-      },
-      via,
-      viaCid,
-      createdAt: normalizeDatetimeAlways(obj.createdAt),
-      indexedAt: timestamp,
-    };
+  const repost = {
+    uri: uri.toString(),
+    cid: cid.toString(),
+    authorDid: uri.host,
+    subject: {
+      uri: obj.subject.uri,
+      cid: obj.subject.cid,
+    },
+    via,
+    viaCid,
+    createdAt: normalizeDatetimeAlways(obj.createdAt),
+    indexedAt: timestamp,
+  };
 
-    // Use findOneAndUpdate with compound key to handle potential duplicate key errors
-    try {
-      const insertedRepost = await db.models.Repost.findOneAndUpdate(
-        {
-          authorDid: repost.authorDid,
-          "subject.uri": repost.subject.uri,
-        },
-        repost,
-        { upsert: true, new: true },
-      );
-      return insertedRepost;
-    } catch (err) {
-      // Handle duplicate key errors gracefully
-      const mongoError = err as { code?: number };
-      if (mongoError.code === 11000) {
-        return null; // Silently skip duplicates
-      }
-      throw err;
-    }
-  } catch (error) {
-    // Log the error but prevent it from crashing the process
-    console.error("Error processing repost:", error);
-    return null;
-  }
+  // Use findOneAndUpdate with compound key to handle potential duplicate key errors
+  const insertedRepost = await db.models.Repost.findOneAndUpdate(
+    {
+      authorDid: repost.authorDid,
+      "subject.uri": repost.subject.uri,
+    },
+    { $set: repost },
+    { upsert: true, new: true },
+  );
+  return insertedRepost;
 };
 
 const findDuplicate = async (
@@ -76,130 +60,106 @@ const findDuplicate = async (
 };
 
 const notifsForInsert = (obj: IndexedRepost) => {
-  try {
-    const subjectUri = new AtUri(obj.subject.uri);
-    // prevent self-notifications
-    const isRepostFromSubjectUser = subjectUri.host === obj.authorDid;
-    if (isRepostFromSubjectUser) {
-      return [];
-    }
-
-    const notifs: Array<{
-      did: string;
-      reason: string;
-      author: string;
-      recordUri: string;
-      recordCid: string;
-      sortAt: string;
-      reasonSubject?: string;
-    }> = [
-      // Notification to the author of the reposted record.
-      {
-        did: subjectUri.host,
-        author: obj.authorDid,
-        recordUri: obj.uri,
-        recordCid: obj.cid,
-        reason: "repost" as const,
-        reasonSubject: subjectUri.toString(),
-        sortAt: obj.createdAt,
-      },
-    ];
-
-    if (obj.via) {
-      try {
-        const viaUri = new AtUri(obj.via);
-        const isRepostFromViaSubjectUser = viaUri.host === obj.authorDid;
-        // prevent self-notifications
-        if (!isRepostFromViaSubjectUser) {
-          notifs.push(
-            // Notification to the reposter via whose repost the repost was made.
-            {
-              did: viaUri.host,
-              author: obj.authorDid,
-              recordUri: obj.uri,
-              recordCid: obj.cid,
-              reason: "repost-via-repost" as const,
-              reasonSubject: viaUri.toString(),
-              sortAt: obj.createdAt,
-            },
-          );
-        }
-      } catch (viaError) {
-        console.error("Error processing via uri in notification:", viaError);
-        // Continue with just the main notification
-      }
-    }
-
-    return notifs;
-  } catch (error) {
-    console.error("Error generating notifications for insert:", error);
+  const subjectUri = new AtUri(obj.subject.uri);
+  // prevent self-notifications
+  const isRepostFromSubjectUser = subjectUri.host === obj.authorDid;
+  if (isRepostFromSubjectUser) {
     return [];
   }
+
+  const notifs: Array<{
+    did: string;
+    reason: string;
+    author: string;
+    recordUri: string;
+    recordCid: string;
+    sortAt: string;
+    reasonSubject?: string;
+  }> = [
+    // Notification to the author of the reposted record.
+    {
+      did: subjectUri.host,
+      author: obj.authorDid,
+      recordUri: obj.uri,
+      recordCid: obj.cid,
+      reason: "repost" as const,
+      reasonSubject: subjectUri.toString(),
+      sortAt: obj.createdAt,
+    },
+  ];
+
+  if (obj.via) {
+    const viaUri = new AtUri(obj.via);
+    const isRepostFromViaSubjectUser = viaUri.host === obj.authorDid;
+    // prevent self-notifications
+    if (!isRepostFromViaSubjectUser) {
+      notifs.push(
+        // Notification to the reposter via whose repost the repost was made.
+        {
+          did: viaUri.host,
+          author: obj.authorDid,
+          recordUri: obj.uri,
+          recordCid: obj.cid,
+          reason: "repost-via-repost" as const,
+          reasonSubject: viaUri.toString(),
+          sortAt: obj.createdAt,
+        },
+      );
+    }
+  }
+
+  return notifs;
 };
 
 const deleteFn = async (
   db: Database,
   uri: AtUri,
 ): Promise<IndexedRepost | null> => {
-  try {
-    const deleted = await db.models.Repost.findOneAndDelete({
-      uri: uri.toString(),
-    });
-    return deleted;
-  } catch (error) {
-    console.error("Error deleting repost:", error);
-    return null;
-  }
+  const deleted = await db.models.Repost.findOneAndDelete({
+    uri: uri.toString(),
+  });
+  return deleted;
 };
 
 const notifsForDelete = (
   deleted: IndexedRepost,
   replacedBy: IndexedRepost | null,
 ) => {
-  try {
-    const toDelete = replacedBy ? [] : [deleted.uri];
-    return { notifs: [], toDelete };
-  } catch (error) {
-    console.error("Error processing notifications for delete:", error);
-    return { notifs: [], toDelete: [] };
-  }
+  const toDelete = replacedBy ? [] : [deleted.uri];
+  return { notifs: [], toDelete };
 };
 
 const updateAggregates = async (db: Database, repost: IndexedRepost) => {
-  try {
-    const repostCount = await db.models.Repost.countDocuments({
-      "subject.uri": repost.subject.uri,
-    });
+  const repostCount = await db.models.Repost.countDocuments({
+    "subject.uri": repost.subject.uri,
+  });
 
-    const existingPost = await db.models.Post.findOne({
-      uri: repost.subject.uri,
-    });
+  const existingPost = await db.models.Post.findOne({
+    uri: repost.subject.uri,
+  });
 
-    if (existingPost) {
-      await db.models.Post.findOneAndUpdate(
-        { uri: repost.subject.uri },
-        { $set: { repostCount } },
-        { new: true },
-      );
-    }
+  if (existingPost) {
+    await db.models.Post.findOneAndUpdate(
+      { uri: repost.subject.uri },
+      { $set: { repostCount } },
+      { new: true },
+    );
+  }
 
-    const authorRepostCount = await db.models.Repost.countDocuments({
-      authorDid: repost.authorDid,
-    });
+  const authorRepostCount = await db.models.Repost.countDocuments({
+    authorDid: repost.authorDid,
+  });
 
-    const existingProfile = await db.models.Profile.findOne({
-      authorDid: repost.authorDid,
-    });
+  const existingProfile = await db.models.Profile.findOne({
+    authorDid: repost.authorDid,
+  });
 
-    if (existingProfile) {
-      await db.models.Profile.findOneAndUpdate(
-        { authorDid: repost.authorDid },
-        { $set: { repostCount: authorRepostCount } },
-        { new: true },
-      );
-    }
-  } catch (error) {
-    console.error("Error updating repost aggregates:", error);
+  if (existingProfile) {
+    await db.models.Profile.findOneAndUpdate(
+      { authorDid: repost.authorDid },
+      { $set: { repostCount: authorRepostCount } },
+      { new: true },
+    );
   }
 };
 
