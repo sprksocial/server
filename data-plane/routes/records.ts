@@ -136,62 +136,32 @@ export class Records {
   }
 
   async getLikeRecords(uris: string[]) {
-    try {
-      const result = await getRecords(this.db, uris, ids.SoSprkFeedLike);
-      return result;
-    } catch (error) {
-      console.error("Error fetching like records:", error);
-      throw new DataPlaneError(Code.InternalError);
-    }
+    const result = await getRecords(this.db, uris, ids.SoSprkFeedLike);
+    return result;
   }
 
   async getPostRecords(uris: string[]) {
-    try {
-      const result = await getPostRecords(this.db, uris);
-      return result;
-    } catch (error) {
-      console.error("Error fetching post records:", error);
-      throw new DataPlaneError(Code.InternalError);
-    }
+    const result = await getPostRecords(this.db, uris);
+    return result;
   }
 
   async getReplyRecords(uris: string[]) {
-    try {
-      const result = await getReplyRecords(this.db, uris);
-      return result;
-    } catch (error) {
-      console.error("Error fetching reply records:", error);
-      throw new DataPlaneError(Code.InternalError);
-    }
+    const result = await getReplyRecords(this.db, uris);
+    return result;
   }
 
   async getProfileRecords(uris: string[]) {
-    try {
-      const result = await getRecords(this.db, uris, ids.SoSprkActorProfile);
-      return result;
-    } catch (error) {
-      console.error("Error fetching profile records:", error);
-      throw new DataPlaneError(Code.InternalError);
-    }
+    const result = await getRecords(this.db, uris, ids.SoSprkActorProfile);
+    return result;
   }
 
   async getRepostRecords(uris: string[]) {
-    try {
-      const result = await getRecords(this.db, uris, ids.AppBskyFeedRepost);
-      return result;
-    } catch (error) {
-      console.error("Error fetching repost records:", error);
-      throw new DataPlaneError(Code.InternalError);
-    }
+    const result = await getRecords(this.db, uris, ids.AppBskyFeedRepost);
+    return result;
   }
 
   async getRecords(uris: string[]) {
-    try {
-      const result = await getRecords(this.db, uris);
-      return result;
-    } catch (error) {
-      console.error("Error fetching records:", error);
-      throw new DataPlaneError(Code.InternalError);
-    }
+    const result = await getRecords(this.db, uris);
+    return result;
   }
 }

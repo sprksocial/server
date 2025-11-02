@@ -31,7 +31,6 @@ export class RepoSubscription {
       cfg,
       idResolver,
       this.background,
-      this.logger,
     );
 
     const { runner, firehose } = createFirehose({

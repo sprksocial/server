@@ -40,22 +40,12 @@ const insertFn = async (
     indexedAt: timestamp,
   };
 
-  // Use findOneAndUpdate with upsert to handle potential duplicate key errors
-  try {
-    const insertedGenerator = await db.models.Generator.findOneAndUpdate(
-      { uri: generator.uri },
-      generator,
-      { upsert: true, new: true },
-    );
-    return insertedGenerator;
-  } catch (err) {
-    // Handle duplicate key errors gracefully
-    const mongoError = err as { code?: number };
-    if (mongoError.code === 11000) {
-      return null; // Silently skip duplicates
-    }
-    throw err;
-  }
+  const insertedGenerator = await db.models.Generator.findOneAndUpdate(
+    { uri: generator.uri },
+    { $set: generator },
+    { upsert: true, new: true },
+  );
+  return insertedGenerator;
 };
 
 const findDuplicate = (): AtUri | null => {

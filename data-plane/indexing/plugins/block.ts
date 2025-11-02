@@ -26,35 +26,13 @@ const insertFn = async (
     indexedAt: timestamp,
   };
 
-  // Check if block already exists by URI
-  const existingBlockByUri = await db.models.Block.findOne({ uri: block.uri })
-    .lean();
-  if (existingBlockByUri) {
-    return null; // Block already indexed
-  }
-
-  // Check if a block with same authorDid+subject already exists
-  const existingBlockByComposite = await db.models.Block.findOne({
-    authorDid: block.authorDid,
-    subject: block.subject,
-  }).lean();
-  if (existingBlockByComposite) {
-    return null; // Block with same author+subject already exists
-  }
-
-  // Insert the new block
-  try {
-    const insertedBlock = new db.models.Block(block);
-    await insertedBlock.save();
-    return insertedBlock;
-  } catch (err) {
-    // Handle duplicate key errors gracefully
-    const mongoError = err as { code?: number };
-    if (mongoError.code === 11000) {
-      return null; // Silently skip duplicates
-    }
-    throw err;
-  }
+  // Use findOneAndUpdate with upsert to handle duplicates gracefully
+  const insertedBlock = await db.models.Block.findOneAndUpdate(
+    { uri: block.uri },
+    { $set: block },
+    { upsert: true, new: true },
+  );
+  return insertedBlock;
 };
 
 const findDuplicate = async (

@@ -2,6 +2,7 @@ import type * as SoSprkMediaImage from "../lex/types/so/sprk/media/image.ts";
 import {
   ImageMedia,
   PostMedia,
+  StoryMedia,
   VideoMappingDocument,
 } from "../data-plane/db/models.ts";
 import { ServerConfig } from "../config.ts";
@@ -80,7 +81,7 @@ export function transformVideoMedia(
 }
 
 export function transformMedia(
-  media: PostMedia | undefined,
+  media: PostMedia | StoryMedia | undefined,
   authorDid: string,
   cfg: ServerConfig,
   videoMapping?: VideoMappingDocument | null,
@@ -92,12 +93,30 @@ export function transformMedia(
   }
 
   if (media.$type === "so.sprk.media.images") {
-    return transformImagesMedia(media, authorDid, options);
+    return transformImagesMedia(media as PostMedia, authorDid, options);
+  }
+
+  if (media.$type === "so.sprk.media.image") {
+    // Handle single image (used in stories and replies)
+    const singleImageMedia = media as StoryMedia;
+    if (!singleImageMedia.image) {
+      return undefined;
+    }
+
+    return {
+      $type: "so.sprk.media.image#view",
+      thumb:
+        `https://media.sprk.so/img/medium/${authorDid}/${singleImageMedia.image.ref.$link}/webp`,
+      fullsize:
+        `https://media.sprk.so/img/full/${authorDid}/${singleImageMedia.image.ref.$link}/webp`,
+      alt: singleImageMedia.image.alt ?? "",
+      aspectRatio: singleImageMedia.image.aspectRatio || undefined,
+    } as const;
   }
 
   if (media.$type === "so.sprk.media.video") {
     return transformVideoMedia(
-      media,
+      media as PostMedia,
       authorDid,
       cfg,
       videoMapping,

@@ -32,20 +32,7 @@ export function postUriToPostgateUri(postUri: string) {
 }
 
 export function uriToDid(uri: string) {
-  try {
-    return new AtUri(uri).hostname;
-  } catch (error) {
-    console.log(`AtUri parser failed for URI: ${uri}, error:`, error);
-    // Handle custom collection namespaces that AtUri might not recognize
-    // Extract DID from URI manually as fallback
-    const match = uri.match(/^at:\/\/(did:[^\/]+)/);
-    if (match) {
-      console.log(`Successfully extracted DID using fallback: ${match[1]}`);
-      return match[1];
-    }
-    console.error(`Failed to extract DID from URI: ${uri}`);
-    throw new Error(`Invalid AT URI format: ${uri}`);
-  }
+  return new AtUri(uri).hostname;
 }
 
 // @TODO temp fix for proliferation of invalid pinned post values

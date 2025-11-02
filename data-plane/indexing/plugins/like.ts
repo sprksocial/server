@@ -35,24 +35,12 @@ const insertFn = async (
   };
 
   // Use findOneAndUpdate with upsert on the compound key to handle potential duplicate key errors
-  try {
-    const insertedLike = await db.models.Like.findOneAndUpdate(
-      {
-        authorDid: like.authorDid,
-        subject: like.subject,
-      },
-      like,
-      { upsert: true, new: true },
-    );
-    return insertedLike;
-  } catch (err) {
-    // Handle duplicate key errors gracefully
-    const mongoError = err as { code?: number };
-    if (mongoError.code === 11000) {
-      return null; // Silently skip duplicates
-    }
-    throw err;
-  }
+  const insertedLike = await db.models.Like.findOneAndUpdate(
+    { uri: like.uri },
+    { $set: like },
+    { upsert: true, new: true },
+  );
+  return insertedLike;
 };
 
 const findDuplicate = async (
@@ -138,52 +126,48 @@ const notifsForDelete = (
 };
 
 const updateAggregates = async (db: Database, like: IndexedLike) => {
-  try {
-    const likeCount = await db.models.Like.countDocuments({
-      subject: like.subject,
+  const likeCount = await db.models.Like.countDocuments({
+    subject: like.subject,
+  });
+
+  const subjectUri = new AtUri(like.subject);
+
+  if (subjectUri.collection === "so.sprk.feed.generator") {
+    const existingGenerator = await db.models.Generator.findOne({
+      uri: like.subject,
     });
 
-    const subjectUri = new AtUri(like.subject);
-
-    if (subjectUri.collection === "so.sprk.feed.generator") {
-      const existingGenerator = await db.models.Generator.findOne({
-        uri: like.subject,
-      });
-
-      if (existingGenerator) {
-        await db.models.Generator.findOneAndUpdate(
-          { uri: like.subject },
-          { $set: { likeCount } },
-          { new: true },
-        );
-      }
-    } else {
-      const existingPost = await db.models.Post.findOne({
-        uri: like.subject,
-      });
-
-      if (existingPost) {
-        await db.models.Post.findOneAndUpdate(
-          { uri: like.subject },
-          { $set: { likeCount } },
-          { new: true },
-        );
-      }
-
-      const existingReply = await db.models.Reply.findOne({
-        uri: like.subject,
-      });
-
-      if (existingReply) {
-        await db.models.Reply.findOneAndUpdate(
-          { uri: like.subject },
-          { $set: { likeCount } },
-          { new: true },
-        );
-      }
+    if (existingGenerator) {
+      await db.models.Generator.findOneAndUpdate(
+        { uri: like.subject },
+        { $set: { likeCount } },
+        { new: true },
+      );
     }
-  } catch (error) {
-    console.error("Error updating like aggregates:", error);
+  } else {
+    const existingPost = await db.models.Post.findOne({
+      uri: like.subject,
+    });
+
+    if (existingPost) {
+      await db.models.Post.findOneAndUpdate(
+        { uri: like.subject },
+        { $set: { likeCount } },
+        { new: true },
+      );
+    }
+
+    const existingReply = await db.models.Reply.findOne({
+      uri: like.subject,
+    });
+
+    if (existingReply) {
+      await db.models.Reply.findOneAndUpdate(
+        { uri: like.subject },
+        { $set: { likeCount } },
+        { new: true },
+      );
+    }
   }
 };
 

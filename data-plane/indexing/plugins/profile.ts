@@ -32,22 +32,12 @@ const insertFn = async (
     indexedAt: timestamp,
   };
 
-  // Use findOneAndUpdate with upsert to handle potential duplicate key errors
-  try {
-    const insertedProfile = await db.models.Profile.findOneAndUpdate(
-      { uri: profile.uri },
-      profile,
-      { upsert: true, new: true },
-    );
-    return insertedProfile;
-  } catch (err) {
-    // Handle duplicate key errors gracefully
-    const mongoError = err as { code?: number };
-    if (mongoError.code === 11000) {
-      return null; // Silently skip duplicates
-    }
-    throw err;
-  }
+  const insertedProfile = await db.models.Profile.findOneAndUpdate(
+    { uri: profile.uri },
+    { $set: profile },
+    { upsert: true, new: true },
+  );
+  return insertedProfile;
 };
 
 const findDuplicate = (): AtUri | null => {
