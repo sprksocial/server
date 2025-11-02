@@ -74,83 +74,73 @@ const insertFn = async (
     indexedAt: timestamp,
   };
 
-  // Use findOneAndUpdate with upsert to handle potential duplicate key errors
-  try {
-    const insertedPost = await db.models.Post.findOneAndUpdate(
-      { uri: post.uri },
-      { $set: post },
-      { upsert: true, new: true },
-    );
+  const insertedPost = await db.models.Post.findOneAndUpdate(
+    { uri: post.uri },
+    { $set: post },
+    { upsert: true, new: true },
+  );
 
-    const facets = (obj.caption?.facets || [])
-      .flatMap((facet) => facet.features)
-      .flatMap((feature) => {
-        if (isMention(feature)) {
-          return {
-            type: "mention" as const,
-            value: feature.did,
-          };
-        }
-        if (isLink(feature)) {
-          return {
-            type: "link" as const,
-            value: feature.uri,
-          };
-        }
-        return [];
-      });
-
-    // Media processing - medias are stored inline in the Post model
-    const medias: Array<{
-      position?: number;
-      imageCid?: string;
-      alt?: string | null;
-      thumbCid?: string | null;
-      videoCid?: string;
-    }> = [];
-    const postMedias = separateMedia(obj.media);
-    for (const postMedia of postMedias) {
-      if (isMediaImages(postMedia)) {
-        const { images } = postMedia as MediaImages;
-        const imagesMedia = images.map((
-          img: MediaImage,
-          i: number,
-        ) => ({
-          position: i,
-          imageCid: img.image.ref.toString(),
-          alt: img.alt,
-        }));
-        medias.push(...imagesMedia);
-      } else if (isMediaVideo(postMedia)) {
-        const media = postMedia as MediaVideo;
-        const videoMedia = {
-          postUri: uri.toString(),
-          videoCid: media.video.ref.toString(),
-          alt: media.alt ?? null,
+  const facets = (obj.caption?.facets || [])
+    .flatMap((facet) => facet.features)
+    .flatMap((feature) => {
+      if (isMention(feature)) {
+        return {
+          type: "mention" as const,
+          value: feature.did,
         };
-        medias.push(videoMedia);
       }
-    }
-
-    const descendents = await getDescendents(db, {
-      uri: post.uri,
-      depth: REPLY_NOTIF_DEPTH,
+      if (isLink(feature)) {
+        return {
+          type: "link" as const,
+          value: feature.uri,
+        };
+      }
+      return [];
     });
 
-    return {
-      post: insertedPost,
-      facets,
-      medias,
-      descendents,
-    };
-  } catch (err) {
-    // Handle duplicate key errors gracefully
-    const mongoError = err as { code?: number };
-    if (mongoError.code === 11000) {
-      return null; // Silently skip duplicates
+  // Media processing - medias are stored inline in the Post model
+  const medias: Array<{
+    position?: number;
+    imageCid?: string;
+    alt?: string | null;
+    thumbCid?: string | null;
+    videoCid?: string;
+  }> = [];
+  const postMedias = separateMedia(obj.media);
+  for (const postMedia of postMedias) {
+    if (isMediaImages(postMedia)) {
+      const { images } = postMedia as MediaImages;
+      const imagesMedia = images.map((
+        img: MediaImage,
+        i: number,
+      ) => ({
+        position: i,
+        imageCid: img.image.ref.toString(),
+        alt: img.alt,
+      }));
+      medias.push(...imagesMedia);
+    } else if (isMediaVideo(postMedia)) {
+      const media = postMedia as MediaVideo;
+      const videoMedia = {
+        postUri: uri.toString(),
+        videoCid: media.video.ref.toString(),
+        alt: media.alt ?? null,
+      };
+      medias.push(videoMedia);
     }
-    throw err;
   }
+
+  const descendents = await getDescendents(db, {
+    uri: post.uri,
+    depth: REPLY_NOTIF_DEPTH,
+  });
+
+  return {
+    post: insertedPost,
+    facets,
+    medias,
+    descendents,
+  };
 };
 
 const findDuplicate = (): AtUri | null => {

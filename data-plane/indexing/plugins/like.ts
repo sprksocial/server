@@ -35,24 +35,12 @@ const insertFn = async (
   };
 
   // Use findOneAndUpdate with upsert on the compound key to handle potential duplicate key errors
-  try {
-    const insertedLike = await db.models.Like.findOneAndUpdate(
-      {
-        authorDid: like.authorDid,
-        subject: like.subject,
-      },
-      { $set: like },
-      { upsert: true, new: true },
-    );
-    return insertedLike;
-  } catch (err) {
-    // Handle duplicate key errors gracefully
-    const mongoError = err as { code?: number };
-    if (mongoError.code === 11000) {
-      return null; // Silently skip duplicates
-    }
-    throw err;
-  }
+  const insertedLike = await db.models.Like.findOneAndUpdate(
+    { uri: like.uri },
+    { $set: like },
+    { upsert: true, new: true },
+  );
+  return insertedLike;
 };
 
 const findDuplicate = async (

@@ -27,10 +27,7 @@ const insertFn = async (
   };
 
   const insertedFollow = await db.models.Follow.findOneAndUpdate(
-    {
-      authorDid: follow.authorDid,
-      subject: follow.subject,
-    },
+    { uri: follow.uri },
     { $set: follow },
     { upsert: true, new: true },
   );

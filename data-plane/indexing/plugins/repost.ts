@@ -37,10 +37,7 @@ const insertFn = async (
 
   // Use findOneAndUpdate with compound key to handle potential duplicate key errors
   const insertedRepost = await db.models.Repost.findOneAndUpdate(
-    {
-      authorDid: repost.authorDid,
-      "subject.uri": repost.subject.uri,
-    },
+    { uri: repost.uri },
     { $set: repost },
     { upsert: true, new: true },
   );
