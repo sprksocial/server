@@ -11,6 +11,7 @@
     "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
   },
   "imports": {
+    "@atp/bytes": "jsr:@atp/bytes@^0.1.0-alpha.1",
     "@atp/common": "jsr:@atp/common@^0.1.0-alpha.4",
     "@atp/crypto": "jsr:@atp/crypto@^0.1.0-alpha.2",
     "@atp/identity": "jsr:@atp/identity@^0.1.0-alpha.1",

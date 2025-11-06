@@ -19,7 +19,7 @@ export type Record = {
 export async function getRecords(
   db: Database,
   uris: string[],
-  collection?: string | string[],
+  collection?: string,
 ): Promise<{
   records: Array<Record>;
 }> {
@@ -119,10 +119,7 @@ export class Records {
 
   async getFeedGeneratorRecords(uris: string[]) {
     try {
-      const result = await getRecords(this.db, uris, [
-        ids.AppBskyFeedGenerator,
-        ids.SoSprkFeedGenerator,
-      ]);
+      const result = await getRecords(this.db, uris, ids.SoSprkFeedGenerator);
       return result;
     } catch (error) {
       console.error("Error fetching feed generator records:", error);
