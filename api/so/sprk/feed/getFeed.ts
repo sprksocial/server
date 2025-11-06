@@ -27,7 +27,6 @@ import {
   SkeletonFnInput,
 } from "../../../../pipeline.ts";
 import { resHeaders, SPRK_USER_AGENT } from "../../../util.ts";
-import { HandlerError as GetFeedSkeletonHandlerError } from "../../../../lex/types/so/sprk/feed/getFeedSkeleton.ts";
 
 type GetIdentityByDidResponse = {
   did: string;
@@ -235,9 +234,9 @@ const skeletonFromFeedGen = async (
       };
     }
   } catch (err) {
-    if (err as GetFeedSkeletonHandlerError) {
+    if (typeof (err as { message: string }).message == "string") {
       throw new InvalidRequestError(
-        (err as GetFeedSkeletonHandlerError).message,
+        (err as { message: string }).message,
         "UnknownFeed",
       );
     }

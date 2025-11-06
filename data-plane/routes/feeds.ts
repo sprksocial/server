@@ -31,15 +31,10 @@ interface FeedItem {
 export class Feeds {
   private db: Database;
   private timeCidKeyset: TimeCidKeyset;
-  private createdAtCidKeyset: TimeCidKeyset;
 
   constructor(db: Database) {
     this.db = db;
     this.timeCidKeyset = new TimeCidKeyset();
-    // Create a keyset for createdAt + cid which matches the database schema
-    this.createdAtCidKeyset = new TimeCidKeyset();
-    this.createdAtCidKeyset.primary = "createdAt";
-    this.createdAtCidKeyset.secondary = "cid";
   }
 
   async getAuthorFeed(
@@ -97,13 +92,13 @@ export class Feeds {
     });
 
     // Apply pagination using createdAt + cid (which matches DB schema and indexes)
-    const paginatedPostsQuery = this.createdAtCidKeyset.paginate(postsQuery, {
+    const paginatedPostsQuery = this.timeCidKeyset.paginate(postsQuery, {
       limit: fetchLimit,
       cursor,
       direction: "desc",
     });
 
-    const paginatedRepostsQuery = this.createdAtCidKeyset.paginate(
+    const paginatedRepostsQuery = this.timeCidKeyset.paginate(
       repostsQuery,
       {
         limit: fetchLimit,
@@ -152,7 +147,7 @@ export class Feeds {
     let nextCursor: string | undefined;
     if (allItems.length >= limit) {
       const lastItem = allItems[allItems.length - 1];
-      nextCursor = this.createdAtCidKeyset.pack({
+      nextCursor = this.timeCidKeyset.pack({
         primary: lastItem.createdAt,
         secondary: lastItem.cid,
       });
