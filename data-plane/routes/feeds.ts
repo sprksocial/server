@@ -31,10 +31,15 @@ interface FeedItem {
 export class Feeds {
   private db: Database;
   private timeCidKeyset: TimeCidKeyset;
+  private createdAtCidKeyset: TimeCidKeyset;
 
   constructor(db: Database) {
     this.db = db;
     this.timeCidKeyset = new TimeCidKeyset();
+    // Create a keyset for createdAt + cid which matches the database schema
+    this.createdAtCidKeyset = new TimeCidKeyset();
+    this.createdAtCidKeyset.primary = "createdAt";
+    this.createdAtCidKeyset.secondary = "cid";
   }
 
   async getAuthorFeed(
@@ -42,10 +47,9 @@ export class Feeds {
     limit = 50,
     cursor?: string,
   ) {
-    // Get posts by this author (exclude replies)
+    // Get posts by this author - Post collection doesn't have replies (they're in Reply collection)
     const postsQuery = this.db.models.Post.find({
       authorDid: actorDid,
-      reply: null,
     });
 
     // Apply pagination to posts query
@@ -80,37 +84,39 @@ export class Feeds {
     const followedDids = follows.map((f) => f.subject);
     const timelineDids = [...followedDids, actorDid];
 
-    const postsLimit = Math.floor(limit * 0.8);
-    const repostsLimit = limit - postsLimit;
+    const fetchLimit = limit * 2;
 
-    // Get timeline posts (exclude replies)
+    // Get timeline posts
     const postsQuery = this.db.models.Post.find({
       authorDid: { $in: timelineDids },
-      reply: null,
     });
-
-    // Apply pagination to posts query
-    const paginatedPostsQuery = this.timeCidKeyset.paginate(postsQuery, {
-      limit: postsLimit,
-      cursor,
-      direction: "desc",
-    });
-
-    const posts = await paginatedPostsQuery.exec();
 
     // Get timeline reposts
     const repostsQuery = this.db.models.Repost.find({
       authorDid: { $in: timelineDids },
     });
 
-    // Apply pagination to reposts query
-    const paginatedRepostsQuery = this.timeCidKeyset.paginate(repostsQuery, {
-      limit: repostsLimit,
+    // Apply pagination using createdAt + cid (which matches DB schema and indexes)
+    const paginatedPostsQuery = this.createdAtCidKeyset.paginate(postsQuery, {
+      limit: fetchLimit,
       cursor,
       direction: "desc",
     });
 
-    const reposts = await paginatedRepostsQuery.exec();
+    const paginatedRepostsQuery = this.createdAtCidKeyset.paginate(
+      repostsQuery,
+      {
+        limit: fetchLimit,
+        cursor,
+        direction: "desc",
+      },
+    );
+
+    // Fetch both in parallel
+    const [posts, reposts] = await Promise.all([
+      paginatedPostsQuery.exec(),
+      paginatedRepostsQuery.exec(),
+    ]);
 
     // Transform and combine results
     const transformedPosts: FeedItem[] = posts.map((p) => ({
@@ -135,9 +141,8 @@ export class Feeds {
     // Combine and sort all items
     const allItems = [...transformedPosts, ...transformedReposts]
       .sort((a, b) => {
-        // Sort by sortAt descending, then by cid descending
-        if (a.sortAt !== b.sortAt) {
-          return a.sortAt > b.sortAt ? -1 : 1;
+        if (a.createdAt !== b.createdAt) {
+          return a.createdAt > b.createdAt ? -1 : 1;
         }
         return a.cid > b.cid ? -1 : 1;
       })
@@ -145,10 +150,10 @@ export class Feeds {
 
     // Generate cursor from the last item if we have a full page
     let nextCursor: string | undefined;
-    if (allItems.length === limit && allItems.length > 0) {
+    if (allItems.length >= limit) {
       const lastItem = allItems[allItems.length - 1];
-      nextCursor = this.timeCidKeyset.pack({
-        primary: lastItem.sortAt,
+      nextCursor = this.createdAtCidKeyset.pack({
+        primary: lastItem.createdAt,
         secondary: lastItem.cid,
       });
     }

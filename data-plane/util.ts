@@ -4,6 +4,7 @@ import {
 } from "../lex/types/so/sprk/feed/reply.ts";
 import { Database } from "./db/index.ts";
 import { DidDocument } from "@atp/identity";
+import * as bytes from "@atp/bytes";
 
 export const getDescendents = async (
   db: Database,
@@ -185,3 +186,47 @@ export class DataPlaneError extends Error {
 export function isDataPlaneError(error: unknown, code?: Code): boolean {
   return error instanceof DataPlaneError && (!code || error.code === code);
 }
+
+export const unpackIdentityServices = (services: string) => {
+  if (!services) return {};
+  return JSON.parse(services) as UnpackedServices;
+};
+
+export const unpackIdentityKeys = (keysBytes: Uint8Array) => {
+  const keysStr = bytes.toString(keysBytes, "utf8");
+  if (!keysStr) return {};
+  return JSON.parse(keysStr) as UnpackedKeys;
+};
+
+export const getServiceEndpoint = (
+  services: UnpackedServices,
+  opts: { id: string; type: string },
+) => {
+  const endpoint = services[opts.id] &&
+    services[opts.id].Type === opts.type &&
+    validateUrl(services[opts.id].URL);
+  return endpoint || undefined;
+};
+
+type UnpackedServices = Record<string, { Type: string; URL: string }>;
+
+type UnpackedKeys = Record<
+  string,
+  { Type: string; PublicKeyMultibase: string }
+>;
+
+const validateUrl = (urlStr: string): string | undefined => {
+  let url;
+  try {
+    url = new URL(urlStr);
+  } catch {
+    return undefined;
+  }
+  if (!["http:", "https:"].includes(url.protocol)) {
+    return undefined;
+  } else if (!url.hostname) {
+    return undefined;
+  } else {
+    return urlStr;
+  }
+};

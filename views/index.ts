@@ -515,7 +515,7 @@ export class Views {
   viewerMuteExists(did: string, state: HydrationState): boolean {
     const viewer = state.profileViewers?.get(did);
     if (!viewer) return false;
-    return !viewer.muted;
+    return !!viewer.muted;
   }
 
   blockedProfileViewer(

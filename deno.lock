@@ -1100,6 +1100,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@atp/bytes@~0.1.0-alpha.1",
       "jsr:@atp/common@~0.1.0-alpha.4",
       "jsr:@atp/crypto@~0.1.0-alpha.2",
       "jsr:@atp/identity@~0.1.0-alpha.1",
