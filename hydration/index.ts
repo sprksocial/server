@@ -743,7 +743,7 @@ export class Hydrator {
 
       // Parse the record JSON
       const record = JSON.parse(storyRecord.record);
-      if (!record || record === null) return undefined;
+      if (!record) return undefined;
 
       const recordInfo: RecordInfo<typeof record> = {
         record,
