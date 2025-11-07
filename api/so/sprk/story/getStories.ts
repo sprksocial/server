@@ -6,7 +6,10 @@ import {
   Hydrator,
 } from "../../../../hydration/index.ts";
 import { Server } from "../../../../lex/index.ts";
-import { QueryParams, OutputSchema } from "../../../../lex/types/so/sprk/story/getStories.ts";
+import {
+  OutputSchema,
+  QueryParams,
+} from "../../../../lex/types/so/sprk/story/getStories.ts";
 import {
   createPipeline,
   HydrationFnInput,
@@ -92,9 +95,9 @@ export default function (server: Server, ctx: AppContext) {
 
       if (invalidUris.length > 0) {
         console.warn(
-          `Invalid story URIs provided: ${
-            invalidUris.slice(0, 5).join(", ")
-          }${invalidUris.length > 5 ? "..." : ""}`,
+          `Invalid story URIs provided: ${invalidUris.slice(0, 5).join(", ")}${
+            invalidUris.length > 5 ? "..." : ""
+          }`,
         );
       }
 
@@ -137,9 +140,11 @@ const hydration = async (
   );
 
   // Get author DIDs for actor hydration
-  const authorDids = [...new Set(
-    skeleton.stories.map((uri) => uriToDid(uri)),
-  )];
+  const authorDids = [
+    ...new Set(
+      skeleton.stories.map((uri) => uriToDid(uri)),
+    ),
+  ];
 
   // Hydrate actors (profiles)
   const actors = await ctx.hydrator.actor.getActors(

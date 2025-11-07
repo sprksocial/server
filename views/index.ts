@@ -12,10 +12,7 @@ import {
   ThreadContext,
   ThreadViewPost,
 } from "../lex/types/so/sprk/feed/defs.ts";
-import {
-  StoryView,
-  StoriesByAuthor,
-} from "../lex/types/so/sprk/story/defs.ts";
+import { StoriesByAuthor, StoryView } from "../lex/types/so/sprk/story/defs.ts";
 import {
   isRecord as isReplyRecord,
   Record as ReplyRecord,
@@ -297,9 +294,7 @@ export class Views {
       cid: storyInfo.cid,
       author,
       record: storyInfo.record,
-      media: mediaRecord
-        ? this.storyMedia(uri, mediaRecord, state)
-        : undefined,
+      media: mediaRecord ? this.storyMedia(uri, mediaRecord, state) : undefined,
       indexedAt: this.indexedAt(storyInfo)?.toISOString() ??
         new Date().toISOString(),
     };
@@ -371,7 +366,9 @@ export class Views {
     // Check if it's a video media
     if (isVideoMediaMain(media)) {
       const videoMedia = media as VideoMediaMainType;
-      const videoCid = videoMedia.video ? cidFromBlobJson(videoMedia.video) : "";
+      const videoCid = videoMedia.video
+        ? cidFromBlobJson(videoMedia.video)
+        : "";
       const videoMappingKey = `${authorDid}-${videoCid}`;
       const videoMapping = state?.videoMappings?.get(videoMappingKey) || null;
       return this.videoMedia(authorDid, videoMedia, videoMapping);
@@ -602,7 +599,9 @@ export class Views {
       handle: actor.handle ?? INVALID_HANDLE,
       displayName: actor.profile?.displayName,
       avatar: actor.profile?.avatar
-        ? `${this.mediaCdn}/avatar/medium/${did}/${cidFromBlobJson(actor.profile.avatar)}/webp`
+        ? `${this.mediaCdn}/avatar/medium/${did}/${
+          cidFromBlobJson(actor.profile.avatar)
+        }/webp`
         : undefined,
       viewer: this.profileViewer(did, state),
       createdAt: actor.createdAt?.toISOString(),

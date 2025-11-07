@@ -34,10 +34,7 @@ import {
   ThreadRef,
   VideoMappings,
 } from "./feed.ts";
-import {
-  Stories,
-  StoryHydrator,
-} from "./story.ts";
+import { Stories, StoryHydrator } from "./story.ts";
 
 import {
   BlockEntry,
@@ -741,13 +738,13 @@ export class Hydrator {
       // Get story records through dataplane
       const res = await this.dataplane.records.getStoryRecords([uri]);
       const storyRecord = res.records[0];
-      
+
       if (!storyRecord || !storyRecord.cid) return undefined;
-      
+
       // Parse the record JSON
       const record = JSON.parse(storyRecord.record);
       if (!record || record === null) return undefined;
-      
+
       const recordInfo: RecordInfo<typeof record> = {
         record,
         cid: storyRecord.cid,
@@ -759,7 +756,7 @@ export class Hydrator {
           : new Date(0),
         takedownRef: storyRecord.takedownRef,
       };
-      
+
       return recordInfo;
     }
   }

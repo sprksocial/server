@@ -163,4 +163,3 @@ export class Stories {
     return blockedAuthorDids;
   }
 }
-

@@ -1,12 +1,12 @@
 import { InvalidRequestError } from "@atp/xrpc-server";
 import { AppContext } from "../../../../context.ts";
-import {
-  HydrateCtx,
-  HydrationState,
-} from "../../../../hydration/index.ts";
+import { HydrateCtx, HydrationState } from "../../../../hydration/index.ts";
 import { parseString } from "../../../../hydration/util.ts";
 import { Server } from "../../../../lex/index.ts";
-import { QueryParams, OutputSchema } from "../../../../lex/types/so/sprk/story/getTimeline.ts";
+import {
+  OutputSchema,
+  QueryParams,
+} from "../../../../lex/types/so/sprk/story/getTimeline.ts";
 import {
   createPipeline,
   HydrationFnInput,
@@ -106,9 +106,11 @@ const hydration = async (
   );
 
   // Get author DIDs for actor hydration
-  const authorDids = [...new Set(
-    skeleton.stories.map((uri) => uriToDid(uri)),
-  )];
+  const authorDids = [
+    ...new Set(
+      skeleton.stories.map((uri) => uriToDid(uri)),
+    ),
+  ];
 
   // Hydrate actors (profiles)
   const actors = await ctx.hydrator.actor.getActors(

@@ -1,10 +1,5 @@
 import { Record as StoryRecord } from "../lex/types/so/sprk/story/post.ts";
-import {
-  HydrationMap,
-  parseRecord,
-  RecordInfo,
-  split,
-} from "./util.ts";
+import { HydrationMap, parseRecord, RecordInfo, split } from "./util.ts";
 import { DataPlane } from "../data-plane/index.ts";
 
 export type Story = RecordInfo<StoryRecord>;
@@ -35,4 +30,3 @@ export class StoryHydrator {
     }, base);
   }
 }
-

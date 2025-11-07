@@ -40,6 +40,5 @@
     "permissions": {
       "env": true
     }
-  },
-  "links": ["../atp"]
+  }
 }
