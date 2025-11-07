@@ -10,27 +10,28 @@
     "jsr:@atp/lexicon@~0.1.0-alpha.1": "0.1.0-alpha.2",
     "jsr:@atp/lexicon@~0.1.0-alpha.2": "0.1.0-alpha.2",
     "jsr:@atp/repo@~0.1.0-alpha.2": "0.1.0-alpha.2",
-    "jsr:@atp/sync@~0.1.0-alpha.3": "0.1.0-alpha.3",
-    "jsr:@atp/syntax@~0.1.0-alpha.1": "0.1.0-alpha.1",
+    "jsr:@atp/sync@~0.1.0-alpha.3": "0.1.0-alpha.4",
+    "jsr:@atp/syntax@~0.1.0-alpha.1": "0.1.0-alpha.2",
     "jsr:@atp/xrpc-server@~0.1.0-alpha.2": "0.1.0-alpha.2",
     "jsr:@atp/xrpc@~0.1.0-alpha.2": "0.1.0-alpha.2",
-    "jsr:@hono/hono@^4.9.8": "4.9.9",
-    "jsr:@hono/hono@^4.9.9": "4.9.9",
-    "jsr:@logtape/file@^1.2.0-dev.344+834f24a9": "1.2.0-dev.344+834f24a9",
-    "jsr:@logtape/logtape@^1.2.0-dev.344+834f24a9": "1.2.0-dev.344+834f24a9",
-    "jsr:@logtape/pretty@^1.2.0-dev.344+834f24a9": "1.2.0-dev.344+834f24a9",
+    "jsr:@hono/hono@^4.9.8": "4.10.4",
+    "jsr:@hono/hono@^4.9.9": "4.10.4",
+    "jsr:@logtape/file@^1.2.0-dev.344+834f24a9": "1.2.0-dev.367+d4fd9984",
+    "jsr:@logtape/logtape@^1.2.0-dev.344+834f24a9": "1.2.0-dev.367+d4fd9984",
+    "jsr:@logtape/logtape@^1.2.0-dev.367+d4fd9984": "1.2.0-dev.367+d4fd9984",
+    "jsr:@logtape/pretty@^1.2.0-dev.344+834f24a9": "1.2.0-dev.367+d4fd9984",
     "jsr:@noble/curves@^2.0.1": "2.0.1",
     "jsr:@noble/hashes@2": "2.0.1",
     "jsr:@noble/hashes@^2.0.1": "2.0.1",
-    "jsr:@std/assert@^1.0.14": "1.0.14",
+    "jsr:@std/assert@^1.0.14": "1.0.15",
     "jsr:@std/bytes@^1.0.5": "1.0.6",
     "jsr:@std/cbor@~0.1.8": "0.1.8",
     "jsr:@std/crypto@^1.0.5": "1.0.5",
     "jsr:@std/encoding@^1.0.10": "1.0.10",
     "jsr:@std/fs@^1.0.19": "1.0.19",
-    "jsr:@std/internal@^1.0.10": "1.0.10",
-    "jsr:@std/streams@^1.0.9": "1.0.12",
-    "jsr:@zod/zod@^4.1.11": "4.1.11",
+    "jsr:@std/internal@^1.0.12": "1.0.12",
+    "jsr:@std/streams@^1.0.9": "1.0.13",
+    "jsr:@zod/zod@^4.1.11": "4.1.12",
     "npm:@atproto/api@~0.16.11": "0.16.11",
     "npm:@atproto/identity@~0.4.9": "0.4.9",
     "npm:@atproto/repo@~0.8.10": "0.8.10",
@@ -45,7 +46,7 @@
     "npm:multiformats@^13.4.1": "13.4.1",
     "npm:p-queue@^8.1.1": "8.1.1",
     "npm:rate-limiter-flexible@^2.4.2": "2.4.2",
-    "npm:zod@^4.1.11": "4.1.11"
+    "npm:zod@^4.1.11": "4.1.12"
   },
   "jsr": {
     "@atp/bytes@0.1.0-alpha.1": {
@@ -59,7 +60,7 @@
       "dependencies": [
         "jsr:@atp/bytes",
         "jsr:@logtape/file",
-        "jsr:@logtape/logtape",
+        "jsr:@logtape/logtape@^1.2.0-dev.344+834f24a9",
         "jsr:@std/cbor",
         "jsr:@std/crypto",
         "jsr:@std/encoding",
@@ -106,8 +107,8 @@
         "npm:zod"
       ]
     },
-    "@atp/sync@0.1.0-alpha.3": {
-      "integrity": "c5d8dbed0d7e2a15013428e5eeb16c2624017756b82eb2c809a9e59623334e13",
+    "@atp/sync@0.1.0-alpha.4": {
+      "integrity": "9b6aa6ccc9447270843272e40bfcb26520eddaf37f98202bcbab6c0bee0a602b",
       "dependencies": [
         "jsr:@atp/common@~0.1.0-alpha.4",
         "jsr:@atp/identity",
@@ -119,8 +120,8 @@
         "npm:p-queue"
       ]
     },
-    "@atp/syntax@0.1.0-alpha.1": {
-      "integrity": "9e2055cace77cf63a8c52a4a94c39492215e7135101db7bc2289ebad9bec1991"
+    "@atp/syntax@0.1.0-alpha.2": {
+      "integrity": "f7ab598b6b3c3b01dc446077b4c57acc1f1cb8a45f91bd3eb394997408a712a2"
     },
     "@atp/xrpc@0.1.0-alpha.2": {
       "integrity": "53a548b554430671eeef683ce48830599c12e48bb2f73ef9fa49d1cfe3aba1fb",
@@ -146,22 +147,22 @@
     "@hono/hono@4.9.8": {
       "integrity": "908150f13e90181a051a3af3bf15203aff00190682afedfd38824d0cb9299a95"
     },
-    "@hono/hono@4.9.9": {
-      "integrity": "1d716e97b71e91b852c70beb85c9d3b236393282c59d5e268b07cfd224a77318"
+    "@hono/hono@4.10.4": {
+      "integrity": "e54d00c4cf994e7ae297d7321793cf940656b9c5e934564c03ffc15499041b9e"
     },
-    "@logtape/file@1.2.0-dev.344+834f24a9": {
-      "integrity": "4d674c368f8130dc1403c5c93a316726a65d6b17e36b094780f1b2ed301f5e1b",
+    "@logtape/file@1.2.0-dev.367+d4fd9984": {
+      "integrity": "c00ef17a3ba5d7f949aee3c56a80700a70d89ce571736db4af3c04448bd9d62f",
       "dependencies": [
-        "jsr:@logtape/logtape"
+        "jsr:@logtape/logtape@^1.2.0-dev.367+d4fd9984"
       ]
     },
-    "@logtape/logtape@1.2.0-dev.344+834f24a9": {
-      "integrity": "204222be0f94cd1b64a500e2dcdea22a1618a086fc531b054351e3cfa079c435"
+    "@logtape/logtape@1.2.0-dev.367+d4fd9984": {
+      "integrity": "56a8ee17f80759773769a701e4b110341fdca8e6f3da7e733dbc47cc1d340c62"
     },
-    "@logtape/pretty@1.2.0-dev.344+834f24a9": {
-      "integrity": "19aa16ee6409d7112b7cbcaadf10f0e379df03583426eda7efe2740e30a1c065",
+    "@logtape/pretty@1.2.0-dev.367+d4fd9984": {
+      "integrity": "f1b14a1f9ca190f87067fbf82d34717d2fdcad22bdd0ce733ef74ed5de16a157",
       "dependencies": [
-        "jsr:@logtape/logtape",
+        "jsr:@logtape/logtape@^1.2.0-dev.367+d4fd9984",
         "npm:@types/node"
       ]
     },
@@ -174,8 +175,8 @@
     "@noble/hashes@2.0.1": {
       "integrity": "e0e908292a0bf91099cf8ba0720a1647cef82ab38b588815b5e9535b4ff4d7bb"
     },
-    "@std/assert@1.0.14": {
-      "integrity": "68d0d4a43b365abc927f45a9b85c639ea18a9fab96ad92281e493e4ed84abaa4",
+    "@std/assert@1.0.15": {
+      "integrity": "d64018e951dbdfab9777335ecdb000c0b4e3df036984083be219ce5941e4703b",
       "dependencies": [
         "jsr:@std/internal"
       ]
@@ -199,14 +200,14 @@
     "@std/fs@1.0.19": {
       "integrity": "051968c2b1eae4d2ea9f79a08a3845740ef6af10356aff43d3e2ef11ed09fb06"
     },
-    "@std/internal@1.0.10": {
-      "integrity": "e3be62ce42cab0e177c27698e5d9800122f67b766a0bea6ca4867886cbde8cf7"
+    "@std/internal@1.0.12": {
+      "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
     },
-    "@std/streams@1.0.12": {
-      "integrity": "ae925fa1dc459b1abf5cbaa28cc5c7b0485853af3b2a384b0dc22d86e59dfbf4"
+    "@std/streams@1.0.13": {
+      "integrity": "772d208cd0d3e5dac7c1d9e6cdb25842846d136eea4a41a62e44ed4ab0c8dd9e"
     },
-    "@zod/zod@4.1.11": {
-      "integrity": "0d48947455491addca672d8ef766d86bc7bc3add07e78d049b8ffd643bb33a7a"
+    "@zod/zod@4.1.12": {
+      "integrity": "5876ed4c6d44673faf5120f0a461a2ada2eb6c735329d3ebaf5ba1fc08387695"
     }
   },
   "npm": {
@@ -366,7 +367,7 @@
     "@ipld/dag-cbor@9.2.5": {
       "integrity": "sha512-84wSr4jv30biui7endhobYhXBQzQE4c/wdoWlFrKcfiwH+ofaPg8fwsM8okX9cOzkkrsAsNdDyH3ou+kiLquwQ==",
       "dependencies": [
-        "cborg@4.2.15",
+        "cborg@4.2.18",
         "multiformats@13.4.1"
       ]
     },
@@ -495,8 +496,8 @@
       "integrity": "sha512-b3tFPA9pUr2zCUiCfRd2+wok2/LBSNUMKOuRRok+WlvvAgEt/PlbgPTsZUcwCOs53IJvLgTp0eotwtosE6njug==",
       "bin": true
     },
-    "cborg@4.2.15": {
-      "integrity": "sha512-T+YVPemWyXcBVQdp0k61lQp2hJniRNmul0lAwTj2DTS/6dI4eCq/MRMucGqqvFqMBfmnD8tJ9aFtPu5dEGAbgw==",
+    "cborg@4.2.18": {
+      "integrity": "sha512-uzhkd5HOaLccokqeZa5B0Qz7/aa9C12pmUq5yU3vcy6I6OhTKdPHSzOuBPZfcoQHdcx8Emz/dWZbPNNfF/puvg==",
       "bin": true
     },
     "content-disposition@0.5.4": {
@@ -1094,8 +1095,8 @@
     "zod@3.25.76": {
       "integrity": "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="
     },
-    "zod@4.1.11": {
-      "integrity": "sha512-WPsqwxITS2tzx1bzhIKsEs19ABD5vmCVa4xBo2tq/SrV4RNZtfws1EnCWQXM6yh8bD08a1idvkB5MZSBiZsjwg=="
+    "zod@4.1.12": {
+      "integrity": "sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ=="
     }
   },
   "workspace": {

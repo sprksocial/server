@@ -103,6 +103,12 @@ export class RecordProcessor<T, S> {
   ) {
     this.assertValidRecord(obj);
 
+    // Extract createdAt from the record object if available
+    const recordObj = obj as Record<string, unknown>;
+    const createdAt = typeof recordObj.createdAt === "string"
+      ? recordObj.createdAt
+      : timestamp;
+
     // Insert or update record
     await this.db.models.Record.findOneAndUpdate(
       { uri: uri.toString() },
@@ -113,6 +119,7 @@ export class RecordProcessor<T, S> {
         collectionName: uri.collection,
         rkey: uri.rkey,
         json: stringifyLex(obj),
+        createdAt,
         indexedAt: timestamp,
       },
       { upsert: true, new: true },
@@ -161,14 +168,30 @@ export class RecordProcessor<T, S> {
   ) {
     this.assertValidRecord(obj);
 
+    // Extract createdAt from the record object if available
+    const recordObj = obj as Record<string, unknown>;
+    const createdAt = typeof recordObj.createdAt === "string"
+      ? recordObj.createdAt
+      : undefined;
+
     // Update record
+    const updateData: {
+      cid: string;
+      json: string;
+      indexedAt: string;
+      createdAt?: string;
+    } = {
+      cid: cid.toString(),
+      json: stringifyLex(obj),
+      indexedAt: timestamp,
+    };
+    if (createdAt) {
+      updateData.createdAt = createdAt;
+    }
+
     await this.db.models.Record.findOneAndUpdate(
       { uri: uri.toString() },
-      {
-        cid: cid.toString(),
-        json: stringifyLex(obj),
-        indexedAt: timestamp,
-      },
+      updateData,
       { new: true },
     );
 

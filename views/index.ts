@@ -12,6 +12,7 @@ import {
   ThreadContext,
   ThreadViewPost,
 } from "../lex/types/so/sprk/feed/defs.ts";
+import { StoriesByAuthor, StoryView } from "../lex/types/so/sprk/story/defs.ts";
 import {
   isRecord as isReplyRecord,
   Record as ReplyRecord,
@@ -38,9 +39,14 @@ import {
   VideoMediaView,
 } from "./types.ts";
 import {
+  isMain as isImageMedia,
   Main as ImageMedia,
   View as ImageView,
 } from "../lex/types/so/sprk/media/image.ts";
+import {
+  isMain as isVideoMediaMain,
+} from "../lex/types/so/sprk/media/video.ts";
+import type { Main as VideoMediaMainType } from "../lex/types/so/sprk/media/video.ts";
 import { AudioView } from "../lex/types/so/sprk/sound/defs.ts";
 import { INVALID_HANDLE } from "@atp/syntax";
 import { cidFromBlobJson } from "./util.ts";
@@ -269,6 +275,108 @@ export class Views {
     };
   }
 
+  story(
+    uri: string,
+    state: HydrationState,
+  ): Un$Typed<StoryView> | undefined {
+    const storyInfo = state.stories?.get(uri);
+    if (!storyInfo) return;
+
+    const parsedUri = new AtUri(uri);
+    const authorDid = parsedUri.hostname;
+    const author = this.profileBasic(authorDid, state);
+    if (!author) return;
+
+    const mediaRecord = storyInfo.record.media;
+
+    return {
+      uri,
+      cid: storyInfo.cid,
+      author,
+      record: storyInfo.record,
+      media: mediaRecord ? this.storyMedia(uri, mediaRecord, state) : undefined,
+      indexedAt: this.indexedAt(storyInfo)?.toISOString() ??
+        new Date().toISOString(),
+    };
+  }
+
+  storiesByAuthor(
+    stories: StoryView[],
+  ): StoriesByAuthor[] {
+    if (stories.length === 0) {
+      return [];
+    }
+
+    // Group stories by author
+    const storiesGroupedByAuthor = new Map<string, {
+      author: ProfileViewBasic;
+      stories: StoryView[];
+    }>();
+
+    for (const story of stories) {
+      const authorDid = story.author.did;
+
+      if (!storiesGroupedByAuthor.has(authorDid)) {
+        storiesGroupedByAuthor.set(authorDid, {
+          author: story.author,
+          stories: [],
+        });
+      }
+
+      storiesGroupedByAuthor.get(authorDid)!.stories.push(story);
+    }
+
+    // Convert to array and sort stories within each group
+    const storiesByAuthor = Array.from(storiesGroupedByAuthor.values()).map(
+      (group) => ({
+        author: group.author,
+        stories: group.stories.sort(
+          (a, b) =>
+            new Date(a.indexedAt).getTime() - new Date(b.indexedAt).getTime(),
+        ),
+      }),
+    );
+
+    // Sort author groups by the latest story from each author (newest first)
+    storiesByAuthor.sort((a, b) => {
+      const latestA = Math.max(
+        ...a.stories.map((s) => new Date(s.indexedAt).getTime()),
+      );
+      const latestB = Math.max(
+        ...b.stories.map((s) => new Date(s.indexedAt).getTime()),
+      );
+      return latestB - latestA;
+    });
+
+    return storiesByAuthor;
+  }
+
+  storyMedia(
+    storyUri: string,
+    media: $Typed<ImageMedia> | $Typed<VideoMedia> | { $type: string },
+    state?: HydrationState,
+  ): (ImageView | VideoMediaView) & { $type: string } | undefined {
+    const authorDid = uriToDid(storyUri);
+
+    // Check if it's an image media
+    if (isImageMedia(media)) {
+      return this.imageMedia(authorDid, media);
+    }
+
+    // Check if it's a video media
+    if (isVideoMediaMain(media)) {
+      const videoMedia = media as VideoMediaMainType;
+      const videoCid = videoMedia.video
+        ? cidFromBlobJson(videoMedia.video)
+        : "";
+      const videoMappingKey = `${authorDid}-${videoCid}`;
+      const videoMapping = state?.videoMappings?.get(videoMappingKey) || null;
+      return this.videoMedia(authorDid, videoMedia, videoMapping);
+    }
+
+    return undefined;
+  }
+
   feedViewPost(
     item: FeedItem,
     state: HydrationState,
@@ -491,7 +599,9 @@ export class Views {
       handle: actor.handle ?? INVALID_HANDLE,
       displayName: actor.profile?.displayName,
       avatar: actor.profile?.avatar
-        ? `${this.mediaCdn}/avatar/medium/${did}/${actor.profile.avatar.ref}/webp`
+        ? `${this.mediaCdn}/avatar/medium/${did}/${
+          cidFromBlobJson(actor.profile.avatar)
+        }/webp`
         : undefined,
       viewer: this.profileViewer(did, state),
       createdAt: actor.createdAt?.toISOString(),
