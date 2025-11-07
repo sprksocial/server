@@ -353,7 +353,7 @@ export class Views {
 
   storyMedia(
     storyUri: string,
-    media: { $type?: string } | { $type?: string },
+    media: $Typed<ImageMedia> | $Typed<VideoMedia> | { $type: string },
     state?: HydrationState,
   ): (ImageView | VideoMediaView) & { $type: string } | undefined {
     const authorDid = uriToDid(storyUri);

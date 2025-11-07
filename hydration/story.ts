@@ -25,7 +25,7 @@ export class StoryHydrator {
       const record = parseRecord<StoryRecord>(res.records[i], includeTakedowns);
       return acc.set(
         uri,
-        record ? record : null,
+        record ?? null,
       );
     }, base);
   }
