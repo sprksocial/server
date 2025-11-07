@@ -65,7 +65,7 @@ export const parseRecord = <T extends UnknownRecord>(
   if (!includeTakedowns && entry.takenDown) {
     return undefined;
   }
-  const record = jsonStringToLex(entry.record);
+  const record = JSON.parse(entry.record);
   const cid = entry.cid;
   const sortedAt = new Date(entry.sortedAt ?? 0);
   const indexedAt = new Date(entry.indexedAt ?? 0);

@@ -34,6 +34,10 @@ import {
   ThreadRef,
   VideoMappings,
 } from "./feed.ts";
+import {
+  Stories,
+  StoryHydrator,
+} from "./story.ts";
 
 import {
   BlockEntry,
@@ -88,6 +92,7 @@ export type HydrationState = {
   threadContexts?: ThreadContexts;
   sounds?: Sounds;
   soundAggs?: SoundAggs;
+  stories?: Stories;
 
   postBlocks?: PostBlocks;
   reposts?: Reposts;
@@ -126,6 +131,7 @@ export class Hydrator {
   actor: ActorHydrator;
   feed: FeedHydrator;
   graph: GraphHydrator;
+  story: StoryHydrator;
 
   constructor(
     public dataplane: DataPlane,
@@ -133,6 +139,7 @@ export class Hydrator {
     this.actor = new ActorHydrator(dataplane);
     this.feed = new FeedHydrator(dataplane);
     this.graph = new GraphHydrator(dataplane);
+    this.story = new StoryHydrator(dataplane);
   }
 
   // so.sprk.actor.defs#profileView
@@ -729,6 +736,30 @@ export class Hydrator {
         takedownRef: actor.profileTakedownRef,
       };
 
+      return recordInfo;
+    } else if (collection === ids.SoSprkStoryPost) {
+      // Get story records through dataplane
+      const res = await this.dataplane.records.getStoryRecords([uri]);
+      const storyRecord = res.records[0];
+      
+      if (!storyRecord || !storyRecord.cid) return undefined;
+      
+      // Parse the record JSON
+      const record = JSON.parse(storyRecord.record);
+      if (!record || record === null) return undefined;
+      
+      const recordInfo: RecordInfo<typeof record> = {
+        record,
+        cid: storyRecord.cid,
+        sortedAt: storyRecord.sortedAt
+          ? new Date(storyRecord.sortedAt)
+          : new Date(storyRecord.createdAt || storyRecord.indexedAt || 0),
+        indexedAt: storyRecord.indexedAt
+          ? new Date(storyRecord.indexedAt)
+          : new Date(0),
+        takedownRef: storyRecord.takedownRef,
+      };
+      
       return recordInfo;
     }
   }

@@ -161,4 +161,9 @@ export class Records {
     const result = await getRecords(this.db, uris);
     return result;
   }
+
+  async getStoryRecords(uris: string[]) {
+    const result = await getRecords(this.db, uris, ids.SoSprkStoryPost);
+    return result;
+  }
 }
