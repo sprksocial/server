@@ -355,11 +355,11 @@ export const storySchema = new Schema<StoryDocument>({
 storySchema.index({ authorDid: 1, createdAt: -1 });
 storySchema.index({ tags: 1, createdAt: -1 });
 
-followSchema.index({ authorDid: 1, subject: 1, type: 1 }, { unique: true });
+followSchema.index({ authorDid: 1, subject: 1 });
 followSchema.index({ subject: 1, createdAt: -1 });
 followSchema.index({ type: 1, createdAt: -1 });
 
-blockSchema.index({ authorDid: 1, subject: 1 }, { unique: true });
+blockSchema.index({ authorDid: 1, subject: 1 });
 blockSchema.index({ subject: 1, createdAt: -1 });
 
 audioSchema.index({ authorDid: 1, createdAt: -1 });
