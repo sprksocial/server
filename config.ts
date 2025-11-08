@@ -25,8 +25,10 @@ export interface ServerConfigValues {
   mediaCdn?: string;
   thumbCdn?: string;
 
-  dbUri?: string;
-  dbName?: string;
+  dbUri: string;
+  dbName: string;
+  dbUser: string;
+  dbPass: string;
   relayUrl?: string;
   plcUrl?: string;
 }
@@ -64,6 +66,8 @@ export class ServerConfig {
     const dbUri = envStr("SPRK_DB_URI") ??
       "mongodb://mongo:mongo@localhost:27017/dev";
     const dbName = envStr("SPRK_DB_NAME") ?? "dev";
+    const dbUser = envStr("SPRK_DB_USER") ?? "mongo";
+    const dbPass = envStr("SPRK_DB_PASS") ?? "mongo";
     const relayUrl = envStr("SPRK_RELAY") ??
       "wss://relay1.us-east.bsky.network";
     const plcUrl = envStr("SPRK_PLC") ?? "https://plc.directory";
@@ -89,6 +93,8 @@ export class ServerConfig {
       thumbCdn,
       dbUri,
       dbName,
+      dbUser,
+      dbPass,
       relayUrl,
       plcUrl,
     });
@@ -158,6 +164,12 @@ export class ServerConfig {
   }
   get dbName() {
     return this.cfg.dbName;
+  }
+  get dbUser() {
+    return this.cfg.dbUser;
+  }
+  get dbPass() {
+    return this.cfg.dbPass;
   }
   get relayUrl() {
     return this.cfg.relayUrl;

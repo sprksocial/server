@@ -22,6 +22,9 @@ export class Database {
 
   connect() {
     const uri = this.cfg.dbUri;
+    const name = this.cfg.dbName;
+    const user = this.cfg.dbUser;
+    const pass = this.cfg.dbPass;
     if (!uri) {
       throw new Error("No database URI provided");
     }
@@ -31,6 +34,9 @@ export class Database {
       this.connection = mongoose.createConnection(uri, {
         autoIndex: true,
         autoCreate: true,
+        dbName: name,
+        user,
+        pass,
       });
 
       // Attach basic listeners for visibility
