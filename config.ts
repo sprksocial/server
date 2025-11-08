@@ -25,10 +25,10 @@ export interface ServerConfigValues {
   mediaCdn?: string;
   thumbCdn?: string;
 
-  dbUri: string;
-  dbName: string;
-  dbUser: string;
-  dbPass: string;
+  dbUri?: string;
+  dbName?: string;
+  dbUser?: string;
+  dbPass?: string;
   relayUrl?: string;
   plcUrl?: string;
 }
