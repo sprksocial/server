@@ -81,6 +81,7 @@ export class Views {
     this.videoCdn = opts?.videoCdn;
     this.hlsCdn = opts?.hlsCdn;
     this.mediaCdn = opts?.mediaCdn;
+    this.thumbCdn = opts?.thumbCdn;
   }
 
   thread(
