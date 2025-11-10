@@ -64,7 +64,6 @@ export class Views {
   public indexedAtEpoch?: Date | undefined;
 
   private videoCdn?: string;
-  private hlsCdn?: string;
   private mediaCdn?: string;
   private thumbCdn?: string;
 
@@ -72,14 +71,12 @@ export class Views {
     opts: {
       indexedAtEpoch?: Date | undefined;
       videoCdn?: string;
-      hlsCdn?: string;
       mediaCdn?: string;
       thumbCdn?: string;
     },
   ) {
     this.indexedAtEpoch = opts?.indexedAtEpoch;
     this.videoCdn = opts?.videoCdn;
-    this.hlsCdn = opts?.hlsCdn;
     this.mediaCdn = opts?.mediaCdn;
     this.thumbCdn = opts?.thumbCdn;
   }
@@ -729,11 +726,11 @@ export class Views {
     let thumbnail: string;
 
     if (videoMapping) {
-      playlist = `${this.hlsCdn}/${videoMapping.bunnyGuid}/playlist.m3u8`;
-      thumbnail = `${this.hlsCdn}/${videoMapping.bunnyGuid}/thumbnail.jpg`;
+      playlist = `${this.videoCdn}/${videoMapping.bunnyGuid}/playlist.m3u8`;
+      thumbnail = `${this.videoCdn}/${videoMapping.bunnyGuid}/thumbnail.jpg`;
     } else {
       playlist = `${this.videoCdn}/watch/${did}/${cid}/playlist.m3u8`;
-      thumbnail = `${this.thumbCdn}/${did}/${cid}/thumbnail`;
+      thumbnail = `${this.videoCdn}/${did}/${cid}/thumbnail`;
     }
 
     return {

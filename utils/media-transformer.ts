@@ -57,8 +57,8 @@ export function transformVideoMedia(
   let thumbnail: string;
 
   if (videoMapping) {
-    playlist = `${cfg.hlsCdn}/${videoMapping.bunnyGuid}/playlist.m3u8`;
-    thumbnail = `${cfg.hlsCdn}/${videoMapping.bunnyGuid}/thumbnail.jpg`;
+    playlist = `${cfg.videoCdn}/${videoMapping.bunnyGuid}/playlist.m3u8`;
+    thumbnail = `${cfg.videoCdn}/${videoMapping.bunnyGuid}/thumbnail.jpg`;
   } else if (isStory) {
     playlist =
       `https://media.sprk.so/video/${authorDid}/${media.video.ref.$link}`;

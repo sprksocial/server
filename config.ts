@@ -21,7 +21,6 @@ export interface ServerConfigValues {
   maxThreadParents: number;
 
   videoCdn?: string;
-  hlsCdn?: string;
   mediaCdn?: string;
   thumbCdn?: string;
 
@@ -59,7 +58,6 @@ export class ServerConfig {
     const maxThreadParents = envInt("SPRK_MAX_THREAD_PARENTS") ?? 10;
 
     const videoCdn = envStr("SPRK_VIDEO_CDN") ?? "https://video.sprk.so";
-    const hlsCdn = envStr("SPRK_HLS_CDN") ?? "https://hls.sprk.so";
     const mediaCdn = envStr("SPRK_MEDIA_CDN") ?? "https://media.sprk.so";
     const thumbCdn = envStr("SPRK_THUMB_CDN") ?? "https://thumb.sprk.so";
 
@@ -88,7 +86,6 @@ export class ServerConfig {
       maxThreadDepth,
       maxThreadParents,
       videoCdn,
-      hlsCdn,
       mediaCdn,
       thumbCdn,
       dbUri,
@@ -148,9 +145,6 @@ export class ServerConfig {
   // CDNs
   get videoCdn() {
     return this.cfg.videoCdn;
-  }
-  get hlsCdn() {
-    return this.cfg.hlsCdn;
   }
   get mediaCdn() {
     return this.cfg.mediaCdn;

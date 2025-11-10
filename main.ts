@@ -55,7 +55,6 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
   const views = new Views({
     indexedAtEpoch: cfg.indexedAtEpoch,
     videoCdn: cfg.videoCdn,
-    hlsCdn: cfg.hlsCdn,
     mediaCdn: cfg.mediaCdn,
     thumbCdn: cfg.thumbCdn,
   });
