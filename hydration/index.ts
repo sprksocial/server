@@ -32,7 +32,6 @@ import {
   Sounds,
   ThreadContexts,
   ThreadRef,
-  VideoMappings,
 } from "./feed.ts";
 import { Stories, StoryHydrator } from "./story.ts";
 
@@ -103,7 +102,6 @@ export type HydrationState = {
   knownFollowers?: KnownFollowersStates;
   activitySubscriptions?: ActivitySubscriptionStates;
   bidirectionalBlocks?: BidirectionalBlocks;
-  videoMappings?: VideoMappings;
 };
 
 export type PostBlock = { embed: boolean; parent: boolean; root: boolean };
@@ -846,7 +844,6 @@ export const mergeStates = (
     feedgenAggs: mergeMaps(stateA.feedgenAggs, stateB.feedgenAggs),
     feedgenViewers: mergeMaps(stateA.feedgenViewers, stateB.feedgenViewers),
     knownFollowers: mergeMaps(stateA.knownFollowers, stateB.knownFollowers),
-    videoMappings: mergeMaps(stateA.videoMappings, stateB.videoMappings),
   };
 };
 

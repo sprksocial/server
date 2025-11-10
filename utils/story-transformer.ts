@@ -19,7 +19,6 @@ export async function transformStoryToStoryView(
     story.media,
     story.authorDid,
     ctx.cfg,
-    null,
     {
       firstImageOnly: true,
     },
@@ -69,7 +68,6 @@ export async function transformStoriesToStoryViews(
       story.media,
       story.authorDid,
       ctx.cfg,
-      null,
       {
         firstImageOnly: true,
       },

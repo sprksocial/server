@@ -5,7 +5,6 @@ import { Record as PostRecord } from "../lex/types/so/sprk/feed/post.ts";
 import { Record as ReplyRecord } from "../lex/types/so/sprk/feed/reply.ts";
 import { Record as RepostRecord } from "../lex/types/app/bsky/feed/repost.ts";
 import { Record as AudioRecord } from "../lex/types/so/sprk/sound/audio.ts";
-import { VideoMappingDocument } from "../data-plane/db/models.ts";
 import { uriToDid as didFromUri } from "../utils/uris.ts";
 import {
   HydrationMap,
@@ -29,9 +28,6 @@ export type SoundAgg = {
 };
 
 export type SoundAggs = HydrationMap<SoundAgg>;
-
-export type VideoMapping = VideoMappingDocument;
-export type VideoMappings = HydrationMap<VideoMapping>;
 
 export type PostViewerState = {
   like?: string;
@@ -99,16 +95,6 @@ export type FeedItem = {
 
 export class FeedHydrator {
   constructor(public dataplane: DataPlane) {}
-
-  getVideoMappings(
-    keys: string[],
-  ): VideoMappings {
-    if (!keys.length) return new HydrationMap<VideoMapping>();
-
-    // This would need to be implemented in the dataplane client
-    // For now, return empty mappings
-    return new HydrationMap<VideoMapping>();
-  }
 
   async getPosts(
     uris: string[],

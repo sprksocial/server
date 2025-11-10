@@ -220,9 +220,7 @@ export class Views {
       cid: recordInfo.cid,
       author,
       record: recordInfo.record,
-      media: mediaRecord
-        ? this.media(uri, mediaRecord as Media, state)
-        : undefined,
+      media: mediaRecord ? this.media(uri, mediaRecord as Media) : undefined,
       replyCount: repliesCount,
       repostCount,
       likeCount,
@@ -292,7 +290,7 @@ export class Views {
       cid: storyInfo.cid,
       author,
       record: storyInfo.record,
-      media: mediaRecord ? this.storyMedia(uri, mediaRecord, state) : undefined,
+      media: mediaRecord ? this.storyMedia(uri, mediaRecord) : undefined,
       indexedAt: this.indexedAt(storyInfo)?.toISOString() ??
         new Date().toISOString(),
     };
@@ -352,7 +350,6 @@ export class Views {
   storyMedia(
     storyUri: string,
     media: $Typed<ImageMedia> | $Typed<VideoMedia> | { $type: string },
-    state?: HydrationState,
   ): (ImageView | VideoMediaView) & { $type: string } | undefined {
     const authorDid = uriToDid(storyUri);
 
@@ -364,12 +361,7 @@ export class Views {
     // Check if it's a video media
     if (isVideoMediaMain(media)) {
       const videoMedia = media as VideoMediaMainType;
-      const videoCid = videoMedia.video
-        ? cidFromBlobJson(videoMedia.video)
-        : "";
-      const videoMappingKey = `${authorDid}-${videoCid}`;
-      const videoMapping = state?.videoMappings?.get(videoMappingKey) || null;
-      return this.videoMedia(authorDid, videoMedia, videoMapping);
+      return this.videoMedia(authorDid, videoMedia);
     }
 
     return undefined;
@@ -666,16 +658,12 @@ export class Views {
   media(
     postUri: string,
     media: Media | { $type: string },
-    state?: HydrationState,
   ): (MediaView & { $type: string }) | undefined {
     if (isImagesMedia(media)) {
       return this.imagesMedia(uriToDid(postUri), media);
     } else if (isVideoMedia(media)) {
       const authorDid = uriToDid(postUri);
-      const videoCid = media.video ? cidFromBlobJson(media.video) : "";
-      const videoMappingKey = `${authorDid}-${videoCid}`;
-      const videoMapping = state?.videoMappings?.get(videoMappingKey) || null;
-      return this.videoMedia(authorDid, media, videoMapping);
+      return this.videoMedia(authorDid, media);
     } else {
       return undefined;
     }
@@ -718,20 +706,11 @@ export class Views {
   videoMedia(
     did: string,
     media: VideoMedia,
-    videoMapping?: { bunnyGuid: string } | null,
   ): VideoMediaView & { $type: string } {
     const cid = cidFromBlobJson(media.video);
 
-    let playlist: string;
-    let thumbnail: string;
-
-    if (videoMapping) {
-      playlist = `${this.videoCdn}/${videoMapping.bunnyGuid}/playlist.m3u8`;
-      thumbnail = `${this.videoCdn}/${videoMapping.bunnyGuid}/thumbnail.jpg`;
-    } else {
-      playlist = `${this.videoCdn}/watch/${did}/${cid}/playlist.m3u8`;
-      thumbnail = `${this.videoCdn}/${did}/${cid}/thumbnail`;
-    }
+    const playlist = `${this.videoCdn}/watch/${did}/${cid}/playlist.m3u8`;
+    const thumbnail = `${this.thumbCdn}/${did}/${cid}/thumbnail`;
 
     return {
       $type: "so.sprk.media.video#view",

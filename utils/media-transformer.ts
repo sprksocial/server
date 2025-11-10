@@ -1,10 +1,5 @@
 import type * as SoSprkMediaImage from "../lex/types/so/sprk/media/image.ts";
-import {
-  ImageMedia,
-  PostMedia,
-  StoryMedia,
-  VideoMappingDocument,
-} from "../data-plane/db/models.ts";
+import { ImageMedia, PostMedia, StoryMedia } from "../data-plane/db/models.ts";
 import { ServerConfig } from "../config.ts";
 
 interface ImageTransformOptions {
@@ -46,7 +41,6 @@ export function transformVideoMedia(
   media: PostMedia,
   authorDid: string,
   cfg: ServerConfig,
-  videoMapping?: VideoMappingDocument | null,
   isStory = false,
 ) {
   if (!media.video) {
@@ -56,19 +50,15 @@ export function transformVideoMedia(
   let playlist: string;
   let thumbnail: string;
 
-  if (videoMapping) {
-    playlist = `${cfg.videoCdn}/${videoMapping.bunnyGuid}/playlist.m3u8`;
-    thumbnail = `${cfg.videoCdn}/${videoMapping.bunnyGuid}/thumbnail.jpg`;
-  } else if (isStory) {
-    playlist =
-      `https://media.sprk.so/video/${authorDid}/${media.video.ref.$link}`;
+  if (isStory) {
+    playlist = `${cfg.mediaCdn}/video/${authorDid}/${media.video.ref.$link}`;
     thumbnail =
-      `https://thumb.sprk.so/${authorDid}/${media.video.ref.$link}/thumbnail`;
+      `${cfg.thumbCdn}/${authorDid}/${media.video.ref.$link}/thumbnail`;
   } else {
     playlist =
       `${cfg.videoCdn}/watch/${authorDid}/${media.video.ref.$link}/playlist.m3u8`;
     thumbnail =
-      `https://thumb.sprk.so/${authorDid}/${media.video.ref.$link}/thumbnail`;
+      `${cfg.thumbCdn}/${authorDid}/${media.video.ref.$link}/thumbnail`;
   }
 
   return {
@@ -84,7 +74,6 @@ export function transformMedia(
   media: PostMedia | StoryMedia | undefined,
   authorDid: string,
   cfg: ServerConfig,
-  videoMapping?: VideoMappingDocument | null,
   options: ImageTransformOptions = {},
   isStory = false,
 ) {
@@ -119,7 +108,6 @@ export function transformMedia(
       media as PostMedia,
       authorDid,
       cfg,
-      videoMapping,
       isStory,
     );
   }

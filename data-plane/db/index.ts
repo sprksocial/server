@@ -88,10 +88,6 @@ export class Database {
           "Profile",
           models.profileSchema,
         ),
-        VideoMapping: this.connection.model<models.VideoMappingDocument>(
-          "VideoMapping",
-          models.videoMappingSchema,
-        ),
         Audio: this.connection.model<models.AudioDocument>(
           "Audio",
           models.audioSchema,

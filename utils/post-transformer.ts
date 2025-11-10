@@ -28,7 +28,6 @@ export async function transformPostsToPostViews(
     replyCounts,
     repostCounts,
     authors,
-    videoMappings,
     viewerLikes,
     viewerReposts,
   ] = await Promise.all([
@@ -57,14 +56,6 @@ export async function transformPostsToPostViews(
         );
       }),
     ),
-    // Get video mappings
-    ctx.db.models.VideoMapping.find({
-      key: {
-        $in: posts
-          .filter((p) => p.media?.$type === "so.sprk.embed.video")
-          .map((p) => `${p.authorDid}-${p.media?.video?.ref.$link}`),
-      },
-    }),
     // Get viewer likes
     userDid
       ? ctx.db.models.Like.find({
@@ -93,9 +84,7 @@ export async function transformPostsToPostViews(
   );
 
   const authorsMap = new Map(authors.map((author) => [author.did, author]));
-  const videoMappingsMap = new Map(
-    videoMappings.map((item) => [item.key, item]),
-  );
+
   const viewerLikesMap = new Map(
     viewerLikes.map((like) => [like.subject, like.uri]),
   );
@@ -111,17 +100,10 @@ export async function transformPostsToPostViews(
   const audioViewsMap = new Map(audioViews.map((av) => [av.uri, av]));
 
   return posts.map((post) => {
-    const videoMapping = post.media?.$type === "so.sprk.media.video"
-      ? videoMappingsMap.get(
-        `${post.authorDid}-${post.media.video?.ref.$link}`,
-      ) || null
-      : null;
-
     const embed = transformMedia(
       post.media,
       post.authorDid,
       ctx.cfg,
-      videoMapping,
     );
 
     const labels = post.labels

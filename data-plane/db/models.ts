@@ -507,18 +507,6 @@ export const cursorStateSchema = new Schema<CursorStateDocument>({
   updatedAt: { type: Date, default: Date.now },
 });
 
-export interface VideoMappingDocument extends Document {
-  key: string; // did-cid
-  bunnyGuid: string;
-  postMongoId: string;
-}
-
-export const videoMappingSchema = new Schema<VideoMappingDocument>({
-  key: { type: String, required: true, unique: true, index: true },
-  bunnyGuid: { type: String, required: true, index: true },
-  postMongoId: { type: String, required: true, index: true },
-});
-
 // Apply plugin to schemas that extend AuthoredDocument
 ([
   profileSchema,
@@ -553,5 +541,4 @@ export interface DatabaseModels {
   ActorSync: Model<ActorSyncDocument>;
   UserPreference: Model<UserPreferenceDocument>;
   CursorState: Model<CursorStateDocument>;
-  VideoMapping: Model<VideoMappingDocument>;
 }
