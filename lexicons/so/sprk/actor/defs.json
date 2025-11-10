@@ -293,10 +293,6 @@
             "random",
             "hotness"
           ]
-        },
-        "prioritizeFollowedUsers": {
-          "type": "boolean",
-          "description": "Show followed users at the top of all replies."
         }
       }
     },

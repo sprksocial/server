@@ -18,8 +18,6 @@ export type QueryParams = {
   depth: number;
   /** How many levels of parent (and grandparent, etc) post to include. */
   parentHeight: number;
-  /** Whether to prioritize posts from followed users. It only has effect when the user is authenticated. */
-  prioritizeFollowedUsers: boolean;
   /** Sorting for the thread replies. */
   sort:
     | "newest"

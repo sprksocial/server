@@ -305,8 +305,6 @@ export interface ThreadViewPref {
     | "random"
     | "hotness"
     | (string & globalThis.Record<PropertyKey, never>);
-  /** Show followed users at the top of all replies. */
-  prioritizeFollowedUsers?: boolean;
 }
 
 const hashThreadViewPref = "threadViewPref";

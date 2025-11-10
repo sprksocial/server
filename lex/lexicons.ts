@@ -8964,10 +8964,6 @@ export const schemaDict = {
               "hotness",
             ],
           },
-          "prioritizeFollowedUsers": {
-            "type": "boolean",
-            "description": "Show followed users at the top of all replies.",
-          },
         },
       },
       "interestsPref": {
@@ -13169,12 +13165,6 @@ export const schemaDict = {
               "minimum": 0,
               "maximum": 1000,
             },
-            "prioritizeFollowedUsers": {
-              "type": "boolean",
-              "description":
-                "Whether to prioritize posts from followed users. It only has effect when the user is authenticated.",
-              "default": false,
-            },
             "sort": {
               "type": "string",
               "description": "Sorting for the thread replies.",
@@ -14925,10 +14915,6 @@ export const schemaDict = {
               "random",
               "hotness",
             ],
-          },
-          "prioritizeFollowedUsers": {
-            "type": "boolean",
-            "description": "Show followed users at the top of all replies.",
           },
         },
       },
