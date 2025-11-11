@@ -14755,7 +14755,6 @@ export const schemaDict = {
         "items": {
           "type": "union",
           "refs": [
-            "lex:so.sprk.actor.defs#adultContentPref",
             "lex:so.sprk.actor.defs#contentLabelPref",
             "lex:so.sprk.actor.defs#savedFeedsPref",
             "lex:so.sprk.actor.defs#personalDetailsPref",
@@ -14767,18 +14766,6 @@ export const schemaDict = {
             "lex:so.sprk.actor.defs#labelersPref",
             "lex:so.sprk.actor.defs#postInteractionSettingsPref",
           ],
-        },
-      },
-      "adultContentPref": {
-        "type": "object",
-        "required": [
-          "enabled",
-        ],
-        "properties": {
-          "enabled": {
-            "type": "boolean",
-            "default": false,
-          },
         },
       },
       "contentLabelPref": {

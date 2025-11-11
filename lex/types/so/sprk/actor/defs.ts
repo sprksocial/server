@@ -165,7 +165,6 @@ export function validateKnownFollowers<V>(v: V) {
 }
 
 export type Preferences = (
-  | $Typed<AdultContentPref>
   | $Typed<ContentLabelPref>
   | $Typed<SavedFeedsPref>
   | $Typed<PersonalDetailsPref>
@@ -178,21 +177,6 @@ export type Preferences = (
   | $Typed<PostInteractionSettingsPref>
   | { $type: string }
 )[];
-
-export interface AdultContentPref {
-  $type?: "so.sprk.actor.defs#adultContentPref";
-  enabled: boolean;
-}
-
-const hashAdultContentPref = "adultContentPref";
-
-export function isAdultContentPref<V>(v: V) {
-  return is$typed(v, id, hashAdultContentPref);
-}
-
-export function validateAdultContentPref<V>(v: V) {
-  return validate<AdultContentPref & V>(v, id, hashAdultContentPref);
-}
 
 export interface ContentLabelPref {
   $type?: "so.sprk.actor.defs#contentLabelPref";
