@@ -199,7 +199,6 @@ function createFirehose(opts: {
     },
     filterCollections: [
       "so.sprk.*",
-      "app.bsky.graph.block",
     ],
   });
   return { firehose, runner };
