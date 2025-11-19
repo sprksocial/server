@@ -17,35 +17,30 @@ export async function transformAudioToAudioView(
     : undefined;
   const details = audio.details ? { ...audio.details } : undefined;
 
-  const isMusic = !!details;
-  const musicTitle = details?.title;
-  const musicArtist = details?.artist;
-  const baseTitle = isMusic ? audio.title : "Original Audio";
-  const musicSuffix = isMusic
-    ? ` contains music of ${musicTitle ?? "Unknown"} - ${
-      musicArtist ?? "Unknown"
-    }`
-    : "";
-  const computedTitle = `${baseTitle}${musicSuffix}`;
-
   const record = {
-    title: computedTitle,
+    title: audio.title,
     origin: audio.origin ?? undefined,
     sound: audio.sound ?? undefined,
     labels: audio.labels ?? undefined,
     createdAt: audio.createdAt,
   } as Record<string, unknown>;
 
+  const audioCid = audio.sound.ref.$link;
+  const audioUrl = `https://media.sprk.so/sound/${
+    encodeURIComponent(audio.authorDid)
+  }/${encodeURIComponent(audioCid)}`;
+
   return {
     uri: audio.uri,
     cid: audio.cid,
     author: authorView,
-    title: computedTitle,
-    coverArt: isMusic ? "" : (authorView.avatar ?? ""),
+    title: audio.title,
+    coverArt: authorView.avatar ?? "",
     record,
     useCount: usageCount ?? 0,
     details,
     indexedAt: audio.indexedAt,
+    audio: audioUrl,
     labels,
   };
 }
@@ -92,6 +87,11 @@ export async function transformAudiosToAudioViews(
 
     const coverArt = authorsMap.get(audio.authorDid)?.avatar ?? "";
 
+    const audioCid = audio.sound.ref.$link;
+    const audioUrl = `https://media.sprk.so/sound/${
+      encodeURIComponent(audio.authorDid)
+    }/${encodeURIComponent(audioCid)}`;
+
     return {
       uri: audio.uri,
       cid: audio.cid,
@@ -102,6 +102,7 @@ export async function transformAudiosToAudioViews(
       useCount: usageMap.get(audio.uri) ?? 0,
       details,
       indexedAt: audio.indexedAt,
+      audio: audioUrl,
       labels,
     } satisfies SoSprkSoundDefs.AudioView;
   });

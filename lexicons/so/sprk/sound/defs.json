@@ -23,9 +23,10 @@
         "record": { "type": "unknown" },
         "useCount": { "type": "integer" },
         "title": { "type": "string" },
-        "coverArt": { "type": "string" },
+        "coverArt": { "type": "string", "format": "uri" },
         "details": { "type": "ref", "ref": "#audioDetails" },
         "indexedAt": { "type": "string", "format": "datetime" },
+        "audio": { "type": "string", "format": "uri" },
         "labels": {
           "type": "array",
           "items": { "type": "ref", "ref": "com.atproto.label.defs#label" }
