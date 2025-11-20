@@ -1,0 +1,5 @@
+devdb/
+.git
+.github
+.vscode
+.env
