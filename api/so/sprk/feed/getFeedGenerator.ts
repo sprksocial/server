@@ -22,7 +22,7 @@ export default function (server: Server, ctx: AppContext) {
       const view = ctx.views.generator(params.feed, hydrationState);
 
       if (!view) {
-        throw new Error("Feed generator not found");
+        throw new Error(`Feed generator not found: ${params.feed}`);
       }
 
       // For now, assume online and valid
