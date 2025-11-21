@@ -13,7 +13,10 @@ export default function (server: Server, ctx: AppContext) {
       });
 
       // Hydrate feed generator
-      const hydrationState = await ctx.hydrator.hydrateFeedGens([params.feed], hydrateCtx);
+      const hydrationState = await ctx.hydrator.hydrateFeedGens(
+        [params.feed],
+        hydrateCtx,
+      );
 
       // Create generator view
       const view = ctx.views.generator(params.feed, hydrationState);
