@@ -368,6 +368,7 @@ repostSchema.index({ authorDid: 1, createdAt: -1 });
 repostSchema.index({ "subject.uri": 1, createdAt: -1 });
 
 export interface GeneratorDocument extends AuthoredDocument {
+  did: string;
   displayName: string;
   description?: string;
   descriptionFacets?: Facet[];
@@ -474,23 +475,76 @@ export const actorSchema = new Schema<ActorDocument>({
   services: { type: String, required: true },
 });
 
-type SavedFeed = {
-  id: string;
-  type: "feed" | "list" | "timeline";
-  value: string;
-  pinned: boolean;
-};
-
-export interface UserPreferenceDocument extends Document {
+export interface PreferenceDocument extends Document {
   userDid: string;
-  savedFeeds: SavedFeed[];
+  contentLabelPrefs?: Array<{
+    labelerDid?: string;
+    label: string;
+    visibility: string;
+  }>;
+  savedFeeds?: Array<{
+    id: string;
+    type: string;
+    value: string;
+    pinned: boolean;
+  }>;
+  personalDetailsPref?: {
+    birthDate?: string;
+  };
+  feedViewPrefs?: Array<{
+    feed: string;
+    hideReplies?: boolean;
+    hideRepliesByUnfollowed: boolean;
+    hideRepliesByLikeCount?: number;
+    hideRepliesByLookCount?: number;
+    hideReposts?: boolean;
+    hideQuotePosts?: boolean;
+  }>;
+  threadViewPref?: {
+    sort?: string;
+  };
+  interestsPref?: {
+    tags: string[];
+  };
+  mutedWordsPref?: {
+    items: Array<{
+      id?: string;
+      value: string;
+      targets: string[];
+      actorTarget: string;
+      expiresAt?: string;
+    }>;
+  };
+  hiddenPostsPref?: {
+    items: string[];
+  };
+  labelersPref?: {
+    labelers: Array<{
+      did: string;
+    }>;
+  };
+  postInteractionSettingsPref?: {
+    threadgateAllowRules?: Array<{
+      $type: string;
+      [key: string]: unknown;
+    }>;
+  };
   createdAt: string;
   updatedAt: string;
 }
 
-export const userPreferenceSchema = new Schema<UserPreferenceDocument>({
+export const preferenceSchema = new Schema<PreferenceDocument>({
   userDid: { type: String, required: true, unique: true, index: true },
-  savedFeeds: { type: [Object], required: true },
+  contentLabelPrefs: { type: [Object], required: false },
+  savedFeeds: { type: [Object], required: false },
+  personalDetailsPref: { type: Object, required: false },
+  feedViewPrefs: { type: [Object], required: false },
+  threadViewPref: { type: Object, required: false },
+  interestsPref: { type: Object, required: false },
+  mutedWordsPref: { type: Object, required: false },
+  hiddenPostsPref: { type: Object, required: false },
+  labelersPref: { type: Object, required: false },
+  postInteractionSettingsPref: { type: Object, required: false },
   createdAt: { type: String, required: true },
   updatedAt: { type: String, required: true },
 });
@@ -539,6 +593,6 @@ export interface DatabaseModels {
   BlobTakedown: Model<BlobTakedownDocument>;
   Actor: Model<ActorDocument>;
   ActorSync: Model<ActorSyncDocument>;
-  UserPreference: Model<UserPreferenceDocument>;
+  Preference: Model<PreferenceDocument>;
   CursorState: Model<CursorStateDocument>;
 }

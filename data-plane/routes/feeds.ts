@@ -37,6 +37,32 @@ export class Feeds {
     this.timeCidKeyset = new TimeCidKeyset();
   }
 
+  async getFeedGenerators(uris: string[]) {
+    if (!uris.length) return { generators: [] };
+
+    const generators = await this.db.models.Generator.find({
+      uri: { $in: uris },
+    }).populate("actor");
+
+    return {
+      generators: generators.map((generator) => ({
+        uri: generator.uri,
+        cid: generator.cid,
+        did: generator.did,
+        authorDid: generator.authorDid,
+        displayName: generator.displayName,
+        description: generator.description,
+        descriptionFacets: generator.descriptionFacets,
+        avatar: generator.avatar,
+        acceptsInteractions: generator.acceptsInteractions,
+        likeCount: generator.likeCount || 0,
+        createdAt: generator.createdAt,
+        indexedAt: generator.indexedAt,
+        actor: generator.actor,
+      })),
+    };
+  }
+
   async getAuthorFeed(
     actorDid: string,
     limit = 50,

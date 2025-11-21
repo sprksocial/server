@@ -1,5 +1,4 @@
 import { Record as FeedGenRecord } from "../lex/types/so/sprk/feed/generator.ts";
-import { Record as BskyFeedGenRecord } from "../lex/types/app/bsky/feed/generator.ts";
 import { Record as LikeRecord } from "../lex/types/so/sprk/feed/like.ts";
 import { Record as PostRecord } from "../lex/types/so/sprk/feed/post.ts";
 import { Record as ReplyRecord } from "../lex/types/so/sprk/feed/reply.ts";
@@ -70,7 +69,7 @@ export type FeedGenAgg = {
 
 export type FeedGenAggs = HydrationMap<FeedGenAgg>;
 
-export type FeedGen = RecordInfo<FeedGenRecord | BskyFeedGenRecord>;
+export type FeedGen = RecordInfo<FeedGenRecord>;
 export type FeedGens = HydrationMap<FeedGen>;
 
 export type FeedGenViewerState = {
@@ -268,7 +267,7 @@ export class FeedHydrator {
     if (!uris.length) return new HydrationMap<FeedGen>();
     const res = await this.dataplane.records.getFeedGeneratorRecords(uris);
     return uris.reduce((acc, uri, i) => {
-      const record = parseRecord<FeedGenRecord | BskyFeedGenRecord>(
+      const record = parseRecord<FeedGenRecord>(
         res.records[i],
         includeTakedowns,
       );
