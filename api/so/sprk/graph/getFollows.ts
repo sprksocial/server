@@ -74,6 +74,7 @@ const hydration = async (
   const { followUris, subjectDid } = skeleton;
   const followState = await ctx.hydrator.hydrateFollows(
     followUris,
+    params.hydrateCtx,
   );
   const dids = [subjectDid];
   if (followState.follows) {
@@ -87,7 +88,6 @@ const hydration = async (
     dids,
     params.hydrateCtx,
   );
-  console.log(profileState);
   return mergeStates(followState, profileState);
 };
 

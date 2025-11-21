@@ -609,8 +609,9 @@ export class Hydrator {
   // provides partial hydration state within getFollows / getFollowers, mainly for applying rules
   async hydrateFollows(
     uris: string[],
+    ctx: HydrateCtx,
   ): Promise<HydrationState> {
-    const follows = await this.graph.getFollows(uris);
+    const follows = await this.graph.getFollows(uris, ctx.includeTakedowns);
     const pairs: RelationshipPair[] = [];
     for (const [uri, follow] of follows) {
       if (follow) {
@@ -699,12 +700,12 @@ export class Hydrator {
         (await this.feed.getSounds([uri], includeTakedowns)).get(uri) ??
           undefined
       );
-    } else if (collection === ids.AppBskyGraphFollow) {
+    } else if (collection === ids.SoSprkGraphFollow) {
       return (
         (await this.graph.getFollows([uri], includeTakedowns)).get(uri) ??
           undefined
       );
-    } else if (collection === ids.AppBskyGraphBlock) {
+    } else if (collection === ids.SoSprkGraphBlock) {
       return (
         (await this.graph.getBlocks([uri], includeTakedowns)).get(uri) ??
           undefined
