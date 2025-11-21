@@ -1,111 +1,129 @@
-import { Server } from "../../../../lex/index.ts";
+import { mapDefined } from "@atp/common";
+import { ServerConfig } from "../../../../config.ts";
 import { AppContext } from "../../../../context.ts";
-import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts";
-import * as SoSprkFeedDefs from "../../../../lex/types/so/sprk/feed/defs.ts";
-import { OutputSchema } from "../../../../lex/types/so/sprk/feed/searchPosts.ts";
-import { RootFilterQuery } from "mongoose";
-import { PostDocument } from "../../../../data-plane/db/models.ts";
-
-// Helper to escape user input for safe RegExp usage
-function escapeRegExp(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+import { DataPlane } from "../../../../data-plane/index.ts";
+import {
+  parsePostSearchQuery,
+  PostSearchQuery,
+} from "../../../../data-plane/util.ts";
+import { HydrateCtx, Hydrator } from "../../../../hydration/index.ts";
+import { parseString } from "../../../../hydration/util.ts";
+import { Server } from "../../../../lex/index.ts";
+import { QueryParams } from "../../../../lex/types/so/sprk/feed/searchPosts.ts";
+import {
+  createPipeline,
+  HydrationFnInput,
+  PresentationFnInput,
+  RulesFnInput,
+  SkeletonFnInput,
+} from "../../../../pipeline.ts";
+import { uriToDid as creatorFromUri } from "../../../../utils/uris.ts";
+import { Views } from "../../../../views/index.ts";
+import { resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
+  const searchPosts = createPipeline(
+    skeleton,
+    hydration,
+    noBlocksOrTagged,
+    presentation,
+  );
   server.so.sprk.feed.searchPosts({
     auth: ctx.authVerifier.standardOptional,
-    handler: async ({ params, auth }) => {
-      const { q, limit, cursor, sort } = params;
-      const userDid = auth.credentials.type === "standard"
-        ? auth.credentials.iss
-        : undefined;
-
-      let skip = 0;
-      if (cursor) {
-        const parsedCursor = parseInt(cursor, 10);
-        if (!isNaN(parsedCursor) && parsedCursor > 0) {
-          skip = parsedCursor;
-        }
-      }
-
-      const escapedQuery = escapeRegExp(q.trim());
-      const regex = new RegExp(escapedQuery, "i");
-
-      const query: RootFilterQuery<PostDocument> = {
-        reply: { $eq: null },
-        $or: [
-          { text: regex },
-          { "embed.images.alt": regex },
-          { "embed.alt": regex },
-        ],
-      };
-
-      let posts;
-
-      if (sort === "top") {
-        // For 'top', we use aggregation to count likes and sort by popularity
-        posts = await ctx.db.models.Post.aggregate([
-          { $match: query },
-          {
-            $lookup: {
-              from: "likes",
-              localField: "uri",
-              foreignField: "subject",
-              as: "likes",
-              pipeline: [
-                { $project: { _id: 1 } }, // Only fetch _id for counting
-              ],
-            },
-          },
-          {
-            $addFields: {
-              likeCount: { $size: "$likes" },
-            },
-          },
-          {
-            $sort: {
-              likeCount: -1,
-              createdAt: -1, // Secondary sort by creation date
-            },
-          },
-          { $skip: skip },
-          { $limit: limit },
-          {
-            $project: {
-              likes: 0, // Remove the likes array from the result
-            },
-          },
-        ]);
-      } else {
-        // For 'latest' or default sorting
-        const sortOrder: Record<string, 1 | -1> = { createdAt: -1 };
-
-        posts = await ctx.db.models.Post.find(query)
-          .sort(sortOrder)
-          .skip(skip)
-          .limit(limit)
-          .lean();
-      }
-
-      const postViews = await transformPostsToPostViews(posts, ctx, userDid);
-
-      const filteredPostViews = postViews.filter(
-        (v: SoSprkFeedDefs.PostView | null): v is SoSprkFeedDefs.PostView =>
-          v !== null,
+    handler: async ({ auth, params }) => {
+      const { viewer } = ctx.authVerifier.parseCreds(auth);
+      const hydrateCtx = ctx.hydrator.createContext({ viewer });
+      const results = await searchPosts(
+        { ...params, hydrateCtx },
+        ctx,
       );
-
-      let nextCursor: string | undefined;
-      if (filteredPostViews.length === limit) {
-        nextCursor = (skip + limit).toString();
-      }
-
       return {
         encoding: "application/json",
-        body: {
-          posts: filteredPostViews,
-          cursor: nextCursor,
-        } satisfies OutputSchema,
+        body: results,
+        headers: resHeaders({}),
       };
     },
   });
 }
+
+const skeleton = async (inputs: SkeletonFnInput<Context, Params>) => {
+  const { ctx, params } = inputs;
+  const parsedQuery = parsePostSearchQuery(params.q);
+
+  const res = await ctx.dataplane.search.searchPosts(
+    params.q,
+    params.limit,
+    params.cursor,
+  );
+  return {
+    posts: res.uris,
+    cursor: parseString(res.cursor),
+    parsedQuery,
+  };
+};
+
+const hydration = async (
+  inputs: HydrationFnInput<Context, Params, Skeleton>,
+) => {
+  const { ctx, params, skeleton } = inputs;
+  return await ctx.hydrator.hydratePosts(
+    skeleton.posts.map((uri) => ({ uri })),
+    params.hydrateCtx,
+    undefined,
+  );
+};
+
+const noBlocksOrTagged = (inputs: RulesFnInput<Context, Params, Skeleton>) => {
+  const { ctx, params, skeleton, hydration } = inputs;
+
+  skeleton.posts = skeleton.posts.filter((uri) => {
+    const post = hydration.posts?.get(uri);
+    if (!post) return;
+
+    const creator = creatorFromUri(uri);
+    const isPostByViewer = creator === params.hydrateCtx.viewer;
+
+    // Cases to always show.
+    if (isPostByViewer) return true;
+
+    // Cases to never show.
+    if (ctx.views.viewerBlockExists(creator, hydration)) return false;
+    return true;
+  });
+  return skeleton;
+};
+
+const presentation = (
+  inputs: PresentationFnInput<Context, Params, Skeleton>,
+) => {
+  const { ctx, skeleton, hydration } = inputs;
+  const posts = mapDefined(skeleton.posts, (uri) => {
+    const post = hydration.posts?.get(uri);
+    if (!post) return;
+
+    return ctx.views.post(uri, hydration);
+  });
+  return {
+    posts,
+    cursor: skeleton.cursor,
+    hitsTotal: skeleton.hitsTotal,
+  };
+};
+
+type Context = {
+  cfg: ServerConfig;
+  dataplane: DataPlane;
+  hydrator: Hydrator;
+  views: Views;
+};
+
+type Params = QueryParams & {
+  hydrateCtx: HydrateCtx;
+};
+
+type Skeleton = {
+  posts: string[];
+  hitsTotal?: number;
+  cursor?: string;
+  parsedQuery: PostSearchQuery;
+};

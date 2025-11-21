@@ -16,6 +16,7 @@ import { Stories } from "./routes/stories.ts";
 import { Sync } from "./routes/sync.ts";
 import { Threads } from "./routes/threads.ts";
 import { Preferences } from "./routes/preferences.ts";
+import { Search } from "./routes/search.ts";
 
 export { RepoSubscription } from "./subscription.ts";
 
@@ -45,6 +46,7 @@ export class DataPlane {
   public sync: Sync;
   public threads: Threads;
   public preferences: Preferences;
+  public search: Search;
 
   constructor(
     db: Database,
@@ -70,5 +72,6 @@ export class DataPlane {
     this.sync = new Sync(db);
     this.threads = new Threads(db);
     this.preferences = new Preferences(db);
+    this.search = new Search(db);
   }
 }

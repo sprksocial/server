@@ -43,8 +43,8 @@ export async function transformPostsToPostViews(
     ]),
     // Get repost counts
     ctx.db.models.Repost.aggregate([
-      { $match: { "subject.uri": { $in: postUris } } },
-      { $group: { _id: "$subject.uri", count: { $sum: 1 } } },
+      { $match: { subject: { $in: postUris } } },
+      { $group: { _id: "$subject", count: { $sum: 1 } } },
     ]),
 
     // Get authors
@@ -67,7 +67,7 @@ export async function transformPostsToPostViews(
     // Get viewer reposts
     userDid
       ? ctx.db.models.Repost.find({
-        "subject.uri": { $in: postUris },
+        subject: { $in: postUris },
         authorDid: userDid,
       }).lean()
       : Promise.resolve([]),
@@ -89,8 +89,8 @@ export async function transformPostsToPostViews(
     viewerLikes.map((like) => [like.subject, like.uri]),
   );
   const viewerRepostsMap = new Map(
-    viewerReposts.map((repost: { subject: { uri: string }; uri: string }) => [
-      repost.subject.uri,
+    viewerReposts.map((repost: { subject: string; uri: string }) => [
+      repost.subject,
       repost.uri,
     ]),
   );
