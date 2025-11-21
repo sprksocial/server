@@ -26,7 +26,7 @@ export class Preferences {
         $set: updateData,
         $setOnInsert: { userDid, createdAt: now },
       },
-      { upsert: true }
+      { upsert: true },
     );
   }
 }
