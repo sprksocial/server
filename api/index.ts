@@ -25,6 +25,8 @@ import getTrendingAudios from "./so/sprk/sound/getTrendingAudios.ts";
 import getSuggestedFeeds from "./so/sprk/feed/getSuggestedFeeds.ts";
 import getTimeline from "./so/sprk/feed/getTimeline.ts";
 import getFeed from "./so/sprk/feed/getFeed.ts";
+import getFeedGenerator from "./so/sprk/feed/getFeedGenerator.ts";
+import getFeedGenerators from "./so/sprk/feed/getFeedGenerators.ts";
 
 export default function (server: Server, ctx: AppContext) {
   getAccountInfos(server, ctx);
@@ -52,4 +54,6 @@ export default function (server: Server, ctx: AppContext) {
   getSuggestedFeeds(server, ctx);
   getTimeline(server, ctx);
   getFeed(server, ctx);
+  getFeedGenerator(server, ctx);
+  getFeedGenerators(server, ctx);
 }
