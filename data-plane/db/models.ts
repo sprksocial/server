@@ -368,7 +368,6 @@ repostSchema.index({ authorDid: 1, createdAt: -1 });
 repostSchema.index({ "subject.uri": 1, createdAt: -1 });
 
 export interface GeneratorDocument extends AuthoredDocument {
-  did: string;
   displayName: string;
   description?: string;
   descriptionFacets?: Facet[];

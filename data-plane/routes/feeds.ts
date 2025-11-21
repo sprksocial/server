@@ -48,7 +48,6 @@ export class Feeds {
       generators: generators.map((generator) => ({
         uri: generator.uri,
         cid: generator.cid,
-        did: generator.did,
         authorDid: generator.authorDid,
         displayName: generator.displayName,
         description: generator.description,
