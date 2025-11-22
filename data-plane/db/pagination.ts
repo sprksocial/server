@@ -174,35 +174,35 @@ export class TimeCidKeyset<
 
 export class CreatedAtDidKeyset extends TimeCidKeyset<{
   createdAt: string;
-  did: string; // dids are treated identically to cids in TimeCidKeyset
+  authorDid: string; // dids are treated identically to cids in TimeCidKeyset
 }> {
   constructor() {
     super();
     this.primary = "createdAt";
-    this.secondary = "did";
+    this.secondary = "authorDid";
   }
 
-  override labelResult(result: { createdAt: string; did: string }) {
+  override labelResult(result: { createdAt: string; authorDid: string }) {
     // Use current time as fallback if createdAt is missing
     const createdAt = result.createdAt || new Date().toISOString();
-    return { primary: createdAt, secondary: result.did };
+    return { primary: createdAt, secondary: result.authorDid };
   }
 }
 
 export class IndexedAtDidKeyset extends TimeCidKeyset<{
   indexedAt: string;
-  did: string; // dids are treated identically to cids in TimeCidKeyset
+  authorDid: string; // dids are treated identically to cids in TimeCidKeyset
 }> {
   constructor() {
     super();
     this.primary = "indexedAt";
-    this.secondary = "did";
+    this.secondary = "authorDid";
   }
 
-  override labelResult(result: { indexedAt: string; did: string }) {
+  override labelResult(result: { indexedAt: string; authorDid: string }) {
     // Use current time as fallback if indexedAt is missing
     const indexedAt = result.indexedAt || new Date().toISOString();
-    return { primary: indexedAt, secondary: result.did };
+    return { primary: indexedAt, secondary: result.authorDid };
   }
 }
 

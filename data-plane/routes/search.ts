@@ -17,40 +17,62 @@ export class Search {
     this.timeCidKeyset = new TimeCidKeyset();
   }
 
-  // @TODO actor search endpoints still fall back to search service
   async actors(term: string, limit = 50, cursor?: string) {
     const cleanedTerm = cleanQuery(term);
     const regex = new RegExp(cleanedTerm, "i");
 
-    const actorsQuery = this.db.models.Actor.find({
+    // First, find Actor DIDs that match the handle
+    const matchingActors = await this.db.models.Actor.find({
       handle: { $regex: regex },
-    });
+    }).select("did").lean();
+    const actorDids = matchingActors.map((actor) => actor.did);
 
-    const paginatedQuery = this.indexedAtDidKeyset.paginate(actorsQuery, {
-      limit,
-      cursor,
-      direction: "desc",
-    });
+    // Build a single Profile query that searches displayName or handle (via authorDid)
+    const queryConditions: Array<Record<string, unknown>> = [
+      { displayName: { $regex: regex } },
+    ];
 
-    const actors = await paginatedQuery.exec();
+    if (actorDids.length > 0) {
+      queryConditions.push({ authorDid: { $in: actorDids } });
+    }
 
-    // Generate cursor from the last item if we have a full page
+    const profilesQuery = this.db.models.Profile.find({
+      $or: queryConditions,
+    }).populate("actor");
+
+    const paginatedQuery = this.indexedAtDidKeyset.paginate(
+      profilesQuery,
+      {
+        limit: limit + 1, // Fetch one extra to check if more results exist
+        cursor,
+        direction: "desc",
+      },
+    );
+
+    const profiles = await paginatedQuery.exec();
+
+    // Check if there are more results
+    const hasMore = profiles.length > limit;
+    const results = hasMore ? profiles.slice(0, limit) : profiles;
+
+    // Generate cursor from the last item if we have more results
     let nextCursor: string | undefined;
-    if (actors.length === limit && actors.length > 0) {
-      const lastActor = actors[actors.length - 1];
+    if (hasMore && results.length > 0) {
+      const lastProfile = results[results.length - 1];
       nextCursor = this.indexedAtDidKeyset.pack({
-        primary: lastActor.indexedAt,
-        secondary: lastActor.did,
+        primary: lastProfile.indexedAt,
+        secondary: lastProfile.authorDid,
       });
     }
 
     return {
-      dids: actors.map((actor) => actor.did),
+      dids: results.map((profile: { authorDid: string; indexedAt: string }) =>
+        profile.authorDid
+      ),
       cursor: nextCursor,
     };
   }
 
-  // @TODO post search endpoint still falls back to search service
   async posts(term: string, limit = 50, cursor?: string) {
     const { q, author } = parsePostSearchQuery(term);
 
@@ -66,8 +88,13 @@ export class Search {
     const query: Record<string, unknown> = {};
 
     if (q) {
-      // Search in caption.text using regex
-      query["caption.text"] = { $regex: q, $options: "i" };
+      // Search in multiple fields for better relevance
+      query.$or = [
+        { "caption.text": { $regex: q, $options: "i" } },
+        { "media.images.alt": { $regex: q, $options: "i" } },
+        { "media.video.alt": { $regex: q, $options: "i" } },
+        { tags: { $regex: q, $options: "i" } },
+      ];
     }
 
     if (authorDid) {
