@@ -63,8 +63,12 @@ const insertFn = async (
     uri: uri.toString(),
     cid: cid.toString(),
     authorDid: uri.host,
-    text: obj.caption?.text || "",
-    facets: obj.caption?.facets || [],
+    caption: obj.caption
+      ? {
+        text: obj.caption.text || "",
+        facets: obj.caption.facets || [],
+      }
+      : undefined,
     media: obj.media || null,
     sound: obj.sound || null,
     langs: obj.langs || [],
