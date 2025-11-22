@@ -50,7 +50,7 @@ const skeleton = async (inputs: SkeletonFnInput<Context, Params>) => {
   const { ctx, params } = inputs;
   const parsedQuery = parsePostSearchQuery(params.q);
 
-  const res = await ctx.dataplane.search.searchPosts(
+  const res = await ctx.dataplane.search.posts(
     params.q,
     params.limit,
     params.cursor,

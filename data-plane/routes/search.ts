@@ -18,7 +18,7 @@ export class Search {
   }
 
   // @TODO actor search endpoints still fall back to search service
-  async searchActors(term: string, limit = 50, cursor?: string) {
+  async actors(term: string, limit = 50, cursor?: string) {
     const cleanedTerm = cleanQuery(term);
     const regex = new RegExp(cleanedTerm, "i");
 
@@ -51,7 +51,7 @@ export class Search {
   }
 
   // @TODO post search endpoint still falls back to search service
-  async searchPosts(term: string, limit = 50, cursor?: string) {
+  async posts(term: string, limit = 50, cursor?: string) {
     const { q, author } = parsePostSearchQuery(term);
 
     let authorDid = author;
