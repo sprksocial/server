@@ -34,7 +34,6 @@ const insertFn = async (
     indexedAt: timestamp,
   };
 
-  // Use findOneAndUpdate with upsert on the compound key to handle potential duplicate key errors
   const insertedLike = await db.models.Like.findOneAndUpdate(
     { uri: like.uri },
     { $set: like },
