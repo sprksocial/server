@@ -1,4 +1,4 @@
-import { AtUri } from "@atproto/api";
+import { AtUri, ComAtprotoRepoStrongRef } from "@atproto/api";
 import { HydrationState } from "../hydration/index.ts";
 import {
   FeedViewPost,
@@ -215,12 +215,17 @@ export class Views {
       ? recordInfo.record.media
       : undefined;
 
+    const soundRecord = "sound" in recordInfo.record
+      ? recordInfo.record.sound as ComAtprotoRepoStrongRef.Main
+      : undefined;
+
     return {
       uri,
       cid: recordInfo.cid,
       author,
       record: recordInfo.record,
       media: mediaRecord ? this.media(uri, mediaRecord as Media) : undefined,
+      sound: soundRecord ? this.soundView(soundRecord.uri, state) : undefined,
       replyCount: repliesCount,
       repostCount,
       likeCount,
@@ -727,33 +732,66 @@ export class Views {
     state: HydrationState,
   ): Un$Typed<AudioView> | undefined {
     const soundInfo = state.sounds?.get(uri);
-    if (!soundInfo) return;
+    if (!soundInfo) {
+      return;
+    }
 
     const parsedUri = new AtUri(uri);
     const authorDid = parsedUri.hostname;
     const author = this.profileBasic(authorDid, state);
-    if (!author) return;
+    if (!author) {
+      return;
+    }
 
     const soundAgg = state.soundAggs?.get(uri);
-    const coverArtCid = cidFromBlobJson(soundInfo.record.coverArt as BlobRef);
 
-    return {
+    let coverArtUrl: string;
+    if (soundInfo.record.coverArt) {
+      const coverArtCid = cidFromBlobJson(soundInfo.record.coverArt as BlobRef);
+      coverArtUrl =
+        `${this.mediaCdn}/img/medium/${authorDid}/${coverArtCid}/webp`;
+    } else {
+      coverArtUrl = author.avatar ?? "";
+    }
+
+    const details = soundInfo.record.details
+      ? {
+        artist: soundInfo.record.details.artist,
+        title: soundInfo.record.details.title,
+      }
+      : undefined;
+
+    const record = {
+      title: soundInfo.record.title,
+      origin: soundInfo.record.origin ?? undefined,
+      sound: soundInfo.record.sound ?? undefined,
+      labels: soundInfo.record.labels ?? undefined,
+      createdAt: soundInfo.record.createdAt,
+    } as Record<string, unknown>;
+
+    const audioCid = cidFromBlobJson(soundInfo.record.sound as BlobRef);
+    const audioUrl = `https://media.sprk.so/sound/${
+      encodeURIComponent(authorDid)
+    }/${encodeURIComponent(audioCid)}`;
+
+    const indexedAt = this.indexedAt(soundInfo)?.toISOString() ??
+      new Date().toISOString();
+
+    const audioView = {
       uri,
       cid: soundInfo.cid,
       author,
-      record: soundInfo.record,
-      useCount: soundAgg?.uses ?? 0,
       title: soundInfo.record.title,
-      coverArt: `${this.mediaCdn}/img/medium/${authorDid}/${coverArtCid}/webp`,
-      details: soundInfo.record.details
-        ? {
-          artist: soundInfo.record.details.artist,
-          title: soundInfo.record.details.title,
-        }
-        : undefined,
-      indexedAt: this.indexedAt(soundInfo)?.toISOString() ??
-        new Date().toISOString(),
+      coverArt: coverArtUrl,
+      record,
+      useCount: soundAgg?.uses ?? 0,
+      details,
+      indexedAt,
+      audio: audioUrl,
+      labels: undefined,
     };
+
+    return audioView;
   }
   indexedAt({ sortedAt, indexedAt }: { sortedAt: Date; indexedAt: Date }) {
     if (!this.indexedAtEpoch) return sortedAt;
