@@ -4,6 +4,7 @@
 import type * as ToolsOzoneTeamDefs from "./defs.ts";
 
 export type QueryParams = {
+  q?: string;
   disabled?: boolean;
   roles?: string[];
   limit: number;

@@ -1,0 +1,44 @@
+/**
+ * GENERATED CODE - DO NOT MODIFY
+ */
+import type * as ToolsOzoneVerificationDefs from "./defs.ts";
+
+export type QueryParams = {
+  /** Pagination cursor */
+  cursor?: string;
+  /** Maximum number of results to return */
+  limit: number;
+  /** Filter to verifications created after this timestamp */
+  createdAfter?: string;
+  /** Filter to verifications created before this timestamp */
+  createdBefore?: string;
+  /** Filter to verifications from specific issuers */
+  issuers?: string[];
+  /** Filter to specific verified DIDs */
+  subjects?: string[];
+  /** Sort direction for creation date */
+  sortDirection: "asc" | "desc";
+  /** Filter to verifications that are revoked or not. By default, includes both. */
+  isRevoked?: boolean;
+};
+export type InputSchema = undefined;
+
+export interface OutputSchema {
+  cursor?: string;
+  verifications: (ToolsOzoneVerificationDefs.VerificationView)[];
+}
+
+export type HandlerInput = void;
+
+export interface HandlerSuccess {
+  encoding: "application/json";
+  body: OutputSchema;
+  headers?: { [key: string]: string };
+}
+
+export interface HandlerError {
+  status: number;
+  message?: string;
+}
+
+export type HandlerOutput = HandlerError | HandlerSuccess;

@@ -46,7 +46,7 @@ export interface Notification {
   uri: string;
   cid: string;
   author: AppBskyActorDefs.ProfileView;
-  /** Expected values are 'like', 'repost', 'follow', 'mention', 'reply', 'quote', and 'starterpack-joined'. */
+  /** The reason why this notification was delivered - e.g. your post was liked, or you received a new follower. */
   reason:
     | "like"
     | "repost"
@@ -55,6 +55,11 @@ export interface Notification {
     | "reply"
     | "quote"
     | "starterpack-joined"
+    | "verified"
+    | "unverified"
+    | "like-via-repost"
+    | "repost-via-repost"
+    | "subscribed-post"
     | (string & globalThis.Record<PropertyKey, never>);
   reasonSubject?: string;
   record: { [_ in string]: unknown };

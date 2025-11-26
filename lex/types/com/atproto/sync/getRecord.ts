@@ -9,8 +9,6 @@ export type QueryParams = {
   collection: string;
   /** Record Key */
   rkey: string;
-  /** DEPRECATED: referenced a repo commit by CID, and retrieved record as of that commit */
-  commit?: string;
 };
 export type InputSchema = undefined;
 export type HandlerInput = void;

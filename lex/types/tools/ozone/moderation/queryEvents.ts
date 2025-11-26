@@ -38,6 +38,20 @@ export type QueryParams = {
   removedTags?: string[];
   reportTypes?: string[];
   policies?: string[];
+  /** If specified, only events where the modTool name matches any of the given values are returned */
+  modTool?: string[];
+  /** If specified, only events where the batchId matches the given value are returned */
+  batchId?: string;
+  /** If specified, only events where the age assurance state matches the given value are returned */
+  ageAssuranceState?:
+    | "pending"
+    | "assured"
+    | "unknown"
+    | "reset"
+    | "blocked"
+    | (string & globalThis.Record<PropertyKey, never>);
+  /** If specified, only events where strikeCount value is set are returned. */
+  withStrike?: boolean;
   cursor?: string;
 };
 export type InputSchema = undefined;

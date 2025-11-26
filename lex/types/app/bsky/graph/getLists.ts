@@ -8,6 +8,11 @@ export type QueryParams = {
   actor: string;
   limit: number;
   cursor?: string;
+  /** Optional filter by list purpose. If not specified, all supported types are returned. */
+  purposes?:
+    | "modlist"
+    | "curatelist"
+    | (string & globalThis.Record<PropertyKey, never>)[];
 };
 export type InputSchema = undefined;
 

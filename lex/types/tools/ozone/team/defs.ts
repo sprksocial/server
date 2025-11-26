@@ -17,9 +17,10 @@ export interface Member {
   updatedAt?: string;
   lastUpdatedBy?: string;
   role:
-    | "lex:tools.ozone.team.defs#roleAdmin"
-    | "lex:tools.ozone.team.defs#roleModerator"
-    | "lex:tools.ozone.team.defs#roleTriage"
+    | "tools.ozone.team.defs#roleAdmin"
+    | "tools.ozone.team.defs#roleModerator"
+    | "tools.ozone.team.defs#roleTriage"
+    | "tools.ozone.team.defs#roleVerifier"
     | (string & globalThis.Record<PropertyKey, never>);
 }
 
@@ -39,3 +40,5 @@ export const ROLEADMIN = `${id}#roleAdmin`;
 export const ROLEMODERATOR = `${id}#roleModerator`;
 /** Triage role. Mostly intended for monitoring and escalating issues. */
 export const ROLETRIAGE = `${id}#roleTriage`;
+/** Verifier role. Only allowed to issue verifications. */
+export const ROLEVERIFIER = `${id}#roleVerifier`;

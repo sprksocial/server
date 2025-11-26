@@ -14,7 +14,10 @@ export interface OutputSchema {
   status?:
     | "takendown"
     | "suspended"
+    | "deleted"
     | "deactivated"
+    | "desynchronized"
+    | "throttled"
     | (string & globalThis.Record<PropertyKey, never>);
   /** Optional field, the current rev of the repo, if active=true */
   rev?: string;

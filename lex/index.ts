@@ -14,10 +14,19 @@ import * as ToolsOzoneSignatureFindCorrelation from "./types/tools/ozone/signatu
 import * as ToolsOzoneSignatureSearchAccounts from "./types/tools/ozone/signature/searchAccounts.ts";
 import * as ToolsOzoneSignatureFindRelatedAccounts from "./types/tools/ozone/signature/findRelatedAccounts.ts";
 import * as ToolsOzoneServerGetConfig from "./types/tools/ozone/server/getConfig.ts";
+import * as ToolsOzoneVerificationRevokeVerifications from "./types/tools/ozone/verification/revokeVerifications.ts";
+import * as ToolsOzoneVerificationGrantVerifications from "./types/tools/ozone/verification/grantVerifications.ts";
+import * as ToolsOzoneVerificationListVerifications from "./types/tools/ozone/verification/listVerifications.ts";
+import * as ToolsOzoneSafelinkAddRule from "./types/tools/ozone/safelink/addRule.ts";
+import * as ToolsOzoneSafelinkRemoveRule from "./types/tools/ozone/safelink/removeRule.ts";
+import * as ToolsOzoneSafelinkUpdateRule from "./types/tools/ozone/safelink/updateRule.ts";
+import * as ToolsOzoneSafelinkQueryEvents from "./types/tools/ozone/safelink/queryEvents.ts";
+import * as ToolsOzoneSafelinkQueryRules from "./types/tools/ozone/safelink/queryRules.ts";
 import * as ToolsOzoneTeamListMembers from "./types/tools/ozone/team/listMembers.ts";
 import * as ToolsOzoneTeamDeleteMember from "./types/tools/ozone/team/deleteMember.ts";
 import * as ToolsOzoneTeamUpdateMember from "./types/tools/ozone/team/updateMember.ts";
 import * as ToolsOzoneTeamAddMember from "./types/tools/ozone/team/addMember.ts";
+import * as ToolsOzoneHostingGetAccountHistory from "./types/tools/ozone/hosting/getAccountHistory.ts";
 import * as ToolsOzoneCommunicationUpdateTemplate from "./types/tools/ozone/communication/updateTemplate.ts";
 import * as ToolsOzoneCommunicationCreateTemplate from "./types/tools/ozone/communication/createTemplate.ts";
 import * as ToolsOzoneCommunicationListTemplates from "./types/tools/ozone/communication/listTemplates.ts";
@@ -32,33 +41,62 @@ import * as ToolsOzoneSettingListOptions from "./types/tools/ozone/setting/listO
 import * as ToolsOzoneSettingRemoveOptions from "./types/tools/ozone/setting/removeOptions.ts";
 import * as ToolsOzoneSettingUpsertOption from "./types/tools/ozone/setting/upsertOption.ts";
 import * as ToolsOzoneModerationGetReporterStats from "./types/tools/ozone/moderation/getReporterStats.ts";
+import * as ToolsOzoneModerationCancelScheduledActions from "./types/tools/ozone/moderation/cancelScheduledActions.ts";
+import * as ToolsOzoneModerationListScheduledActions from "./types/tools/ozone/moderation/listScheduledActions.ts";
 import * as ToolsOzoneModerationQueryStatuses from "./types/tools/ozone/moderation/queryStatuses.ts";
 import * as ToolsOzoneModerationGetRepo from "./types/tools/ozone/moderation/getRepo.ts";
+import * as ToolsOzoneModerationGetSubjects from "./types/tools/ozone/moderation/getSubjects.ts";
 import * as ToolsOzoneModerationGetRecords from "./types/tools/ozone/moderation/getRecords.ts";
+import * as ToolsOzoneModerationScheduleAction from "./types/tools/ozone/moderation/scheduleAction.ts";
 import * as ToolsOzoneModerationGetEvent from "./types/tools/ozone/moderation/getEvent.ts";
 import * as ToolsOzoneModerationQueryEvents from "./types/tools/ozone/moderation/queryEvents.ts";
 import * as ToolsOzoneModerationGetRecord from "./types/tools/ozone/moderation/getRecord.ts";
 import * as ToolsOzoneModerationEmitEvent from "./types/tools/ozone/moderation/emitEvent.ts";
 import * as ToolsOzoneModerationSearchRepos from "./types/tools/ozone/moderation/searchRepos.ts";
+import * as ToolsOzoneModerationGetAccountTimeline from "./types/tools/ozone/moderation/getAccountTimeline.ts";
 import * as ToolsOzoneModerationGetRepos from "./types/tools/ozone/moderation/getRepos.ts";
 import * as AppBskyVideoUploadVideo from "./types/app/bsky/video/uploadVideo.ts";
 import * as AppBskyVideoGetJobStatus from "./types/app/bsky/video/getJobStatus.ts";
 import * as AppBskyVideoGetUploadLimits from "./types/app/bsky/video/getUploadLimits.ts";
+import * as AppBskyBookmarkDeleteBookmark from "./types/app/bsky/bookmark/deleteBookmark.ts";
+import * as AppBskyBookmarkGetBookmarks from "./types/app/bsky/bookmark/getBookmarks.ts";
+import * as AppBskyBookmarkCreateBookmark from "./types/app/bsky/bookmark/createBookmark.ts";
 import * as AppBskyNotificationRegisterPush from "./types/app/bsky/notification/registerPush.ts";
 import * as AppBskyNotificationPutPreferences from "./types/app/bsky/notification/putPreferences.ts";
+import * as AppBskyNotificationPutActivitySubscription from "./types/app/bsky/notification/putActivitySubscription.ts";
+import * as AppBskyNotificationPutPreferencesV2 from "./types/app/bsky/notification/putPreferencesV2.ts";
 import * as AppBskyNotificationUpdateSeen from "./types/app/bsky/notification/updateSeen.ts";
+import * as AppBskyNotificationListActivitySubscriptions from "./types/app/bsky/notification/listActivitySubscriptions.ts";
+import * as AppBskyNotificationUnregisterPush from "./types/app/bsky/notification/unregisterPush.ts";
+import * as AppBskyNotificationGetPreferences from "./types/app/bsky/notification/getPreferences.ts";
 import * as AppBskyNotificationListNotifications from "./types/app/bsky/notification/listNotifications.ts";
 import * as AppBskyNotificationGetUnreadCount from "./types/app/bsky/notification/getUnreadCount.ts";
+import * as AppBskyUnspeccedGetSuggestedFeedsSkeleton from "./types/app/bsky/unspecced/getSuggestedFeedsSkeleton.ts";
 import * as AppBskyUnspeccedSearchStarterPacksSkeleton from "./types/app/bsky/unspecced/searchStarterPacksSkeleton.ts";
+import * as AppBskyUnspeccedGetOnboardingSuggestedStarterPacksSkeleton from "./types/app/bsky/unspecced/getOnboardingSuggestedStarterPacksSkeleton.ts";
+import * as AppBskyUnspeccedGetSuggestedUsers from "./types/app/bsky/unspecced/getSuggestedUsers.ts";
+import * as AppBskyUnspeccedGetPostThreadOtherV2 from "./types/app/bsky/unspecced/getPostThreadOtherV2.ts";
+import * as AppBskyUnspeccedGetSuggestedStarterPacks from "./types/app/bsky/unspecced/getSuggestedStarterPacks.ts";
+import * as AppBskyUnspeccedGetSuggestedStarterPacksSkeleton from "./types/app/bsky/unspecced/getSuggestedStarterPacksSkeleton.ts";
+import * as AppBskyUnspeccedGetOnboardingSuggestedStarterPacks from "./types/app/bsky/unspecced/getOnboardingSuggestedStarterPacks.ts";
+import * as AppBskyUnspeccedGetSuggestedUsersSkeleton from "./types/app/bsky/unspecced/getSuggestedUsersSkeleton.ts";
+import * as AppBskyUnspeccedGetPostThreadV2 from "./types/app/bsky/unspecced/getPostThreadV2.ts";
+import * as AppBskyUnspeccedGetTrends from "./types/app/bsky/unspecced/getTrends.ts";
 import * as AppBskyUnspeccedSearchActorsSkeleton from "./types/app/bsky/unspecced/searchActorsSkeleton.ts";
 import * as AppBskyUnspeccedGetSuggestionsSkeleton from "./types/app/bsky/unspecced/getSuggestionsSkeleton.ts";
 import * as AppBskyUnspeccedSearchPostsSkeleton from "./types/app/bsky/unspecced/searchPostsSkeleton.ts";
+import * as AppBskyUnspeccedGetAgeAssuranceState from "./types/app/bsky/unspecced/getAgeAssuranceState.ts";
 import * as AppBskyUnspeccedGetPopularFeedGenerators from "./types/app/bsky/unspecced/getPopularFeedGenerators.ts";
+import * as AppBskyUnspeccedInitAgeAssurance from "./types/app/bsky/unspecced/initAgeAssurance.ts";
 import * as AppBskyUnspeccedGetTrendingTopics from "./types/app/bsky/unspecced/getTrendingTopics.ts";
 import * as AppBskyUnspeccedGetTaggedSuggestions from "./types/app/bsky/unspecced/getTaggedSuggestions.ts";
+import * as AppBskyUnspeccedGetSuggestedFeeds from "./types/app/bsky/unspecced/getSuggestedFeeds.ts";
+import * as AppBskyUnspeccedGetTrendsSkeleton from "./types/app/bsky/unspecced/getTrendsSkeleton.ts";
 import * as AppBskyUnspeccedGetConfig from "./types/app/bsky/unspecced/getConfig.ts";
 import * as AppBskyGraphGetStarterPacks from "./types/app/bsky/graph/getStarterPacks.ts";
 import * as AppBskyGraphGetSuggestedFollowsByActor from "./types/app/bsky/graph/getSuggestedFollowsByActor.ts";
+import * as AppBskyGraphGetStarterPacksWithMembership from "./types/app/bsky/graph/getStarterPacksWithMembership.ts";
+import * as AppBskyGraphGetListsWithMembership from "./types/app/bsky/graph/getListsWithMembership.ts";
 import * as AppBskyGraphUnmuteActorList from "./types/app/bsky/graph/unmuteActorList.ts";
 import * as AppBskyGraphGetListBlocks from "./types/app/bsky/graph/getListBlocks.ts";
 import * as AppBskyGraphGetStarterPack from "./types/app/bsky/graph/getStarterPack.ts";
@@ -96,6 +134,9 @@ import * as AppBskyFeedGetFeedSkeleton from "./types/app/bsky/feed/getFeedSkelet
 import * as AppBskyFeedGetListFeed from "./types/app/bsky/feed/getListFeed.ts";
 import * as AppBskyFeedGetSuggestedFeeds from "./types/app/bsky/feed/getSuggestedFeeds.ts";
 import * as AppBskyFeedGetActorFeeds from "./types/app/bsky/feed/getActorFeeds.ts";
+import * as AppBskyAgeassuranceBegin from "./types/app/bsky/ageassurance/begin.ts";
+import * as AppBskyAgeassuranceGetState from "./types/app/bsky/ageassurance/getState.ts";
+import * as AppBskyAgeassuranceGetConfig from "./types/app/bsky/ageassurance/getConfig.ts";
 import * as AppBskyActorSearchActorsTypeahead from "./types/app/bsky/actor/searchActorsTypeahead.ts";
 import * as AppBskyActorPutPreferences from "./types/app/bsky/actor/putPreferences.ts";
 import * as AppBskyActorGetProfile from "./types/app/bsky/actor/getProfile.ts";
@@ -110,9 +151,11 @@ import * as ChatBskyConvoGetConvoAvailability from "./types/chat/bsky/convo/getC
 import * as ChatBskyConvoGetLog from "./types/chat/bsky/convo/getLog.ts";
 import * as ChatBskyConvoSendMessage from "./types/chat/bsky/convo/sendMessage.ts";
 import * as ChatBskyConvoLeaveConvo from "./types/chat/bsky/convo/leaveConvo.ts";
+import * as ChatBskyConvoAddReaction from "./types/chat/bsky/convo/addReaction.ts";
 import * as ChatBskyConvoAcceptConvo from "./types/chat/bsky/convo/acceptConvo.ts";
 import * as ChatBskyConvoMuteConvo from "./types/chat/bsky/convo/muteConvo.ts";
 import * as ChatBskyConvoDeleteMessageForSelf from "./types/chat/bsky/convo/deleteMessageForSelf.ts";
+import * as ChatBskyConvoRemoveReaction from "./types/chat/bsky/convo/removeReaction.ts";
 import * as ChatBskyConvoUpdateRead from "./types/chat/bsky/convo/updateRead.ts";
 import * as ChatBskyConvoUpdateAllRead from "./types/chat/bsky/convo/updateAllRead.ts";
 import * as ChatBskyConvoGetConvo from "./types/chat/bsky/convo/getConvo.ts";
@@ -173,16 +216,22 @@ import * as SoSprkActorGetPreferences from "./types/so/sprk/actor/getPreferences
 import * as SoSprkStoryGetTimeline from "./types/so/sprk/story/getTimeline.ts";
 import * as SoSprkStoryGetStories from "./types/so/sprk/story/getStories.ts";
 import * as SoSprkLabelerGetServices from "./types/so/sprk/labeler/getServices.ts";
+import * as ComAtprotoTempDereferenceScope from "./types/com/atproto/temp/dereferenceScope.ts";
 import * as ComAtprotoTempAddReservedHandle from "./types/com/atproto/temp/addReservedHandle.ts";
 import * as ComAtprotoTempCheckSignupQueue from "./types/com/atproto/temp/checkSignupQueue.ts";
+import * as ComAtprotoTempCheckHandleAvailability from "./types/com/atproto/temp/checkHandleAvailability.ts";
 import * as ComAtprotoTempRequestPhoneVerification from "./types/com/atproto/temp/requestPhoneVerification.ts";
+import * as ComAtprotoTempRevokeAccountCredentials from "./types/com/atproto/temp/revokeAccountCredentials.ts";
 import * as ComAtprotoTempFetchLabels from "./types/com/atproto/temp/fetchLabels.ts";
 import * as ComAtprotoIdentityUpdateHandle from "./types/com/atproto/identity/updateHandle.ts";
 import * as ComAtprotoIdentitySignPlcOperation from "./types/com/atproto/identity/signPlcOperation.ts";
 import * as ComAtprotoIdentitySubmitPlcOperation from "./types/com/atproto/identity/submitPlcOperation.ts";
+import * as ComAtprotoIdentityResolveIdentity from "./types/com/atproto/identity/resolveIdentity.ts";
+import * as ComAtprotoIdentityRefreshIdentity from "./types/com/atproto/identity/refreshIdentity.ts";
 import * as ComAtprotoIdentityResolveHandle from "./types/com/atproto/identity/resolveHandle.ts";
 import * as ComAtprotoIdentityRequestPlcOperationSignature from "./types/com/atproto/identity/requestPlcOperationSignature.ts";
 import * as ComAtprotoIdentityGetRecommendedDidCredentials from "./types/com/atproto/identity/getRecommendedDidCredentials.ts";
+import * as ComAtprotoIdentityResolveDid from "./types/com/atproto/identity/resolveDid.ts";
 import * as ComAtprotoAdminUpdateAccountEmail from "./types/com/atproto/admin/updateAccountEmail.ts";
 import * as ComAtprotoAdminGetAccountInfo from "./types/com/atproto/admin/getAccountInfo.ts";
 import * as ComAtprotoAdminGetSubjectStatus from "./types/com/atproto/admin/getSubjectStatus.ts";
@@ -190,6 +239,7 @@ import * as ComAtprotoAdminSearchAccounts from "./types/com/atproto/admin/search
 import * as ComAtprotoAdminUpdateAccountPassword from "./types/com/atproto/admin/updateAccountPassword.ts";
 import * as ComAtprotoAdminUpdateAccountHandle from "./types/com/atproto/admin/updateAccountHandle.ts";
 import * as ComAtprotoAdminGetInviteCodes from "./types/com/atproto/admin/getInviteCodes.ts";
+import * as ComAtprotoAdminUpdateAccountSigningKey from "./types/com/atproto/admin/updateAccountSigningKey.ts";
 import * as ComAtprotoAdminEnableAccountInvites from "./types/com/atproto/admin/enableAccountInvites.ts";
 import * as ComAtprotoAdminDisableAccountInvites from "./types/com/atproto/admin/disableAccountInvites.ts";
 import * as ComAtprotoAdminDisableInviteCodes from "./types/com/atproto/admin/disableInviteCodes.ts";
@@ -224,6 +274,7 @@ import * as ComAtprotoServerRequestAccountDelete from "./types/com/atproto/serve
 import * as ComAtprotoServerCreateAccount from "./types/com/atproto/server/createAccount.ts";
 import * as ComAtprotoServerDeleteAccount from "./types/com/atproto/server/deleteAccount.ts";
 import * as ComAtprotoServerCreateInviteCode from "./types/com/atproto/server/createInviteCode.ts";
+import * as ComAtprotoLexiconResolveLexicon from "./types/com/atproto/lexicon/resolveLexicon.ts";
 import * as ComAtprotoSyncGetHead from "./types/com/atproto/sync/getHead.ts";
 import * as ComAtprotoSyncGetBlob from "./types/com/atproto/sync/getBlob.ts";
 import * as ComAtprotoSyncGetRepo from "./types/com/atproto/sync/getRepo.ts";
@@ -234,7 +285,9 @@ import * as ComAtprotoSyncGetLatestCommit from "./types/com/atproto/sync/getLate
 import * as ComAtprotoSyncSubscribeRepos from "./types/com/atproto/sync/subscribeRepos.ts";
 import * as ComAtprotoSyncGetRepoStatus from "./types/com/atproto/sync/getRepoStatus.ts";
 import * as ComAtprotoSyncGetRecord from "./types/com/atproto/sync/getRecord.ts";
+import * as ComAtprotoSyncListHosts from "./types/com/atproto/sync/listHosts.ts";
 import * as ComAtprotoSyncListRepos from "./types/com/atproto/sync/listRepos.ts";
+import * as ComAtprotoSyncGetHostStatus from "./types/com/atproto/sync/getHostStatus.ts";
 import * as ComAtprotoSyncGetBlocks from "./types/com/atproto/sync/getBlocks.ts";
 import * as ComAtprotoSyncListReposByCollection from "./types/com/atproto/sync/listReposByCollection.ts";
 import * as ComAtprotoSyncGetCheckout from "./types/com/atproto/sync/getCheckout.ts";
@@ -254,12 +307,75 @@ export const TOOLS_OZONE_TEAM = {
   DefsRoleAdmin: "tools.ozone.team.defs#roleAdmin",
   DefsRoleModerator: "tools.ozone.team.defs#roleModerator",
   DefsRoleTriage: "tools.ozone.team.defs#roleTriage",
+  DefsRoleVerifier: "tools.ozone.team.defs#roleVerifier",
+};
+export const TOOLS_OZONE_REPORT = {
+  DefsReasonAppeal: "tools.ozone.report.defs#reasonAppeal",
+  DefsReasonOther: "tools.ozone.report.defs#reasonOther",
+  DefsReasonViolenceAnimal: "tools.ozone.report.defs#reasonViolenceAnimal",
+  DefsReasonViolenceThreats: "tools.ozone.report.defs#reasonViolenceThreats",
+  DefsReasonViolenceGraphicContent:
+    "tools.ozone.report.defs#reasonViolenceGraphicContent",
+  DefsReasonViolenceGlorification:
+    "tools.ozone.report.defs#reasonViolenceGlorification",
+  DefsReasonViolenceExtremistContent:
+    "tools.ozone.report.defs#reasonViolenceExtremistContent",
+  DefsReasonViolenceTrafficking:
+    "tools.ozone.report.defs#reasonViolenceTrafficking",
+  DefsReasonViolenceOther: "tools.ozone.report.defs#reasonViolenceOther",
+  DefsReasonSexualAbuseContent:
+    "tools.ozone.report.defs#reasonSexualAbuseContent",
+  DefsReasonSexualNCII: "tools.ozone.report.defs#reasonSexualNCII",
+  DefsReasonSexualDeepfake: "tools.ozone.report.defs#reasonSexualDeepfake",
+  DefsReasonSexualAnimal: "tools.ozone.report.defs#reasonSexualAnimal",
+  DefsReasonSexualUnlabeled: "tools.ozone.report.defs#reasonSexualUnlabeled",
+  DefsReasonSexualOther: "tools.ozone.report.defs#reasonSexualOther",
+  DefsReasonChildSafetyCSAM: "tools.ozone.report.defs#reasonChildSafetyCSAM",
+  DefsReasonChildSafetyGroom: "tools.ozone.report.defs#reasonChildSafetyGroom",
+  DefsReasonChildSafetyPrivacy:
+    "tools.ozone.report.defs#reasonChildSafetyPrivacy",
+  DefsReasonChildSafetyHarassment:
+    "tools.ozone.report.defs#reasonChildSafetyHarassment",
+  DefsReasonChildSafetyOther: "tools.ozone.report.defs#reasonChildSafetyOther",
+  DefsReasonHarassmentTroll: "tools.ozone.report.defs#reasonHarassmentTroll",
+  DefsReasonHarassmentTargeted:
+    "tools.ozone.report.defs#reasonHarassmentTargeted",
+  DefsReasonHarassmentHateSpeech:
+    "tools.ozone.report.defs#reasonHarassmentHateSpeech",
+  DefsReasonHarassmentDoxxing:
+    "tools.ozone.report.defs#reasonHarassmentDoxxing",
+  DefsReasonHarassmentOther: "tools.ozone.report.defs#reasonHarassmentOther",
+  DefsReasonMisleadingBot: "tools.ozone.report.defs#reasonMisleadingBot",
+  DefsReasonMisleadingImpersonation:
+    "tools.ozone.report.defs#reasonMisleadingImpersonation",
+  DefsReasonMisleadingSpam: "tools.ozone.report.defs#reasonMisleadingSpam",
+  DefsReasonMisleadingScam: "tools.ozone.report.defs#reasonMisleadingScam",
+  DefsReasonMisleadingElections:
+    "tools.ozone.report.defs#reasonMisleadingElections",
+  DefsReasonMisleadingOther: "tools.ozone.report.defs#reasonMisleadingOther",
+  DefsReasonRuleSiteSecurity: "tools.ozone.report.defs#reasonRuleSiteSecurity",
+  DefsReasonRuleProhibitedSales:
+    "tools.ozone.report.defs#reasonRuleProhibitedSales",
+  DefsReasonRuleBanEvasion: "tools.ozone.report.defs#reasonRuleBanEvasion",
+  DefsReasonRuleOther: "tools.ozone.report.defs#reasonRuleOther",
+  DefsReasonSelfHarmContent: "tools.ozone.report.defs#reasonSelfHarmContent",
+  DefsReasonSelfHarmED: "tools.ozone.report.defs#reasonSelfHarmED",
+  DefsReasonSelfHarmStunts: "tools.ozone.report.defs#reasonSelfHarmStunts",
+  DefsReasonSelfHarmSubstances:
+    "tools.ozone.report.defs#reasonSelfHarmSubstances",
+  DefsReasonSelfHarmOther: "tools.ozone.report.defs#reasonSelfHarmOther",
 };
 export const TOOLS_OZONE_MODERATION = {
   DefsReviewOpen: "tools.ozone.moderation.defs#reviewOpen",
   DefsReviewEscalated: "tools.ozone.moderation.defs#reviewEscalated",
   DefsReviewClosed: "tools.ozone.moderation.defs#reviewClosed",
   DefsReviewNone: "tools.ozone.moderation.defs#reviewNone",
+  DefsTimelineEventPlcCreate:
+    "tools.ozone.moderation.defs#timelineEventPlcCreate",
+  DefsTimelineEventPlcOperation:
+    "tools.ozone.moderation.defs#timelineEventPlcOperation",
+  DefsTimelineEventPlcTombstone:
+    "tools.ozone.moderation.defs#timelineEventPlcTombstone",
 };
 export const APP_BSKY_GRAPH = {
   DefsModlist: "app.bsky.graph.defs#modlist",
@@ -281,6 +397,9 @@ export const APP_BSKY_FEED = {
   DefsInteractionReply: "app.bsky.feed.defs#interactionReply",
   DefsInteractionQuote: "app.bsky.feed.defs#interactionQuote",
   DefsInteractionShare: "app.bsky.feed.defs#interactionShare",
+};
+export const APP_BSKY_ACTOR = {
+  StatusLive: "app.bsky.actor.status#live",
 };
 export const SO_SPRK_FEED = {
   DefsRequestLess: "so.sprk.feed.defs#requestLess",
@@ -341,7 +460,10 @@ export class ToolsOzoneNS {
   _server: Server;
   signature: ToolsOzoneSignatureNS;
   server: ToolsOzoneServerNS;
+  verification: ToolsOzoneVerificationNS;
+  safelink: ToolsOzoneSafelinkNS;
   team: ToolsOzoneTeamNS;
+  hosting: ToolsOzoneHostingNS;
   communication: ToolsOzoneCommunicationNS;
   set: ToolsOzoneSetNS;
   setting: ToolsOzoneSettingNS;
@@ -351,7 +473,10 @@ export class ToolsOzoneNS {
     this._server = server;
     this.signature = new ToolsOzoneSignatureNS(server);
     this.server = new ToolsOzoneServerNS(server);
+    this.verification = new ToolsOzoneVerificationNS(server);
+    this.safelink = new ToolsOzoneSafelinkNS(server);
     this.team = new ToolsOzoneTeamNS(server);
+    this.hosting = new ToolsOzoneHostingNS(server);
     this.communication = new ToolsOzoneCommunicationNS(server);
     this.set = new ToolsOzoneSetNS(server);
     this.setting = new ToolsOzoneSettingNS(server);
@@ -423,6 +548,118 @@ export class ToolsOzoneServerNS {
   }
 }
 
+export class ToolsOzoneVerificationNS {
+  _server: Server;
+
+  constructor(server: Server) {
+    this._server = server;
+  }
+
+  revokeVerifications<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ToolsOzoneVerificationRevokeVerifications.QueryParams,
+      ToolsOzoneVerificationRevokeVerifications.HandlerInput,
+      ToolsOzoneVerificationRevokeVerifications.HandlerOutput
+    >,
+  ) {
+    const nsid = "tools.ozone.verification.revokeVerifications"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  grantVerifications<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ToolsOzoneVerificationGrantVerifications.QueryParams,
+      ToolsOzoneVerificationGrantVerifications.HandlerInput,
+      ToolsOzoneVerificationGrantVerifications.HandlerOutput
+    >,
+  ) {
+    const nsid = "tools.ozone.verification.grantVerifications"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  listVerifications<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ToolsOzoneVerificationListVerifications.QueryParams,
+      ToolsOzoneVerificationListVerifications.HandlerInput,
+      ToolsOzoneVerificationListVerifications.HandlerOutput
+    >,
+  ) {
+    const nsid = "tools.ozone.verification.listVerifications"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+}
+
+export class ToolsOzoneSafelinkNS {
+  _server: Server;
+
+  constructor(server: Server) {
+    this._server = server;
+  }
+
+  addRule<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ToolsOzoneSafelinkAddRule.QueryParams,
+      ToolsOzoneSafelinkAddRule.HandlerInput,
+      ToolsOzoneSafelinkAddRule.HandlerOutput
+    >,
+  ) {
+    const nsid = "tools.ozone.safelink.addRule"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  removeRule<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ToolsOzoneSafelinkRemoveRule.QueryParams,
+      ToolsOzoneSafelinkRemoveRule.HandlerInput,
+      ToolsOzoneSafelinkRemoveRule.HandlerOutput
+    >,
+  ) {
+    const nsid = "tools.ozone.safelink.removeRule"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  updateRule<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ToolsOzoneSafelinkUpdateRule.QueryParams,
+      ToolsOzoneSafelinkUpdateRule.HandlerInput,
+      ToolsOzoneSafelinkUpdateRule.HandlerOutput
+    >,
+  ) {
+    const nsid = "tools.ozone.safelink.updateRule"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  queryEvents<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ToolsOzoneSafelinkQueryEvents.QueryParams,
+      ToolsOzoneSafelinkQueryEvents.HandlerInput,
+      ToolsOzoneSafelinkQueryEvents.HandlerOutput
+    >,
+  ) {
+    const nsid = "tools.ozone.safelink.queryEvents"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  queryRules<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ToolsOzoneSafelinkQueryRules.QueryParams,
+      ToolsOzoneSafelinkQueryRules.HandlerInput,
+      ToolsOzoneSafelinkQueryRules.HandlerOutput
+    >,
+  ) {
+    const nsid = "tools.ozone.safelink.queryRules"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+}
+
 export class ToolsOzoneTeamNS {
   _server: Server;
 
@@ -475,6 +712,26 @@ export class ToolsOzoneTeamNS {
     >,
   ) {
     const nsid = "tools.ozone.team.addMember"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+}
+
+export class ToolsOzoneHostingNS {
+  _server: Server;
+
+  constructor(server: Server) {
+    this._server = server;
+  }
+
+  getAccountHistory<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ToolsOzoneHostingGetAccountHistory.QueryParams,
+      ToolsOzoneHostingGetAccountHistory.HandlerInput,
+      ToolsOzoneHostingGetAccountHistory.HandlerOutput
+    >,
+  ) {
+    const nsid = "tools.ozone.hosting.getAccountHistory"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -678,6 +935,30 @@ export class ToolsOzoneModerationNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
+  cancelScheduledActions<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ToolsOzoneModerationCancelScheduledActions.QueryParams,
+      ToolsOzoneModerationCancelScheduledActions.HandlerInput,
+      ToolsOzoneModerationCancelScheduledActions.HandlerOutput
+    >,
+  ) {
+    const nsid = "tools.ozone.moderation.cancelScheduledActions"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  listScheduledActions<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ToolsOzoneModerationListScheduledActions.QueryParams,
+      ToolsOzoneModerationListScheduledActions.HandlerInput,
+      ToolsOzoneModerationListScheduledActions.HandlerOutput
+    >,
+  ) {
+    const nsid = "tools.ozone.moderation.listScheduledActions"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
   queryStatuses<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -702,6 +983,18 @@ export class ToolsOzoneModerationNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
+  getSubjects<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ToolsOzoneModerationGetSubjects.QueryParams,
+      ToolsOzoneModerationGetSubjects.HandlerInput,
+      ToolsOzoneModerationGetSubjects.HandlerOutput
+    >,
+  ) {
+    const nsid = "tools.ozone.moderation.getSubjects"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
   getRecords<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -711,6 +1004,18 @@ export class ToolsOzoneModerationNS {
     >,
   ) {
     const nsid = "tools.ozone.moderation.getRecords"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  scheduleAction<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ToolsOzoneModerationScheduleAction.QueryParams,
+      ToolsOzoneModerationScheduleAction.HandlerInput,
+      ToolsOzoneModerationScheduleAction.HandlerOutput
+    >,
+  ) {
+    const nsid = "tools.ozone.moderation.scheduleAction"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -774,6 +1079,18 @@ export class ToolsOzoneModerationNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
+  getAccountTimeline<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ToolsOzoneModerationGetAccountTimeline.QueryParams,
+      ToolsOzoneModerationGetAccountTimeline.HandlerInput,
+      ToolsOzoneModerationGetAccountTimeline.HandlerOutput
+    >,
+  ) {
+    const nsid = "tools.ozone.moderation.getAccountTimeline"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
   getRepos<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -800,24 +1117,28 @@ export class AppNS {
 export class AppBskyNS {
   _server: Server;
   video: AppBskyVideoNS;
+  bookmark: AppBskyBookmarkNS;
   embed: AppBskyEmbedNS;
   notification: AppBskyNotificationNS;
   unspecced: AppBskyUnspeccedNS;
   graph: AppBskyGraphNS;
   feed: AppBskyFeedNS;
   richtext: AppBskyRichtextNS;
+  ageassurance: AppBskyAgeassuranceNS;
   actor: AppBskyActorNS;
   labeler: AppBskyLabelerNS;
 
   constructor(server: Server) {
     this._server = server;
     this.video = new AppBskyVideoNS(server);
+    this.bookmark = new AppBskyBookmarkNS(server);
     this.embed = new AppBskyEmbedNS(server);
     this.notification = new AppBskyNotificationNS(server);
     this.unspecced = new AppBskyUnspeccedNS(server);
     this.graph = new AppBskyGraphNS(server);
     this.feed = new AppBskyFeedNS(server);
     this.richtext = new AppBskyRichtextNS(server);
+    this.ageassurance = new AppBskyAgeassuranceNS(server);
     this.actor = new AppBskyActorNS(server);
     this.labeler = new AppBskyLabelerNS(server);
   }
@@ -867,6 +1188,50 @@ export class AppBskyVideoNS {
   }
 }
 
+export class AppBskyBookmarkNS {
+  _server: Server;
+
+  constructor(server: Server) {
+    this._server = server;
+  }
+
+  deleteBookmark<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyBookmarkDeleteBookmark.QueryParams,
+      AppBskyBookmarkDeleteBookmark.HandlerInput,
+      AppBskyBookmarkDeleteBookmark.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.bookmark.deleteBookmark"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getBookmarks<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyBookmarkGetBookmarks.QueryParams,
+      AppBskyBookmarkGetBookmarks.HandlerInput,
+      AppBskyBookmarkGetBookmarks.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.bookmark.getBookmarks"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  createBookmark<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyBookmarkCreateBookmark.QueryParams,
+      AppBskyBookmarkCreateBookmark.HandlerInput,
+      AppBskyBookmarkCreateBookmark.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.bookmark.createBookmark"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+}
+
 export class AppBskyEmbedNS {
   _server: Server;
 
@@ -906,6 +1271,30 @@ export class AppBskyNotificationNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
+  putActivitySubscription<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyNotificationPutActivitySubscription.QueryParams,
+      AppBskyNotificationPutActivitySubscription.HandlerInput,
+      AppBskyNotificationPutActivitySubscription.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.notification.putActivitySubscription"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  putPreferencesV2<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyNotificationPutPreferencesV2.QueryParams,
+      AppBskyNotificationPutPreferencesV2.HandlerInput,
+      AppBskyNotificationPutPreferencesV2.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.notification.putPreferencesV2"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
   updateSeen<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -915,6 +1304,42 @@ export class AppBskyNotificationNS {
     >,
   ) {
     const nsid = "app.bsky.notification.updateSeen"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  listActivitySubscriptions<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyNotificationListActivitySubscriptions.QueryParams,
+      AppBskyNotificationListActivitySubscriptions.HandlerInput,
+      AppBskyNotificationListActivitySubscriptions.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.notification.listActivitySubscriptions"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  unregisterPush<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyNotificationUnregisterPush.QueryParams,
+      AppBskyNotificationUnregisterPush.HandlerInput,
+      AppBskyNotificationUnregisterPush.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.notification.unregisterPush"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getPreferences<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyNotificationGetPreferences.QueryParams,
+      AppBskyNotificationGetPreferences.HandlerInput,
+      AppBskyNotificationGetPreferences.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.notification.getPreferences"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -950,6 +1375,18 @@ export class AppBskyUnspeccedNS {
     this._server = server;
   }
 
+  getSuggestedFeedsSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetSuggestedFeedsSkeleton.QueryParams,
+      AppBskyUnspeccedGetSuggestedFeedsSkeleton.HandlerInput,
+      AppBskyUnspeccedGetSuggestedFeedsSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getSuggestedFeedsSkeleton"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
   searchStarterPacksSkeleton<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -959,6 +1396,115 @@ export class AppBskyUnspeccedNS {
     >,
   ) {
     const nsid = "app.bsky.unspecced.searchStarterPacksSkeleton"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getOnboardingSuggestedStarterPacksSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetOnboardingSuggestedStarterPacksSkeleton.QueryParams,
+      AppBskyUnspeccedGetOnboardingSuggestedStarterPacksSkeleton.HandlerInput,
+      AppBskyUnspeccedGetOnboardingSuggestedStarterPacksSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid =
+      "app.bsky.unspecced.getOnboardingSuggestedStarterPacksSkeleton"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getSuggestedUsers<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetSuggestedUsers.QueryParams,
+      AppBskyUnspeccedGetSuggestedUsers.HandlerInput,
+      AppBskyUnspeccedGetSuggestedUsers.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getSuggestedUsers"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getPostThreadOtherV2<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetPostThreadOtherV2.QueryParams,
+      AppBskyUnspeccedGetPostThreadOtherV2.HandlerInput,
+      AppBskyUnspeccedGetPostThreadOtherV2.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getPostThreadOtherV2"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getSuggestedStarterPacks<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetSuggestedStarterPacks.QueryParams,
+      AppBskyUnspeccedGetSuggestedStarterPacks.HandlerInput,
+      AppBskyUnspeccedGetSuggestedStarterPacks.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getSuggestedStarterPacks"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getSuggestedStarterPacksSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetSuggestedStarterPacksSkeleton.QueryParams,
+      AppBskyUnspeccedGetSuggestedStarterPacksSkeleton.HandlerInput,
+      AppBskyUnspeccedGetSuggestedStarterPacksSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getSuggestedStarterPacksSkeleton"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getOnboardingSuggestedStarterPacks<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetOnboardingSuggestedStarterPacks.QueryParams,
+      AppBskyUnspeccedGetOnboardingSuggestedStarterPacks.HandlerInput,
+      AppBskyUnspeccedGetOnboardingSuggestedStarterPacks.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getOnboardingSuggestedStarterPacks"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getSuggestedUsersSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetSuggestedUsersSkeleton.QueryParams,
+      AppBskyUnspeccedGetSuggestedUsersSkeleton.HandlerInput,
+      AppBskyUnspeccedGetSuggestedUsersSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getSuggestedUsersSkeleton"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getPostThreadV2<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetPostThreadV2.QueryParams,
+      AppBskyUnspeccedGetPostThreadV2.HandlerInput,
+      AppBskyUnspeccedGetPostThreadV2.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getPostThreadV2"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getTrends<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetTrends.QueryParams,
+      AppBskyUnspeccedGetTrends.HandlerInput,
+      AppBskyUnspeccedGetTrends.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getTrends"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -998,6 +1544,18 @@ export class AppBskyUnspeccedNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
+  getAgeAssuranceState<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetAgeAssuranceState.QueryParams,
+      AppBskyUnspeccedGetAgeAssuranceState.HandlerInput,
+      AppBskyUnspeccedGetAgeAssuranceState.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getAgeAssuranceState"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
   getPopularFeedGenerators<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -1007,6 +1565,18 @@ export class AppBskyUnspeccedNS {
     >,
   ) {
     const nsid = "app.bsky.unspecced.getPopularFeedGenerators"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  initAgeAssurance<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedInitAgeAssurance.QueryParams,
+      AppBskyUnspeccedInitAgeAssurance.HandlerInput,
+      AppBskyUnspeccedInitAgeAssurance.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.initAgeAssurance"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1031,6 +1601,30 @@ export class AppBskyUnspeccedNS {
     >,
   ) {
     const nsid = "app.bsky.unspecced.getTaggedSuggestions"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getSuggestedFeeds<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetSuggestedFeeds.QueryParams,
+      AppBskyUnspeccedGetSuggestedFeeds.HandlerInput,
+      AppBskyUnspeccedGetSuggestedFeeds.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getSuggestedFeeds"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getTrendsSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetTrendsSkeleton.QueryParams,
+      AppBskyUnspeccedGetTrendsSkeleton.HandlerInput,
+      AppBskyUnspeccedGetTrendsSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getTrendsSkeleton"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1075,6 +1669,30 @@ export class AppBskyGraphNS {
     >,
   ) {
     const nsid = "app.bsky.graph.getSuggestedFollowsByActor"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getStarterPacksWithMembership<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyGraphGetStarterPacksWithMembership.QueryParams,
+      AppBskyGraphGetStarterPacksWithMembership.HandlerInput,
+      AppBskyGraphGetStarterPacksWithMembership.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.graph.getStarterPacksWithMembership"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getListsWithMembership<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyGraphGetListsWithMembership.QueryParams,
+      AppBskyGraphGetListsWithMembership.HandlerInput,
+      AppBskyGraphGetListsWithMembership.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.graph.getListsWithMembership"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1539,6 +2157,50 @@ export class AppBskyRichtextNS {
   }
 }
 
+export class AppBskyAgeassuranceNS {
+  _server: Server;
+
+  constructor(server: Server) {
+    this._server = server;
+  }
+
+  begin<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyAgeassuranceBegin.QueryParams,
+      AppBskyAgeassuranceBegin.HandlerInput,
+      AppBskyAgeassuranceBegin.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.ageassurance.begin"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getState<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyAgeassuranceGetState.QueryParams,
+      AppBskyAgeassuranceGetState.HandlerInput,
+      AppBskyAgeassuranceGetState.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.ageassurance.getState"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getConfig<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyAgeassuranceGetConfig.QueryParams,
+      AppBskyAgeassuranceGetConfig.HandlerInput,
+      AppBskyAgeassuranceGetConfig.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.ageassurance.getConfig"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+}
+
 export class AppBskyActorNS {
   _server: Server;
 
@@ -1754,6 +2416,18 @@ export class ChatBskyConvoNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
+  addReaction<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ChatBskyConvoAddReaction.QueryParams,
+      ChatBskyConvoAddReaction.HandlerInput,
+      ChatBskyConvoAddReaction.HandlerOutput
+    >,
+  ) {
+    const nsid = "chat.bsky.convo.addReaction"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
   acceptConvo<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -1787,6 +2461,18 @@ export class ChatBskyConvoNS {
     >,
   ) {
     const nsid = "chat.bsky.convo.deleteMessageForSelf"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  removeReaction<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ChatBskyConvoRemoveReaction.QueryParams,
+      ChatBskyConvoRemoveReaction.HandlerInput,
+      ChatBskyConvoRemoveReaction.HandlerOutput
+    >,
+  ) {
+    const nsid = "chat.bsky.convo.removeReaction"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2688,6 +3374,18 @@ export class ComAtprotoTempNS {
     this._server = server;
   }
 
+  dereferenceScope<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ComAtprotoTempDereferenceScope.QueryParams,
+      ComAtprotoTempDereferenceScope.HandlerInput,
+      ComAtprotoTempDereferenceScope.HandlerOutput
+    >,
+  ) {
+    const nsid = "com.atproto.temp.dereferenceScope"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
   addReservedHandle<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -2712,6 +3410,18 @@ export class ComAtprotoTempNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
+  checkHandleAvailability<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ComAtprotoTempCheckHandleAvailability.QueryParams,
+      ComAtprotoTempCheckHandleAvailability.HandlerInput,
+      ComAtprotoTempCheckHandleAvailability.HandlerOutput
+    >,
+  ) {
+    const nsid = "com.atproto.temp.checkHandleAvailability"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
   requestPhoneVerification<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -2721,6 +3431,18 @@ export class ComAtprotoTempNS {
     >,
   ) {
     const nsid = "com.atproto.temp.requestPhoneVerification"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  revokeAccountCredentials<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ComAtprotoTempRevokeAccountCredentials.QueryParams,
+      ComAtprotoTempRevokeAccountCredentials.HandlerInput,
+      ComAtprotoTempRevokeAccountCredentials.HandlerOutput
+    >,
+  ) {
+    const nsid = "com.atproto.temp.revokeAccountCredentials"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -2780,6 +3502,30 @@ export class ComAtprotoIdentityNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
+  resolveIdentity<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ComAtprotoIdentityResolveIdentity.QueryParams,
+      ComAtprotoIdentityResolveIdentity.HandlerInput,
+      ComAtprotoIdentityResolveIdentity.HandlerOutput
+    >,
+  ) {
+    const nsid = "com.atproto.identity.resolveIdentity"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  refreshIdentity<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ComAtprotoIdentityRefreshIdentity.QueryParams,
+      ComAtprotoIdentityRefreshIdentity.HandlerInput,
+      ComAtprotoIdentityRefreshIdentity.HandlerOutput
+    >,
+  ) {
+    const nsid = "com.atproto.identity.refreshIdentity"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
   resolveHandle<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -2813,6 +3559,18 @@ export class ComAtprotoIdentityNS {
     >,
   ) {
     const nsid = "com.atproto.identity.getRecommendedDidCredentials"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  resolveDid<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ComAtprotoIdentityResolveDid.QueryParams,
+      ComAtprotoIdentityResolveDid.HandlerInput,
+      ComAtprotoIdentityResolveDid.HandlerOutput
+    >,
+  ) {
+    const nsid = "com.atproto.identity.resolveDid"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -2905,6 +3663,18 @@ export class ComAtprotoAdminNS {
     >,
   ) {
     const nsid = "com.atproto.admin.getInviteCodes"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  updateAccountSigningKey<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ComAtprotoAdminUpdateAccountSigningKey.QueryParams,
+      ComAtprotoAdminUpdateAccountSigningKey.HandlerInput,
+      ComAtprotoAdminUpdateAccountSigningKey.HandlerOutput
+    >,
+  ) {
+    const nsid = "com.atproto.admin.updateAccountSigningKey"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -3338,6 +4108,18 @@ export class ComAtprotoLexiconNS {
   constructor(server: Server) {
     this._server = server;
   }
+
+  resolveLexicon<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ComAtprotoLexiconResolveLexicon.QueryParams,
+      ComAtprotoLexiconResolveLexicon.HandlerInput,
+      ComAtprotoLexiconResolveLexicon.HandlerOutput
+    >,
+  ) {
+    const nsid = "com.atproto.lexicon.resolveLexicon"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
 }
 
 export class ComAtprotoSyncNS {
@@ -3466,6 +4248,18 @@ export class ComAtprotoSyncNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
+  listHosts<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ComAtprotoSyncListHosts.QueryParams,
+      ComAtprotoSyncListHosts.HandlerInput,
+      ComAtprotoSyncListHosts.HandlerOutput
+    >,
+  ) {
+    const nsid = "com.atproto.sync.listHosts"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
   listRepos<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -3475,6 +4269,18 @@ export class ComAtprotoSyncNS {
     >,
   ) {
     const nsid = "com.atproto.sync.listRepos"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getHostStatus<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      ComAtprotoSyncGetHostStatus.QueryParams,
+      ComAtprotoSyncGetHostStatus.HandlerInput,
+      ComAtprotoSyncGetHostStatus.HandlerOutput
+    >,
+  ) {
+    const nsid = "com.atproto.sync.getHostStatus"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 

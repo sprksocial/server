@@ -7,8 +7,10 @@ import { type $Typed } from "../../../../util.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 import type * as AppBskyGraphDefs from "../graph/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef.ts";
+import type * as AppBskyNotificationDefs from "../notification/defs.ts";
 import type * as AppBskyFeedThreadgate from "../feed/threadgate.ts";
 import type * as AppBskyFeedPostgate from "../feed/postgate.ts";
+import type * as AppBskyEmbedExternal from "../embed/external.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "app.bsky.actor.defs";
@@ -18,11 +20,16 @@ export interface ProfileViewBasic {
   did: string;
   handle: string;
   displayName?: string;
+  pronouns?: string;
   avatar?: string;
   associated?: ProfileAssociated;
   viewer?: ViewerState;
   labels?: (ComAtprotoLabelDefs.Label)[];
   createdAt?: string;
+  verification?: VerificationState;
+  status?: StatusView;
+  /** Debug information for internal development */
+  debug?: { [_ in string]: unknown };
 }
 
 const hashProfileViewBasic = "profileViewBasic";
@@ -40,6 +47,7 @@ export interface ProfileView {
   did: string;
   handle: string;
   displayName?: string;
+  pronouns?: string;
   description?: string;
   avatar?: string;
   associated?: ProfileAssociated;
@@ -47,6 +55,10 @@ export interface ProfileView {
   createdAt?: string;
   viewer?: ViewerState;
   labels?: (ComAtprotoLabelDefs.Label)[];
+  verification?: VerificationState;
+  status?: StatusView;
+  /** Debug information for internal development */
+  debug?: { [_ in string]: unknown };
 }
 
 const hashProfileView = "profileView";
@@ -65,6 +77,8 @@ export interface ProfileViewDetailed {
   handle: string;
   displayName?: string;
   description?: string;
+  pronouns?: string;
+  website?: string;
   avatar?: string;
   banner?: string;
   followersCount?: number;
@@ -77,6 +91,10 @@ export interface ProfileViewDetailed {
   viewer?: ViewerState;
   labels?: (ComAtprotoLabelDefs.Label)[];
   pinnedPost?: ComAtprotoRepoStrongRef.Main;
+  verification?: VerificationState;
+  status?: StatusView;
+  /** Debug information for internal development */
+  debug?: { [_ in string]: unknown };
 }
 
 const hashProfileViewDetailed = "profileViewDetailed";
@@ -96,6 +114,7 @@ export interface ProfileAssociated {
   starterPacks?: number;
   labeler?: boolean;
   chat?: ProfileAssociatedChat;
+  activitySubscription?: ProfileAssociatedActivitySubscription;
 }
 
 const hashProfileAssociated = "profileAssociated";
@@ -127,6 +146,30 @@ export function validateProfileAssociatedChat<V>(v: V) {
   return validate<ProfileAssociatedChat & V>(v, id, hashProfileAssociatedChat);
 }
 
+export interface ProfileAssociatedActivitySubscription {
+  $type?: "app.bsky.actor.defs#profileAssociatedActivitySubscription";
+  allowSubscriptions:
+    | "followers"
+    | "mutuals"
+    | "none"
+    | (string & globalThis.Record<PropertyKey, never>);
+}
+
+const hashProfileAssociatedActivitySubscription =
+  "profileAssociatedActivitySubscription";
+
+export function isProfileAssociatedActivitySubscription<V>(v: V) {
+  return is$typed(v, id, hashProfileAssociatedActivitySubscription);
+}
+
+export function validateProfileAssociatedActivitySubscription<V>(v: V) {
+  return validate<ProfileAssociatedActivitySubscription & V>(
+    v,
+    id,
+    hashProfileAssociatedActivitySubscription,
+  );
+}
+
 /** Metadata about the requesting account's relationship with the subject account. Only has meaningful content for authed requests. */
 export interface ViewerState {
   $type?: "app.bsky.actor.defs#viewerState";
@@ -138,6 +181,7 @@ export interface ViewerState {
   following?: string;
   followedBy?: string;
   knownFollowers?: KnownFollowers;
+  activitySubscription?: AppBskyNotificationDefs.ActivitySubscription;
 }
 
 const hashViewerState = "viewerState";
@@ -167,6 +211,58 @@ export function validateKnownFollowers<V>(v: V) {
   return validate<KnownFollowers & V>(v, id, hashKnownFollowers);
 }
 
+/** Represents the verification information about the user this object is attached to. */
+export interface VerificationState {
+  $type?: "app.bsky.actor.defs#verificationState";
+  /** All verifications issued by trusted verifiers on behalf of this user. Verifications by untrusted verifiers are not included. */
+  verifications: (VerificationView)[];
+  /** The user's status as a verified account. */
+  verifiedStatus:
+    | "valid"
+    | "invalid"
+    | "none"
+    | (string & globalThis.Record<PropertyKey, never>);
+  /** The user's status as a trusted verifier. */
+  trustedVerifierStatus:
+    | "valid"
+    | "invalid"
+    | "none"
+    | (string & globalThis.Record<PropertyKey, never>);
+}
+
+const hashVerificationState = "verificationState";
+
+export function isVerificationState<V>(v: V) {
+  return is$typed(v, id, hashVerificationState);
+}
+
+export function validateVerificationState<V>(v: V) {
+  return validate<VerificationState & V>(v, id, hashVerificationState);
+}
+
+/** An individual verification for an associated subject. */
+export interface VerificationView {
+  $type?: "app.bsky.actor.defs#verificationView";
+  /** The user who issued this verification. */
+  issuer: string;
+  /** The AT-URI of the verification record. */
+  uri: string;
+  /** True if the verification passes validation, otherwise false. */
+  isValid: boolean;
+  /** Timestamp when the verification was created. */
+  createdAt: string;
+}
+
+const hashVerificationView = "verificationView";
+
+export function isVerificationView<V>(v: V) {
+  return is$typed(v, id, hashVerificationView);
+}
+
+export function validateVerificationView<V>(v: V) {
+  return validate<VerificationView & V>(v, id, hashVerificationView);
+}
+
 export type Preferences = (
   | $Typed<AdultContentPref>
   | $Typed<ContentLabelPref>
@@ -181,6 +277,7 @@ export type Preferences = (
   | $Typed<BskyAppStatePref>
   | $Typed<LabelersPref>
   | $Typed<PostInteractionSettingsPref>
+  | $Typed<VerificationPrefs>
   | { $type: string }
 )[];
 
@@ -507,6 +604,23 @@ export function validateNux<V>(v: V) {
   return validate<Nux & V>(v, id, hashNux);
 }
 
+/** Preferences for how verified accounts appear in the app. */
+export interface VerificationPrefs {
+  $type?: "app.bsky.actor.defs#verificationPrefs";
+  /** Hide the blue check badges for verified accounts and trusted verifiers. */
+  hideBadges: boolean;
+}
+
+const hashVerificationPrefs = "verificationPrefs";
+
+export function isVerificationPrefs<V>(v: V) {
+  return is$typed(v, id, hashVerificationPrefs);
+}
+
+export function validateVerificationPrefs<V>(v: V) {
+  return validate<VerificationPrefs & V>(v, id, hashVerificationPrefs);
+}
+
 /** Default post interaction settings for the account. These values should be applied as default values when creating new posts. These refs should mirror the threadgate and postgate records exactly. */
 export interface PostInteractionSettingsPref {
   $type?: "app.bsky.actor.defs#postInteractionSettingsPref";
@@ -535,4 +649,28 @@ export function validatePostInteractionSettingsPref<V>(v: V) {
     id,
     hashPostInteractionSettingsPref,
   );
+}
+
+export interface StatusView {
+  $type?: "app.bsky.actor.defs#statusView";
+  /** The status for the account. */
+  status:
+    | "app.bsky.actor.status#live"
+    | (string & globalThis.Record<PropertyKey, never>);
+  record: { [_ in string]: unknown };
+  embed?: $Typed<AppBskyEmbedExternal.View> | { $type: string };
+  /** The date when this status will expire. The application might choose to no longer return the status after expiration. */
+  expiresAt?: string;
+  /** True if the status is not expired, false if it is expired. Only present if expiration was set. */
+  isActive?: boolean;
+}
+
+const hashStatusView = "statusView";
+
+export function isStatusView<V>(v: V) {
+  return is$typed(v, id, hashStatusView);
+}
+
+export function validateStatusView<V>(v: V) {
+  return validate<StatusView & V>(v, id, hashStatusView);
 }

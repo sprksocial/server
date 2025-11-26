@@ -44,7 +44,10 @@ export interface Repo {
   status?:
     | "takendown"
     | "suspended"
+    | "deleted"
     | "deactivated"
+    | "desynchronized"
+    | "throttled"
     | (string & globalThis.Record<PropertyKey, never>);
 }
 
