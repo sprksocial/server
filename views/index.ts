@@ -769,7 +769,7 @@ export class Views {
       createdAt: soundInfo.record.createdAt,
     } as Record<string, unknown>;
 
-    const audioCid = cidFromBlobJson(soundInfo.record.sound as BlobRef);
+    const audioCid = cidFromBlobJson(soundInfo.record.sound);
     const audioUrl = `https://media.sprk.so/sound/${
       encodeURIComponent(authorDid)
     }/${encodeURIComponent(audioCid)}`;
