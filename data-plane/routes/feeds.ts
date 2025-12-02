@@ -37,6 +37,31 @@ export class Feeds {
     this.timeCidKeyset = new TimeCidKeyset();
   }
 
+  async getFeedGenerators(uris: string[]) {
+    if (!uris.length) return { generators: [] };
+
+    const generators = await this.db.models.Generator.find({
+      uri: { $in: uris },
+    }).populate("actor");
+
+    return {
+      generators: generators.map((generator) => ({
+        uri: generator.uri,
+        cid: generator.cid,
+        authorDid: generator.authorDid,
+        displayName: generator.displayName,
+        description: generator.description,
+        descriptionFacets: generator.descriptionFacets,
+        avatar: generator.avatar,
+        acceptsInteractions: generator.acceptsInteractions,
+        likeCount: generator.likeCount || 0,
+        createdAt: generator.createdAt,
+        indexedAt: generator.indexedAt,
+        actor: generator.actor,
+      })),
+    };
+  }
+
   async getAuthorFeed(
     actorDid: string,
     limit = 50,
@@ -79,41 +104,21 @@ export class Feeds {
     const followedDids = follows.map((f) => f.subject);
     const timelineDids = [...followedDids, actorDid];
 
-    const fetchLimit = limit * 2;
-
     // Get timeline posts
     const postsQuery = this.db.models.Post.find({
       authorDid: { $in: timelineDids },
     });
 
-    // Get timeline reposts
-    const repostsQuery = this.db.models.Repost.find({
-      authorDid: { $in: timelineDids },
-    });
-
     // Apply pagination using createdAt + cid (which matches DB schema and indexes)
     const paginatedPostsQuery = this.timeCidKeyset.paginate(postsQuery, {
-      limit: fetchLimit,
+      limit,
       cursor,
       direction: "desc",
     });
 
-    const paginatedRepostsQuery = this.timeCidKeyset.paginate(
-      repostsQuery,
-      {
-        limit: fetchLimit,
-        cursor,
-        direction: "desc",
-      },
-    );
+    const posts = await paginatedPostsQuery.exec();
 
-    // Fetch both in parallel
-    const [posts, reposts] = await Promise.all([
-      paginatedPostsQuery.exec(),
-      paginatedRepostsQuery.exec(),
-    ]);
-
-    // Transform and combine results
+    // Transform posts
     const transformedPosts: FeedItem[] = posts.map((p) => ({
       uri: p.uri,
       cid: p.cid,
@@ -123,39 +128,9 @@ export class Feeds {
       sortAt: compositeTime(p.createdAt, p.indexedAt) || p.createdAt,
     }));
 
-    const transformedReposts: FeedItem[] = reposts.map((r) => ({
-      uri: r.subject?.uri || r.uri,
-      cid: r.cid,
-      authorDid: r.authorDid,
-      createdAt: r.createdAt,
-      type: "repost" as const,
-      repostUri: r.uri,
-      sortAt: compositeTime(r.createdAt, r.indexedAt) || r.createdAt,
-    }));
-
-    // Combine and sort all items
-    const allItems = [...transformedPosts, ...transformedReposts]
-      .sort((a, b) => {
-        if (a.createdAt !== b.createdAt) {
-          return a.createdAt > b.createdAt ? -1 : 1;
-        }
-        return a.cid > b.cid ? -1 : 1;
-      })
-      .slice(0, limit);
-
-    // Generate cursor from the last item if we have a full page
-    let nextCursor: string | undefined;
-    if (allItems.length >= limit) {
-      const lastItem = allItems[allItems.length - 1];
-      nextCursor = this.timeCidKeyset.pack({
-        primary: lastItem.createdAt,
-        secondary: lastItem.cid,
-      });
-    }
-
     return {
-      items: allItems.map(feedItemFromRow),
-      cursor: nextCursor,
+      items: transformedPosts.map(feedItemFromRow),
+      cursor: this.timeCidKeyset.packFromResult(transformedPosts),
     };
   }
 }

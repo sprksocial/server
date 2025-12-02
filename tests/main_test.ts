@@ -62,12 +62,8 @@ function createMockContext(): AppContext {
 }
 
 Deno.test("Basic App Creation", async () => {
-  console.log("Testing basic app creation...");
-
   const ctx = createMockContext();
   const app = createApp(ctx);
-
-  console.log("App created successfully");
 
   const res = await app.request("/", {
     headers: {
@@ -76,12 +72,9 @@ Deno.test("Basic App Creation", async () => {
   });
 
   assertEquals(res.status, 200);
-  console.log("Basic app test passed");
 });
 
 Deno.test("Well Known Endpoint", async () => {
-  console.log("Testing well-known endpoint...");
-
   const ctx = createMockContext();
   const app = createApp(ctx);
 
@@ -113,5 +106,4 @@ Deno.test("Well Known Endpoint", async () => {
       ].join(""),
     ),
   );
-  console.log("Well-known endpoint test passed");
 });

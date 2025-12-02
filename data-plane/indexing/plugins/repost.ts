@@ -25,10 +25,8 @@ const insertFn = async (
     uri: uri.toString(),
     cid: cid.toString(),
     authorDid: uri.host,
-    subject: {
-      uri: obj.subject.uri,
-      cid: obj.subject.cid,
-    },
+    subject: obj.subject.uri,
+    subjectCid: obj.subject.cid,
     via,
     viaCid,
     createdAt: normalizeDatetimeAlways(obj.createdAt),
@@ -51,13 +49,13 @@ const findDuplicate = async (
 ): Promise<AtUri | null> => {
   const found = await db.models.Repost.findOne({
     authorDid: uri.host,
-    "subject.uri": obj.subject.uri,
+    subject: obj.subject.uri,
   }).lean();
   return found ? new AtUri(found.uri) : null;
 };
 
 const notifsForInsert = (obj: IndexedRepost) => {
-  const subjectUri = new AtUri(obj.subject.uri);
+  const subjectUri = new AtUri(obj.subject);
   // prevent self-notifications
   const isRepostFromSubjectUser = subjectUri.host === obj.authorDid;
   if (isRepostFromSubjectUser) {
@@ -128,16 +126,16 @@ const notifsForDelete = (
 
 const updateAggregates = async (db: Database, repost: IndexedRepost) => {
   const repostCount = await db.models.Repost.countDocuments({
-    "subject.uri": repost.subject.uri,
+    subject: repost.subject,
   });
 
   const existingPost = await db.models.Post.findOne({
-    uri: repost.subject.uri,
+    uri: repost.subject,
   });
 
   if (existingPost) {
     await db.models.Post.findOneAndUpdate(
-      { uri: repost.subject.uri },
+      { uri: repost.subject },
       { $set: { repostCount } },
       { new: true },
     );

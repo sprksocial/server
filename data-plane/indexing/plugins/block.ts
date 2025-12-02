@@ -26,7 +26,6 @@ const insertFn = async (
     indexedAt: timestamp,
   };
 
-  // Use findOneAndUpdate with upsert to handle duplicates gracefully
   const insertedBlock = await db.models.Block.findOneAndUpdate(
     { uri: block.uri },
     { $set: block },

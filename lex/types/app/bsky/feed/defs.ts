@@ -30,6 +30,7 @@ export interface PostView {
     | $Typed<AppBskyEmbedRecord.View>
     | $Typed<AppBskyEmbedRecordWithMedia.View>
     | { $type: string };
+  bookmarkCount?: number;
   replyCount?: number;
   repostCount?: number;
   likeCount?: number;
@@ -38,6 +39,8 @@ export interface PostView {
   viewer?: ViewerState;
   labels?: (ComAtprotoLabelDefs.Label)[];
   threadgate?: ThreadgateView;
+  /** Debug information for internal development */
+  debug?: { [_ in string]: unknown };
 }
 
 const hashPostView = "postView";
@@ -55,6 +58,7 @@ export interface ViewerState {
   $type?: "app.bsky.feed.defs#viewerState";
   repost?: string;
   like?: string;
+  bookmarked?: boolean;
   threadMuted?: boolean;
   replyDisabled?: boolean;
   embeddingDisabled?: boolean;
@@ -94,6 +98,8 @@ export interface FeedViewPost {
   reason?: $Typed<ReasonRepost> | $Typed<ReasonPin> | { $type: string };
   /** Context provided by feed generator that may be passed back alongside interactions. */
   feedContext?: string;
+  /** Unique identifier per request that may be passed back alongside interactions. */
+  reqId?: string;
 }
 
 const hashFeedViewPost = "feedViewPost";
@@ -130,6 +136,8 @@ export function validateReplyRef<V>(v: V) {
 export interface ReasonRepost {
   $type?: "app.bsky.feed.defs#reasonRepost";
   by: AppBskyActorDefs.ProfileViewBasic;
+  uri?: string;
+  cid?: string;
   indexedAt: string;
 }
 
@@ -363,6 +371,8 @@ export interface Interaction {
     | (string & globalThis.Record<PropertyKey, never>);
   /** Context on a feed item that was originally supplied by the feed generator on getFeedSkeleton. */
   feedContext?: string;
+  /** Unique identifier per request that may be passed back alongside interactions. */
+  reqId?: string;
 }
 
 const hashInteraction = "interaction";

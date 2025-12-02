@@ -21,7 +21,7 @@ export class Reposts {
 
     // Build query for reposts of this subject
     const repostsQuery = this.db.models.Repost.find({
-      "subject.uri": subject.uri,
+      subject: subject.uri,
     });
 
     // Apply pagination using TimeCidKeyset
@@ -61,11 +61,11 @@ export class Reposts {
     const subjectUris = refs.map(({ uri }) => uri);
     const reposts = await this.db.models.Repost.find({
       authorDid: actorDid,
-      "subject.uri": { $in: subjectUris },
+      subject: { $in: subjectUris },
     });
 
     // Create a map for quick lookup
-    const repostMap = new Map(reposts.map((r) => [r.subject.uri, r.uri]));
+    const repostMap = new Map(reposts.map((r) => [r.subject, r.uri]));
     const uris = refs.map(({ uri }) => repostMap.get(uri) || "");
 
     return { uris };

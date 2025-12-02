@@ -109,6 +109,23 @@ export class RecordProcessor<T, S> {
       ? recordObj.createdAt
       : timestamp;
 
+    // Check for duplicates first before attempting insert
+    const found = await this.params.findDuplicate(this.db, uri, obj);
+    if (found && found.toString() !== uri.toString()) {
+      // Duplicate exists with different URI, store in duplicates table with no events
+      await this.db.models.DuplicateRecord.findOneAndUpdate(
+        { uri: uri.toString() },
+        {
+          uri: uri.toString(),
+          cid: cid.toString(),
+          duplicateOf: found.toString(),
+          indexedAt: timestamp,
+        },
+        { upsert: true, new: true },
+      );
+      return;
+    }
+
     // Insert or update record
     await this.db.models.Record.findOneAndUpdate(
       { uri: uri.toString() },
@@ -137,21 +154,6 @@ export class RecordProcessor<T, S> {
       if (!opts?.disableNotifs) {
         this.handleNotifs({ inserted });
       }
-      return;
-    }
-    // if duplicate, insert into duplicates table with no events
-    const found = await this.params.findDuplicate(this.db, uri, obj);
-    if (found && found.toString() !== uri.toString()) {
-      await this.db.models.DuplicateRecord.findOneAndUpdate(
-        { uri: uri.toString() },
-        {
-          uri: uri.toString(),
-          cid: cid.toString(),
-          duplicateOf: found.toString(),
-          indexedAt: timestamp,
-        },
-        { upsert: true, new: true },
-      );
     }
   }
 

@@ -50,6 +50,7 @@ export type HandlerOutput = HandlerError | HandlerSuccess;
 export interface Create {
   $type?: "com.atproto.repo.applyWrites#create";
   collection: string;
+  /** NOTE: maxLength is redundant with record-key format. Keeping it temporarily to ensure backwards compatibility. */
   rkey?: string;
   value: { [_ in string]: unknown };
 }

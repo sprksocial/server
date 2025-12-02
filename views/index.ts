@@ -27,6 +27,7 @@ import {
 } from "../lex/types/so/sprk/actor/defs.ts";
 import {
   BlockedPost,
+  GeneratorView,
   ImagesMedia,
   ImagesMediaView,
   isImagesMedia,
@@ -792,6 +793,44 @@ export class Views {
     };
 
     return audioView;
+  }
+
+  generator(
+    uri: string,
+    state: HydrationState,
+  ): Un$Typed<GeneratorView> | undefined {
+    const generatorInfo = state.feedgens?.get(uri);
+    if (!generatorInfo) return;
+
+    const parsedUri = new AtUri(uri);
+    const authorDid = parsedUri.hostname;
+    const creator = this.profile(authorDid, state);
+    if (!creator) return;
+
+    const generatorAgg = state.feedgenAggs?.get(uri);
+    const viewer = state.feedgenViewers?.get(uri);
+
+    const avatar = generatorInfo.record.avatar
+      ? `${this.mediaCdn}/avatar/medium/${authorDid}/${
+        cidFromBlobJson(generatorInfo.record.avatar as BlobRef)
+      }/webp`
+      : undefined;
+
+    return {
+      uri,
+      cid: generatorInfo.cid,
+      did: generatorInfo.record.did,
+      creator,
+      displayName: generatorInfo.record.displayName,
+      description: generatorInfo.record.description,
+      descriptionFacets: generatorInfo.record.descriptionFacets,
+      avatar,
+      likeCount: generatorAgg?.likes ?? 0,
+      acceptsInteractions: generatorInfo.record.acceptsInteractions,
+      viewer: viewer?.like ? { like: viewer.like } : undefined,
+      indexedAt: this.indexedAt(generatorInfo)?.toISOString() ??
+        new Date().toISOString(),
+    };
   }
   indexedAt({ sortedAt, indexedAt }: { sortedAt: Date; indexedAt: Date }) {
     if (!this.indexedAtEpoch) return sortedAt;

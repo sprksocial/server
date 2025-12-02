@@ -97,7 +97,7 @@ export class Database {
           models.repostSchema,
         ),
         Generator: this.connection.model<models.GeneratorDocument>(
-          "SprkGenerator",
+          "Generator",
           models.generatorSchema,
         ),
         Takedown: this.connection.model<models.TakedownDocument>(
@@ -120,9 +120,9 @@ export class Database {
           "ActorSync",
           models.actorSyncSchema,
         ),
-        UserPreference: this.connection.model<models.UserPreferenceDocument>(
-          "UserPreference",
-          models.userPreferenceSchema,
+        Preference: this.connection.model<models.PreferenceDocument>(
+          "Preference",
+          models.preferenceSchema,
         ),
         CursorState: this.connection.model<models.CursorStateDocument>(
           "CursorState",

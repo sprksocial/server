@@ -113,7 +113,7 @@ export class Records {
   }
 
   async getBlockRecords(uris: string[]) {
-    const result = await getRecords(this.db, uris, ids.AppBskyGraphBlock);
+    const result = await getRecords(this.db, uris, ids.SoSprkGraphBlock);
     return result;
   }
 
@@ -128,7 +128,7 @@ export class Records {
   }
 
   async getFollowRecords(uris: string[]) {
-    const result = await getRecords(this.db, uris, ids.AppBskyGraphFollow);
+    const result = await getRecords(this.db, uris, ids.SoSprkGraphFollow);
     return result;
   }
 

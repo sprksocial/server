@@ -12,6 +12,8 @@ export interface InputSchema {
     | "web"
     | (string & globalThis.Record<PropertyKey, never>);
   appId: string;
+  /** Set to true when the actor is age restricted */
+  ageRestricted?: boolean;
 }
 
 export interface HandlerInput {

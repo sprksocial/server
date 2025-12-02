@@ -42,7 +42,6 @@ const skeleton = async (input: {
   params: Params;
 }): Promise<SkeletonState> => {
   const { ctx, params } = input;
-  console.log("actor params:", params.actors, typeof params.actors);
   const dids = await ctx.hydrator.actor.getDidsDefined(params.actors);
   return { dids };
 };

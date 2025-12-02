@@ -16,6 +16,7 @@ export interface HandlerInput {
 export interface HandlerError {
   status: number;
   message?: string;
+  error?: "HostBanned";
 }
 
 export type HandlerOutput = HandlerError | void;
