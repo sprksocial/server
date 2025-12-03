@@ -20719,10 +20719,6 @@ export const schemaDict = {
             "type": "integer",
             "minimum": 0,
           },
-          "lookCount": {
-            "type": "integer",
-            "minimum": 0,
-          },
           "viewer": {
             "type": "ref",
             "ref": "lex:so.sprk.labeler.defs#labelerViewerState",
@@ -20770,10 +20766,6 @@ export const schemaDict = {
             "type": "integer",
             "minimum": 0,
           },
-          "lookCount": {
-            "type": "integer",
-            "minimum": 0,
-          },
           "viewer": {
             "type": "ref",
             "ref": "lex:so.sprk.labeler.defs#labelerViewerState",
@@ -20789,16 +20781,39 @@ export const schemaDict = {
               "ref": "lex:com.atproto.label.defs#label",
             },
           },
+          "reasonTypes": {
+            "description":
+              "The set of report reason 'codes' which are in-scope for this service to review and action. These usually align to policy categories. If not defined (distinct from empty array), all reason types are allowed.",
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:com.atproto.moderation.defs#reasonType",
+            },
+          },
+          "subjectTypes": {
+            "description":
+              "The set of subject types (account, record, etc) this service accepts reports on.",
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:com.atproto.moderation.defs#subjectType",
+            },
+          },
+          "subjectCollections": {
+            "type": "array",
+            "description":
+              "Set of record types (collection NSIDs) which can be reported to this service. If not defined (distinct from empty array), default is any record type.",
+            "items": {
+              "type": "string",
+              "format": "nsid",
+            },
+          },
         },
       },
       "labelerViewerState": {
         "type": "object",
         "properties": {
           "like": {
-            "type": "string",
-            "format": "at-uri",
-          },
-          "look": {
             "type": "string",
             "format": "at-uri",
           },
@@ -20860,6 +20875,33 @@ export const schemaDict = {
             "createdAt": {
               "type": "string",
               "format": "datetime",
+            },
+            "reasonTypes": {
+              "description":
+                "The set of report reason 'codes' which are in-scope for this service to review and action. These usually align to policy categories. If not defined (distinct from empty array), all reason types are allowed.",
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "lex:com.atproto.moderation.defs#reasonType",
+              },
+            },
+            "subjectTypes": {
+              "description":
+                "The set of subject types (account, record, etc) this service accepts reports on.",
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "lex:com.atproto.moderation.defs#subjectType",
+              },
+            },
+            "subjectCollections": {
+              "type": "array",
+              "description":
+                "Set of record types (collection NSIDs) which can be reported to this service. If not defined (distinct from empty array), default is any record type.",
+              "items": {
+                "type": "string",
+                "format": "nsid",
+              },
             },
           },
         },

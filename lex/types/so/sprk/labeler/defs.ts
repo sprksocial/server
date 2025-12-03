@@ -5,6 +5,7 @@ import { validate as _validate } from "../../../../lexicons.ts";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as SoSprkActorDefs from "../actor/defs.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
+import type * as ComAtprotoModerationDefs from "../../../com/atproto/moderation/defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.labeler.defs";
@@ -15,7 +16,6 @@ export interface LabelerView {
   cid: string;
   creator: SoSprkActorDefs.ProfileView;
   likeCount?: number;
-  lookCount?: number;
   viewer?: LabelerViewerState;
   indexedAt: string;
   labels?: (ComAtprotoLabelDefs.Label)[];
@@ -38,10 +38,15 @@ export interface LabelerViewDetailed {
   creator: SoSprkActorDefs.ProfileView;
   policies: LabelerPolicies;
   likeCount?: number;
-  lookCount?: number;
   viewer?: LabelerViewerState;
   indexedAt: string;
   labels?: (ComAtprotoLabelDefs.Label)[];
+  /** The set of report reason 'codes' which are in-scope for this service to review and action. These usually align to policy categories. If not defined (distinct from empty array), all reason types are allowed. */
+  reasonTypes?: (ComAtprotoModerationDefs.ReasonType)[];
+  /** The set of subject types (account, record, etc) this service accepts reports on. */
+  subjectTypes?: (ComAtprotoModerationDefs.SubjectType)[];
+  /** Set of record types (collection NSIDs) which can be reported to this service. If not defined (distinct from empty array), default is any record type. */
+  subjectCollections?: (string)[];
 }
 
 const hashLabelerViewDetailed = "labelerViewDetailed";
@@ -57,7 +62,6 @@ export function validateLabelerViewDetailed<V>(v: V) {
 export interface LabelerViewerState {
   $type?: "so.sprk.labeler.defs#labelerViewerState";
   like?: string;
-  look?: string;
 }
 
 const hashLabelerViewerState = "labelerViewerState";
