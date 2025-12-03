@@ -1,4 +1,3 @@
-import { AtUri, ComAtprotoRepoStrongRef } from "@atproto/api";
 import { HydrationState } from "../hydration/index.ts";
 import {
   FeedViewPost,
@@ -49,7 +48,8 @@ import {
 } from "../lex/types/so/sprk/media/video.ts";
 import type { Main as VideoMediaMainType } from "../lex/types/so/sprk/media/video.ts";
 import { AudioView } from "../lex/types/so/sprk/sound/defs.ts";
-import { INVALID_HANDLE } from "@atp/syntax";
+import { AtUri, INVALID_HANDLE } from "@atp/syntax";
+import { Main as StrongRef } from "../lex/types/com/atproto/repo/strongRef.ts";
 import { cidFromBlobJson } from "./util.ts";
 import { uriToDid } from "../utils/uris.ts";
 import { mapDefined } from "@atp/common";
@@ -217,7 +217,7 @@ export class Views {
       : undefined;
 
     const soundRecord = "sound" in recordInfo.record
-      ? recordInfo.record.sound as ComAtprotoRepoStrongRef.Main
+      ? recordInfo.record.sound as StrongRef
       : undefined;
 
     return {
