@@ -9,13 +9,13 @@ export interface InputSchema {
   /** Cursor for pagination */
   cursor?: string;
   /** Maximum number of results to return */
-  limit: number;
+  limit?: number;
   /** Filter by specific URLs or domains */
   urls?: (string)[];
   /** Filter by pattern type */
   patternType?: string;
   /** Sort direction */
-  sortDirection:
+  sortDirection?:
     | "asc"
     | "desc"
     | (string & globalThis.Record<PropertyKey, never>);

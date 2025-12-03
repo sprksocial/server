@@ -19245,6 +19245,7 @@ export const schemaDict = {
           },
           "coverArt": {
             "type": "string",
+            "format": "uri",
           },
           "details": {
             "type": "ref",
@@ -19253,6 +19254,10 @@ export const schemaDict = {
           "indexedAt": {
             "type": "string",
             "format": "datetime",
+          },
+          "audio": {
+            "type": "string",
+            "format": "uri",
           },
           "labels": {
             "type": "array",

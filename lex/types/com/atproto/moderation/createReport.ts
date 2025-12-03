@@ -2,8 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
-import { is$typed as _is$typed } from "../../../../util.ts";
-import { type $Typed } from "../../../../util.ts";
+import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as ComAtprotoModerationDefs from "./defs.ts";
 import type * as ComAtprotoAdminDefs from "../admin/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../repo/strongRef.ts";

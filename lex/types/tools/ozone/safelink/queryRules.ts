@@ -9,7 +9,7 @@ export interface InputSchema {
   /** Cursor for pagination */
   cursor?: string;
   /** Maximum number of results to return */
-  limit: number;
+  limit?: number;
   /** Filter by specific URLs or domains */
   urls?: (string)[];
   /** Filter by pattern type */
@@ -21,7 +21,7 @@ export interface InputSchema {
   /** Filter by rule creator */
   createdBy?: string;
   /** Sort direction */
-  sortDirection:
+  sortDirection?:
     | "asc"
     | "desc"
     | (string & globalThis.Record<PropertyKey, never>);

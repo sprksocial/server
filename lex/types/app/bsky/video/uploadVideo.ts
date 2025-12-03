@@ -1,7 +1,6 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import stream from "node:stream";
 import type * as AppBskyVideoDefs from "./defs.ts";
 
 export type QueryParams = globalThis.Record<PropertyKey, never>;
@@ -13,7 +12,7 @@ export interface OutputSchema {
 
 export interface HandlerInput {
   encoding: "video/mp4";
-  body: stream.Readable;
+  body: ReadableStream;
 }
 
 export interface HandlerSuccess {

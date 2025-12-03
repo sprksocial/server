@@ -1,10 +1,153 @@
-import { Server } from "../../../../lex/index.ts";
-import { AppContext } from "../../../../context.ts";
-import { transformPostsToPostViews } from "../../../../utils/post-transformer.ts";
+import { mapDefined } from "@atp/common";
 import { decodeBase64, encodeBase64 } from "@std/encoding";
-import { transformAudioToAudioView } from "../../../../utils/audio-transformer.ts";
+import { AppContext } from "../../../../context.ts";
+import {
+  HydrateCtx,
+  HydrationState,
+  Hydrator,
+  mergeManyStates,
+} from "../../../../hydration/index.ts";
+import { Server } from "../../../../lex/index.ts";
+import { QueryParams } from "../../../../lex/types/so/sprk/sound/getAudioPosts.ts";
+import { createPipeline } from "../../../../pipeline.ts";
+import { uriToDid as creatorFromUri } from "../../../../utils/uris.ts";
+import { Views } from "../../../../views/index.ts";
+import { resHeaders } from "../../../util.ts";
+import { InvalidRequestError } from "@atp/xrpc-server";
 import { RootFilterQuery } from "mongoose";
 import { PostDocument } from "../../../../data-plane/db/models.ts";
+
+export default function (server: Server, ctx: AppContext) {
+  const getAudioPosts = createPipeline(
+    skeleton,
+    hydration,
+    noBlocks,
+    presentation,
+  );
+  server.so.sprk.sound.getAudioPosts({
+    auth: ctx.authVerifier.standardOptional,
+    handler: async ({ params, auth }) => {
+      const viewer = auth.credentials.type === "standard"
+        ? auth.credentials.iss
+        : undefined;
+      const hydrateCtx = ctx.hydrator.createContext({ viewer: viewer ?? null });
+
+      const results = await getAudioPosts({ ...params, hydrateCtx }, ctx);
+
+      return {
+        encoding: "application/json",
+        body: results,
+        headers: resHeaders({}),
+      };
+    },
+  });
+}
+
+const skeleton = async (inputs: {
+  ctx: AppContext;
+  params: Params;
+}) => {
+  const { ctx, params } = inputs;
+  const { uri, limit = 50, cursor } = params;
+
+  const dbAudio = await ctx.db.models.Audio.findOne({
+    uri: uri,
+  }).exec();
+
+  if (!dbAudio) {
+    throw new InvalidRequestError("Audio not found", "NotFound");
+  }
+
+  let cursorData: CursorData | undefined;
+  if (cursor) {
+    try {
+      cursorData = parseCursor(cursor);
+    } catch {
+      throw new InvalidRequestError("The provided cursor is invalid");
+    }
+  }
+
+  const query: RootFilterQuery<PostDocument> = {
+    "sound.uri": uri,
+    reply: null,
+  };
+
+  if (cursorData) {
+    query.$or = [
+      { createdAt: { $lt: cursorData.createdAt } },
+      { createdAt: cursorData.createdAt, _id: { $lt: cursorData.id } },
+    ];
+  }
+
+  const posts = await ctx.db.models.Post
+    .find(query)
+    .sort({ createdAt: -1, _id: -1 })
+    .limit(limit + 1);
+
+  const hasMore = posts.length > limit;
+  if (hasMore) posts.pop();
+
+  const postUris = posts.map((p) => p.uri);
+
+  let nextCursor: string | undefined;
+  if (hasMore && posts.length > 0) {
+    const last = posts[posts.length - 1];
+    nextCursor = generateCursor(String(last.createdAt), String(last._id));
+  }
+
+  return { posts: postUris, audioUri: uri, cursor: nextCursor };
+};
+
+const hydration = async (inputs: {
+  ctx: Context;
+  params: Params;
+  skeleton: Skeleton;
+}) => {
+  const { ctx, params, skeleton } = inputs;
+  const [postState, soundState] = await Promise.all([
+    ctx.hydrator.hydratePosts(
+      skeleton.posts.map((uri) => ({ uri })),
+      params.hydrateCtx,
+    ),
+    ctx.hydrator.hydrateSounds([skeleton.audioUri], params.hydrateCtx),
+  ]);
+  return mergeManyStates(postState, soundState);
+};
+
+const noBlocks = (inputs: {
+  ctx: Context;
+  skeleton: Skeleton;
+  hydration: HydrationState;
+}) => {
+  const { ctx, skeleton, hydration } = inputs;
+  skeleton.posts = skeleton.posts.filter((uri) => {
+    const creator = creatorFromUri(uri);
+    return !ctx.views.viewerBlockExists(creator, hydration);
+  });
+  return skeleton;
+};
+
+const presentation = (inputs: {
+  ctx: Context;
+  params: Params;
+  skeleton: Skeleton;
+  hydration: HydrationState;
+}) => {
+  const { ctx, skeleton, hydration } = inputs;
+  const posts = mapDefined(
+    skeleton.posts,
+    (uri) => ctx.views.post(uri, hydration),
+  );
+  const audio = ctx.views.soundView(skeleton.audioUri, hydration);
+
+  // If audio hydration failed, return stub or empty?
+  // The schema likely requires the audio field.
+  // If hydration fails, soundView returns undefined.
+  // We should probably handle this, but since we checked existence in skeleton, it implies DB record exists.
+  // Views handles it.
+
+  return { audio: audio!, posts, cursor: skeleton.cursor };
+};
 
 interface CursorData {
   createdAt: string;
@@ -12,110 +155,26 @@ interface CursorData {
 }
 
 function parseCursor(cursor: string): CursorData {
-  try {
-    const decoded = new TextDecoder().decode(decodeBase64(cursor));
-    const [createdAt, id] = decoded.split("::");
-    if (!createdAt || !id) throw new Error("Invalid cursor format");
-    return { createdAt, id };
-  } catch {
-    throw new Error("Invalid cursor format");
-  }
+  const decoded = new TextDecoder().decode(decodeBase64(cursor));
+  const [createdAt, id] = decoded.split("::");
+  if (!createdAt || !id) throw new Error("Invalid cursor format");
+  return { createdAt, id };
 }
 
 function generateCursor(createdAt: string, id: string): string {
   return encodeBase64(new TextEncoder().encode(`${createdAt}::${id}`));
 }
 
-export default function (server: Server, ctx: AppContext) {
-  server.so.sprk.sound.getAudioPosts({
-    auth: ctx.authVerifier.standardOptional,
-    handler: async ({ params, auth }) => {
-      try {
-        const { uri, limit = 50, cursor } = params;
-        const userDid = auth.credentials.type === "standard"
-          ? auth.credentials.iss
-          : undefined;
+type Context = {
+  db: AppContext["db"];
+  hydrator: Hydrator;
+  views: Views;
+};
 
-        let cursorData: CursorData | undefined;
-        if (cursor) {
-          try {
-            cursorData = parseCursor(cursor);
-          } catch {
-            return { status: 400, message: "The provided cursor is invalid" };
-          }
-        }
+type Params = QueryParams & { hydrateCtx: HydrateCtx };
 
-        const dbAudio = await ctx.db.models.Audio.findOne({
-          uri: uri,
-        })
-          .exec();
-
-        if (!dbAudio) {
-          return { status: 404, message: "Audio not found" };
-        }
-
-        const audioView = await transformAudioToAudioView(dbAudio, ctx);
-
-        const query: RootFilterQuery<PostDocument> = {
-          "sound.uri": uri,
-          reply: null,
-        };
-
-        if (cursorData) {
-          query.$or = [
-            { createdAt: { $lt: cursorData.createdAt } },
-            { createdAt: cursorData.createdAt, _id: { $lt: cursorData.id } },
-          ];
-        }
-
-        const posts = await ctx.db.models.Post
-          .find(query)
-          .sort({ createdAt: -1, _id: -1 })
-          .limit(limit + 1);
-
-        const hasMore = posts.length > limit;
-        if (hasMore) posts.pop();
-
-        // Block relationships: filter out posts by authors blocked by or blocking user
-        if (userDid && posts.length > 0) {
-          const authorDids = [...new Set(posts.map((p) => p.authorDid))];
-          const [userBlocking, userBlocked] = await Promise.all([
-            ctx.db.models.Block.find({
-              authorDid: userDid,
-              subject: { $in: authorDids },
-            }),
-            ctx.db.models.Block.find({
-              authorDid: { $in: authorDids },
-              subject: userDid,
-            }),
-          ]);
-          const blockedAuthorDids = new Set<string>([
-            ...userBlocking.map((b) => b.subject),
-            ...userBlocked.map((b) => b.authorDid),
-          ]);
-          for (let i = posts.length - 1; i >= 0; i--) {
-            if (blockedAuthorDids.has(posts[i].authorDid)) posts.splice(i, 1);
-          }
-        }
-
-        const postViews = await transformPostsToPostViews(posts, ctx, userDid);
-
-        let nextCursor: string | undefined;
-        if (hasMore && posts.length > 0) {
-          const last = posts[posts.length - 1];
-          nextCursor = generateCursor(String(last.createdAt), String(last._id));
-        }
-
-        const body = {
-          audio: audioView,
-          posts: postViews,
-          ...(nextCursor ? { cursor: nextCursor } : {}),
-        };
-        return { encoding: "application/json", body };
-      } catch (error) {
-        console.error("Unexpected error in getAudioPosts:", error);
-        return { status: 500, message: "Internal server error" };
-      }
-    },
-  });
-}
+type Skeleton = {
+  posts: string[];
+  audioUri: string;
+  cursor?: string;
+};

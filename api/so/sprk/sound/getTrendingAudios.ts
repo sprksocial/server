@@ -1,84 +1,117 @@
-import { Server } from "../../../../lex/index.ts";
+import { mapDefined } from "@atp/common";
 import { AppContext } from "../../../../context.ts";
-import { transformAudiosToAudioViews } from "../../../../utils/audio-transformer.ts";
-import { AudioDocument } from "../../../../data-plane/db/models.ts";
-
-interface AudioAggDoc {
-  uri: string;
-  createdAt: string | Date;
-}
-interface BlockDoc {
-  authorDid: string;
-  subject: string;
-}
+import {
+  HydrateCtx,
+  HydrationState,
+  Hydrator,
+} from "../../../../hydration/index.ts";
+import { Server } from "../../../../lex/index.ts";
+import { QueryParams } from "../../../../lex/types/so/sprk/sound/getTrendingAudios.ts";
+import { createPipeline } from "../../../../pipeline.ts";
+import { uriToDid as creatorFromUri } from "../../../../utils/uris.ts";
+import { Views } from "../../../../views/index.ts";
+import { resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
+  const getTrendingAudios = createPipeline(
+    skeleton,
+    hydration,
+    noBlocks,
+    presentation,
+  );
   server.so.sprk.sound.getTrendingAudios({
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth }) => {
-      const { limit = 25, cursor } = params;
-      const userDid = auth.credentials.type === "standard"
+      const viewer = auth.credentials.type === "standard"
         ? auth.credentials.iss
         : undefined;
+      const hydrateCtx = ctx.hydrator.createContext({ viewer: viewer ?? null });
 
-      let skip = 0;
-      if (cursor) {
-        const parsed = parseInt(cursor, 10);
-        if (!isNaN(parsed) && parsed > 0) skip = parsed;
-      }
+      const results = await getTrendingAudios({ ...params, hydrateCtx }, ctx);
 
-      // Rank by: useCount desc, then createdAt desc
-      const docsPage = await ctx.db.models.Audio.find({})
-        .sort({ useCount: -1, createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean();
-      const uris = docsPage.map((a) => a.uri);
-
-      // Fetch full audio documents and preserve order
-      const docs = await ctx.db.models.Audio.find({ uri: { $in: uris } });
-      const byUri = new Map(docs.map((d) => [d.uri, d] as const));
-      let audiosOrdered: AudioDocument[] = [];
-      for (const uri of uris) {
-        const doc = byUri.get(uri);
-        if (doc) audiosOrdered.push(doc);
-      }
-
-      // Block filtering like other endpoints: when authed, filter out audios authored by blocked accounts
-      if (userDid && audiosOrdered.length > 0) {
-        const authorDids = [...new Set(audiosOrdered.map((a) => a.authorDid))];
-        const [blocking, blockedBy] = await Promise.all([
-          ctx.db.models.Block.find({
-            authorDid: userDid,
-            subject: { $in: authorDids },
-          }).lean(),
-          ctx.db.models.Block.find({
-            authorDid: { $in: authorDids },
-            subject: userDid,
-          }).lean(),
-        ]) satisfies [BlockDoc[], BlockDoc[]];
-        const blockedSet = new Set<string>([
-          ...blocking.map((b) => b.subject),
-          ...blockedBy.map((b) => b.authorDid),
-        ]);
-        audiosOrdered = audiosOrdered.filter((a) =>
-          !blockedSet.has(a.authorDid)
-        );
-      }
-
-      const views = await transformAudiosToAudioViews(audiosOrdered, ctx);
-
-      let nextCursor: string | undefined;
-      if (views.length === limit) {
-        nextCursor = (skip + limit).toString();
-      }
-
-      const body = {
-        audios: views,
-        ...(nextCursor ? { cursor: nextCursor } : {}),
+      return {
+        encoding: "application/json",
+        body: results,
+        headers: resHeaders({}),
       };
-
-      return { encoding: "application/json", body };
     },
   });
 }
+
+const skeleton = async (inputs: {
+  ctx: AppContext;
+  params: Params;
+}) => {
+  const { ctx, params } = inputs;
+  const { limit = 25, cursor } = params;
+
+  let skip = 0;
+  if (cursor) {
+    const parsed = parseInt(cursor, 10);
+    if (!isNaN(parsed) && parsed > 0) skip = parsed;
+  }
+
+  const docsPage = await ctx.db.models.Audio.find({})
+    .sort({ useCount: -1, createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .lean();
+
+  const uris = docsPage.map((a) => a.uri);
+
+  let nextCursor: string | undefined;
+  if (uris.length === limit) {
+    nextCursor = (skip + limit).toString();
+  }
+
+  return { audios: uris, cursor: nextCursor };
+};
+
+const hydration = (inputs: {
+  ctx: Context;
+  params: Params;
+  skeleton: Skeleton;
+}) => {
+  const { ctx, params, skeleton } = inputs;
+  return ctx.hydrator.hydrateSounds(skeleton.audios, params.hydrateCtx);
+};
+
+const noBlocks = (inputs: {
+  ctx: Context;
+  skeleton: Skeleton;
+  hydration: HydrationState;
+}) => {
+  const { ctx, skeleton, hydration } = inputs;
+  skeleton.audios = skeleton.audios.filter((uri) => {
+    const creator = creatorFromUri(uri);
+    return !ctx.views.viewerBlockExists(creator, hydration);
+  });
+  return skeleton;
+};
+
+const presentation = (inputs: {
+  ctx: Context;
+  params: Params;
+  skeleton: Skeleton;
+  hydration: HydrationState;
+}) => {
+  const { ctx, skeleton, hydration } = inputs;
+  const audios = mapDefined(
+    skeleton.audios,
+    (uri) => ctx.views.soundView(uri, hydration),
+  );
+  return { audios, cursor: skeleton.cursor };
+};
+
+type Context = {
+  db: AppContext["db"];
+  hydrator: Hydrator;
+  views: Views;
+};
+
+type Params = QueryParams & { hydrateCtx: HydrateCtx };
+
+type Skeleton = {
+  audios: string[];
+  cursor?: string;
+};

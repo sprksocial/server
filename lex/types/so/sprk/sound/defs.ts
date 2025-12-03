@@ -20,6 +20,7 @@ export interface AudioView {
   coverArt: string;
   details?: AudioDetails;
   indexedAt: string;
+  audio?: string;
   labels?: (ComAtprotoLabelDefs.Label)[];
 }
 

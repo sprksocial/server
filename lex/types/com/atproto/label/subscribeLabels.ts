@@ -2,9 +2,8 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
-import { is$typed as _is$typed } from "../../../../util.ts";
-import { type $Typed } from "../../../../util.ts";
-import { ErrorFrame } from "@atp/xrpc-server";
+import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
+import type { ErrorFrame } from "@atp/xrpc-server";
 import type * as ComAtprotoLabelDefs from "./defs.ts";
 
 const is$typed = _is$typed, validate = _validate;

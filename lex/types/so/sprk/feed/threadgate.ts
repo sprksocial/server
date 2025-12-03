@@ -2,8 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
-import { is$typed as _is$typed } from "../../../../util.ts";
-import { type $Typed } from "../../../../util.ts";
+import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.feed.threadgate";
@@ -32,6 +31,8 @@ export function isRecord<V>(v: V) {
 export function validateRecord<V>(v: V) {
   return validate<Record & V>(v, id, hashRecord, true);
 }
+
+export type Main = Record;
 
 /** Allow replies from actors mentioned in your post. */
 export interface MentionRule {

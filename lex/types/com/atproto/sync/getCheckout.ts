@@ -1,8 +1,6 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import stream from "node:stream";
-
 export type QueryParams = {
   /** The DID of the repo. */
   did: string;
@@ -12,7 +10,7 @@ export type HandlerInput = void;
 
 export interface HandlerSuccess {
   encoding: "application/vnd.ipld.car";
-  body: Uint8Array | stream.Readable;
+  body: Uint8Array | ReadableStream;
   headers?: { [key: string]: string };
 }
 

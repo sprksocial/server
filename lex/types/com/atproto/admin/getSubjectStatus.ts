@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type $Typed } from "../../../../util.ts";
+import type { $Typed } from "../../../../util.ts";
 import type * as ComAtprotoAdminDefs from "./defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../repo/strongRef.ts";
 

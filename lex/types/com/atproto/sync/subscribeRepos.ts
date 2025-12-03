@@ -1,11 +1,10 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { CID } from "multiformats/cid";
+import type { CID } from "multiformats/cid";
 import { validate as _validate } from "../../../../lexicons.ts";
-import { is$typed as _is$typed } from "../../../../util.ts";
-import { type $Typed } from "../../../../util.ts";
-import { ErrorFrame } from "@atp/xrpc-server";
+import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
+import type { ErrorFrame } from "@atp/xrpc-server";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "com.atproto.sync.subscribeRepos";

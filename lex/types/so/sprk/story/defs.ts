@@ -2,8 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
-import { is$typed as _is$typed } from "../../../../util.ts";
-import { type $Typed } from "../../../../util.ts";
+import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as SoSprkActorDefs from "../actor/defs.ts";
 import type * as SoSprkMediaImage from "../media/image.ts";
 import type * as SoSprkMediaVideo from "../media/video.ts";

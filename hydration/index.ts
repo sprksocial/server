@@ -328,6 +328,13 @@ export class Hydrator {
     );
     const authorDids = authorUris.map(didFromUri);
 
+    const soundUris = new Set<string>();
+    for (const post of state.posts!.values()) {
+      if (post && post.record.sound) {
+        soundUris.add(post.record.sound.uri);
+      }
+    }
+
     const [
       postAggs,
       replyAggs,
@@ -336,6 +343,7 @@ export class Hydrator {
       profileState,
       feedGenState,
       threadContexts,
+      soundState,
     ] = await Promise.all([
       this.feed.getPostAggregates(postRefs),
       this.feed.getReplyAggregates(replyRefs),
@@ -346,11 +354,13 @@ export class Hydrator {
       this.hydrateProfiles(authorDids, ctx),
       this.hydrateFeedGens([], ctx),
       this.feed.getThreadContexts(threadRefs),
+      this.hydrateSounds(Array.from(soundUris), ctx),
     ]);
 
     return mergeManyStates(
       profileState,
       feedGenState,
+      soundState,
       {
         posts: state.posts,
         replies: state.replies,

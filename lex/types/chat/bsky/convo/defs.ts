@@ -2,8 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
-import { is$typed as _is$typed } from "../../../../util.ts";
-import { type $Typed } from "../../../../util.ts";
+import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as AppBskyRichtextFacet from "../../../app/bsky/richtext/facet.ts";
 import type * as AppBskyEmbedRecord from "../../../app/bsky/embed/record.ts";
 import type * as ChatBskyActorDefs from "../actor/defs.ts";

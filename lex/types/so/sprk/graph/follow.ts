@@ -23,3 +23,5 @@ export function isRecord<V>(v: V) {
 export function validateRecord<V>(v: V) {
   return validate<Record & V>(v, id, hashRecord, true);
 }
+
+export type Main = Record;
