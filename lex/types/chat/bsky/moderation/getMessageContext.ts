@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type $Typed } from "../../../../util.ts";
+import type { $Typed } from "../../../../util.ts";
 import type * as ChatBskyConvoDefs from "../convo/defs.ts";
 
 export type QueryParams = {

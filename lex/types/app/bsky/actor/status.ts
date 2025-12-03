@@ -2,8 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
-import { is$typed as _is$typed } from "../../../../util.ts";
-import { type $Typed } from "../../../../util.ts";
+import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as AppBskyEmbedExternal from "../embed/external.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -31,6 +30,8 @@ export function isRecord<V>(v: V) {
 export function validateRecord<V>(v: V) {
   return validate<Record & V>(v, id, hashRecord, true);
 }
+
+export type Main = Record;
 
 /** Advertises an account as currently offering live content. */
 export const LIVE = `${id}#live`;

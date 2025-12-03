@@ -31,6 +31,8 @@ export function validateRecord<V>(v: V) {
   return validate<Record & V>(v, id, hashRecord, true);
 }
 
+export type Main = Record;
+
 export interface FeedItem {
   $type?: "app.bsky.graph.starterpack#feedItem";
   uri: string;

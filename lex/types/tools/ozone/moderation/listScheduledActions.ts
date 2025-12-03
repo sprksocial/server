@@ -21,7 +21,7 @@ export interface InputSchema {
     | (string & globalThis.Record<PropertyKey, never>)
   )[];
   /** Maximum number of results to return */
-  limit: number;
+  limit?: number;
   /** Cursor for pagination */
   cursor?: string;
 }

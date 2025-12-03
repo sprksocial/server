@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { type $Typed } from "../../../../util.ts";
+import type { $Typed } from "../../../../util.ts";
 import type * as AppBskyGraphDefs from "./defs.ts";
 
 export type QueryParams = {
