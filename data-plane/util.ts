@@ -281,3 +281,10 @@ export const parsePostSearchQuery = (
     author,
   };
 };
+
+// Helper function for composite time
+export function compositeTime(ts1?: string, ts2?: string): string | undefined {
+  if (!ts1) return ts2;
+  if (!ts2) return ts1;
+  return new Date(ts1) < new Date(ts2) ? ts1 : ts2;
+}

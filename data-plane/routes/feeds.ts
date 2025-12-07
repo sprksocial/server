@@ -1,6 +1,6 @@
 import { Database } from "../db/index.ts";
 import { TimeCidKeyset } from "../db/pagination.ts";
-import { compositeTime } from "./records.ts";
+import { compositeTime } from "../util.ts";
 
 // Helper function to format feed items
 function feedItemFromRow(

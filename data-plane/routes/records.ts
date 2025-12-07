@@ -2,7 +2,7 @@ import { Database } from "../db/index.ts";
 import { AtUri } from "@atp/syntax";
 import { ids } from "../../lex/lexicons.ts";
 import { keyBy } from "@atp/common";
-import { Code, DataPlaneError } from "../util.ts";
+import { Code, DataPlaneError, compositeTime } from "../util.ts";
 
 export type Record = {
   record: string;
@@ -96,13 +96,6 @@ async function getReplyRecords(
   ]);
 
   return { records };
-}
-
-// Helper function for composite time
-export function compositeTime(ts1?: string, ts2?: string): string | undefined {
-  if (!ts1) return ts2;
-  if (!ts2) return ts1;
-  return new Date(ts1) < new Date(ts2) ? ts1 : ts2;
 }
 
 export class Records {

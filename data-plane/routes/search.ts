@@ -1,7 +1,7 @@
 import { Database } from "../db/index.ts";
 import { IndexedAtDidKeyset, TimeCidKeyset } from "../db/pagination.ts";
 import { parsePostSearchQuery } from "../util.ts";
-import { compositeTime } from "./records.ts";
+import { compositeTime } from "../util.ts";
 
 // Remove leading @ in case a handle is input that way
 const cleanQuery = (query: string) => query.trim().replace(/^@/g, "");

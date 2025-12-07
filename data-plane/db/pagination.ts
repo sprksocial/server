@@ -127,21 +127,21 @@ export abstract class GenericKeyset<R, LR extends KeysetLabeledResult> {
   }
 }
 
-type SortedAtCidResult = { sortAt?: string; cid: string };
+type IndexedAtCidResult = { indexedAt?: string; cid: string };
 type TimeCidLabeledResult = KeysetCursor;
 
 export class TimeCidKeyset<
-  TimeCidResult = SortedAtCidResult,
+  TimeCidResult = IndexedAtCidResult,
 > extends GenericKeyset<TimeCidResult, TimeCidLabeledResult> {
   constructor() {
-    super("sortAt", "cid");
+    super("indexedAt", "cid");
   }
 
   labelResult(result: TimeCidResult): TimeCidLabeledResult;
-  labelResult<TimeCidResult extends SortedAtCidResult>(result: TimeCidResult) {
-    // Use current time as fallback if sortAt is missing
-    const sortAt = result.sortAt || new Date().toISOString();
-    return { primary: sortAt, secondary: result.cid };
+  labelResult<TimeCidResult extends IndexedAtCidResult>(result: TimeCidResult) {
+    // Use current time as fallback if indexedAt is missing
+    const indexedAt = result.indexedAt || new Date().toISOString();
+    return { primary: indexedAt, secondary: result.cid };
   }
   labeledResultToCursor(labeled: TimeCidLabeledResult) {
     const timestamp = new Date(labeled.primary).getTime();
@@ -307,20 +307,20 @@ export abstract class GenericSingleKey<R, LR extends SingleKeyLabeledResult> {
   }
 }
 
-type SortAtResult = { sortAt: string };
+type IndexedAtResult = { indexedAt: string };
 type TimeLabeledResult = SingleKeyCursor;
 
-export class IsoTimeKey<TimeResult = SortAtResult> extends GenericSingleKey<
+export class IsoTimeKey<TimeResult = IndexedAtResult> extends GenericSingleKey<
   TimeResult,
   TimeLabeledResult
 > {
   constructor() {
-    super("sortAt");
+    super("indexedAt");
   }
 
   labelResult(result: TimeResult): TimeLabeledResult;
-  labelResult<TimeResult extends SortAtResult>(result: TimeResult) {
-    return { primary: result.sortAt };
+  labelResult<TimeResult extends IndexedAtResult>(result: TimeResult) {
+    return { primary: result.indexedAt };
   }
   labeledResultToCursor(labeled: TimeLabeledResult) {
     const primaryDate = new Date(labeled.primary);
@@ -343,14 +343,14 @@ export class IsoTimeKey<TimeResult = SortAtResult> extends GenericSingleKey<
 }
 
 export class IsoSortAtKey extends IsoTimeKey<{
-  sortAt: string;
+  indexedAt: string;
 }> {
   constructor() {
     super();
   }
 
-  override labelResult(result: { sortAt: string }) {
-    return { primary: result.sortAt };
+  override labelResult(result: { indexedAt: string }) {
+    return { primary: result.indexedAt };
   }
 }
 
