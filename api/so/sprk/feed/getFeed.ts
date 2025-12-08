@@ -217,8 +217,8 @@ const skeletonFromFeedGen = async (
       // The feedgen is not guaranteed to honor the limit, but we try it.
       limit: params.limit,
       cursor: params.cursor,
-    }, {
-      headers,
+    }, undefined, {
+      headers
     });
 
     skeleton = result.data;
