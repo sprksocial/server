@@ -19,15 +19,19 @@ export class Interactions {
       return { likes: [], replies: [], reposts: [], quotes: [] };
     }
 
-    // Get pre-computed counts from Post and Reply documents
-    const [posts, replies] = await Promise.all([
+    // Get pre-computed counts from Post, Reply, and Generator documents
+    const [posts, replies, generators] = await Promise.all([
       this.db.models.Post.find(
         { uri: { $in: uris } },
         { uri: 1, likeCount: 1, replyCount: 1, repostCount: 1 },
       ),
       this.db.models.Reply.find(
         { uri: { $in: uris } },
-        { uri: 1, likeCount: 1, replyCount: 1, repostCount: 1 },
+        { uri: 1, likeCount: 1, replyCount: 1 },
+      ),
+      this.db.models.Generator.find(
+        { uri: { $in: uris } },
+        { uri: 1, likeCount: 1 },
       ),
     ]);
 
@@ -45,6 +49,10 @@ export class Interactions {
     for (const reply of replies) {
       likesMap.set(reply.uri, reply.likeCount ?? 0);
       repliesMap.set(reply.uri, reply.replyCount ?? 0);
+    }
+
+    for (const generator of generators) {
+      likesMap.set(generator.uri, generator.likeCount ?? 0);
     }
 
     return {
