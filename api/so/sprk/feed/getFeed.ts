@@ -212,14 +212,19 @@ const skeletonFromFeedGen = async (
   let resHeaders: Record<string, string> | undefined = undefined;
   try {
     // @TODO currently passthrough auth headers from pds
-    const result = await client.call("so.sprk.feed.getFeedSkeleton", {
-      feed: params.feed,
-      // The feedgen is not guaranteed to honor the limit, but we try it.
-      limit: params.limit,
-      cursor: params.cursor,
-    }, undefined, {
-      headers
-    });
+    const result = await client.call(
+      "so.sprk.feed.getFeedSkeleton",
+      {
+        feed: params.feed,
+        // The feedgen is not guaranteed to honor the limit, but we try it.
+        limit: params.limit,
+        cursor: params.cursor,
+      },
+      undefined,
+      {
+        headers,
+      },
+    );
 
     skeleton = result.data;
 

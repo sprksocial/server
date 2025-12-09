@@ -2,7 +2,7 @@ import { Database } from "../db/index.ts";
 import { AtUri } from "@atp/syntax";
 import { ids } from "../../lex/lexicons.ts";
 import { keyBy } from "@atp/common";
-import { Code, DataPlaneError, compositeTime } from "../util.ts";
+import { Code, compositeTime, DataPlaneError } from "../util.ts";
 
 export type Record = {
   record: string;

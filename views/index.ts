@@ -534,6 +534,42 @@ export class Views {
     };
   }
 
+  feedGenerator(
+    uri: string,
+    state: HydrationState,
+  ): Un$Typed<GeneratorView> | undefined {
+    const feedgen = state.feedgens?.get(uri);
+    if (!feedgen) return;
+    const creatorDid = uriToDid(uri);
+    const creator = this.profile(creatorDid, state);
+    if (!creator) return;
+    const viewer = state.feedgenViewers?.get(uri);
+    const aggs = state.feedgenAggs?.get(uri);
+
+    return {
+      uri,
+      cid: feedgen.cid,
+      did: feedgen.record.did,
+      creator,
+      displayName: feedgen.record.displayName,
+      description: feedgen.record.description,
+      descriptionFacets: feedgen.record.descriptionFacets,
+      avatar: feedgen.record?.avatar
+        ? `${this.mediaCdn}/avatar/medium/${creatorDid}/${
+          cidFromBlobJson(feedgen.record.avatar)
+        }/webp`
+        : undefined,
+      likeCount: aggs?.likes ?? 0,
+      acceptsInteractions: feedgen.record.acceptsInteractions,
+      viewer: viewer
+        ? {
+          like: viewer.like,
+        }
+        : undefined,
+      indexedAt: this.indexedAt(feedgen).toISOString(),
+    };
+  }
+
   profile(
     did: string,
     state: HydrationState,

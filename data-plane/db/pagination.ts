@@ -397,3 +397,44 @@ export class StashKeyKey extends RkeyKey<{
     return { primary: result.key };
   }
 }
+
+type LikeCountCidResult = { likeCount: number; cid: string };
+type LikeCountCidLabeledResult = KeysetCursor;
+
+/**
+ * Custom keyset for paginating by like count with cid as tie-breaker.
+ * Useful for sorting items by popularity or engagement metrics.
+ */
+export class LikeCountCidKeyset extends GenericKeyset<
+  LikeCountCidResult,
+  LikeCountCidLabeledResult
+> {
+  constructor() {
+    super("likeCount", "cid");
+  }
+
+  labelResult(result: LikeCountCidResult): LikeCountCidLabeledResult {
+    return {
+      primary: result.likeCount.toString(),
+      secondary: result.cid,
+    };
+  }
+
+  labeledResultToCursor(labeled: LikeCountCidLabeledResult) {
+    return {
+      primary: labeled.primary,
+      secondary: labeled.secondary,
+    };
+  }
+
+  cursorToLabeledResult(cursor: KeysetCursor) {
+    const likeCount = parseInt(cursor.primary, 10);
+    if (isNaN(likeCount)) {
+      throw new InvalidRequestError("Malformed cursor: invalid like count");
+    }
+    return {
+      primary: cursor.primary,
+      secondary: cursor.secondary,
+    };
+  }
+}

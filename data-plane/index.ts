@@ -2,6 +2,7 @@ import { IdResolver } from "@atp/identity";
 import { Database } from "./db/index.ts";
 import { getLogger, Logger } from "@logtape/logtape";
 import { Blocks } from "./routes/blocks.ts";
+import { FeedGens } from "./routes/feed-gens.ts";
 import { Feeds } from "./routes/feeds.ts";
 import { Follows } from "./routes/follows.ts";
 import { Likes } from "./routes/likes.ts";
@@ -32,6 +33,7 @@ export class DataPlane {
 
   // Route handlers as root-level properties
   public blocks: Blocks;
+  public feedGens: FeedGens;
   public feeds: Feeds;
   public follows: Follows;
   public likes: Likes;
@@ -58,6 +60,7 @@ export class DataPlane {
 
     // Initialize all route handlers
     this.blocks = new Blocks(db);
+    this.feedGens = new FeedGens(db);
     this.feeds = new Feeds(db);
     this.follows = new Follows(db);
     this.likes = new Likes(db);
