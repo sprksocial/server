@@ -12,45 +12,57 @@ export class Relationships {
       return { relationships: [] };
     }
 
-    const relationships = await Promise.all(
-      targetDids.map(async (targetDid) => {
-        const [
-          blocking,
-          blockedBy,
-          following,
-          followedBy,
-        ] = await Promise.all([
-          // Check if actor blocks target
-          this.db.models.Block.findOne({
-            authorDid: actorDid,
-            subjectDid: targetDid,
-          }),
-          // Check if target blocks actor
-          this.db.models.Block.findOne({
-            authorDid: targetDid,
-            subjectDid: actorDid,
-          }),
-          // Check if actor follows target
-          this.db.models.Follow.findOne({
-            authorDid: actorDid,
-            subject: targetDid,
-          }),
-          // Check if target follows actor
-          this.db.models.Follow.findOne({
-            authorDid: targetDid,
-            subject: actorDid,
-          }),
-        ]);
-
-        return {
-          muted: false,
-          blockedBy: blockedBy?.uri || "",
-          blocking: blocking?.uri || "",
-          following: following?.uri || "",
-          followedBy: followedBy?.uri || "",
-        };
+    // Batch queries using $in to reduce N+1 to 4 total queries
+    const [
+      blockingResults,
+      blockedByResults,
+      followingResults,
+      followedByResults,
+    ] = await Promise.all([
+      // All blocks where actor blocks any target
+      this.db.models.Block.find({
+        authorDid: actorDid,
+        subject: { $in: targetDids },
       }),
+      // All blocks where any target blocks actor
+      this.db.models.Block.find({
+        authorDid: { $in: targetDids },
+        subject: actorDid,
+      }),
+      // All follows where actor follows any target
+      this.db.models.Follow.find({
+        authorDid: actorDid,
+        subject: { $in: targetDids },
+      }),
+      // All follows where any target follows actor
+      this.db.models.Follow.find({
+        authorDid: { $in: targetDids },
+        subject: actorDid,
+      }),
+    ]);
+
+    // Build lookup maps for O(1) access
+    const blockingMap = new Map(
+      blockingResults.map((b) => [b.subject, b.uri]),
     );
+    const blockedByMap = new Map(
+      blockedByResults.map((b) => [b.authorDid, b.uri]),
+    );
+    const followingMap = new Map(
+      followingResults.map((f) => [f.subject, f.uri]),
+    );
+    const followedByMap = new Map(
+      followedByResults.map((f) => [f.authorDid, f.uri]),
+    );
+
+    // Build relationships from maps
+    const relationships = targetDids.map((targetDid) => ({
+      muted: false,
+      blockedBy: blockedByMap.get(targetDid) || "",
+      blocking: blockingMap.get(targetDid) || "",
+      following: followingMap.get(targetDid) || "",
+      followedBy: followedByMap.get(targetDid) || "",
+    }));
 
     return { relationships };
   }
@@ -60,40 +72,38 @@ export class Relationships {
       return { exists: [], blocks: [] };
     }
 
-    const results = await Promise.all(
-      pairs.map(async (pair) => {
-        const [
-          blocking,
-          blockedBy,
-        ] = await Promise.all([
-          // Check if A blocks B
-          this.db.models.Block.findOne({
-            authorDid: pair.a,
-            subjectDid: pair.b,
-          }),
-          // Check if B blocks A
-          this.db.models.Block.findOne({
-            authorDid: pair.b,
-            subjectDid: pair.a,
-          }),
-        ]);
+    // Build all block query pairs for batch lookup
+    const blockQueries = pairs.flatMap((pair) => [
+      { authorDid: pair.a, subject: pair.b },
+      { authorDid: pair.b, subject: pair.a },
+    ]);
 
-        const hasBlocks = !!(
-          blocking ||
-          blockedBy
-        );
+    // Single batch query using $or
+    const allBlocks = await this.db.models.Block.find({
+      $or: blockQueries,
+    });
 
-        return {
-          exists: hasBlocks,
-          blocks: {
-            blockedBy: blockedBy?.uri || undefined,
-            blocking: blocking?.uri || undefined,
-            blockedByList: undefined,
-            blockingByList: undefined,
-          },
-        };
-      }),
+    // Build lookup map: "authorDid:subject" -> uri
+    const blockMap = new Map(
+      allBlocks.map((b) => [`${b.authorDid}:${b.subject}`, b.uri]),
     );
+
+    // Build results from map
+    const results = pairs.map((pair) => {
+      const blockingUri = blockMap.get(`${pair.a}:${pair.b}`);
+      const blockedByUri = blockMap.get(`${pair.b}:${pair.a}`);
+      const hasBlocks = !!(blockingUri || blockedByUri);
+
+      return {
+        exists: hasBlocks,
+        blocks: {
+          blockedBy: blockedByUri || undefined,
+          blocking: blockingUri || undefined,
+          blockedByList: undefined,
+          blockingByList: undefined,
+        },
+      };
+    });
 
     return {
       exists: results.map((r) => r.exists),

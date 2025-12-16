@@ -38,18 +38,21 @@ export default function (server: Server, ctx: AppContext) {
         include3pBlocks,
       });
 
+      // Start repoRev fetch early so it runs in parallel with the pipeline
+      const repoRevPromise = ctx.hydrator.actor.getRepoRevSafe(viewer);
+
       let result: OutputSchema;
       try {
         result = await getPostThread({ ...params, hydrateCtx }, ctx);
       } catch (err) {
-        const repoRev = await ctx.hydrator.actor.getRepoRevSafe(viewer);
+        const repoRev = await repoRevPromise;
         if (repoRev) {
           res.headers.set(ATPROTO_REPO_REV, repoRev);
         }
         throw err;
       }
 
-      const repoRev = await ctx.hydrator.actor.getRepoRevSafe(viewer);
+      const repoRev = await repoRevPromise;
 
       return {
         encoding: "application/json",

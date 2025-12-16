@@ -341,7 +341,6 @@ export class Hydrator {
       postViewers,
       postBlocks,
       profileState,
-      feedGenState,
       threadContexts,
       soundState,
     ] = await Promise.all([
@@ -352,14 +351,12 @@ export class Hydrator {
         : Promise.resolve<PostViewerStates | undefined>(undefined),
       this.hydratePostBlocks(state.posts!, state.replies!),
       this.hydrateProfiles(authorDids, ctx),
-      this.hydrateFeedGens([], ctx),
       this.feed.getThreadContexts(threadRefs),
       this.hydrateSounds(Array.from(soundUris), ctx),
     ]);
 
     return mergeManyStates(
       profileState,
-      feedGenState,
       soundState,
       {
         posts: state.posts,

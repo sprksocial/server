@@ -12,18 +12,16 @@ export default function (server: Server, ctx: AppContext) {
         includeTakedowns,
       });
 
-      // Hydrate feed generators
-      const hydrationState = await ctx.hydrator.hydrateFeedGens(
-        params.feeds,
-        hydrateCtx,
-      );
+      // Parallelize hydration with repoRev fetch
+      const [hydrationState, repoRev] = await Promise.all([
+        ctx.hydrator.hydrateFeedGens(params.feeds, hydrateCtx),
+        ctx.hydrator.actor.getRepoRevSafe(viewer),
+      ]);
 
       // Create generator views
       const feeds = params.feeds
         .map((uri) => ctx.views.generator(uri, hydrationState))
         .filter((view): view is NonNullable<typeof view> => view !== undefined);
-
-      const repoRev = await ctx.hydrator.actor.getRepoRevSafe(viewer);
 
       return {
         encoding: "application/json",

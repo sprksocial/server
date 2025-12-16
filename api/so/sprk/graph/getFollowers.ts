@@ -72,22 +72,15 @@ const hydration = async (
 ) => {
   const { ctx, params, skeleton } = input;
   const { followUris, subjectDid } = skeleton;
-  const followState = await ctx.hydrator.hydrateFollows(
-    followUris,
-    params.hydrateCtx,
-  );
-  const dids = [subjectDid];
-  if (followState.follows) {
-    for (const [uri, follow] of followState.follows) {
-      if (follow) {
-        dids.push(didFromUri(uri));
-      }
-    }
-  }
-  const profileState = await ctx.hydrator.hydrateProfiles(
-    dids,
-    params.hydrateCtx,
-  );
+
+  // DIDs can be derived from URIs directly, enabling parallel fetches
+  const dids = [subjectDid, ...followUris.map(didFromUri)];
+
+  const [followState, profileState] = await Promise.all([
+    ctx.hydrator.hydrateFollows(followUris, params.hydrateCtx),
+    ctx.hydrator.hydrateProfiles(dids, params.hydrateCtx),
+  ]);
+
   return mergeStates(followState, profileState);
 };
 

@@ -22,9 +22,11 @@ export default function (server: Server, ctx: AppContext) {
         includeTakedowns,
       });
 
-      const result = await getProfile({ ...params, hydrateCtx }, ctx);
-
-      const repoRev = await ctx.hydrator.actor.getRepoRevSafe(viewer);
+      // Parallelize pipeline execution with repoRev fetch
+      const [result, repoRev] = await Promise.all([
+        getProfile({ ...params, hydrateCtx }, ctx),
+        ctx.hydrator.actor.getRepoRevSafe(viewer),
+      ]);
 
       return {
         encoding: "application/json",

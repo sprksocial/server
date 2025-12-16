@@ -12,11 +12,11 @@ export default function (server: Server, ctx: AppContext) {
         includeTakedowns,
       });
 
-      // Hydrate feed generator
-      const hydrationState = await ctx.hydrator.hydrateFeedGens(
-        [params.feed],
-        hydrateCtx,
-      );
+      // Parallelize hydration with repoRev fetch
+      const [hydrationState, repoRev] = await Promise.all([
+        ctx.hydrator.hydrateFeedGens([params.feed], hydrateCtx),
+        ctx.hydrator.actor.getRepoRevSafe(viewer),
+      ]);
 
       // Create generator view
       const view = ctx.views.generator(params.feed, hydrationState);
@@ -29,8 +29,6 @@ export default function (server: Server, ctx: AppContext) {
       // In a real implementation, you might check service health
       const isOnline = true;
       const isValid = true;
-
-      const repoRev = await ctx.hydrator.actor.getRepoRevSafe(viewer);
 
       return {
         encoding: "application/json",

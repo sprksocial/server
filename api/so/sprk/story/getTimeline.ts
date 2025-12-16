@@ -47,12 +47,14 @@ export default function (server: Server, ctx: AppContext) {
         );
       }
 
-      const result = await getTimeline(
-        { ...params, limit, cursor, hydrateCtx: hydrateCtx.copy({ viewer }) },
-        ctx,
-      );
-
-      const repoRev = await ctx.hydrator.actor.getRepoRevSafe(viewer);
+      // Parallelize pipeline execution with repoRev fetch
+      const [result, repoRev] = await Promise.all([
+        getTimeline(
+          { ...params, limit, cursor, hydrateCtx: hydrateCtx.copy({ viewer }) },
+          ctx,
+        ),
+        ctx.hydrator.actor.getRepoRevSafe(viewer),
+      ]);
 
       return {
         encoding: "application/json",
@@ -99,24 +101,21 @@ const hydration = async (
 ): Promise<HydrationState> => {
   const { ctx, params, skeleton } = inputs;
 
-  // Hydrate stories
-  const stories = await ctx.hydrator.story.getStories(
-    skeleton.stories,
-    params.hydrateCtx.includeTakedowns || false,
-  );
-
-  // Get author DIDs for actor hydration
+  // Get author DIDs for actor hydration (can be computed before fetching)
   const authorDids = [
     ...new Set(
       skeleton.stories.map((uri) => uriToDid(uri)),
     ),
   ];
 
-  // Hydrate actors (profiles)
-  const actors = await ctx.hydrator.actor.getActors(
-    authorDids,
-    params.hydrateCtx,
-  );
+  // Parallelize stories and actors hydration
+  const [stories, actors] = await Promise.all([
+    ctx.hydrator.story.getStories(
+      skeleton.stories,
+      params.hydrateCtx.includeTakedowns || false,
+    ),
+    ctx.hydrator.actor.getActors(authorDids, params.hydrateCtx),
+  ]);
 
   return {
     stories,

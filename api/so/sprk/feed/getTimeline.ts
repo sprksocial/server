@@ -27,12 +27,14 @@ export default function (server: Server, ctx: AppContext) {
       const viewer = auth.credentials.iss;
       const hydrateCtx = ctx.hydrator.createContext({ viewer });
 
-      const result = await getTimeline(
-        { ...params, hydrateCtx: hydrateCtx.copy({ viewer }) },
-        ctx,
-      );
-
-      const repoRev = await ctx.hydrator.actor.getRepoRevSafe(viewer);
+      // Parallelize pipeline execution with repoRev fetch
+      const [result, repoRev] = await Promise.all([
+        getTimeline(
+          { ...params, hydrateCtx: hydrateCtx.copy({ viewer }) },
+          ctx,
+        ),
+        ctx.hydrator.actor.getRepoRevSafe(viewer),
+      ]);
 
       return {
         encoding: "application/json",

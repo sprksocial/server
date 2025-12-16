@@ -34,9 +34,11 @@ export default function (server: Server, ctx: AppContext) {
         includeTakedowns,
       });
 
-      const result = await getAuthorFeed({ ...params, hydrateCtx }, ctx);
-
-      const repoRev = await ctx.hydrator.actor.getRepoRevSafe(viewer);
+      // Parallelize pipeline execution with repoRev fetch
+      const [result, repoRev] = await Promise.all([
+        getAuthorFeed({ ...params, hydrateCtx }, ctx),
+        ctx.hydrator.actor.getRepoRevSafe(viewer),
+      ]);
 
       return {
         encoding: "application/json",
@@ -54,7 +56,12 @@ export const skeleton = async (inputs: {
   params: Params;
 }): Promise<Skeleton> => {
   const { ctx, params } = inputs;
-  const [did] = await ctx.hydrator.actor.getDids([params.actor]);
+
+  // Skip DID lookup if params.actor is already a DID
+  const did = params.actor.startsWith("did:")
+    ? params.actor
+    : (await ctx.hydrator.actor.getDids([params.actor]))[0];
+
   if (!did) {
     throw new InvalidRequestError("Profile not found");
   }
