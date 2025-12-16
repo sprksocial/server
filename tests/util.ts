@@ -247,6 +247,7 @@ export function createMockContext(
   const mockDb = {
     connect: () => Promise.resolve(),
     disconnect: () => Promise.resolve(),
+    ping: () => Promise.resolve(),
     models: {},
     getCursorState: () => Promise.resolve(null),
     saveCursorState: () => Promise.resolve(),

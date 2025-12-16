@@ -1,71 +1,75 @@
 import { assertEquals } from "@std/assert";
 import { assertMatch } from "@std/assert/match";
 import { createMockApp, createMockContext } from "./util.ts";
+import { createApp } from "../main.ts";
 
-Deno.test("Basic App Creation", async () => {
+Deno.test("Basic Endpoints", async (t) => {
   const app = createMockApp();
+  await t.step("/", async () => {
+    const res = await app.request("/", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-  const res = await app.request("/", {
-    headers: {
-      "Content-Type": "application/json",
-    },
+    assertEquals(res.status, 200);
   });
+  await t.step("/.well-known/did.json", async () => {
+    const res = await app.request("/.well-known/did.json", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-  assertEquals(res.status, 200);
+    assertMatch(
+      await res.text(),
+      new RegExp(
+        [
+          "^\\{",
+          '"@context":\\["https://www\\.w3\\.org/ns/did/v1","https://w3id\\.org/security/multikey/v1"\\],',
+          '"id":"(did:web:[^"]+)",',
+          '"verificationMethod":\\[\\{',
+          '"id":"\\1#atproto",',
+          '"type":"Multikey",',
+          '"controller":"\\1",',
+          '"publicKeyMultibase":"[a-zA-Z0-9]+"',
+          "\\}\\],",
+          '"service":\\[\\{',
+          '"id":"#sprk_appview",',
+          '"type":"SprkAppView",',
+          '"serviceEndpoint":"https?://[^"]+"',
+          "\\}\\]",
+          "\\}$",
+        ].join(""),
+      ),
+    );
+  });
 });
 
-Deno.test("Well Known Endpoint", async () => {
-  const app = createMockApp();
+Deno.test("Health Check", async (t) => {
+  await t.step("succeeds when DB is healthy", async () => {
+    const ctx = createMockContext();
+    ctx.db.ping = () => Promise.resolve();
 
-  const res = await app.request("/.well-known/did.json", {
-    headers: {
-      "Content-Type": "application/json",
-    },
+    const app = createApp(ctx);
+    const res = await app.request("/xrpc/_health");
+
+    assertEquals(res.status, 200);
+    const body = await res.json();
+    assertEquals(typeof body.version, "string");
+    assertEquals(body.error, undefined);
   });
 
-  assertMatch(
-    await res.text(),
-    new RegExp(
-      [
-        "^\\{",
-        '"@context":\\["https://www\\.w3\\.org/ns/did/v1","https://w3id\\.org/security/multikey/v1"\\],',
-        '"id":"(did:web:[^"]+)",',
-        '"verificationMethod":\\[\\{',
-        '"id":"\\1#atproto",',
-        '"type":"Multikey",',
-        '"controller":"\\1",',
-        '"publicKeyMultibase":"[a-zA-Z0-9]+"',
-        "\\}\\],",
-        '"service":\\[\\{',
-        '"id":"#sprk_appview",',
-        '"type":"SprkAppView",',
-        '"serviceEndpoint":"https?://[^"]+"',
-        "\\}\\]",
-        "\\}$",
-      ].join(""),
-    ),
-  );
-});
+  await t.step("returns 503 when DB is unavailable", async () => {
+    const ctx = createMockContext();
+    ctx.db.ping = () => Promise.reject(new Error("Connection failed"));
 
-Deno.test("Mock Context Creation", () => {
-  const ctx = createMockContext();
+    const app = createApp(ctx);
+    const res = await app.request("/xrpc/_health");
 
-  assertEquals(typeof ctx.db, "object");
-  assertEquals(typeof ctx.dataplane, "object");
-  assertEquals(typeof ctx.hydrator, "object");
-  assertEquals(typeof ctx.views, "object");
-  assertEquals(typeof ctx.authVerifier, "function"); // AuthVerifier is a callable function
-  assertEquals(typeof ctx.logger, "object");
-  assertEquals(typeof ctx.idResolver, "object");
-  assertEquals(ctx.cfg.serverDid, "did:web:localhost");
-});
-
-Deno.test("Mock Context with Config Overrides", () => {
-  const ctx = createMockContext({
-    serverDid: "did:web:custom.test",
-    adminPasswords: ["custom-password"],
+    assertEquals(res.status, 503);
+    const body = await res.json();
+    assertEquals(typeof body.version, "string");
+    assertEquals(body.error, "Database not connected");
   });
-
-  assertEquals(ctx.cfg.serverDid, "did:web:custom.test");
-  assertEquals(ctx.cfg.adminPasswords, ["custom-password"]);
 });

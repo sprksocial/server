@@ -37,7 +37,11 @@
   "test": {
     "permissions": {
       "env": true,
-      "read": true
+      "read": true,
+      "write": true,
+      "net": true,
+      "run": true,
+      "sys": true
     }
   }
 }

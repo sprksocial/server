@@ -144,6 +144,14 @@ export class Database {
     }
   }
 
+  async ping(): Promise<void> {
+    const db = this.connection?.db;
+    if (!db) {
+      throw new Error("Database not connected");
+    }
+    await db.admin().ping();
+  }
+
   // Add methods for DID resolution
   async resolveHandle(handle: string): Promise<string | undefined> {
     try {

@@ -32,10 +32,11 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
   // Lexicon/XRPC server and routers
   const lexServer = createServer();
   API(lexServer, ctx);
-  app.route("/", lexServer.xrpc.app);
 
   app.route("/.well-known", wellKnown);
   app.route("/", health);
+  app.route("/", lexServer.xrpc.app);
+
   return app;
 }
 

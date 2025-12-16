@@ -1,6 +1,7 @@
 import { Hono } from "hono";
+import { AppEnv } from "../context.ts";
 
-const app = new Hono();
+const app = new Hono<AppEnv>();
 
 app.get("/", (c) => {
   return c.text(
@@ -16,7 +17,7 @@ ${"`"}------'${"`"}------'${"`"}------'${"`"}------'${"`"}------'
 This is an AT Protocol Application View (AppView) for the "sprk.so" application.
 
 Most API routes are under /xrpc/
-                                                                 	
+
 		`,
   );
 });
@@ -27,9 +28,15 @@ app.get("/robots.txt", (c) => {
   );
 });
 
-app.get("/xrpc/_health", (c) => {
+app.get("/xrpc/_health", async (c) => {
   const version = Deno.env.get("COMMIT_SHA") ?? "unknown";
-  return c.json({ version });
+
+  try {
+    await c.env.db.ping();
+    return c.json({ version });
+  } catch {
+    return c.json({ version, error: "Database not connected" }, 503);
+  }
 });
 
 export default app;
