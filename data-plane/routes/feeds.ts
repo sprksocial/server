@@ -1,6 +1,5 @@
 import { Database } from "../db/index.ts";
 import { TimeCidKeyset } from "../db/pagination.ts";
-import { compositeTime } from "../util.ts";
 
 // Helper function to format feed items
 function feedItemFromRow(
@@ -23,9 +22,9 @@ interface FeedItem {
   cid: string;
   authorDid: string;
   createdAt: string;
+  indexedAt: string;
   type: "post" | "repost";
   repostUri?: string;
-  sortAt: string;
 }
 
 export class Feeds {
@@ -87,8 +86,8 @@ export class Feeds {
       cid: p.cid,
       authorDid: p.authorDid,
       createdAt: p.createdAt,
+      indexedAt: p.indexedAt,
       type: "post" as const,
-      sortAt: compositeTime(p.createdAt, p.indexedAt) || p.createdAt,
     }));
 
     return {
@@ -124,8 +123,8 @@ export class Feeds {
       cid: p.cid,
       authorDid: p.authorDid,
       createdAt: p.createdAt,
+      indexedAt: p.indexedAt,
       type: "post" as const,
-      sortAt: compositeTime(p.createdAt, p.indexedAt) || p.createdAt,
     }));
 
     return {
