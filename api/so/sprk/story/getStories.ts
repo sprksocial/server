@@ -63,14 +63,6 @@ export default function (server: Server, ctx: AppContext) {
         : null;
       const hydrateCtx = ctx.hydrator.createContext({ viewer });
 
-      // Validate input
-      if (!params.uris) {
-        return {
-          status: 400,
-          message: "URIs parameter is required",
-        };
-      }
-
       // Ensure uris is an array
       const uriArray = Array.isArray(params.uris) ? params.uris : [params.uris];
 

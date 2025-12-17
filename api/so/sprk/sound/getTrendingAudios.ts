@@ -1,5 +1,6 @@
 import { mapDefined } from "@atp/common";
 import { AppContext } from "../../../../context.ts";
+import { DataPlane } from "../../../../data-plane/index.ts";
 import {
   HydrateCtx,
   HydrationState,
@@ -45,26 +46,12 @@ const skeleton = async (inputs: {
   const { ctx, params } = inputs;
   const { limit = 25, cursor } = params;
 
-  let skip = 0;
-  if (cursor) {
-    const parsed = parseInt(cursor, 10);
-    if (!isNaN(parsed) && parsed > 0) skip = parsed;
-  }
+  const result = await ctx.dataplane.sounds.getTrendingAudios(limit, cursor);
 
-  const docsPage = await ctx.db.models.Audio.find({})
-    .sort({ useCount: -1, createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .lean();
-
-  const uris = docsPage.map((a) => a.uri);
-
-  let nextCursor: string | undefined;
-  if (uris.length === limit) {
-    nextCursor = (skip + limit).toString();
-  }
-
-  return { audios: uris, cursor: nextCursor };
+  return {
+    audios: result.audios.map((a: { uri: string }) => a.uri),
+    cursor: result.cursor,
+  };
 };
 
 const hydration = (inputs: {
@@ -98,13 +85,13 @@ const presentation = (inputs: {
   const { ctx, skeleton, hydration } = inputs;
   const audios = mapDefined(
     skeleton.audios,
-    (uri) => ctx.views.soundView(uri, hydration),
+    (uri) => ctx.views.sound(uri, hydration),
   );
   return { audios, cursor: skeleton.cursor };
 };
 
 type Context = {
-  db: AppContext["db"];
+  dataplane: DataPlane;
   hydrator: Hydrator;
   views: Views;
 };

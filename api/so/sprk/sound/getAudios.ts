@@ -71,7 +71,7 @@ const presentation = (inputs: {
   const { ctx, skeleton, hydration } = inputs;
   const audios = mapDefined(
     skeleton.audios,
-    (uri) => ctx.views.soundView(uri, hydration),
+    (uri) => ctx.views.sound(uri, hydration),
   );
   return { audios };
 };

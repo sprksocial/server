@@ -1,6 +1,7 @@
 import { mapDefined } from "@atp/common";
-import { decodeBase64, encodeBase64 } from "@std/encoding";
+import { InvalidRequestError } from "@atp/xrpc-server";
 import { AppContext } from "../../../../context.ts";
+import { DataPlane } from "../../../../data-plane/index.ts";
 import {
   HydrateCtx,
   HydrationState,
@@ -12,7 +13,6 @@ import { createPipeline } from "../../../../pipeline.ts";
 import { uriToDid as creatorFromUri } from "../../../../utils/uris.ts";
 import { Views } from "../../../../views/index.ts";
 import { resHeaders } from "../../../util.ts";
-import { InvalidRequestError } from "@atp/xrpc-server";
 
 export default function (server: Server, ctx: AppContext) {
   const getActorAudios = createPipeline(
@@ -48,51 +48,24 @@ const skeleton = async (inputs: {
   const { actor, limit = 50, cursor } = params;
 
   // Resolve handle to DID
-  let actorDid = actor;
-  if (!actor.startsWith("did:")) {
-    try {
-      const didDoc = await ctx.idResolver.did.resolveAtprotoData(actor);
-      actorDid = didDoc.did;
-    } catch {
-      throw new InvalidRequestError("Could not resolve actor handle");
-    }
+  const actorDid = actor.startsWith("did:")
+    ? actor
+    : (await ctx.hydrator.actor.getDids([actor]))[0];
+
+  if (!actorDid) {
+    throw new InvalidRequestError("Could not resolve actor handle");
   }
 
-  // Parse cursor
-  let cursorData: CursorData | undefined;
-  if (cursor) {
-    try {
-      cursorData = parseCursor(cursor);
-    } catch {
-      throw new InvalidRequestError("The provided cursor is invalid");
-    }
-  }
+  const result = await ctx.dataplane.sounds.getActorAudios(
+    actorDid,
+    limit,
+    cursor,
+  );
 
-  // Build query
-  const query: Record<string, unknown> = { authorDid: actorDid };
-  if (cursorData) {
-    query.$or = [
-      { createdAt: { $lt: cursorData.createdAt } },
-      { createdAt: cursorData.createdAt, _id: { $lt: cursorData.id } },
-    ];
-  }
-
-  const audios = await ctx.db.models.Audio.find(query)
-    .sort({ createdAt: -1, _id: -1 })
-    .limit(limit + 1);
-
-  const hasMore = audios.length > limit;
-  if (hasMore) audios.pop();
-
-  const uris = audios.map((a) => a.uri);
-
-  let nextCursor: string | undefined;
-  if (hasMore && audios.length > 0) {
-    const last = audios[audios.length - 1];
-    nextCursor = generateCursor(String(last.createdAt), String(last._id));
-  }
-
-  return { audios: uris, cursor: nextCursor };
+  return {
+    audios: result.audios.map((a: { uri: string }) => a.uri),
+    cursor: result.cursor,
+  };
 };
 
 const hydration = (inputs: {
@@ -126,30 +99,13 @@ const presentation = (inputs: {
   const { ctx, skeleton, hydration } = inputs;
   const audios = mapDefined(
     skeleton.audios,
-    (uri) => ctx.views.soundView(uri, hydration),
+    (uri) => ctx.views.sound(uri, hydration),
   );
   return { audios, cursor: skeleton.cursor };
 };
 
-interface CursorData {
-  createdAt: string;
-  id: string;
-}
-
-function parseCursor(cursor: string): CursorData {
-  const decoded = new TextDecoder().decode(decodeBase64(cursor));
-  const [createdAt, id] = decoded.split("::");
-  if (!createdAt || !id) throw new Error("Invalid cursor format");
-  return { createdAt, id };
-}
-
-function generateCursor(createdAt: string, id: string): string {
-  return encodeBase64(new TextEncoder().encode(`${createdAt}::${id}`));
-}
-
 type Context = {
-  db: AppContext["db"];
-  idResolver: AppContext["idResolver"];
+  dataplane: DataPlane;
   hydrator: Hydrator;
   views: Views;
 };

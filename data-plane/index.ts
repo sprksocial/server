@@ -13,6 +13,7 @@ import { Records } from "./routes/records.ts";
 import { Relationships } from "./routes/relationships.ts";
 import { Interactions } from "./routes/interactions.ts";
 import { Reposts } from "./routes/reposts.ts";
+import { Sounds } from "./routes/sounds.ts";
 import { Stories } from "./routes/stories.ts";
 import { Sync } from "./routes/sync.ts";
 import { Threads } from "./routes/threads.ts";
@@ -44,6 +45,7 @@ export class DataPlane {
   public relationships: Relationships;
   public interactions: Interactions;
   public reposts: Reposts;
+  public sounds: Sounds;
   public stories: Stories;
   public sync: Sync;
   public threads: Threads;
@@ -71,6 +73,7 @@ export class DataPlane {
     this.relationships = new Relationships(db);
     this.interactions = new Interactions(db);
     this.reposts = new Reposts(db);
+    this.sounds = new Sounds(db);
     this.stories = new Stories(db);
     this.sync = new Sync(db);
     this.threads = new Threads(db);

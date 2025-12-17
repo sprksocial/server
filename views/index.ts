@@ -226,7 +226,7 @@ export class Views {
       author,
       record: recordInfo.record,
       media: mediaRecord ? this.media(uri, mediaRecord as Media) : undefined,
-      sound: soundRecord ? this.soundView(soundRecord.uri, state) : undefined,
+      sound: soundRecord ? this.sound(soundRecord.uri, state) : undefined,
       replyCount: repliesCount,
       repostCount,
       likeCount,
@@ -764,7 +764,7 @@ export class Views {
     };
   }
 
-  soundView(
+  sound(
     uri: string,
     state: HydrationState,
   ): Un$Typed<AudioView> | undefined {
