@@ -166,14 +166,13 @@ export class Views {
     uri: string,
     state: HydrationState,
   ): $Typed<ThreadViewPost> | undefined {
-    const postView = this.post(uri, state) ??
-      this.reply(uri, state);
-    if (postView) {
+    const post = this.post(uri, state) ?? this.reply(uri, state);
+    if (post) {
       return {
         $type: "so.sprk.feed.defs#threadViewPost",
-        post: postView,
+        post,
         threadContext: this.threadContext(uri, state),
-      } as $Typed<ThreadViewPost>;
+      };
     }
   }
 
@@ -193,7 +192,7 @@ export class Views {
   post(
     uri: string,
     state: HydrationState,
-  ): Un$Typed<PostView> | undefined {
+  ): $Typed<PostView> | undefined {
     const recordInfo = state.posts?.get(uri) ?? state.replies?.get(uri);
     if (!recordInfo) return;
 
@@ -221,6 +220,7 @@ export class Views {
       : undefined;
 
     return {
+      $type: "so.sprk.feed.defs#postView",
       uri,
       cid: recordInfo.cid,
       author,
@@ -244,7 +244,7 @@ export class Views {
   reply(
     uri: string,
     state: HydrationState,
-  ): Un$Typed<ReplyView> | undefined {
+  ): $Typed<ReplyView> | undefined {
     const replyInfo = state.replies?.get(uri);
     if (!replyInfo) return;
 
@@ -257,6 +257,7 @@ export class Views {
     const viewer = state.postViewers?.get(uri);
 
     return {
+      $type: "so.sprk.feed.defs#replyView",
       uri,
       cid: replyInfo.cid,
       author,
@@ -471,10 +472,7 @@ export class Views {
       if (this.viewerBlockExists(reply.author.did, state)) {
         return this.blockedPost(uri, reply.author.did, state);
       }
-      return {
-        ...reply,
-        $type: "so.sprk.feed.defs#replyView",
-      };
+      return reply;
     }
 
     const post = this.post(uri, state);
@@ -484,10 +482,7 @@ export class Views {
     if (this.viewerBlockExists(post.author.did, state)) {
       return this.blockedPost(uri, post.author.did, state);
     }
-    return {
-      ...post,
-      $type: "so.sprk.feed.defs#postView",
-    };
+    return post;
   }
 
   blockedPost(
