@@ -18334,8 +18334,8 @@ export const schemaDict = {
             "type": "union",
             "refs": [
               "lex:so.sprk.feed.defs#threadViewPost",
-              "lex:so.sprk.feed.defs#NotFoundPost",
-              "lex:so.sprk.feed.defs#BlockedPost",
+              "lex:so.sprk.feed.defs#notFoundPost",
+              "lex:so.sprk.feed.defs#blockedPost",
             ],
           },
         },
