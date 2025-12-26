@@ -30,6 +30,8 @@ export interface ServerConfigValues {
   dbPass?: string;
   relayUrl?: string;
   plcUrl?: string;
+
+  labelsFromIssuerDids: string[];
 }
 
 export class ServerConfig {
@@ -70,6 +72,8 @@ export class ServerConfig {
       "wss://relay1.us-east.bsky.network";
     const plcUrl = envStr("SPRK_PLC") ?? "https://plc.directory";
 
+    const labelsFromIssuerDids = envList("SPRK_LABELS_FROM_ISSUER_DIDS") ?? [];
+
     return new ServerConfig({
       version,
       debugMode,
@@ -94,6 +98,7 @@ export class ServerConfig {
       dbPass,
       relayUrl,
       plcUrl,
+      labelsFromIssuerDids,
     });
   }
 
@@ -170,5 +175,9 @@ export class ServerConfig {
   }
   get plcUrl() {
     return this.cfg.plcUrl;
+  }
+
+  get labelsFromIssuerDids() {
+    return this.cfg.labelsFromIssuerDids;
   }
 }

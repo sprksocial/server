@@ -7,7 +7,7 @@ import { resHeaders } from "../../../util.ts";
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.feed.getSuggestedFeeds({
     auth: ctx.authVerifier.standardOptional,
-    handler: async ({ auth, params }) => {
+    handler: async ({ auth, params, req }) => {
       const viewer = auth.credentials.iss;
 
       // @NOTE no need to coordinate the cursor for appview swap, as v1 doesn't use the cursor
@@ -16,7 +16,8 @@ export default function (server: Server, ctx: AppContext) {
         params.cursor,
       );
       const uris = suggestedRes.uris;
-      const hydrateCtx = ctx.hydrator.createContext({ viewer });
+      const labelers = ctx.reqLabelers(req);
+      const hydrateCtx = await ctx.hydrator.createContext({ viewer, labelers });
       const hydration = await ctx.hydrator.hydrateFeedGens(uris, hydrateCtx);
       const feedViews = mapDefined(
         uris,

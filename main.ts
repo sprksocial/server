@@ -15,6 +15,7 @@ import { Hydrator } from "./hydration/index.ts";
 import { Views } from "./views/index.ts";
 import { AppContext, AppEnv } from "./context.ts";
 import { ServerConfig } from "./config.ts";
+import { defaultLabelerHeader, parseLabelerHeader } from "./util.ts";
 
 await configureLogger();
 
@@ -52,7 +53,7 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
   const idResolver = new IdResolver({ plcUrl: cfg.plcUrl });
 
   const dataplane = new DataPlane(db, idResolver);
-  const hydrator = new Hydrator(dataplane);
+  const hydrator = new Hydrator(dataplane, cfg.labelsFromIssuerDids);
   const views = new Views({
     indexedAtEpoch: cfg.indexedAtEpoch,
     videoCdn: cfg.videoCdn,
@@ -67,6 +68,13 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
     adminPasses: cfg.adminPasswords,
   });
 
+  const reqLabelers = (req: Request) => {
+    const val = req.headers.get("atproto-accept-labelers") ?? undefined;
+    const parsed = parseLabelerHeader(val);
+    if (!parsed) return defaultLabelerHeader(cfg.labelsFromIssuerDids);
+    return parsed;
+  };
+
   const ctx = {
     db,
     dataplane,
@@ -76,6 +84,7 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
     idResolver,
     cfg,
     authVerifier,
+    reqLabelers,
   };
 
   const app = createApp(ctx);

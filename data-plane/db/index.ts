@@ -100,6 +100,14 @@ export class Database {
           "Generator",
           models.generatorSchema,
         ),
+        Labeler: this.connection.model<models.LabelerDocument>(
+          "Labeler",
+          models.labelerSchema,
+        ),
+        Label: this.connection.model<models.LabelDocument>(
+          "Label",
+          models.labelSchema,
+        ),
         Takedown: this.connection.model<models.TakedownDocument>(
           "Takedown",
           models.takedownSchema,

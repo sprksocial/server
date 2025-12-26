@@ -57,11 +57,12 @@ export default function (server: Server, ctx: AppContext) {
   const getStories = createPipeline(skeleton, hydration, rules, presentation);
   server.so.sprk.story.getStories({
     auth: ctx.authVerifier.standardOptional,
-    handler: async ({ params, auth }) => {
+    handler: async ({ params, auth, req }) => {
       const viewer = auth.credentials.type === "standard"
         ? auth.credentials.iss
         : null;
-      const hydrateCtx = ctx.hydrator.createContext({ viewer });
+      const labelers = ctx.reqLabelers(req);
+      const hydrateCtx = await ctx.hydrator.createContext({ viewer, labelers });
 
       // Ensure uris is an array
       const uriArray = Array.isArray(params.uris) ? params.uris : [params.uris];

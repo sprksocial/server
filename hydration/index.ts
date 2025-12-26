@@ -43,14 +43,24 @@ import {
 } from "./graph.ts";
 import { HydrationMap, ItemRef, mergeMaps, RecordInfo } from "./util.ts";
 import { getLogger } from "@logtape/logtape";
+import {
+  LabelerAggs,
+  Labelers,
+  LabelerViewerStates,
+  LabelHydrator,
+  Labels,
+} from "./label.ts";
+import { ParsedLabelers } from "../util.ts";
 
 export class HydrateCtx {
+  labelers: ParsedLabelers;
   viewer: string | null;
   includeTakedowns?: boolean;
   includeActorTakedowns?: boolean;
   include3pBlocks?: boolean;
 
   constructor(private vals: HydrateCtxVals) {
+    this.labelers = this.vals.labelers;
     this.viewer = this.vals.viewer !== null
       ? serviceRefToDid(this.vals.viewer)
       : null;
@@ -69,6 +79,7 @@ export class HydrateCtx {
 }
 
 export type HydrateCtxVals = {
+  labelers: ParsedLabelers;
   viewer: string | null;
   includeTakedowns?: boolean;
   includeActorTakedowns?: boolean;
@@ -96,9 +107,13 @@ export type HydrationState = {
   followBlocks?: FollowBlocks;
   likes?: Likes;
   likeBlocks?: LikeBlocks;
+  labels?: Labels;
   feedgens?: FeedGens;
   feedgenViewers?: FeedGenViewerStates;
   feedgenAggs?: FeedGenAggs;
+  labelers?: Labelers;
+  labelerViewers?: LabelerViewerStates;
+  labelerAggs?: LabelerAggs;
   knownFollowers?: KnownFollowersStates;
   activitySubscriptions?: ActivitySubscriptionStates;
   bidirectionalBlocks?: BidirectionalBlocks;
@@ -127,14 +142,19 @@ export class Hydrator {
   feed: FeedHydrator;
   graph: GraphHydrator;
   story: StoryHydrator;
+  label: LabelHydrator;
+  serviceLabelers: Set<string>;
 
   constructor(
     public dataplane: DataPlane,
+    serviceLabelers: string[],
   ) {
     this.actor = new ActorHydrator(dataplane);
     this.feed = new FeedHydrator(dataplane);
     this.graph = new GraphHydrator(dataplane);
     this.story = new StoryHydrator(dataplane);
+    this.label = new LabelHydrator(dataplane);
+    this.serviceLabelers = new Set(serviceLabelers);
   }
 
   // so.sprk.actor.defs#profileView
@@ -165,14 +185,19 @@ export class Hydrator {
     ctx: HydrateCtx,
   ): Promise<HydrationState> {
     const includeTakedowns = ctx.includeTakedowns || ctx.includeActorTakedowns;
-    const [actors, profileViewersState] = await Promise.all([
+    const [actors, labels, profileViewersState] = await Promise.all([
       this.actor.getActors(dids, {
         includeTakedowns,
       }),
+      this.label.getLabelsForSubjects(labelSubjectsForDid(dids), ctx.labelers),
       this.hydrateProfileViewers(dids, ctx),
     ]);
+    if (!includeTakedowns) {
+      actionTakedownLabels(dids, actors, labels);
+    }
     return mergeStates(profileViewersState ?? {}, {
       actors,
+      labels,
       ctx,
     });
   }
@@ -261,6 +286,8 @@ export class Hydrator {
       new AtUri(ref.uri).collection === ids.SoSprkFeedReply
     );
 
+    const allUris = refs.map((ref) => ref.uri);
+
     state.posts ??= new HydrationMap<Post>();
     state.replies ??= new HydrationMap<Reply>();
 
@@ -339,6 +366,7 @@ export class Hydrator {
       postAggs,
       replyAggs,
       postViewers,
+      labels,
       postBlocks,
       profileState,
       threadContexts,
@@ -349,6 +377,7 @@ export class Hydrator {
       ctx.viewer
         ? this.feed.getPostViewerStates(threadRefs, ctx.viewer)
         : Promise.resolve<PostViewerStates | undefined>(undefined),
+      this.label.getLabelsForSubjects(allUris, ctx.labelers),
       this.hydratePostBlocks(state.posts!, state.replies!),
       this.hydrateProfiles(authorDids, ctx),
       this.feed.getThreadContexts(threadRefs),
@@ -365,6 +394,7 @@ export class Hydrator {
         replyAggs,
         postViewers,
         postBlocks,
+        labels,
         threadContexts,
         ctx,
       },
@@ -531,21 +561,24 @@ export class Hydrator {
     uris: string[], // @TODO any way to get refs here?
     ctx: HydrateCtx,
   ): Promise<HydrationState> {
-    const [feedgens, feedgenAggs, feedgenViewers, profileState] = await Promise
-      .all([
-        this.feed.getFeedGens(uris, ctx.includeTakedowns),
-        this.feed.getFeedGenAggregates(
-          uris.map((uri) => ({ uri })),
-        ),
-        ctx.viewer
-          ? this.feed.getFeedGenViewerStates(uris, ctx.viewer)
-          : undefined,
-        this.hydrateProfiles(uris.map(didFromUri), ctx),
-      ]);
+    const [feedgens, feedgenAggs, feedgenViewers, profileState, labels] =
+      await Promise
+        .all([
+          this.feed.getFeedGens(uris, ctx.includeTakedowns),
+          this.feed.getFeedGenAggregates(
+            uris.map((uri) => ({ uri })),
+          ),
+          ctx.viewer
+            ? this.feed.getFeedGenViewerStates(uris, ctx.viewer)
+            : undefined,
+          this.hydrateProfiles(uris.map(didFromUri), ctx),
+          this.label.getLabelsForSubjects(uris, ctx.labelers),
+        ]);
     return mergeStates(profileState, {
       feedgens,
       feedgenAggs,
       feedgenViewers,
+      labels,
       ctx,
     });
   }
@@ -677,6 +710,32 @@ export class Hydrator {
     return result;
   }
 
+  // so.sprk.labeler.def#labelerViewDetailed
+  // - labeler
+  //   - profile
+  //     - list basic
+  async hydrateLabelers(
+    dids: string[],
+    ctx: HydrateCtx,
+  ): Promise<HydrationState> {
+    const [labelers, labelerAggs, labelerViewers, profileState] = await Promise
+      .all([
+        this.label.getLabelers(dids, ctx.includeTakedowns),
+        this.label.getLabelerAggregates(dids, ctx.viewer),
+        ctx.viewer
+          ? this.label.getLabelerViewerStates(dids, ctx.viewer)
+          : undefined,
+        this.hydrateProfiles(dids, ctx),
+      ]);
+    actionTakedownLabels(dids, labelers, profileState.labels ?? new Labels());
+    return mergeStates(profileState, {
+      labelers,
+      labelerAggs,
+      labelerViewers,
+      ctx,
+    });
+  }
+
   // ad-hoc record hydration
   // in com.atproto.repo.getRecord
   async getRecord(uri: string, includeTakedowns = false) {
@@ -692,7 +751,7 @@ export class Hydrator {
         (await this.feed.getReplies([uri], includeTakedowns)).get(uri) ??
           undefined
       );
-    } else if (collection === ids.AppBskyFeedRepost) {
+    } else if (collection === ids.SoSprkFeedRepost) {
       return (
         (await this.feed.getReposts([uri], includeTakedowns)).get(uri) ??
           undefined
@@ -717,12 +776,16 @@ export class Hydrator {
         (await this.graph.getBlocks([uri], includeTakedowns)).get(uri) ??
           undefined
       );
-    } else if (
-      collection === ids.AppBskyFeedGenerator ||
-      collection === ids.SoSprkFeedGenerator
-    ) {
+    } else if (collection === ids.SoSprkFeedGenerator) {
       return (
         (await this.feed.getFeedGens([uri], includeTakedowns)).get(uri) ??
+          undefined
+      );
+    } else if (collection === ids.SoSprkLabelerService) {
+      if (parsed.rkey !== "self") return;
+      const did = parsed.hostname;
+      return (
+        (await this.label.getLabelers([did], includeTakedowns)).get(did) ??
           undefined
       );
     } else if (collection === ids.SoSprkActorProfile) {
@@ -767,13 +830,29 @@ export class Hydrator {
     }
   }
 
-  createContext = (vals: HydrateCtxVals) => {
+  async createContext(vals: HydrateCtxVals) {
+    // ensures we're only apply labelers that exist and are not taken down
+    const labelers = vals.labelers.dids;
+    const nonServiceLabelers = labelers.filter(
+      (did) => !this.serviceLabelers.has(did),
+    );
+    const labelerActors = await this.actor.getActors(nonServiceLabelers, {
+      includeTakedowns: vals.includeTakedowns,
+    });
+    const availableDids = labelers.filter(
+      (did) => this.serviceLabelers.has(did) || !!labelerActors.get(did),
+    );
+    const availableLabelers = {
+      dids: availableDids,
+      redact: vals.labelers.redact,
+    };
     return new HydrateCtx({
+      labelers: availableLabelers,
       viewer: vals.viewer,
       includeTakedowns: vals.includeTakedowns,
       include3pBlocks: vals.include3pBlocks,
     });
-  };
+  }
 
   async resolveUri(uriStr: string) {
     const uri = new AtUri(uriStr);
@@ -788,6 +867,15 @@ export class Hydrator {
 const serviceRefToDid = (serviceRef: string) => {
   const idx = serviceRef.indexOf("#");
   return idx !== -1 ? serviceRef.slice(0, idx) : serviceRef;
+};
+
+const labelSubjectsForDid = (dids: string[]) => {
+  return [
+    ...dids,
+    ...dids.map((did) =>
+      AtUri.make(did, ids.SoSprkActorProfile, "self").toString()
+    ),
+  ];
 };
 
 const rootUrisFromReplies = (replies: Replies): string[] => {
@@ -857,4 +945,16 @@ export const mergeStates = (
 
 export const mergeManyStates = (...states: HydrationState[]) => {
   return states.reduce(mergeStates, {} as HydrationState);
+};
+
+const actionTakedownLabels = <T>(
+  keys: string[],
+  hydrationMap: HydrationMap<T>,
+  labels: Labels,
+) => {
+  for (const key of keys) {
+    if (labels.get(key)?.isTakendown) {
+      hydrationMap.set(key, null);
+    }
+  }
 };

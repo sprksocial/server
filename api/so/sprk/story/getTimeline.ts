@@ -30,9 +30,10 @@ export default function (server: Server, ctx: AppContext) {
   );
   server.so.sprk.story.getTimeline({
     auth: ctx.authVerifier.standard,
-    handler: async ({ params, auth }) => {
+    handler: async ({ params, auth, req }) => {
       const viewer = auth.credentials.iss;
-      const hydrateCtx = ctx.hydrator.createContext({ viewer });
+      const labelers = ctx.reqLabelers(req);
+      const hydrateCtx = await ctx.hydrator.createContext({ viewer, labelers });
 
       const { limit: limitParam = DEFAULT_LIMIT, cursor } = params;
 

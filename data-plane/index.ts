@@ -19,6 +19,7 @@ import { Sync } from "./routes/sync.ts";
 import { Threads } from "./routes/threads.ts";
 import { Preferences } from "./routes/preferences.ts";
 import { Search } from "./routes/search.ts";
+import { Labels } from "./routes/labels.ts";
 
 export { RepoSubscription } from "./subscription.ts";
 
@@ -51,6 +52,7 @@ export class DataPlane {
   public threads: Threads;
   public preferences: Preferences;
   public search: Search;
+  public labels: Labels;
 
   constructor(
     db: Database,
@@ -79,5 +81,6 @@ export class DataPlane {
     this.threads = new Threads(db);
     this.preferences = new Preferences(db);
     this.search = new Search(db);
+    this.labels = new Labels(db);
   }
 }
