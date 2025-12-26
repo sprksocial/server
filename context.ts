@@ -6,6 +6,7 @@ import { Views } from "./views/index.ts";
 import { IdResolver } from "@atp/identity";
 import { AuthVerifier } from "./auth-verifier.ts";
 import { ServerConfig } from "./config.ts";
+import { ParsedLabelers } from "./util.ts";
 
 export type AppContext = {
   db: Database;
@@ -16,6 +17,7 @@ export type AppContext = {
   idResolver: IdResolver;
   authVerifier: AuthVerifier;
   cfg: ServerConfig;
+  reqLabelers: (req: Request) => ParsedLabelers;
 };
 
 export type AppEnv = {

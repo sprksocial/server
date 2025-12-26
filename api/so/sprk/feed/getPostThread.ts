@@ -29,10 +29,12 @@ export default function (server: Server, ctx: AppContext) {
   );
   server.so.sprk.feed.getPostThread({
     auth: ctx.authVerifier.optionalStandardOrRole,
-    handler: async ({ params, auth, res }) => {
+    handler: async ({ params, auth, req, res }) => {
       const { viewer, includeTakedowns, include3pBlocks } = ctx.authVerifier
         .parseCreds(auth);
-      const hydrateCtx = ctx.hydrator.createContext({
+      const labelers = ctx.reqLabelers(req);
+      const hydrateCtx = await ctx.hydrator.createContext({
+        labelers,
         viewer,
         includeTakedowns,
         include3pBlocks,

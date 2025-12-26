@@ -24,17 +24,21 @@ export default function (server: Server, ctx: AppContext) {
   );
   server.so.sprk.actor.searchActors({
     auth: ctx.authVerifier.standardOptional,
-    handler: async ({ auth, params }) => {
+    handler: async ({ auth, params, req }) => {
       const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
-      const hydrateCtx = ctx.hydrator.createContext({
+      const labelers = ctx.reqLabelers(req);
+      const hydrateCtx = await ctx.hydrator.createContext({
         viewer,
+        labelers,
         includeTakedowns,
       });
       const results = await searchActors({ ...params, hydrateCtx }, ctx);
       return {
         encoding: "application/json",
         body: results,
-        headers: resHeaders({}),
+        headers: resHeaders({
+          labelers: hydrateCtx.labelers,
+        }),
       };
     },
   });

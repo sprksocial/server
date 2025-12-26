@@ -27,9 +27,11 @@ export default function (server: Server, ctx: AppContext) {
   );
   server.so.sprk.graph.getFollows({
     auth: ctx.authVerifier.optionalStandardOrRole,
-    handler: async ({ params, auth }) => {
+    handler: async ({ params, auth, req }) => {
       const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
-      const hydrateCtx = ctx.hydrator.createContext({
+      const labelers = ctx.reqLabelers(req);
+      const hydrateCtx = await ctx.hydrator.createContext({
+        labelers,
         viewer,
         includeTakedowns,
       });

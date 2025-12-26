@@ -12,6 +12,7 @@ import { Hydrator } from "../hydration/index.ts";
 import { Views } from "../views/index.ts";
 import { IdResolver } from "@atp/identity";
 import { ServerConfig, ServerConfigValues } from "../config.ts";
+import { defaultLabelerHeader } from "../util.ts";
 
 // Configure mongodb-memory-server to use a specific download directory
 // This prevents issues with empty paths when running with restricted permissions
@@ -76,6 +77,7 @@ const DEFAULT_TEST_CONFIG: ServerConfigValues = {
   alternateAudienceDids: [],
   bigThreadUris: new Set(["did:web:test"]),
   maxThreadParents: 10,
+  labelsFromIssuerDids: [],
 };
 
 // ============================================================================
@@ -187,6 +189,14 @@ export async function createTestDatabase(
       "CursorState",
       models.cursorStateSchema,
     ),
+    Labeler: connection.model<models.LabelerDocument>(
+      "Labeler",
+      models.labelerSchema,
+    ),
+    Label: connection.model<models.LabelDocument>(
+      "Label",
+      models.labelSchema,
+    ),
   };
 
   // Seed data
@@ -255,7 +265,7 @@ export function createMockContext(
   } as unknown as Database;
 
   const dataplane = new DataPlane(mockDb, idResolver);
-  const hydrator = new Hydrator(dataplane);
+  const hydrator = new Hydrator(dataplane, cfg.labelsFromIssuerDids);
   const views = new Views(cfg);
   const authVerifier = createAuthVerifier(dataplane, {
     ownDid: cfg.serverDid,
@@ -273,6 +283,7 @@ export function createMockContext(
     idResolver,
     cfg,
     authVerifier,
+    reqLabelers: () => defaultLabelerHeader(cfg.labelsFromIssuerDids),
   };
 }
 
@@ -332,7 +343,7 @@ export async function createTestContext(
   } as unknown as Database;
 
   const dataplane = new DataPlane(db, idResolver);
-  const hydrator = new Hydrator(dataplane);
+  const hydrator = new Hydrator(dataplane, cfg.labelsFromIssuerDids);
   const views = new Views(cfg);
   const authVerifier = createAuthVerifier(dataplane, {
     ownDid: cfg.serverDid,
@@ -350,6 +361,7 @@ export async function createTestContext(
     idResolver,
     cfg,
     authVerifier,
+    reqLabelers: () => defaultLabelerHeader(cfg.labelsFromIssuerDids),
   };
 
   const cleanup = async () => {

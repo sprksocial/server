@@ -32,7 +32,8 @@
     "mongoose": "npm:mongoose@^8.20.2",
     "multiformats": "npm:multiformats@^13.4.1",
     "p-queue": "npm:p-queue@^8.1.1",
-    "mongodb-memory-server-core": "npm:mongodb-memory-server-core@^11.0.0"
+    "mongodb-memory-server-core": "npm:mongodb-memory-server-core@^11.0.0",
+    "structured-headers": "npm:structured-headers@^2.0.2"
   },
   "test": {
     "permissions": {

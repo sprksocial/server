@@ -43,7 +43,8 @@
     "npm:mongoose@^8.20.2": "8.20.2",
     "npm:multiformats@^13.4.1": "13.4.1",
     "npm:p-queue@^8.1.1": "8.1.1",
-    "npm:rate-limiter-flexible@9": "9.0.0"
+    "npm:rate-limiter-flexible@9": "9.0.0",
+    "npm:structured-headers@^2.0.2": "2.0.2"
   },
   "jsr": {
     "@atp/bytes@0.1.0-alpha.1": {
@@ -547,6 +548,9 @@
         "text-decoder"
       ]
     },
+    "structured-headers@2.0.2": {
+      "integrity": "sha512-IUul56vVHuMg2UxWhwDj9zVJE6ztYEQQkynr1FQ/NydPhivtk5+Qb2N1RS36owEFk2fNUriTguJ2R7htRObcdA=="
+    },
     "tar-stream@3.1.7": {
       "integrity": "sha512-qJj60CXt7IU1Ffyc3NJMjh6EkuCFej46zUqJ4J7pqYlThyd9bO0XBTmcOIhSzZJVWfsLks0+nle/j538YAW9RQ==",
       "dependencies": [
@@ -627,7 +631,8 @@
       "npm:mongodb-memory-server-core@11",
       "npm:mongoose@^8.20.2",
       "npm:multiformats@^13.4.1",
-      "npm:p-queue@^8.1.1"
+      "npm:p-queue@^8.1.1",
+      "npm:structured-headers@^2.0.2"
     ]
   }
 }

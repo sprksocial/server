@@ -55,7 +55,8 @@ export default function (server: Server, ctx: AppContext) {
     }),
     handler: async ({ params, auth, req }) => {
       const viewer = auth.credentials.iss;
-      const hydrateCtx = ctx.hydrator.createContext({ viewer });
+      const labelers = ctx.reqLabelers(req);
+      const hydrateCtx = await ctx.hydrator.createContext({ viewer, labelers });
       const headers = noUndefinedVals({
         "user-agent": SPRK_USER_AGENT,
         authorization: req.headers.get("authorization") as string,

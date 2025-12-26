@@ -15,24 +15,25 @@ export default function (server: Server, ctx: AppContext) {
   const getProfile = createPipeline(skeleton, hydration, noRules, presentation);
   server.so.sprk.actor.getProfiles({
     auth: ctx.authVerifier.standardOptional,
-    handler: async ({ auth, params }) => {
+    handler: async ({ auth, params, req }) => {
       const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
-      const hydrateCtx = ctx.hydrator.createContext({
+      const labelers = ctx.reqLabelers(req);
+      const hydrateCtx = await ctx.hydrator.createContext({
         viewer,
+        labelers,
         includeTakedowns,
       });
 
-      // Parallelize pipeline execution with repoRev fetch
-      const [result, repoRev] = await Promise.all([
-        getProfile({ ...params, hydrateCtx }, ctx),
-        ctx.hydrator.actor.getRepoRevSafe(viewer),
-      ]);
+      const result = await getProfile({ ...params, hydrateCtx }, ctx);
+
+      const repoRev = await ctx.hydrator.actor.getRepoRevSafe(viewer);
 
       return {
         encoding: "application/json",
         body: result,
         headers: resHeaders({
           repoRev,
+          labelers: hydrateCtx.labelers,
         }),
       };
     },

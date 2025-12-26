@@ -22,11 +22,15 @@ export default function (server: Server, ctx: AppContext) {
   );
   server.so.sprk.sound.getTrendingAudios({
     auth: ctx.authVerifier.standardOptional,
-    handler: async ({ params, auth }) => {
+    handler: async ({ params, auth, req }) => {
       const viewer = auth.credentials.type === "standard"
         ? auth.credentials.iss
         : undefined;
-      const hydrateCtx = ctx.hydrator.createContext({ viewer: viewer ?? null });
+      const labelers = ctx.reqLabelers(req);
+      const hydrateCtx = await ctx.hydrator.createContext({
+        viewer: viewer ?? null,
+        labelers,
+      });
 
       const results = await getTrendingAudios({ ...params, hydrateCtx }, ctx);
 

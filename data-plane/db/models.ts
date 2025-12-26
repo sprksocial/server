@@ -386,6 +386,39 @@ export const generatorSchema = new Schema<GeneratorDocument>({
 })
   .index({ authorDid: 1, createdAt: -1 });
 
+// labelers
+
+export interface LabelerDocument extends AuthoredDocument {}
+
+export const labelerSchema = new Schema<LabelerDocument>({
+  ...authoredSchema,
+})
+  .index({ authorDid: 1, createdAt: -1 });
+
+// labels
+
+export interface LabelDocument extends Document {
+  src: string;
+  uri: string;
+  cid: string;
+  val: string;
+  neg: boolean;
+  cts: string;
+  exp: string | null;
+}
+
+export const labelSchema = new Schema<LabelDocument>({
+  src: { type: String, required: true, index: true },
+  uri: { type: String, required: true, index: true },
+  cid: { type: String, required: true },
+  val: { type: String, required: true, index: true },
+  neg: { type: Boolean, required: true },
+  cts: { type: String, required: true },
+  exp: { type: String, required: false, default: null },
+})
+  .index({ uri: 1, src: 1, val: 1 }, { unique: true })
+  .index({ src: 1, cts: -1 });
+
 // takedowns
 
 export interface TakedownDocument extends Document {
@@ -569,6 +602,7 @@ export const cursorStateSchema = new Schema<CursorStateDocument>({
   generatorSchema,
   audioSchema,
   storySchema,
+  labelerSchema,
 ] as Schema[]).forEach((s) => s.plugin(addAuthor));
 
 export interface DatabaseModels {
@@ -584,6 +618,8 @@ export interface DatabaseModels {
   Audio: Model<AudioDocument>;
   Repost: Model<RepostDocument>;
   Generator: Model<GeneratorDocument>;
+  Labeler: Model<LabelerDocument>;
+  Label: Model<LabelDocument>;
   Takedown: Model<TakedownDocument>;
   RepoTakedown: Model<RepoTakedownDocument>;
   BlobTakedown: Model<BlobTakedownDocument>;

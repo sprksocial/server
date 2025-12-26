@@ -30,9 +30,10 @@ export default function (server: Server, ctx: AppContext) {
   );
   server.so.sprk.feed.searchPosts({
     auth: ctx.authVerifier.standardOptional,
-    handler: async ({ auth, params }) => {
+    handler: async ({ auth, params, req }) => {
       const { viewer } = ctx.authVerifier.parseCreds(auth);
-      const hydrateCtx = ctx.hydrator.createContext({ viewer });
+      const labelers = ctx.reqLabelers(req);
+      const hydrateCtx = await ctx.hydrator.createContext({ viewer, labelers });
       const results = await searchPosts(
         { ...params, hydrateCtx },
         ctx,
