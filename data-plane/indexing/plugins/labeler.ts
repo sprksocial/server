@@ -1,13 +1,13 @@
 import { CID } from "multiformats/cid";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
 import * as lex from "../../../lex/lexicons.ts";
-import * as Labeler from "../../../lex/types/app/bsky/labeler/service.ts";
+import * as Labeler from "../../../lex/types/so/sprk/labeler/service.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { LabelerDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexId = lex.ids.AppBskyLabelerService;
+const lexId = lex.ids.SoSprkLabelerService;
 type IndexedLabeler = LabelerDocument;
 
 const insertFn = async (

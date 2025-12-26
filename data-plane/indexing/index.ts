@@ -120,8 +120,7 @@ export class IndexingService {
         );
       }
 
-      const uri = `at://${did}/so.sprk.actor.profile`;
-      const actorInfo = { uri, handle, indexedAt: timestamp };
+      const actorInfo = { handle, indexedAt: timestamp };
       await this.db.models.Actor.findOneAndUpdate(
         { did },
         { did, ...actorInfo },
@@ -135,8 +134,7 @@ export class IndexingService {
       );
 
       // Still update the actor record with null handle to prevent repeated attempts
-      const uri = `at://${did}/so.sprk.actor.profile`;
-      const actorInfo = { uri, handle: null, indexedAt: timestamp };
+      const actorInfo = { handle: null, indexedAt: timestamp };
       try {
         await this.db.models.Actor.findOneAndUpdate(
           { did },
