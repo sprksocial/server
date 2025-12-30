@@ -1,5 +1,17 @@
 import { HydrationState } from "../hydration/index.ts";
 import {
+  isRecord as isPostRecord,
+  Record as PostRecord,
+} from "../lex/types/so/sprk/feed/post.ts";
+import { Record as LikeRecord } from "../lex/types/so/sprk/feed/like.ts";
+import { Record as RepostRecord } from "../lex/types/so/sprk/feed/repost.ts";
+import { Record as FollowRecord } from "../lex/types/so/sprk/graph/follow.ts";
+import {
+  isRecord as isProfileRecord,
+  Record as ProfileRecord,
+} from "../lex/types/so/sprk/actor/profile.ts";
+import { Label } from "../lex/types/com/atproto/label/defs.ts";
+import {
   FeedViewPost,
   isPostView,
   isReplyView,
@@ -48,7 +60,7 @@ import {
 } from "../lex/types/so/sprk/media/video.ts";
 import type { Main as VideoMediaMainType } from "../lex/types/so/sprk/media/video.ts";
 import { AudioView } from "../lex/types/so/sprk/sound/defs.ts";
-import { AtUri, INVALID_HANDLE } from "@atp/syntax";
+import { AtUri, INVALID_HANDLE, normalizeDatetimeAlways } from "@atp/syntax";
 import { Main as StrongRef } from "../lex/types/com/atproto/repo/strongRef.ts";
 import { cidFromBlobJson } from "./util.ts";
 import { uriToDid } from "../utils/uris.ts";
@@ -60,6 +72,15 @@ import {
 } from "../lex/types/so/sprk/feed/getPostThread.ts";
 import { $Typed, Un$Typed } from "../lex/util.ts";
 import { BlobRef } from "@atp/lexicon";
+import {
+  isRecord as isLabelerRecord,
+  Record as LabelerRecord,
+} from "../lex/types/so/sprk/labeler/service.ts";
+import {
+  LabelerView,
+  LabelerViewDetailed,
+} from "../lex/types/so/sprk/labeler/defs.ts";
+import { isSelfLabels } from "../lex/types/com/atproto/label/defs.ts";
 
 export class Views {
   public indexedAtEpoch?: Date | undefined;
@@ -81,6 +102,106 @@ export class Views {
     this.mediaCdn = opts?.mediaCdn;
     this.thumbCdn = opts?.thumbCdn;
   }
+
+  // Labels
+  // ------------
+
+  selfLabels({
+    uri,
+    cid,
+    record,
+  }: {
+    uri?: string;
+    cid?: string;
+    record?:
+      | PostRecord
+      | LikeRecord
+      | RepostRecord
+      | FollowRecord
+      | ProfileRecord
+      | LabelerRecord;
+  }): Label[] {
+    if (!uri || !cid || !record) return [];
+
+    // Only these have a "labels" property:
+    if (
+      !isPostRecord(record) &&
+      !isProfileRecord(record) &&
+      !isLabelerRecord(record)
+    ) {
+      return [];
+    }
+
+    // Ignore if no labels defines
+    if (!isSelfLabels(record.labels) || !record.labels.values.length) {
+      return [];
+    }
+
+    const src = uriToDid(uri); // record creator
+    const cts = typeof record.createdAt === "string"
+      ? normalizeDatetimeAlways(record.createdAt)
+      : new Date(0).toISOString();
+    return record.labels.values.map(({ val }) => {
+      return { src, uri, cid, val, cts };
+    });
+  }
+
+  labeler(
+    did: string,
+    state: HydrationState,
+  ): Un$Typed<LabelerView> | undefined {
+    const labeler = state.labelers?.get(did);
+    if (!labeler) return;
+    const creator = this.profile(did, state);
+    if (!creator) return;
+    const viewer = state.labelerViewers?.get(did);
+    const aggs = state.labelerAggs?.get(did);
+
+    const uri = AtUri.make(did, ids.SoSprkLabelerService, "self").toString();
+    const labels = [
+      ...(state.labels?.getBySubject(uri) ?? []),
+      ...this.selfLabels({
+        uri,
+        cid: labeler.cid.toString(),
+        record: labeler.record,
+      }),
+    ];
+
+    return {
+      uri,
+      cid: labeler.cid.toString(),
+      creator,
+      likeCount: aggs?.likes ?? 0,
+      viewer: viewer
+        ? {
+          like: viewer.like,
+        }
+        : undefined,
+      indexedAt: this.indexedAt(labeler).toISOString(),
+      labels,
+    };
+  }
+
+  labelerDetailed(
+    did: string,
+    state: HydrationState,
+  ): Un$Typed<LabelerViewDetailed> | undefined {
+    const baseView = this.labeler(did, state);
+    if (!baseView) return;
+    const labeler = state.labelers?.get(did);
+    if (!labeler) return;
+
+    return {
+      ...baseView,
+      policies: labeler.record.policies,
+      reasonTypes: labeler.record.reasonTypes,
+      subjectTypes: labeler.record.subjectTypes,
+      subjectCollections: labeler.record.subjectCollections,
+    };
+  }
+
+  // Threads
+  // ------------
 
   thread(
     skeleton: { anchor: string; uris: string[] },
@@ -188,6 +309,9 @@ export class Views {
       ...(like ? { rootAuthorLike: like } : {}),
     };
   }
+
+  // Feed
+  // ------------
 
   post(
     uri: string,

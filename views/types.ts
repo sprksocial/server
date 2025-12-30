@@ -13,7 +13,7 @@ import {
   PostView,
   ReplyView,
 } from "../lex/types/so/sprk/feed/defs.ts";
-import { LabelerView } from "../lex/types/app/bsky/labeler/defs.ts";
+import { LabelerView } from "../lex/types/so/sprk/labeler/defs.ts";
 
 export {
   isMain as isImagesMedia,
