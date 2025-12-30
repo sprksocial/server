@@ -259,8 +259,6 @@ export interface FeedViewPref {
   hideRepliesByUnfollowed: boolean;
   /** Hide replies in the feed if they do not have this number of likes. */
   hideRepliesByLikeCount?: number;
-  /** Hide replies in the feed if they do not have this number of looks. */
-  hideRepliesByLookCount?: number;
   /** Hide reposts in the feed. */
   hideReposts?: boolean;
   /** Hide quote posts in the feed. */
@@ -284,7 +282,6 @@ export interface ThreadViewPref {
     | "oldest"
     | "newest"
     | "most-likes"
-    | "most-looks"
     | "random"
     | "hotness"
     | (string & globalThis.Record<PropertyKey, never>);

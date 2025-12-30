@@ -65,7 +65,6 @@ export default function (server: Server, ctx: AppContext) {
               hideReplies: pref.hideReplies,
               hideRepliesByUnfollowed: pref.hideRepliesByUnfollowed,
               hideRepliesByLikeCount: pref.hideRepliesByLikeCount,
-              hideRepliesByLookCount: pref.hideRepliesByLookCount,
               hideReposts: pref.hideReposts,
               hideQuotePosts: pref.hideQuotePosts,
             });

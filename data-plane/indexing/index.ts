@@ -25,6 +25,7 @@ import * as Profile from "./plugins/profile.ts";
 import * as Repost from "./plugins/repost.ts";
 import * as Story from "./plugins/story.ts";
 import * as Audio from "./plugins/audio.ts";
+import * as Labeler from "./plugins/labeler.ts";
 import { RecordProcessor } from "./processor.ts";
 import { getLogger, Logger } from "@logtape/logtape";
 import { ServerConfig } from "../../config.ts";
@@ -41,6 +42,7 @@ export class IndexingService {
     generator: Generator.PluginType;
     story: Story.PluginType;
     audio: Audio.PluginType;
+    labeler: Labeler.PluginType;
   };
   logger: Logger;
 
@@ -62,6 +64,7 @@ export class IndexingService {
       generator: Generator.makePlugin(this.db, this.background),
       story: Story.makePlugin(this.db, this.background),
       audio: Audio.makePlugin(this.db, this.background),
+      labeler: Labeler.makePlugin(this.db, this.background),
     };
   }
 
@@ -308,6 +311,7 @@ export class IndexingService {
     await this.db.models.Block.deleteMany({ authorDid: did });
     await this.db.models.Post.deleteMany({ authorDid: did });
     await this.db.models.Reply.deleteMany({ authorDid: did });
+    await this.db.models.Labeler.deleteMany({ authorDid: did });
   }
 }
 

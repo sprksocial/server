@@ -19981,11 +19981,6 @@ export const schemaDict = {
             "description":
               "Hide replies in the feed if they do not have this number of likes.",
           },
-          "hideRepliesByLookCount": {
-            "type": "integer",
-            "description":
-              "Hide replies in the feed if they do not have this number of looks.",
-          },
           "hideReposts": {
             "type": "boolean",
             "description": "Hide reposts in the feed.",
@@ -20006,7 +20001,6 @@ export const schemaDict = {
               "oldest",
               "newest",
               "most-likes",
-              "most-looks",
               "random",
               "hotness",
             ],

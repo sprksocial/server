@@ -525,7 +525,6 @@ export interface PreferenceDocument extends Document {
     hideReplies?: boolean;
     hideRepliesByUnfollowed: boolean;
     hideRepliesByLikeCount?: number;
-    hideRepliesByLookCount?: number;
     hideReposts?: boolean;
     hideQuotePosts?: boolean;
   }>;
