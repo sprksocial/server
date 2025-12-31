@@ -930,16 +930,25 @@ export const mergeStates = (
     threadContexts: mergeMaps(stateA.threadContexts, stateB.threadContexts),
     sounds: mergeMaps(stateA.sounds, stateB.sounds),
     soundAggs: mergeMaps(stateA.soundAggs, stateB.soundAggs),
+    stories: mergeMaps(stateA.stories, stateB.stories),
     postBlocks: mergeMaps(stateA.postBlocks, stateB.postBlocks),
     reposts: mergeMaps(stateA.reposts, stateB.reposts),
     follows: mergeMaps(stateA.follows, stateB.follows),
     followBlocks: mergeMaps(stateA.followBlocks, stateB.followBlocks),
     likes: mergeMaps(stateA.likes, stateB.likes),
     likeBlocks: mergeMaps(stateA.likeBlocks, stateB.likeBlocks),
+    labels: mergeMaps(stateA.labels, stateB.labels),
     feedgens: mergeMaps(stateA.feedgens, stateB.feedgens),
     feedgenAggs: mergeMaps(stateA.feedgenAggs, stateB.feedgenAggs),
     feedgenViewers: mergeMaps(stateA.feedgenViewers, stateB.feedgenViewers),
+    labelers: mergeMaps(stateA.labelers, stateB.labelers),
+    labelerViewers: mergeMaps(stateA.labelerViewers, stateB.labelerViewers),
+    labelerAggs: mergeMaps(stateA.labelerAggs, stateB.labelerAggs),
     knownFollowers: mergeMaps(stateA.knownFollowers, stateB.knownFollowers),
+    bidirectionalBlocks: mergeMaps(
+      stateA.bidirectionalBlocks,
+      stateB.bidirectionalBlocks,
+    ),
   };
 };
 
