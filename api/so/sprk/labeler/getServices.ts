@@ -4,7 +4,7 @@ import { Server } from "../../../../lex/index.ts";
 import { resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  server.app.bsky.labeler.getServices({
+  server.so.sprk.labeler.getServices({
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth, req }) => {
       const { dids, detailed } = params;
@@ -22,14 +22,14 @@ export default function (server: Server, ctx: AppContext) {
           if (!view) return;
           return {
             ...view,
-            $type: "app.bsky.labeler.defs#labelerViewDetailed",
+            $type: "so.sprk.labeler.defs#labelerViewDetailed",
           };
         } else {
           const view = ctx.views.labeler(did, hydration);
           if (!view) return;
           return {
             ...view,
-            $type: "app.bsky.labeler.defs#labelerView",
+            $type: "so.sprk.labeler.defs#labelerView",
           };
         }
       });
