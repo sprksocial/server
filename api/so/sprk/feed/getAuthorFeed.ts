@@ -47,6 +47,7 @@ export default function (server: Server, ctx: AppContext) {
         body: result,
         headers: resHeaders({
           repoRev,
+          labelers: hydrateCtx.labelers,
         }),
       };
     },

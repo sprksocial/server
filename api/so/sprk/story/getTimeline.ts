@@ -60,7 +60,10 @@ export default function (server: Server, ctx: AppContext) {
       return {
         encoding: "application/json",
         body: result,
-        headers: resHeaders({ repoRev }),
+        headers: resHeaders({
+          repoRev,
+          labelers: hydrateCtx.labelers,
+        }),
       };
     },
   });
