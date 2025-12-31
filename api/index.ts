@@ -27,6 +27,7 @@ import getTimeline from "./so/sprk/feed/getTimeline.ts";
 import getFeed from "./so/sprk/feed/getFeed.ts";
 import getFeedGenerator from "./so/sprk/feed/getFeedGenerator.ts";
 import getFeedGenerators from "./so/sprk/feed/getFeedGenerators.ts";
+import getServices from "./so/sprk/labeler/getServices.ts";
 
 export default function (server: Server, ctx: AppContext) {
   getAccountInfos(server, ctx);
@@ -56,4 +57,5 @@ export default function (server: Server, ctx: AppContext) {
   getFeed(server, ctx);
   getFeedGenerator(server, ctx);
   getFeedGenerators(server, ctx);
+  getServices(server, ctx);
 }
