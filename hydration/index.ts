@@ -504,7 +504,9 @@ export class Hydrator {
     });
 
     const postAndReplyRefs = Array.from(postAndReplyRefsMap.values());
-    const repostUris = mapDefined(items, (item) => item.repost?.uri);
+    const repostUris = items.flatMap((item) =>
+      item.reposts?.map((repost) => repost.uri) ?? []
+    );
 
     const postState = await this.hydratePosts(postAndReplyRefs, ctx, {
       posts,

@@ -84,9 +84,11 @@ export type ThreadRef = ItemRef & { threadRoot: string };
 // technically have additional fields, not supported by the mock dataplane.
 export type FeedItem = {
   post: ItemRef;
-  repost?: ItemRef;
+  reposts?: ItemRef[];
+  likes?: ItemRef[];
+  replies?: ItemRef[];
   /**
-   * If true, overrides the `reason` with `so.sprk.feed.defs#reasonPin`. Used
+   * If true, adds `so.sprk.feed.defs#reasonPin` to reasons. Used
    * only in author feeds.
    */
   authorPinned?: boolean;

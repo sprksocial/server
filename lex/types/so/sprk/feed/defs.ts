@@ -107,7 +107,14 @@ export function validateThreadContext<V>(v: V) {
 export interface FeedViewPost {
   $type?: "so.sprk.feed.defs#feedViewPost";
   post: PostView;
-  reason?: $Typed<ReasonRepost> | $Typed<ReasonPin> | { $type: string };
+  /** Reasons/context signals for why this item is in the feed. */
+  reasons?: (
+    | $Typed<ReasonRepost>
+    | $Typed<ReasonPin>
+    | $Typed<ReasonLike>
+    | $Typed<ReasonReply>
+    | { $type: string }
+  )[];
   /** Context provided by feed generator that may be passed back alongside interactions. */
   feedContext?: string;
 }
@@ -174,6 +181,38 @@ export function isReasonPin<V>(v: V) {
 
 export function validateReasonPin<V>(v: V) {
   return validate<ReasonPin & V>(v, id, hashReasonPin);
+}
+
+export interface ReasonLike {
+  $type?: "so.sprk.feed.defs#reasonLike";
+  by: SoSprkActorDefs.ProfileViewBasic;
+  indexedAt: string;
+}
+
+const hashReasonLike = "reasonLike";
+
+export function isReasonLike<V>(v: V) {
+  return is$typed(v, id, hashReasonLike);
+}
+
+export function validateReasonLike<V>(v: V) {
+  return validate<ReasonLike & V>(v, id, hashReasonLike);
+}
+
+export interface ReasonReply {
+  $type?: "so.sprk.feed.defs#reasonReply";
+  by: SoSprkActorDefs.ProfileViewBasic;
+  indexedAt: string;
+}
+
+const hashReasonReply = "reasonReply";
+
+export function isReasonReply<V>(v: V) {
+  return is$typed(v, id, hashReasonReply);
+}
+
+export function validateReasonReply<V>(v: V) {
+  return validate<ReasonReply & V>(v, id, hashReasonReply);
 }
 
 export interface ThreadViewPost {
@@ -295,9 +334,14 @@ export function validateGeneratorViewerState<V>(v: V) {
 export interface SkeletonFeedPost {
   $type?: "so.sprk.feed.defs#skeletonFeedPost";
   post: string;
-  reason?: $Typed<SkeletonReasonRepost> | $Typed<SkeletonReasonPin> | {
-    $type: string;
-  };
+  /** Reasons/context signals for why this item is in the feed. */
+  reasons?: (
+    | $Typed<SkeletonReasonRepost>
+    | $Typed<SkeletonReasonPin>
+    | $Typed<SkeletonReasonLike>
+    | $Typed<SkeletonReasonReply>
+    | { $type: string }
+  )[];
   /** Context that will be passed through to client and may be passed to feed generator back alongside interactions. */
   feedContext?: string;
 }
@@ -339,6 +383,36 @@ export function isSkeletonReasonPin<V>(v: V) {
 
 export function validateSkeletonReasonPin<V>(v: V) {
   return validate<SkeletonReasonPin & V>(v, id, hashSkeletonReasonPin);
+}
+
+export interface SkeletonReasonLike {
+  $type?: "so.sprk.feed.defs#skeletonReasonLike";
+  like: string;
+}
+
+const hashSkeletonReasonLike = "skeletonReasonLike";
+
+export function isSkeletonReasonLike<V>(v: V) {
+  return is$typed(v, id, hashSkeletonReasonLike);
+}
+
+export function validateSkeletonReasonLike<V>(v: V) {
+  return validate<SkeletonReasonLike & V>(v, id, hashSkeletonReasonLike);
+}
+
+export interface SkeletonReasonReply {
+  $type?: "so.sprk.feed.defs#skeletonReasonReply";
+  reply: string;
+}
+
+const hashSkeletonReasonReply = "skeletonReasonReply";
+
+export function isSkeletonReasonReply<V>(v: V) {
+  return is$typed(v, id, hashSkeletonReasonReply);
+}
+
+export function validateSkeletonReasonReply<V>(v: V) {
+  return validate<SkeletonReasonReply & V>(v, id, hashSkeletonReasonReply);
 }
 
 export interface ThreadgateView {
