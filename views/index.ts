@@ -16,9 +16,7 @@ import {
   isPostView,
   isReplyView,
   PostView,
-  ReasonLike,
   ReasonPin,
-  ReasonReply,
   ReasonRepost,
   ReplyRef,
   ReplyView,
@@ -67,7 +65,7 @@ import { Main as StrongRef } from "../lex/types/com/atproto/repo/strongRef.ts";
 import { cidFromBlobJson } from "./util.ts";
 import { uriToDid } from "../utils/uris.ts";
 import { mapDefined } from "@atp/common";
-import { FeedItem, Like, Reply, Repost } from "../hydration/feed.ts";
+import { FeedItem, Repost } from "../hydration/feed.ts";
 import {
   QueryParams as GetThreadQueryParams,
   ThreadItem,
@@ -504,53 +502,21 @@ export class Views {
     item: FeedItem,
     state: HydrationState,
   ): FeedViewPost | undefined {
-    const reasons = [];
-
+    let reason;
     if (item.authorPinned) {
-      reasons.push(this.reasonPin());
+      reason = this.reasonPin();
+    } else if (item.repost) {
+      const repost = state.reposts?.get(item.repost.uri);
+      if (!repost || !repost?.record.subject) return;
+      if (repost.record.subject.uri !== item.post.uri) return;
+      reason = this.reasonRepost(item.repost.uri, repost, state);
+      if (!reason) return;
     }
-
-    if (item.reposts) {
-      for (const repostRef of item.reposts) {
-        const repost = state.reposts?.get(repostRef.uri);
-        if (!repost || !repost.record.subject) continue;
-        if (repost.record.subject.uri !== item.post.uri) continue;
-        const reason = this.reasonRepost(repostRef.uri, repost, state);
-        if (reason) {
-          reasons.push(reason);
-        }
-      }
-    }
-
-    if (item.likes) {
-      for (const likeRef of item.likes) {
-        const like = state.likes?.get(likeRef.uri);
-        if (!like || !like.record.subject) continue;
-        if (like.record.subject.uri !== item.post.uri) continue;
-        const reason = this.reasonLike(likeRef.uri, like, state);
-        if (reason) {
-          reasons.push(reason);
-        }
-      }
-    }
-
-    if (item.replies) {
-      for (const replyRef of item.replies) {
-        const reply = state.replies?.get(replyRef.uri);
-        if (!reply || !reply.record.reply) continue;
-        if (reply.record.reply.parent.uri !== item.post.uri) continue;
-        const reason = this.reasonReply(replyRef.uri, reply, state);
-        if (reason) {
-          reasons.push(reason);
-        }
-      }
-    }
-
     const post = this.post(item.post.uri, state);
     if (!post) return;
     return {
       post,
-      reasons: reasons.length > 0 ? reasons : undefined,
+      reason,
     };
   }
 
@@ -624,36 +590,6 @@ export class Views {
     };
   }
 
-  reasonLike(
-    uri: string,
-    like: Like,
-    state: HydrationState,
-  ): $Typed<ReasonLike> | undefined {
-    const creatorDid = uriToDid(uri);
-    const creator = this.profileBasic(creatorDid, state);
-    if (!creator) return;
-    return {
-      $type: "so.sprk.feed.defs#reasonLike",
-      by: creator,
-      indexedAt: this.indexedAt(like).toISOString(),
-    };
-  }
-
-  reasonReply(
-    uri: string,
-    reply: Reply,
-    state: HydrationState,
-  ): $Typed<ReasonReply> | undefined {
-    const creatorDid = uriToDid(uri);
-    const creator = this.profileBasic(creatorDid, state);
-    if (!creator) return;
-    return {
-      $type: "so.sprk.feed.defs#reasonReply",
-      by: creator,
-      indexedAt: this.indexedAt(reply).toISOString(),
-    };
-  }
-
   maybePost(uri: string, state: HydrationState): $Typed<MaybePostView> {
     const reply = this.reply(uri, state);
     if (reply) {
@@ -707,26 +643,11 @@ export class Views {
     authorBlocked: boolean;
   } {
     const authorDid = uriToDid(item.post.uri);
-
-    // Check if any repost originator is muted or blocked
-    let originatorMuted = false;
-    let originatorBlocked = false;
-
-    if (item.reposts && item.reposts.length > 0) {
-      for (const repost of item.reposts) {
-        const originatorDid = uriToDid(repost.uri);
-        if (this.viewerMuteExists(originatorDid, state)) {
-          originatorMuted = true;
-        }
-        if (this.viewerBlockExists(originatorDid, state)) {
-          originatorBlocked = true;
-        }
-      }
-    }
+    const originatorDid = item.repost ? uriToDid(item.repost.uri) : authorDid;
 
     return {
-      originatorMuted,
-      originatorBlocked,
+      originatorMuted: this.viewerMuteExists(originatorDid, state),
+      originatorBlocked: this.viewerBlockExists(originatorDid, state),
       authorMuted: this.viewerMuteExists(authorDid, state),
       authorBlocked: this.viewerBlockExists(authorDid, state),
     };

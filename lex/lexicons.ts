@@ -17413,20 +17413,12 @@ export const schemaDict = {
             "type": "ref",
             "ref": "lex:so.sprk.feed.defs#postView",
           },
-          "reasons": {
-            "type": "array",
-            "description":
-              "Reasons/context signals for why this item is in the feed.",
-            "maxLength": 5,
-            "items": {
-              "type": "union",
-              "refs": [
-                "lex:so.sprk.feed.defs#reasonRepost",
-                "lex:so.sprk.feed.defs#reasonPin",
-                "lex:so.sprk.feed.defs#reasonLike",
-                "lex:so.sprk.feed.defs#reasonReply",
-              ],
-            },
+          "reason": {
+            "type": "union",
+            "refs": [
+              "lex:so.sprk.feed.defs#reasonRepost",
+              "lex:so.sprk.feed.defs#reasonPin",
+            ],
           },
           "feedContext": {
             "type": "string",
@@ -17488,40 +17480,6 @@ export const schemaDict = {
       "reasonPin": {
         "type": "object",
         "properties": {},
-      },
-      "reasonLike": {
-        "type": "object",
-        "required": [
-          "by",
-          "indexedAt",
-        ],
-        "properties": {
-          "by": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
-          },
-          "indexedAt": {
-            "type": "string",
-            "format": "datetime",
-          },
-        },
-      },
-      "reasonReply": {
-        "type": "object",
-        "required": [
-          "by",
-          "indexedAt",
-        ],
-        "properties": {
-          "by": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
-          },
-          "indexedAt": {
-            "type": "string",
-            "format": "datetime",
-          },
-        },
       },
       "threadViewPost": {
         "type": "object",
@@ -17705,20 +17663,12 @@ export const schemaDict = {
             "type": "string",
             "format": "at-uri",
           },
-          "reasons": {
-            "type": "array",
-            "description":
-              "Reasons/context signals for why this item is in the feed.",
-            "maxLength": 5,
-            "items": {
-              "type": "union",
-              "refs": [
-                "lex:so.sprk.feed.defs#skeletonReasonRepost",
-                "lex:so.sprk.feed.defs#skeletonReasonPin",
-                "lex:so.sprk.feed.defs#skeletonReasonLike",
-                "lex:so.sprk.feed.defs#skeletonReasonReply",
-              ],
-            },
+          "reason": {
+            "type": "union",
+            "refs": [
+              "lex:so.sprk.feed.defs#skeletonReasonRepost",
+              "lex:so.sprk.feed.defs#skeletonReasonPin",
+            ],
           },
           "feedContext": {
             "type": "string",
@@ -17743,30 +17693,6 @@ export const schemaDict = {
       "skeletonReasonPin": {
         "type": "object",
         "properties": {},
-      },
-      "skeletonReasonLike": {
-        "type": "object",
-        "required": [
-          "like",
-        ],
-        "properties": {
-          "like": {
-            "type": "string",
-            "format": "at-uri",
-          },
-        },
-      },
-      "skeletonReasonReply": {
-        "type": "object",
-        "required": [
-          "reply",
-        ],
-        "properties": {
-          "reply": {
-            "type": "string",
-            "format": "at-uri",
-          },
-        },
       },
       "threadgateView": {
         "type": "object",

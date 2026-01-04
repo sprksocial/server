@@ -16,10 +16,7 @@ import { FeedItem } from "../../../../hydration/feed.ts";
 import { HydrateCtx } from "../../../../hydration/index.ts";
 import { Server } from "../../../../lex/index.ts";
 import { ids, lexicons } from "../../../../lex/lexicons.ts";
-import {
-  isSkeletonReasonRepost,
-  SkeletonReasonRepost,
-} from "../../../../lex/types/so/sprk/feed/defs.ts";
+import { isSkeletonReasonRepost } from "../../../../lex/types/so/sprk/feed/defs.ts";
 import { QueryParams as GetFeedParams } from "../../../../lex/types/so/sprk/feed/getFeed.ts";
 import { OutputSchema as SkeletonOutput } from "../../../../lex/types/so/sprk/feed/getFeedSkeleton.ts";
 import {
@@ -264,17 +261,13 @@ const skeletonFromFeedGen = async (
   }
 
   const { feed: feedSkele, ...skele } = skeleton;
-  const feedItems = feedSkele.slice(0, params.limit).map((item) => {
-    const reposts = item.reasons
-      ?.filter(isSkeletonReasonRepost)
-      .map((reason) => ({ uri: (reason as SkeletonReasonRepost).repost }));
-
-    return {
-      post: { uri: item.post },
-      reposts: reposts && reposts.length > 0 ? reposts : undefined,
-      feedContext: item.feedContext,
-    };
-  });
+  const feedItems = feedSkele.slice(0, params.limit).map((item) => ({
+    post: { uri: item.post },
+    repost: isSkeletonReasonRepost(item.reason)
+      ? { uri: item.reason.repost }
+      : undefined,
+    feedContext: item.feedContext,
+  }));
 
   return { ...skele, resHeaders, feedItems };
 };

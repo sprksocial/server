@@ -66,8 +66,8 @@ export const skeleton = async (inputs: {
   return {
     items: res.items.map((item) => ({
       post: { uri: item.uri, cid: item.cid || undefined },
-      reposts: item.repost
-        ? [{ uri: item.repost, cid: item.repostCid || undefined }]
+      repost: item.repost
+        ? { uri: item.repost, cid: item.repostCid || undefined }
         : undefined,
     })),
     cursor: parseString(res.cursor),

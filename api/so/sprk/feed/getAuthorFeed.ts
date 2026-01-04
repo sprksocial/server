@@ -94,8 +94,8 @@ export const skeleton = async (inputs: {
 
   let items: FeedItem[] = res.items.map((item) => ({
     post: { uri: item.uri, cid: item.cid || undefined },
-    reposts: item.repost
-      ? [{ uri: item.repost, cid: item.repostCid || undefined }]
+    repost: item.repost
+      ? { uri: item.repost, cid: item.repostCid || undefined }
       : undefined,
   }));
 
@@ -162,7 +162,19 @@ const noBlocksOrMutedReposts = (inputs: {
     );
   };
 
-  skeleton.items = skeleton.items.filter(checkBlocksAndMutes);
+  if (skeleton.filter === "posts_and_author_threads") {
+    // ensure replies are only included if the feed contains all
+    // replies up to the thread root (i.e. a complete self-thread.)
+    const selfThread = new SelfThreadTracker(skeleton.items, hydration);
+    skeleton.items = skeleton.items.filter((item) => {
+      return (
+        checkBlocksAndMutes(item) &&
+        (item.repost || item.authorPinned || selfThread.ok(item.post.uri))
+      );
+    });
+  } else {
+    skeleton.items = skeleton.items.filter(checkBlocksAndMutes);
+  }
 
   return skeleton;
 };
@@ -196,3 +208,50 @@ type Skeleton = {
   filter: QueryParams["filter"];
   cursor?: string;
 };
+
+class SelfThreadTracker {
+  feedUris = new Set<string>();
+  cache = new Map<string, boolean>();
+
+  constructor(
+    items: FeedItem[],
+    private hydration: HydrationState,
+  ) {
+    items.forEach((item) => {
+      if (!item.repost) {
+        this.feedUris.add(item.post.uri);
+      }
+    });
+  }
+
+  ok(uri: string, loop = new Set<string>()) {
+    // if we've already checked this uri, pull from the cache
+    if (this.cache.has(uri)) {
+      return this.cache.get(uri) ?? false;
+    }
+    // loop detection
+    if (loop.has(uri)) {
+      this.cache.set(uri, false);
+      return false;
+    } else {
+      loop.add(uri);
+    }
+    // cache through the result
+    const result = this._ok(uri);
+    this.cache.set(uri, result);
+    return result;
+  }
+
+  private _ok(uri: string): boolean {
+    // must be in the feed to be in a self-thread
+    if (!this.feedUris.has(uri)) {
+      return false;
+    }
+    // must be hydratable to be part of self-thread
+    const post = this.hydration.posts?.get(uri);
+    if (!post) {
+      return false;
+    }
+    return true;
+  }
+}

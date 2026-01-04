@@ -79,20 +79,7 @@
       "required": ["post"],
       "properties": {
         "post": { "type": "ref", "ref": "#postView" },
-        "reasons": {
-          "type": "array",
-          "description": "Reasons/context signals for why this item is in the feed.",
-          "maxLength": 5,
-          "items": {
-            "type": "union",
-            "refs": [
-              "#reasonRepost",
-              "#reasonPin",
-              "#reasonLike",
-              "#reasonReply"
-            ]
-          }
-        },
+        "reason": { "type": "union", "refs": ["#reasonRepost", "#reasonPin"] },
         "feedContext": {
           "type": "string",
           "description": "Context provided by feed generator that may be passed back alongside interactions.",
@@ -130,22 +117,6 @@
     "reasonPin": {
       "type": "object",
       "properties": {}
-    },
-    "reasonLike": {
-      "type": "object",
-      "required": ["by", "indexedAt"],
-      "properties": {
-        "by": { "type": "ref", "ref": "so.sprk.actor.defs#profileViewBasic" },
-        "indexedAt": { "type": "string", "format": "datetime" }
-      }
-    },
-    "reasonReply": {
-      "type": "object",
-      "required": ["by", "indexedAt"],
-      "properties": {
-        "by": { "type": "ref", "ref": "so.sprk.actor.defs#profileViewBasic" },
-        "indexedAt": { "type": "string", "format": "datetime" }
-      }
     },
     "threadViewPost": {
       "type": "object",
@@ -235,19 +206,9 @@
       "required": ["post"],
       "properties": {
         "post": { "type": "string", "format": "at-uri" },
-        "reasons": {
-          "type": "array",
-          "description": "Reasons/context signals for why this item is in the feed.",
-          "maxLength": 5,
-          "items": {
-            "type": "union",
-            "refs": [
-              "#skeletonReasonRepost",
-              "#skeletonReasonPin",
-              "#skeletonReasonLike",
-              "#skeletonReasonReply"
-            ]
-          }
+        "reason": {
+          "type": "union",
+          "refs": ["#skeletonReasonRepost", "#skeletonReasonPin"]
         },
         "feedContext": {
           "type": "string",
@@ -266,20 +227,6 @@
     "skeletonReasonPin": {
       "type": "object",
       "properties": {}
-    },
-    "skeletonReasonLike": {
-      "type": "object",
-      "required": ["like"],
-      "properties": {
-        "like": { "type": "string", "format": "at-uri" }
-      }
-    },
-    "skeletonReasonReply": {
-      "type": "object",
-      "required": ["reply"],
-      "properties": {
-        "reply": { "type": "string", "format": "at-uri" }
-      }
     },
     "threadgateView": {
       "type": "object",
