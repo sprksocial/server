@@ -17407,9 +17407,6 @@ export const schemaDict = {
           "embeddingDisabled": {
             "type": "boolean",
           },
-          "pinned": {
-            "type": "boolean",
-          },
           "knownInteractions": {
             "type": "array",
             "items": {
@@ -17746,13 +17743,6 @@ export const schemaDict = {
             "type": "string",
             "format": "at-uri",
           },
-          "reason": {
-            "type": "union",
-            "refs": [
-              "lex:so.sprk.feed.defs#skeletonReasonRepost",
-              "lex:so.sprk.feed.defs#skeletonReasonPin",
-            ],
-          },
           "feedContext": {
             "type": "string",
             "description":
@@ -17760,22 +17750,6 @@ export const schemaDict = {
             "maxLength": 2000,
           },
         },
-      },
-      "skeletonReasonRepost": {
-        "type": "object",
-        "required": [
-          "repost",
-        ],
-        "properties": {
-          "repost": {
-            "type": "string",
-            "format": "at-uri",
-          },
-        },
-      },
-      "skeletonReasonPin": {
-        "type": "object",
-        "properties": {},
       },
       "threadgateView": {
         "type": "object",
