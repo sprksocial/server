@@ -3,17 +3,11 @@ import { TimeCidKeyset } from "../db/pagination.ts";
 
 // Helper function to format feed items
 function feedItemFromRow(
-  item: { uri: string; cid: string; repostUri?: string },
-): { uri: string; cid: string; repost?: string; repostCid?: string } {
+  item: { uri: string; cid: string },
+): { uri: string; cid: string } {
   return {
     uri: item.uri,
     cid: item.cid,
-    repost: item.repostUri && item.repostUri !== item.uri
-      ? item.repostUri
-      : undefined,
-    repostCid: item.repostUri && item.repostUri !== item.uri
-      ? item.cid
-      : undefined,
   };
 }
 
@@ -23,8 +17,6 @@ interface FeedItem {
   authorDid: string;
   createdAt: string;
   indexedAt: string;
-  type: "post" | "repost";
-  repostUri?: string;
 }
 
 export class Feeds {
@@ -87,7 +79,6 @@ export class Feeds {
       authorDid: p.authorDid,
       createdAt: p.createdAt,
       indexedAt: p.indexedAt,
-      type: "post" as const,
     }));
 
     return {
@@ -124,7 +115,6 @@ export class Feeds {
       authorDid: p.authorDid,
       createdAt: p.createdAt,
       indexedAt: p.indexedAt,
-      type: "post" as const,
     }));
 
     return {

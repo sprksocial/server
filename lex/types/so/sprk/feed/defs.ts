@@ -53,7 +53,7 @@ export interface ReplyView {
   replyCount?: number;
   likeCount?: number;
   indexedAt: string;
-  viewer?: ViewerState;
+  viewer?: ViewerStateBasic;
   labels?: (ComAtprotoLabelDefs.Label)[];
 }
 
@@ -68,6 +68,25 @@ export function validateReplyView<V>(v: V) {
 }
 
 /** Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests. */
+export interface ViewerStateBasic {
+  $type?: "so.sprk.feed.defs#viewerStateBasic";
+  like?: string;
+  threadMuted?: boolean;
+  replyDisabled?: boolean;
+  embeddingDisabled?: boolean;
+}
+
+const hashViewerStateBasic = "viewerStateBasic";
+
+export function isViewerStateBasic<V>(v: V) {
+  return is$typed(v, id, hashViewerStateBasic);
+}
+
+export function validateViewerStateBasic<V>(v: V) {
+  return validate<ViewerStateBasic & V>(v, id, hashViewerStateBasic);
+}
+
+/** Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests. */
 export interface ViewerState {
   $type?: "so.sprk.feed.defs#viewerState";
   repost?: string;
@@ -76,6 +95,10 @@ export interface ViewerState {
   replyDisabled?: boolean;
   embeddingDisabled?: boolean;
   pinned?: boolean;
+  knownInteractions?:
+    ($Typed<KnownRepost> | $Typed<KnownLike> | $Typed<KnownReply> | {
+      $type: string;
+    })[];
 }
 
 const hashViewerState = "viewerState";
@@ -86,6 +109,61 @@ export function isViewerState<V>(v: V) {
 
 export function validateViewerState<V>(v: V) {
   return validate<ViewerState & V>(v, id, hashViewerState);
+}
+
+export interface KnownRepost {
+  $type?: "so.sprk.feed.defs#knownRepost";
+  by: SoSprkActorDefs.ProfileViewBasic;
+  uri?: string;
+  cid?: string;
+  indexedAt: string;
+}
+
+const hashKnownRepost = "knownRepost";
+
+export function isKnownRepost<V>(v: V) {
+  return is$typed(v, id, hashKnownRepost);
+}
+
+export function validateKnownRepost<V>(v: V) {
+  return validate<KnownRepost & V>(v, id, hashKnownRepost);
+}
+
+export interface KnownLike {
+  $type?: "so.sprk.feed.defs#knownLike";
+  by: SoSprkActorDefs.ProfileViewBasic;
+  uri?: string;
+  cid?: string;
+  indexedAt: string;
+}
+
+const hashKnownLike = "knownLike";
+
+export function isKnownLike<V>(v: V) {
+  return is$typed(v, id, hashKnownLike);
+}
+
+export function validateKnownLike<V>(v: V) {
+  return validate<KnownLike & V>(v, id, hashKnownLike);
+}
+
+export interface KnownReply {
+  $type?: "so.sprk.feed.defs#knownReply";
+  by: SoSprkActorDefs.ProfileViewBasic;
+  uri?: string;
+  cid?: string;
+  indexedAt: string;
+  text?: string;
+}
+
+const hashKnownReply = "knownReply";
+
+export function isKnownReply<V>(v: V) {
+  return is$typed(v, id, hashKnownReply);
+}
+
+export function validateKnownReply<V>(v: V) {
+  return validate<KnownReply & V>(v, id, hashKnownReply);
 }
 
 /** Metadata about this post within the context of the thread it is in. */
@@ -107,7 +185,6 @@ export function validateThreadContext<V>(v: V) {
 export interface FeedViewPost {
   $type?: "so.sprk.feed.defs#feedViewPost";
   post: PostView;
-  reason?: $Typed<ReasonRepost> | $Typed<ReasonPin> | { $type: string };
   /** Context provided by feed generator that may be passed back alongside interactions. */
   feedContext?: string;
 }
@@ -144,36 +221,6 @@ export function isReplyRef<V>(v: V) {
 
 export function validateReplyRef<V>(v: V) {
   return validate<ReplyRef & V>(v, id, hashReplyRef);
-}
-
-export interface ReasonRepost {
-  $type?: "so.sprk.feed.defs#reasonRepost";
-  by: SoSprkActorDefs.ProfileViewBasic;
-  indexedAt: string;
-}
-
-const hashReasonRepost = "reasonRepost";
-
-export function isReasonRepost<V>(v: V) {
-  return is$typed(v, id, hashReasonRepost);
-}
-
-export function validateReasonRepost<V>(v: V) {
-  return validate<ReasonRepost & V>(v, id, hashReasonRepost);
-}
-
-export interface ReasonPin {
-  $type?: "so.sprk.feed.defs#reasonPin";
-}
-
-const hashReasonPin = "reasonPin";
-
-export function isReasonPin<V>(v: V) {
-  return is$typed(v, id, hashReasonPin);
-}
-
-export function validateReasonPin<V>(v: V) {
-  return validate<ReasonPin & V>(v, id, hashReasonPin);
 }
 
 export interface ThreadViewPost {

@@ -6,6 +6,15 @@ interface AggregationResult {
   count: number;
 }
 
+export interface KnownInteraction {
+  type: "like" | "repost" | "reply";
+  uri: string;
+  cid: string;
+  authorDid: string;
+  indexedAt: string;
+  text?: string;
+}
+
 export class Interactions {
   private db: Database;
 
@@ -135,5 +144,135 @@ export class Interactions {
     return {
       uses: uris.map((uri) => usageMap.get(uri) ?? 0),
     };
+  }
+
+  /**
+   * Get interactions (likes, reposts, replies) on subject URIs by users the viewer follows.
+   * Returns interactions sorted by indexedAt descending (most recent first).
+   */
+  async getKnownInteractions(
+    viewerDid: string,
+    subjectUris: string[],
+  ): Promise<{ results: Map<string, KnownInteraction[]> }> {
+    if (subjectUris.length === 0) {
+      return { results: new Map() };
+    }
+
+    // Get all DIDs the viewer follows
+    const viewerFollows = await this.db.models.Follow.find({
+      authorDid: viewerDid,
+    });
+    const followedDids = viewerFollows.map((f) => f.subject);
+
+    if (followedDids.length === 0) {
+      return { results: new Map() };
+    }
+
+    // Query likes, reposts, and replies by followed users on the subject URIs
+    const [likes, reposts, replies] = await Promise.all([
+      this.db.models.Like.find({
+        subject: { $in: subjectUris },
+        authorDid: { $in: followedDids },
+      }).sort({ indexedAt: -1 }),
+      this.db.models.Repost.find({
+        subject: { $in: subjectUris },
+        authorDid: { $in: followedDids },
+      }).sort({ indexedAt: -1 }),
+      this.db.models.Reply.find({
+        "reply.parent.uri": { $in: subjectUris },
+        authorDid: { $in: followedDids },
+      }).sort({ indexedAt: -1 }),
+    ]);
+
+    // Build result map keyed by subject URI
+    const results = new Map<string, KnownInteraction[]>();
+
+    // Initialize empty arrays for each subject URI
+    for (const uri of subjectUris) {
+      results.set(uri, []);
+    }
+
+    // Add likes
+    for (const like of likes) {
+      const interactions = results.get(like.subject);
+      if (interactions) {
+        interactions.push({
+          type: "like",
+          uri: like.uri,
+          cid: like.cid,
+          authorDid: like.authorDid,
+          indexedAt: String(like.indexedAt),
+        });
+      }
+    }
+
+    // Add reposts
+    for (const repost of reposts) {
+      const interactions = results.get(repost.subject);
+      if (interactions) {
+        interactions.push({
+          type: "repost",
+          uri: repost.uri,
+          cid: repost.cid,
+          authorDid: repost.authorDid,
+          indexedAt: String(repost.indexedAt),
+        });
+      }
+    }
+
+    // Add replies
+    for (const reply of replies) {
+      const parentUri = reply.reply?.parent.uri;
+      if (!parentUri) continue;
+      const interactions = results.get(parentUri);
+      if (interactions) {
+        interactions.push({
+          type: "reply",
+          uri: reply.uri,
+          cid: reply.cid,
+          authorDid: reply.authorDid,
+          indexedAt: String(reply.indexedAt),
+          text: reply.text,
+        });
+      }
+    }
+
+    // Dedupe: keep one interaction per actor with priority: repost > reply > like
+    // Sort order: repost → like → reply
+    const keepPriority: Record<KnownInteraction["type"], number> = {
+      repost: 0,
+      reply: 1,
+      like: 2,
+    };
+
+    for (const [uri, interactions] of results) {
+      // Group by author, keep highest priority interaction per author
+      const byAuthor = new Map<string, KnownInteraction>();
+      for (const interaction of interactions) {
+        const existing = byAuthor.get(interaction.authorDid);
+        if (
+          !existing ||
+          keepPriority[interaction.type] < keepPriority[existing.type]
+        ) {
+          byAuthor.set(interaction.authorDid, interaction);
+        }
+      }
+
+      // Bucket into 3 arrays by type (avoids sorting)
+      const repostBucket: KnownInteraction[] = [];
+      const likeBucket: KnownInteraction[] = [];
+      const replyBucket: KnownInteraction[] = [];
+
+      for (const interaction of byAuthor.values()) {
+        if (interaction.type === "repost") repostBucket.push(interaction);
+        else if (interaction.type === "like") likeBucket.push(interaction);
+        else replyBucket.push(interaction);
+      }
+
+      // Concatenate in desired order: repost → like → reply
+      results.set(uri, [...repostBucket, ...likeBucket, ...replyBucket]);
+    }
+
+    return { results };
   }
 }

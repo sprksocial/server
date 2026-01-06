@@ -66,9 +66,6 @@ export const skeleton = async (inputs: {
   return {
     items: res.items.map((item) => ({
       post: { uri: item.uri, cid: item.cid || undefined },
-      repost: item.repost
-        ? { uri: item.repost, cid: item.repostCid || undefined }
-        : undefined,
     })),
     cursor: parseString(res.cursor),
   };
@@ -92,9 +89,7 @@ const noBlocksOrMutes = (inputs: {
   skeleton.items = skeleton.items.filter((item) => {
     const bam = ctx.views.feedItemBlocksAndMutes(item, hydration);
     return !bam.authorBlocked &&
-      !bam.authorMuted &&
-      !bam.originatorBlocked &&
-      !bam.originatorMuted;
+      !bam.authorMuted;
   });
   return skeleton;
 };

@@ -15,9 +15,10 @@ import {
   FeedViewPost,
   isPostView,
   isReplyView,
+  KnownLike,
+  KnownReply,
+  KnownRepost,
   PostView,
-  ReasonPin,
-  ReasonRepost,
   ReplyRef,
   ReplyView,
   ThreadContext,
@@ -65,7 +66,7 @@ import { Main as StrongRef } from "../lex/types/com/atproto/repo/strongRef.ts";
 import { cidFromBlobJson } from "./util.ts";
 import { uriToDid } from "../utils/uris.ts";
 import { mapDefined } from "@atp/common";
-import { FeedItem, Repost } from "../hydration/feed.ts";
+import { FeedItem } from "../hydration/feed.ts";
 import {
   QueryParams as GetThreadQueryParams,
   ThreadItem,
@@ -360,6 +361,7 @@ export class Views {
         ? {
           repost: viewer.repost,
           like: viewer.like,
+          knownInteractions: this.knownInteractions(uri, state),
         }
         : undefined,
     };
@@ -395,7 +397,6 @@ export class Views {
         new Date().toISOString(),
       viewer: viewer
         ? {
-          repost: viewer.repost,
           like: viewer.like,
         }
         : undefined,
@@ -502,21 +503,10 @@ export class Views {
     item: FeedItem,
     state: HydrationState,
   ): FeedViewPost | undefined {
-    let reason;
-    if (item.authorPinned) {
-      reason = this.reasonPin();
-    } else if (item.repost) {
-      const repost = state.reposts?.get(item.repost.uri);
-      if (!repost || !repost?.record.subject) return;
-      if (repost.record.subject.uri !== item.post.uri) return;
-      reason = this.reasonRepost(item.repost.uri, repost, state);
-      if (!reason) return;
-    }
     const post = this.post(item.post.uri, state);
     if (!post) return;
     return {
       post,
-      reason,
     };
   }
 
@@ -569,27 +559,6 @@ export class Views {
     };
   }
 
-  reasonPin(): $Typed<ReasonPin> {
-    return {
-      $type: "so.sprk.feed.defs#reasonPin",
-    };
-  }
-
-  reasonRepost(
-    uri: string,
-    repost: Repost,
-    state: HydrationState,
-  ): $Typed<ReasonRepost> | undefined {
-    const creatorDid = uriToDid(uri);
-    const creator = this.profileBasic(creatorDid, state);
-    if (!creator) return;
-    return {
-      $type: "so.sprk.feed.defs#reasonRepost",
-      by: creator,
-      indexedAt: this.indexedAt(repost).toISOString(),
-    };
-  }
-
   maybePost(uri: string, state: HydrationState): $Typed<MaybePostView> {
     const reply = this.reply(uri, state);
     if (reply) {
@@ -637,17 +606,12 @@ export class Views {
     item: FeedItem,
     state: HydrationState,
   ): {
-    originatorMuted: boolean;
-    originatorBlocked: boolean;
     authorMuted: boolean;
     authorBlocked: boolean;
   } {
     const authorDid = uriToDid(item.post.uri);
-    const originatorDid = item.repost ? uriToDid(item.repost.uri) : authorDid;
 
     return {
-      originatorMuted: this.viewerMuteExists(originatorDid, state),
-      originatorBlocked: this.viewerBlockExists(originatorDid, state),
       authorMuted: this.viewerMuteExists(authorDid, state),
       authorBlocked: this.viewerBlockExists(authorDid, state),
     };
@@ -814,6 +778,57 @@ export class Views {
       return this.profileBasic(followerDid, state);
     });
     return { count: knownFollowers.count, followers };
+  }
+
+  knownInteractions(
+    uri: string,
+    state: HydrationState,
+  ):
+    | ($Typed<KnownRepost> | $Typed<KnownLike> | $Typed<KnownReply>)[]
+    | undefined {
+    const interactions = state.knownInteractions?.get(uri);
+    if (!interactions || interactions.length === 0) return undefined;
+
+    const postAuthorDid = uriToDid(uri);
+    const blocks = state.bidirectionalBlocks?.get(postAuthorDid);
+
+    const result = mapDefined(interactions, (interaction) => {
+      // Filter blocked users
+      if (this.viewerBlockExists(interaction.by, state)) return undefined;
+      if (blocks?.get(interaction.by)) return undefined;
+      if (this.actorIsNoHosted(interaction.by, state)) return undefined;
+
+      const by = this.profileBasic(interaction.by, state);
+      if (!by) return undefined;
+
+      const base = {
+        by,
+        uri: interaction.uri,
+        cid: interaction.cid,
+        indexedAt: interaction.indexedAt.toISOString(),
+      };
+
+      switch (interaction.type) {
+        case "like":
+          return {
+            $type: "so.sprk.feed.defs#knownLike" as const,
+            ...base,
+          };
+        case "repost":
+          return {
+            $type: "so.sprk.feed.defs#knownRepost" as const,
+            ...base,
+          };
+        case "reply":
+          return {
+            $type: "so.sprk.feed.defs#knownReply" as const,
+            ...base,
+            text: interaction.text,
+          };
+      }
+    });
+
+    return result.length > 0 ? result : undefined;
   }
 
   media(

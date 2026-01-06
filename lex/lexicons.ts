@@ -17354,7 +17354,7 @@ export const schemaDict = {
           },
           "viewer": {
             "type": "ref",
-            "ref": "lex:so.sprk.feed.defs#viewerState",
+            "ref": "lex:so.sprk.feed.defs#viewerStateBasic",
           },
           "labels": {
             "type": "array",
@@ -17362,6 +17362,26 @@ export const schemaDict = {
               "type": "ref",
               "ref": "lex:com.atproto.label.defs#label",
             },
+          },
+        },
+      },
+      "viewerStateBasic": {
+        "type": "object",
+        "description":
+          "Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests.",
+        "properties": {
+          "like": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "threadMuted": {
+            "type": "boolean",
+          },
+          "replyDisabled": {
+            "type": "boolean",
+          },
+          "embeddingDisabled": {
+            "type": "boolean",
           },
         },
       },
@@ -17390,6 +17410,97 @@ export const schemaDict = {
           "pinned": {
             "type": "boolean",
           },
+          "knownInteractions": {
+            "type": "array",
+            "items": {
+              "type": "union",
+              "refs": [
+                "lex:so.sprk.feed.defs#knownRepost",
+                "lex:so.sprk.feed.defs#knownLike",
+                "lex:so.sprk.feed.defs#knownReply",
+              ],
+            },
+          },
+        },
+      },
+      "knownRepost": {
+        "type": "object",
+        "required": [
+          "by",
+          "indexedAt",
+        ],
+        "properties": {
+          "by": {
+            "type": "ref",
+            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
+          },
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "cid": {
+            "type": "string",
+            "format": "cid",
+          },
+          "indexedAt": {
+            "type": "string",
+            "format": "datetime",
+          },
+        },
+      },
+      "knownLike": {
+        "type": "object",
+        "required": [
+          "by",
+          "indexedAt",
+        ],
+        "properties": {
+          "by": {
+            "type": "ref",
+            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
+          },
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "cid": {
+            "type": "string",
+            "format": "cid",
+          },
+          "indexedAt": {
+            "type": "string",
+            "format": "datetime",
+          },
+        },
+      },
+      "knownReply": {
+        "type": "object",
+        "required": [
+          "by",
+          "indexedAt",
+        ],
+        "properties": {
+          "by": {
+            "type": "ref",
+            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
+          },
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "cid": {
+            "type": "string",
+            "format": "cid",
+          },
+          "indexedAt": {
+            "type": "string",
+            "format": "datetime",
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 3000,
+            "maxGraphemes": 300,
+          },
         },
       },
       "threadContext": {
@@ -17412,13 +17523,6 @@ export const schemaDict = {
           "post": {
             "type": "ref",
             "ref": "lex:so.sprk.feed.defs#postView",
-          },
-          "reason": {
-            "type": "union",
-            "refs": [
-              "lex:so.sprk.feed.defs#reasonRepost",
-              "lex:so.sprk.feed.defs#reasonPin",
-            ],
           },
           "feedContext": {
             "type": "string",
@@ -17459,27 +17563,6 @@ export const schemaDict = {
               "When parent is a reply to another post, this is the author of that post.",
           },
         },
-      },
-      "reasonRepost": {
-        "type": "object",
-        "required": [
-          "by",
-          "indexedAt",
-        ],
-        "properties": {
-          "by": {
-            "type": "ref",
-            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
-          },
-          "indexedAt": {
-            "type": "string",
-            "format": "datetime",
-          },
-        },
-      },
-      "reasonPin": {
-        "type": "object",
-        "properties": {},
       },
       "threadViewPost": {
         "type": "object",
