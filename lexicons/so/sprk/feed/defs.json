@@ -48,14 +48,14 @@
         "replyCount": { "type": "integer" },
         "likeCount": { "type": "integer" },
         "indexedAt": { "type": "string", "format": "datetime" },
-        "viewer": { "type": "ref", "ref": "#viewerStateBasic" },
+        "viewer": { "type": "ref", "ref": "#replyViewerState" },
         "labels": {
           "type": "array",
           "items": { "type": "ref", "ref": "com.atproto.label.defs#label" }
         }
       }
     },
-    "viewerStateBasic": {
+    "replyViewerState": {
       "type": "object",
       "description": "Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests.",
       "properties": {

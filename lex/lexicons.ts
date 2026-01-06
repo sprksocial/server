@@ -17354,7 +17354,7 @@ export const schemaDict = {
           },
           "viewer": {
             "type": "ref",
-            "ref": "lex:so.sprk.feed.defs#viewerStateBasic",
+            "ref": "lex:so.sprk.feed.defs#replyViewerState",
           },
           "labels": {
             "type": "array",
@@ -17365,7 +17365,7 @@ export const schemaDict = {
           },
         },
       },
-      "viewerStateBasic": {
+      "replyViewerState": {
         "type": "object",
         "description":
           "Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests.",

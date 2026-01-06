@@ -53,7 +53,7 @@ export interface ReplyView {
   replyCount?: number;
   likeCount?: number;
   indexedAt: string;
-  viewer?: ViewerStateBasic;
+  viewer?: ReplyViewerState;
   labels?: (ComAtprotoLabelDefs.Label)[];
 }
 
@@ -68,22 +68,22 @@ export function validateReplyView<V>(v: V) {
 }
 
 /** Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests. */
-export interface ViewerStateBasic {
-  $type?: "so.sprk.feed.defs#viewerStateBasic";
+export interface ReplyViewerState {
+  $type?: "so.sprk.feed.defs#replyViewerState";
   like?: string;
   threadMuted?: boolean;
   replyDisabled?: boolean;
   embeddingDisabled?: boolean;
 }
 
-const hashViewerStateBasic = "viewerStateBasic";
+const hashReplyViewerState = "replyViewerState";
 
-export function isViewerStateBasic<V>(v: V) {
-  return is$typed(v, id, hashViewerStateBasic);
+export function isReplyViewerState<V>(v: V) {
+  return is$typed(v, id, hashReplyViewerState);
 }
 
-export function validateViewerStateBasic<V>(v: V) {
-  return validate<ViewerStateBasic & V>(v, id, hashViewerStateBasic);
+export function validateReplyViewerState<V>(v: V) {
+  return validate<ReplyViewerState & V>(v, id, hashReplyViewerState);
 }
 
 /** Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests. */
