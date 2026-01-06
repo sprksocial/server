@@ -16,7 +16,6 @@ import { FeedItem } from "../../../../hydration/feed.ts";
 import { HydrateCtx } from "../../../../hydration/index.ts";
 import { Server } from "../../../../lex/index.ts";
 import { ids, lexicons } from "../../../../lex/lexicons.ts";
-import { isSkeletonReasonRepost } from "../../../../lex/types/so/sprk/feed/defs.ts";
 import { QueryParams as GetFeedParams } from "../../../../lex/types/so/sprk/feed/getFeed.ts";
 import { OutputSchema as SkeletonOutput } from "../../../../lex/types/so/sprk/feed/getFeedSkeleton.ts";
 import {
@@ -127,9 +126,7 @@ const noBlocksOrMutes = (inputs: RulesFnInput<Context, Params, Skeleton>) => {
     const bam = ctx.views.feedItemBlocksAndMutes(item, hydration);
     return (
       !bam.authorBlocked &&
-      !bam.authorMuted &&
-      !bam.originatorBlocked &&
-      !bam.originatorMuted
+      !bam.authorMuted
     );
   });
 
@@ -263,9 +260,6 @@ const skeletonFromFeedGen = async (
   const { feed: feedSkele, ...skele } = skeleton;
   const feedItems = feedSkele.slice(0, params.limit).map((item) => ({
     post: { uri: item.post },
-    repost: isSkeletonReasonRepost(item.reason)
-      ? { uri: item.reason.repost }
-      : undefined,
     feedContext: item.feedContext,
   }));
 

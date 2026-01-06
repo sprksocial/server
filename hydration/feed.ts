@@ -78,18 +78,23 @@ export type FeedGenViewerState = {
 
 export type FeedGenViewerStates = HydrationMap<FeedGenViewerState>;
 
+export type KnownInteractionState = {
+  type: "like" | "repost" | "reply";
+  by: string; // DID of the person who interacted
+  uri: string;
+  cid: string;
+  indexedAt: Date;
+  text?: string; // Only for replies
+};
+
+export type KnownInteractionsStates = HydrationMap<
+  KnownInteractionState[] | undefined
+>;
+
 export type ThreadRef = ItemRef & { threadRoot: string };
 
-// @NOTE the feed item types in the protos for author feeds and timelines
-// technically have additional fields, not supported by the mock dataplane.
 export type FeedItem = {
   post: ItemRef;
-  repost?: ItemRef;
-  /**
-   * If true, overrides the `reason` with `so.sprk.feed.defs#reasonPin`. Used
-   * only in author feeds.
-   */
-  authorPinned?: boolean;
 };
 
 export class FeedHydrator {
@@ -322,5 +327,37 @@ export class FeedHydrator {
       );
       return acc.set(uri, record ?? null);
     }, new HydrationMap<Repost>());
+  }
+
+  async getKnownInteractions(
+    refs: ItemRef[],
+    viewer: string | null,
+  ): Promise<KnownInteractionsStates> {
+    if (!viewer || !refs.length) {
+      return new HydrationMap<KnownInteractionState[] | undefined>();
+    }
+
+    const subjectUris = refs.map((ref) => ref.uri);
+    const { results } = await this.dataplane.interactions.getKnownInteractions(
+      viewer,
+      subjectUris,
+    );
+
+    return refs.reduce((acc, { uri }) => {
+      const interactions = results.get(uri);
+      return acc.set(
+        uri,
+        interactions && interactions.length > 0
+          ? interactions.map((i) => ({
+            type: i.type,
+            by: i.authorDid,
+            uri: i.uri,
+            cid: i.cid,
+            indexedAt: new Date(i.indexedAt),
+            text: i.text,
+          }))
+          : undefined,
+      );
+    }, new HydrationMap<KnownInteractionState[] | undefined>());
   }
 }

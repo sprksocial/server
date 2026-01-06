@@ -48,11 +48,21 @@
         "replyCount": { "type": "integer" },
         "likeCount": { "type": "integer" },
         "indexedAt": { "type": "string", "format": "datetime" },
-        "viewer": { "type": "ref", "ref": "#viewerState" },
+        "viewer": { "type": "ref", "ref": "#viewerStateBasic" },
         "labels": {
           "type": "array",
           "items": { "type": "ref", "ref": "com.atproto.label.defs#label" }
         }
+      }
+    },
+    "viewerStateBasic": {
+      "type": "object",
+      "description": "Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests.",
+      "properties": {
+        "like": { "type": "string", "format": "at-uri" },
+        "threadMuted": { "type": "boolean" },
+        "replyDisabled": { "type": "boolean" },
+        "embeddingDisabled": { "type": "boolean" }
       }
     },
     "viewerState": {
@@ -64,7 +74,45 @@
         "threadMuted": { "type": "boolean" },
         "replyDisabled": { "type": "boolean" },
         "embeddingDisabled": { "type": "boolean" },
-        "pinned": { "type": "boolean" }
+        "pinned": { "type": "boolean" },
+        "knownInteractions": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": ["#knownRepost", "#knownLike", "#knownReply"]
+          }
+        }
+      }
+    },
+    "knownRepost": {
+      "type": "object",
+      "required": ["by", "indexedAt"],
+      "properties": {
+        "by": { "type": "ref", "ref": "so.sprk.actor.defs#profileViewBasic" },
+        "uri": { "type": "string", "format": "at-uri" },
+        "cid": { "type": "string", "format": "cid" },
+        "indexedAt": { "type": "string", "format": "datetime" }
+      }
+    },
+    "knownLike": {
+      "type": "object",
+      "required": ["by", "indexedAt"],
+      "properties": {
+        "by": { "type": "ref", "ref": "so.sprk.actor.defs#profileViewBasic" },
+        "uri": { "type": "string", "format": "at-uri" },
+        "cid": { "type": "string", "format": "cid" },
+        "indexedAt": { "type": "string", "format": "datetime" }
+      }
+    },
+    "knownReply": {
+      "type": "object",
+      "required": ["by", "indexedAt"],
+      "properties": {
+        "by": { "type": "ref", "ref": "so.sprk.actor.defs#profileViewBasic" },
+        "uri": { "type": "string", "format": "at-uri" },
+        "cid": { "type": "string", "format": "cid" },
+        "indexedAt": { "type": "string", "format": "datetime" },
+        "text": { "type": "string", "maxLength": 3000, "maxGraphemes": 300 }
       }
     },
     "threadContext": {
@@ -79,7 +127,6 @@
       "required": ["post"],
       "properties": {
         "post": { "type": "ref", "ref": "#postView" },
-        "reason": { "type": "union", "refs": ["#reasonRepost", "#reasonPin"] },
         "feedContext": {
           "type": "string",
           "description": "Context provided by feed generator that may be passed back alongside interactions.",
@@ -106,18 +153,6 @@
         }
       }
     },
-    "reasonRepost": {
-      "type": "object",
-      "required": ["by", "indexedAt"],
-      "properties": {
-        "by": { "type": "ref", "ref": "so.sprk.actor.defs#profileViewBasic" },
-        "indexedAt": { "type": "string", "format": "datetime" }
-      }
-    },
-    "reasonPin": {
-      "type": "object",
-      "properties": {}
-    },
     "threadViewPost": {
       "type": "object",
       "required": ["post"],
@@ -125,11 +160,7 @@
         "post": { "type": "union", "refs": ["#postView", "#replyView"] },
         "parent": {
           "type": "union",
-          "refs": [
-            "#threadViewPost",
-            "#notFoundPost",
-            "#blockedPost"
-          ]
+          "refs": ["#threadViewPost", "#notFoundPost", "#blockedPost"]
         },
         "replies": {
           "type": "array",
@@ -206,27 +237,12 @@
       "required": ["post"],
       "properties": {
         "post": { "type": "string", "format": "at-uri" },
-        "reason": {
-          "type": "union",
-          "refs": ["#skeletonReasonRepost", "#skeletonReasonPin"]
-        },
         "feedContext": {
           "type": "string",
           "description": "Context that will be passed through to client and may be passed to feed generator back alongside interactions.",
           "maxLength": 2000
         }
       }
-    },
-    "skeletonReasonRepost": {
-      "type": "object",
-      "required": ["repost"],
-      "properties": {
-        "repost": { "type": "string", "format": "at-uri" }
-      }
-    },
-    "skeletonReasonPin": {
-      "type": "object",
-      "properties": {}
     },
     "threadgateView": {
       "type": "object",

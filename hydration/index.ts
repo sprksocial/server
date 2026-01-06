@@ -1,5 +1,4 @@
 import { assert } from "@std/assert";
-import { mapDefined } from "@atp/common";
 import { AtUri } from "@atp/syntax";
 import { DataPlane } from "../data-plane/index.ts";
 import { ids } from "../lex/lexicons.ts";
@@ -19,6 +18,7 @@ import {
   FeedGenViewerStates,
   FeedHydrator,
   FeedItem,
+  KnownInteractionsStates,
   Likes,
   Post,
   PostAggs,
@@ -115,6 +115,7 @@ export type HydrationState = {
   labelerViewers?: LabelerViewerStates;
   labelerAggs?: LabelerAggs;
   knownFollowers?: KnownFollowersStates;
+  knownInteractions?: KnownInteractionsStates;
   activitySubscriptions?: ActivitySubscriptionStates;
   bidirectionalBlocks?: BidirectionalBlocks;
 };
@@ -362,6 +363,38 @@ export class Hydrator {
       }
     }
 
+    // Fetch known interactions first so we can batch all profile hydration
+    const knownInteractions = await this.feed.getKnownInteractions(
+      refs,
+      ctx.viewer,
+    );
+
+    // Gather DIDs from known interactions for profile hydration
+    const knownInteractionDids = new Set<string>();
+    for (const interactions of knownInteractions.values()) {
+      if (interactions) {
+        for (const interaction of interactions) {
+          knownInteractionDids.add(interaction.by);
+        }
+      }
+    }
+
+    // Combine all DIDs for a single batched profile hydration call
+    const allProfileDids = Array.from(
+      new Set([...authorDids, ...knownInteractionDids]),
+    );
+
+    // Build map for bidirectional block checking between post authors and interactors
+    const subjectsToInteractorsMap = new Map<string, string[]>();
+    for (const [uri, interactions] of knownInteractions) {
+      if (interactions && interactions.length > 0) {
+        subjectsToInteractorsMap.set(
+          didFromUri(uri),
+          interactions.map((i) => i.by),
+        );
+      }
+    }
+
     const [
       postAggs,
       replyAggs,
@@ -371,6 +404,7 @@ export class Hydrator {
       profileState,
       threadContexts,
       soundState,
+      interactionBlocks,
     ] = await Promise.all([
       this.feed.getPostAggregates(postRefs),
       this.feed.getReplyAggregates(replyRefs),
@@ -379,9 +413,10 @@ export class Hydrator {
         : Promise.resolve<PostViewerStates | undefined>(undefined),
       this.label.getLabelsForSubjects(allUris, ctx.labelers),
       this.hydratePostBlocks(state.posts!, state.replies!),
-      this.hydrateProfiles(authorDids, ctx),
+      this.hydrateProfiles(allProfileDids, ctx),
       this.feed.getThreadContexts(threadRefs),
       this.hydrateSounds(Array.from(soundUris), ctx),
+      this.hydrateBidirectionalBlocks(subjectsToInteractorsMap),
     ]);
 
     return mergeManyStates(
@@ -396,7 +431,9 @@ export class Hydrator {
         postBlocks,
         labels,
         threadContexts,
+        knownInteractions,
         ctx,
+        bidirectionalBlocks: interactionBlocks,
       },
     );
   }
@@ -504,34 +541,13 @@ export class Hydrator {
     });
 
     const postAndReplyRefs = Array.from(postAndReplyRefsMap.values());
-    const repostUris = mapDefined(items, (item) => item.repost?.uri);
 
     const postState = await this.hydratePosts(postAndReplyRefs, ctx, {
       posts,
       replies,
     });
 
-    const replyParentAuthors = Array.from(
-      new Set(
-        replyRefs
-          .map((ref) =>
-            postState.replies?.get(ref.uri)?.record.reply?.parent.uri
-          )
-          .filter((uri): uri is string => !!uri)
-          .map(didFromUri),
-      ),
-    );
-
-    const [repostProfileState, reposts] = await Promise.all([
-      this.hydrateProfiles(
-        [...repostUris.map(didFromUri), ...replyParentAuthors],
-        ctx,
-      ),
-      this.feed.getReposts(repostUris, ctx.includeTakedowns),
-    ]);
-
-    return mergeManyStates(postState, repostProfileState, {
-      reposts,
+    return mergeStates(postState, {
       ctx,
     });
   }
@@ -945,6 +961,10 @@ export const mergeStates = (
     labelerViewers: mergeMaps(stateA.labelerViewers, stateB.labelerViewers),
     labelerAggs: mergeMaps(stateA.labelerAggs, stateB.labelerAggs),
     knownFollowers: mergeMaps(stateA.knownFollowers, stateB.knownFollowers),
+    knownInteractions: mergeMaps(
+      stateA.knownInteractions,
+      stateB.knownInteractions,
+    ),
     bidirectionalBlocks: mergeMaps(
       stateA.bidirectionalBlocks,
       stateB.bidirectionalBlocks,
