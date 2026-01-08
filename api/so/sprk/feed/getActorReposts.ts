@@ -67,7 +67,7 @@ const skeleton = async (inputs: {
     cursor,
   );
 
-  const items = repostsRes.reposts.map((r) => ({ post: { uri: r.uri } }));
+  const items = repostsRes.reposts.map((r) => ({ post: { uri: r.subject } }));
 
   return {
     actorDid,

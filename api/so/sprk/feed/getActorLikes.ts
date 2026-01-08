@@ -63,7 +63,7 @@ const skeleton = async (inputs: {
 
   const likesRes = await ctx.dataplane.likes.getActor(actorDid, limit, cursor);
 
-  const items = likesRes.likes.map((l) => ({ post: { uri: l.uri } }));
+  const items = likesRes.likes.map((l) => ({ post: { uri: l.subject } }));
 
   return {
     items,
