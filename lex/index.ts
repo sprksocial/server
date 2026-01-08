@@ -202,6 +202,7 @@ import type * as SoSprkFeedGetFeed from "./types/so/sprk/feed/getFeed.ts";
 import type * as SoSprkFeedGetFeedSkeleton from "./types/so/sprk/feed/getFeedSkeleton.ts";
 import type * as SoSprkFeedGetSuggestedFeeds from "./types/so/sprk/feed/getSuggestedFeeds.ts";
 import type * as SoSprkFeedGetActorFeeds from "./types/so/sprk/feed/getActorFeeds.ts";
+import type * as SoSprkFeedGetActorReposts from "./types/so/sprk/feed/getActorReposts.ts";
 import type * as SoSprkSoundGetActorAudios from "./types/so/sprk/sound/getActorAudios.ts";
 import type * as SoSprkSoundGetAudioPosts from "./types/so/sprk/sound/getAudioPosts.ts";
 import type * as SoSprkSoundGetAudios from "./types/so/sprk/sound/getAudios.ts";
@@ -3111,6 +3112,18 @@ export class SoSprkFeedNS {
     >,
   ) {
     const nsid = "so.sprk.feed.getActorFeeds"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getActorReposts<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      SoSprkFeedGetActorReposts.QueryParams,
+      SoSprkFeedGetActorReposts.HandlerInput,
+      SoSprkFeedGetActorReposts.HandlerOutput
+    >,
+  ) {
+    const nsid = "so.sprk.feed.getActorReposts"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }

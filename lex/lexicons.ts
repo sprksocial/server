@@ -19170,6 +19170,66 @@ export const schemaDict = {
       },
     },
   },
+  "SoSprkFeedGetActorReposts": {
+    "lexicon": 1,
+    "id": "so.sprk.feed.getActorReposts",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description": "Get a list of posts reposted by an actor.",
+        "parameters": {
+          "type": "params",
+          "required": [
+            "actor",
+          ],
+          "properties": {
+            "actor": {
+              "type": "string",
+              "format": "at-identifier",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+            },
+            "cursor": {
+              "type": "string",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "feed",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "feed": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.feed.defs#feedViewPost",
+                },
+              },
+            },
+          },
+        },
+        "errors": [
+          {
+            "name": "BlockedActor",
+          },
+          {
+            "name": "BlockedByActor",
+          },
+        ],
+      },
+    },
+  },
   "SoSprkRichtextFacet": {
     "lexicon": 1,
     "id": "so.sprk.richtext.facet",
@@ -26766,6 +26826,7 @@ export const ids = {
   SoSprkFeedGetSuggestedFeeds: "so.sprk.feed.getSuggestedFeeds",
   SoSprkFeedGetActorFeeds: "so.sprk.feed.getActorFeeds",
   SoSprkFeedPost: "so.sprk.feed.post",
+  SoSprkFeedGetActorReposts: "so.sprk.feed.getActorReposts",
   SoSprkRichtextFacet: "so.sprk.richtext.facet",
   SoSprkSoundDefs: "so.sprk.sound.defs",
   SoSprkSoundGetActorAudios: "so.sprk.sound.getActorAudios",
