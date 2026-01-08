@@ -7,6 +7,7 @@ import {
   HydrateCtx,
   HydrationState,
   Hydrator,
+  mergeManyStates,
 } from "../../../../hydration/index.ts";
 import { parseString } from "../../../../hydration/util.ts";
 import { Server } from "../../../../lex/index.ts";
@@ -52,12 +53,11 @@ const skeleton = async (inputs: {
 }): Promise<Skeleton> => {
   const { ctx, params } = inputs;
   const { actor, limit, cursor } = params;
-  const viewer = params.hydrateCtx.viewer;
   if (clearlyBadCursor(cursor)) {
-    return { items: [] };
+    return { actorDid: "", items: [] };
   }
   const [actorDid] = await ctx.hydrator.actor.getDids([actor]);
-  if (!actorDid || !viewer || viewer !== actorDid) {
+  if (!actorDid) {
     throw new InvalidRequestError("Profile not found");
   }
 
@@ -70,6 +70,7 @@ const skeleton = async (inputs: {
   const items = repostsRes.reposts.map((r) => ({ post: { uri: r.uri } }));
 
   return {
+    actorDid,
     items,
     cursor: parseString(repostsRes.cursor),
   };
@@ -81,7 +82,34 @@ const hydration = async (inputs: {
   skeleton: Skeleton;
 }) => {
   const { ctx, params, skeleton } = inputs;
-  return await ctx.hydrator.hydrateFeedItems(skeleton.items, params.hydrateCtx);
+
+  // Build map for bidirectional block checking between actor (reposter) and post authors
+  const postAuthorDids = skeleton.items.map((item) =>
+    creatorFromUri(item.post.uri)
+  );
+  const actorToAuthorsMap = new Map<string, string[]>();
+  if (skeleton.actorDid && postAuthorDids.length > 0) {
+    // Filter out self-reposts (actor reposting their own posts)
+    const otherAuthorDids = postAuthorDids.filter((did) =>
+      did !== skeleton.actorDid
+    );
+    if (otherAuthorDids.length > 0) {
+      actorToAuthorsMap.set(skeleton.actorDid, otherAuthorDids);
+    }
+  }
+
+  const [feedItemsState, actorViewerState, actorAuthorBlocks] = await Promise
+    .all([
+      ctx.hydrator.hydrateFeedItems(skeleton.items, params.hydrateCtx),
+      ctx.hydrator.hydrateProfileViewers(
+        [skeleton.actorDid],
+        params.hydrateCtx,
+      ),
+      ctx.hydrator.hydrateBidirectionalBlocks(actorToAuthorsMap),
+    ]);
+  return mergeManyStates(feedItemsState, actorViewerState, {
+    bidirectionalBlocks: actorAuthorBlocks,
+  });
 };
 
 const noPostBlocks = (inputs: {
@@ -90,9 +118,37 @@ const noPostBlocks = (inputs: {
   hydration: HydrationState;
 }) => {
   const { ctx, skeleton, hydration } = inputs;
+
+  // Check if viewer is blocking or blocked by the actor (reposter)
+  const actorRelationship = hydration.profileViewers?.get(skeleton.actorDid);
+  if (actorRelationship?.blocking) {
+    throw new InvalidRequestError(
+      `Requester has blocked actor: ${skeleton.actorDid}`,
+      "BlockedActor",
+    );
+  }
+  if (actorRelationship?.blockedBy) {
+    throw new InvalidRequestError(
+      `Requester is blocked by actor: ${skeleton.actorDid}`,
+      "BlockedByActor",
+    );
+  }
+
+  // Filter out posts where:
+  // - viewer is blocking or blocked by the post author, OR
+  // - actor (reposter) is blocking or blocked by the post author
+  const actorBlocks = hydration.bidirectionalBlocks?.get(skeleton.actorDid);
   skeleton.items = skeleton.items.filter((item) => {
     const creator = creatorFromUri(item.post.uri);
-    return !ctx.views.viewerBlockExists(creator, hydration);
+    // Check viewer <-> post author blocks
+    if (ctx.views.viewerBlockExists(creator, hydration)) {
+      return false;
+    }
+    // Check actor (reposter) <-> post author blocks
+    if (actorBlocks?.get(creator)) {
+      return false;
+    }
+    return true;
   });
   return skeleton;
 };
@@ -122,6 +178,7 @@ type Context = {
 type Params = QueryParams & { hydrateCtx: HydrateCtx };
 
 type Skeleton = {
+  actorDid: string;
   items: FeedItem[];
   cursor?: string;
 };
