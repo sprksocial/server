@@ -95,7 +95,10 @@ export class Reposts {
     }
 
     return {
-      uris: reposts.map((r) => r.uri),
+      reposts: reposts.map((r) => ({
+        uri: r.uri,
+        subject: r.subject,
+      })),
       cursor: nextCursor,
     };
   }
