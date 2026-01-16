@@ -165,7 +165,8 @@ export const likeSchema = new Schema<LikeDocument>({
   viaCid: { type: String, required: false },
 })
   .index({ authorDid: 1, subject: 1 }, { unique: true })
-  .index({ subject: 1, createdAt: -1 });
+  .index({ subject: 1, createdAt: -1 })
+  .index({ subject: 1, authorDid: 1 });
 
 // follows
 
@@ -177,7 +178,8 @@ export const followSchema = new Schema<FollowDocument>({
   subject: { type: String, required: true, index: true },
 })
   .index({ authorDid: 1, subject: 1 }, { unique: true })
-  .index({ subject: 1, createdAt: -1 });
+  .index({ subject: 1, createdAt: -1 })
+  .index({ subject: 1, authorDid: 1 });
 
 // blocks
 
@@ -260,7 +262,8 @@ export const repostSchema = new Schema<RepostDocument>({
   viaCid: { type: String, required: false },
 })
   .index({ subject: 1, createdAt: -1 })
-  .index({ authorDid: 1, createdAt: -1 });
+  .index({ authorDid: 1, createdAt: -1 })
+  .index({ subject: 1, authorDid: 1 });
 
 // posts
 
@@ -340,7 +343,9 @@ export const replySchema = new Schema<ReplyDocument>({
   likeCount: { type: Number, required: true, default: 0 },
   replyCount: { type: Number, required: true, default: 0 },
 })
-  .index({ reply: 1, createdAt: -1 });
+  .index({ reply: 1, createdAt: -1 })
+  .index({ "reply.parent.uri": 1, authorDid: 1 })
+  .index({ "reply.root.uri": 1, createdAt: -1 });
 
 // stories
 

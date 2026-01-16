@@ -161,7 +161,7 @@ export class Interactions {
     // Get all DIDs the viewer follows
     const viewerFollows = await this.db.models.Follow.find({
       authorDid: viewerDid,
-    });
+    }).select("subject");
     const followedDids = viewerFollows.map((f) => f.subject);
 
     if (followedDids.length === 0) {
@@ -173,15 +173,21 @@ export class Interactions {
       this.db.models.Like.find({
         subject: { $in: subjectUris },
         authorDid: { $in: followedDids },
-      }).sort({ indexedAt: -1 }),
+      })
+        .select("uri cid subject authorDid indexedAt")
+        .sort({ indexedAt: -1 }),
       this.db.models.Repost.find({
         subject: { $in: subjectUris },
         authorDid: { $in: followedDids },
-      }).sort({ indexedAt: -1 }),
+      })
+        .select("uri cid subject authorDid indexedAt")
+        .sort({ indexedAt: -1 }),
       this.db.models.Reply.find({
         "reply.parent.uri": { $in: subjectUris },
         authorDid: { $in: followedDids },
-      }).sort({ indexedAt: -1 }),
+      })
+        .select("uri cid reply.parent.uri authorDid indexedAt text")
+        .sort({ indexedAt: -1 }),
     ]);
 
     // Build result map keyed by subject URI

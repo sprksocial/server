@@ -105,31 +105,40 @@ export class Follows {
 
   async getFollowsFollowing(viewerDid: string, subjectDids: string[]) {
     /*
-     * 1. Get all the people Alice is following
-     * 2. Get all the people Dan is followed by
-     * 3. Find the intersection
+     * Find people the viewer follows who also follow each subject.
+     * Uses aggregation to avoid fetching all followers of popular accounts.
      */
 
     const results: FollowsFollowing[] = [];
 
+    // Get all people the viewer follows (bounded by viewer's follow count)
+    const viewerFollows = await this.db.models.Follow.find({
+      authorDid: viewerDid,
+    }).select("subject");
+
+    const viewerFollowsDids = viewerFollows.map((f) => f.subject);
+
+    if (viewerFollowsDids.length === 0) {
+      // Viewer follows no one, so no known followers possible
+      return {
+        results: subjectDids.map((targetDid) =>
+          new FollowsFollowing({ targetDid, dids: [] })
+        ),
+      };
+    }
+
     for (const subjectDid of subjectDids) {
-      // Get people who follow the subject (Dan's followers)
-      const subjectFollowers = await this.db.models.Follow.find({
-        subject: subjectDid,
-      });
-
-      const followerDids = subjectFollowers.map((f) => f.authorDid);
-
-      // Find which of these followers Alice also follows
+      // Find which of the viewer's follows also follow the subject
+      // This query is bounded by the viewer's follow count, not the subject's follower count
       const mutualConnections = await this.db.models.Follow.find({
-        authorDid: viewerDid,
-        subject: { $in: followerDids },
-      });
+        authorDid: { $in: viewerFollowsDids },
+        subject: subjectDid,
+      }).select("authorDid");
 
       results.push(
         new FollowsFollowing({
           targetDid: subjectDid,
-          dids: mutualConnections.map((connection) => connection.subject),
+          dids: mutualConnections.map((connection) => connection.authorDid),
         }),
       );
     }
