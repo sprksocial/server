@@ -7,7 +7,7 @@ import API from "./api/index.ts";
 import { createServer } from "./lex/index.ts";
 import wellKnown from "./api/well-known.ts";
 import health from "./api/health.ts";
-import { IdResolver } from "@atp/identity";
+import { IdResolver, MemoryCache } from "@atp/identity";
 import { DataPlane } from "./data-plane/index.ts";
 import { getLogger } from "@logtape/logtape";
 import { configureLogger } from "./utils/logger.ts";
@@ -49,8 +49,11 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
   const db = new Database(cfg);
   db.connect();
 
-  // DID and resolver setup
-  const idResolver = new IdResolver({ plcUrl: cfg.plcUrl });
+  // DID and resolver setup with caching
+  const idResolver = new IdResolver({
+    plcUrl: cfg.plcUrl,
+    didCache: new MemoryCache(),
+  });
 
   const dataplane = new DataPlane(db, idResolver);
   const hydrator = new Hydrator(dataplane, cfg.labelsFromIssuerDids);

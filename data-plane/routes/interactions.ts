@@ -158,10 +158,12 @@ export class Interactions {
       return { results: new Map() };
     }
 
-    // Get all DIDs the viewer follows
+    // Get all DIDs the viewer follows (use lean() for faster queries)
     const viewerFollows = await this.db.models.Follow.find({
       authorDid: viewerDid,
-    }).select("subject");
+    })
+      .select("subject")
+      .lean();
     const followedDids = viewerFollows.map((f) => f.subject);
 
     if (followedDids.length === 0) {
@@ -169,35 +171,38 @@ export class Interactions {
     }
 
     // Query likes, reposts, and replies by followed users on the subject URIs
+    // All queries are batched and parallelized for optimal performance
     const [likes, reposts, replies] = await Promise.all([
       this.db.models.Like.find({
         subject: { $in: subjectUris },
         authorDid: { $in: followedDids },
       })
         .select("uri cid subject authorDid indexedAt")
-        .sort({ indexedAt: -1 }),
+        .sort({ indexedAt: -1 })
+        .lean(),
       this.db.models.Repost.find({
         subject: { $in: subjectUris },
         authorDid: { $in: followedDids },
       })
         .select("uri cid subject authorDid indexedAt")
-        .sort({ indexedAt: -1 }),
+        .sort({ indexedAt: -1 })
+        .lean(),
       this.db.models.Reply.find({
         "reply.parent.uri": { $in: subjectUris },
         authorDid: { $in: followedDids },
       })
         .select("uri cid reply.parent.uri authorDid indexedAt text")
-        .sort({ indexedAt: -1 }),
+        .sort({ indexedAt: -1 })
+        .lean(),
     ]);
 
-    // Build result map keyed by subject URI
+    // Build result map keyed by subject URI - pre-initialize for all subject URIs
     const results = new Map<string, KnownInteraction[]>();
-
-    // Initialize empty arrays for each subject URI
     for (const uri of subjectUris) {
       results.set(uri, []);
     }
 
+    // Process all interactions in a single pass for better performance
     // Add likes
     for (const like of likes) {
       const interactions = results.get(like.subject);
@@ -228,7 +233,7 @@ export class Interactions {
 
     // Add replies
     for (const reply of replies) {
-      const parentUri = reply.reply?.parent.uri;
+      const parentUri = reply.reply?.parent?.uri;
       if (!parentUri) continue;
       const interactions = results.get(parentUri);
       if (interactions) {

@@ -109,8 +109,6 @@ export class Follows {
      * Uses aggregation to avoid fetching all followers of popular accounts.
      */
 
-    const results: FollowsFollowing[] = [];
-
     // Get all people the viewer follows (bounded by viewer's follow count)
     const viewerFollows = await this.db.models.Follow.find({
       authorDid: viewerDid,
@@ -118,7 +116,7 @@ export class Follows {
 
     const viewerFollowsDids = viewerFollows.map((f) => f.subject);
 
-    if (viewerFollowsDids.length === 0) {
+    if (viewerFollowsDids.length === 0 || subjectDids.length === 0) {
       // Viewer follows no one, so no known followers possible
       return {
         results: subjectDids.map((targetDid) =>
@@ -127,21 +125,28 @@ export class Follows {
       };
     }
 
-    for (const subjectDid of subjectDids) {
-      // Find which of the viewer's follows also follow the subject
-      // This query is bounded by the viewer's follow count, not the subject's follower count
-      const mutualConnections = await this.db.models.Follow.find({
-        authorDid: { $in: viewerFollowsDids },
-        subject: subjectDid,
-      }).select("authorDid");
+    // Batch query: get all follows where authorDid is in viewer's follows AND subject is in subjectDids
+    // This replaces N sequential queries with 1 query
+    const mutualConnections = await this.db.models.Follow.find({
+      authorDid: { $in: viewerFollowsDids },
+      subject: { $in: subjectDids },
+    }).select("authorDid subject");
 
-      results.push(
-        new FollowsFollowing({
-          targetDid: subjectDid,
-          dids: mutualConnections.map((connection) => connection.authorDid),
-        }),
-      );
+    // Group results by subject
+    const connectionsBySubject = new Map<string, string[]>();
+    for (const connection of mutualConnections) {
+      const existing = connectionsBySubject.get(connection.subject) ?? [];
+      existing.push(connection.authorDid);
+      connectionsBySubject.set(connection.subject, existing);
     }
+
+    // Build results in the same order as subjectDids
+    const results = subjectDids.map((subjectDid) =>
+      new FollowsFollowing({
+        targetDid: subjectDid,
+        dids: connectionsBySubject.get(subjectDid) ?? [],
+      })
+    );
 
     return { results };
   }

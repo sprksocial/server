@@ -10,23 +10,41 @@ import { QueryParams } from "../../../../lex/types/so/sprk/actor/getProfile.ts";
 import { createPipeline, noRules } from "../../../../pipeline.ts";
 import { Views } from "../../../../views/index.ts";
 import { resHeaders } from "../../../util.ts";
+import { getLogger } from "@logtape/logtape";
+
+const logger = getLogger(["appview", "getProfile"]);
 
 export default function (server: Server, ctx: AppContext) {
   const getProfile = createPipeline(skeleton, hydration, noRules, presentation);
   server.so.sprk.actor.getProfile({
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ auth, params, req }) => {
+      const start = performance.now();
+
       const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
       const labelers = ctx.reqLabelers(req);
+
+      const t1 = performance.now();
       const hydrateCtx = await ctx.hydrator.createContext({
         labelers,
         viewer,
         includeTakedowns,
       });
+      const t2 = performance.now();
 
       const result = await getProfile({ ...params, hydrateCtx }, ctx);
+      const t3 = performance.now();
 
       const repoRev = await ctx.hydrator.actor.getRepoRevSafe(viewer);
+      const t4 = performance.now();
+
+      logger.info("getProfile timing", {
+        viewer: !!viewer,
+        createContext: Math.round(t2 - t1),
+        pipeline: Math.round(t3 - t2),
+        repoRev: Math.round(t4 - t3),
+        total: Math.round(t4 - start),
+      });
 
       return {
         encoding: "application/json",

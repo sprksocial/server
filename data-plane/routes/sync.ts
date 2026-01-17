@@ -1,7 +1,7 @@
 import { Database } from "../db/index.ts";
 
 async function getLatestRev(actorDid: string, db: Database) {
-  const res = await db.models.ActorSync.findOne({ where: { did: actorDid } });
+  const res = await db.models.ActorSync.findOne({ did: actorDid });
   return {
     rev: res?.repoRev ?? undefined,
   };

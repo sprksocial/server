@@ -192,7 +192,8 @@ export const blockSchema = new Schema<BlockDocument>({
   subject: { type: String, required: true, index: true },
 })
   .index({ authorDid: 1, subject: 1 }, { unique: true })
-  .index({ subject: 1, createdAt: -1 });
+  .index({ subject: 1, createdAt: -1 })
+  .index({ subject: 1, authorDid: 1 });
 
 // profiles
 
