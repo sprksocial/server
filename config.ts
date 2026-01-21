@@ -19,6 +19,7 @@ export interface ServerConfigValues {
   bigThreadDepth?: number;
   maxThreadDepth?: number;
   maxThreadParents: number;
+  notificationsDelayMs: number;
 
   videoCdn?: string;
   mediaCdn?: string;
@@ -58,6 +59,7 @@ export class ServerConfig {
     const bigThreadDepth = envInt("SPRK_BIG_THREAD_DEPTH") ?? 10;
     const maxThreadDepth = envInt("SPRK_MAX_THREAD_DEPTH") ?? 10;
     const maxThreadParents = envInt("SPRK_MAX_THREAD_PARENTS") ?? 10;
+    const notificationsDelayMs = envInt("SPRK_NOTIFICATIONS_DELAY_MS") ?? 10;
 
     const videoCdn = envStr("SPRK_VIDEO_CDN") ?? "https://video.sprk.so";
     const mediaCdn = envStr("SPRK_MEDIA_CDN") ?? "https://media.sprk.so";
@@ -89,6 +91,7 @@ export class ServerConfig {
       bigThreadDepth,
       maxThreadDepth,
       maxThreadParents,
+      notificationsDelayMs,
       videoCdn,
       mediaCdn,
       thumbCdn,
@@ -145,6 +148,9 @@ export class ServerConfig {
   }
   get maxThreadDepth() {
     return this.cfg.maxThreadDepth;
+  }
+  get notificationsDelayMs() {
+    return this.cfg.notificationsDelayMs;
   }
 
   // CDNs

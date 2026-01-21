@@ -41,7 +41,13 @@ import {
   GraphHydrator,
   RelationshipPair,
 } from "./graph.ts";
-import { HydrationMap, ItemRef, mergeMaps, RecordInfo } from "./util.ts";
+import {
+  HydrationMap,
+  ItemRef,
+  mergeMaps,
+  RecordInfo,
+  urisByCollection,
+} from "./util.ts";
 import { getLogger } from "@logtape/logtape";
 import {
   LabelerAggs,
@@ -51,6 +57,7 @@ import {
   Labels,
 } from "./label.ts";
 import { ParsedLabelers } from "../util.ts";
+import { Notification } from "../data-plane/routes/notifs.ts";
 
 export class HydrateCtx {
   labelers: ParsedLabelers;
@@ -644,6 +651,64 @@ export class Hydrator {
       this.hydrateProfiles(uris.map(didFromUri), ctx),
     ]);
     return mergeStates(profileState, { reposts, ctx });
+  }
+
+  // so.sprk.notification.listNotifications#notification
+  // - notification
+  //   - profile
+  //     - list basic`
+  async hydrateNotifications(
+    notifs: Notification[],
+    ctx: HydrateCtx,
+  ): Promise<HydrationState> {
+    const uris = notifs.map((notif) => notif.uri);
+    const collections = urisByCollection(uris);
+    const postUris = collections.get(ids.SoSprkFeedPost) ?? [];
+    const replyUris = collections.get(ids.SoSprkFeedReply) ?? [];
+    const likeUris = collections.get(ids.SoSprkFeedLike) ?? [];
+    const repostUris = collections.get(ids.SoSprkFeedRepost) ?? [];
+    const followUris = collections.get(ids.SoSprkGraphFollow) ?? [];
+    const [
+      posts,
+      replies,
+      likes,
+      reposts,
+      follows,
+      labels,
+      profileState,
+    ] = await Promise.all([
+      this.feed.getPosts(postUris), // reason: mention, quote
+      this.feed.getReplies(replyUris), // reason: reply
+      this.feed.getLikes(likeUris), // reason: like
+      this.feed.getReposts(repostUris), // reason: repost
+      this.graph.getFollows(followUris), // reason: follow
+      this.label.getLabelsForSubjects(uris, ctx.labelers),
+      this.hydrateProfiles(uris.map(didFromUri), ctx),
+    ]);
+    const viewerRootPostUris = new Set<string>();
+    for (const notif of notifs) {
+      if (notif.reason === "reply") {
+        // Check replies map for reply notifications
+        const reply = replies.get(notif.uri);
+        if (reply) {
+          const rootUri = reply.record.reply?.root.uri;
+          if (rootUri && didFromUri(rootUri) === ctx.viewer) {
+            viewerRootPostUris.add(rootUri);
+          }
+        }
+      }
+    }
+    actionTakedownLabels(postUris, posts, labels);
+    actionTakedownLabels(replyUris, replies, labels);
+    return mergeStates(profileState, {
+      posts,
+      replies,
+      likes,
+      reposts,
+      follows,
+      labels,
+      ctx,
+    });
   }
 
   // so.sprk.sound.defs#audioView

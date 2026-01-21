@@ -595,6 +595,29 @@ export const cursorStateSchema = new Schema<CursorStateDocument>({
   updatedAt: { type: Date, default: Date.now },
 });
 
+// notifications
+
+export interface NotificationDocument extends Document {
+  did: string;
+  recordUri: string;
+  recordCid: string;
+  author: string;
+  reason: string;
+  reasonSubject: string | null;
+  sortAt: string;
+}
+export const notificationSchema = new Schema<NotificationDocument>({
+  did: { type: String, required: true, index: true },
+  recordUri: { type: String, required: true, index: true },
+  recordCid: { type: String, required: true },
+  author: { type: String, required: true, index: true },
+  reason: { type: String, required: true },
+  reasonSubject: { type: String, required: false, default: null },
+  sortAt: { type: String, required: true, index: true },
+})
+  .index({ did: 1, sortAt: -1 })
+  .index({ did: 1, reason: 1, sortAt: -1 });
+
 // Apply plugin to schemas that extend AuthoredDocument
 ([
   profileSchema,
@@ -632,4 +655,5 @@ export interface DatabaseModels {
   ActorSync: Model<ActorSyncDocument>;
   Preference: Model<PreferenceDocument>;
   CursorState: Model<CursorStateDocument>;
+  Notification: Model<NotificationDocument>;
 }

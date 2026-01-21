@@ -4,6 +4,7 @@ import { AtUri } from "@atp/syntax";
 import { lexicons } from "../../lex/lexicons.ts";
 import { BackgroundQueue } from "../background.ts";
 import { Database } from "../db/index.ts";
+import { chunkArray } from "@atp/common";
 
 // @NOTE re: insertions and deletions. Due to how record updates are handled,
 // (insertFn) should have the same effect as (insertFn -> deleteFn -> insertFn).
@@ -292,19 +293,56 @@ export class RecordProcessor<T, S> {
     }
   }
 
-  handleNotifs(op: { deleted?: S; inserted?: S }) {
-    let _notifs: Notif[] = [];
+  async handleNotifs(op: { deleted?: S; inserted?: S }) {
+    let notifs: Notif[] = [];
+    const runOnCommit: ((db: Database) => Promise<void>)[] = [];
     if (op.deleted) {
       const forDelete = this.params.notifsForDelete(
         op.deleted,
         op.inserted ?? null,
       );
-      _notifs = forDelete.notifs;
+      if (forDelete.toDelete.length > 0) {
+        // Notifs can be deleted in background: they are expensive to delete and
+        // listNotifications already excludes notifs with missing records.
+        runOnCommit.push(async (db) => {
+          await db.models.Notification.deleteMany({
+            recordUri: { $in: forDelete.toDelete },
+          });
+        });
+      }
+      notifs = forDelete.notifs;
     } else if (op.inserted) {
-      _notifs = this.params.notifsForInsert(op.inserted);
+      notifs = this.params.notifsForInsert(op.inserted);
     }
+    for (const chunk of chunkArray(notifs, 500)) {
+      runOnCommit.push(async (db) => {
+        const filtered = await this.filterNotifsForThreadMutes(chunk);
+        if (filtered.length > 0) {
+          await db.models.Notification.insertMany(
+            filtered.map((n) => ({
+              did: n.did,
+              recordUri: n.recordUri,
+              recordCid: n.recordCid,
+              author: n.author,
+              reason: n.reason,
+              reasonSubject: n.reasonSubject ?? null,
+              sortAt: n.sortAt,
+            })),
+          );
+        }
+      });
+    }
+    // Need to ensure notif deletion always happens before creation, otherwise delete may clobber in a race.
+    for (const fn of runOnCommit) {
+      await fn(this.appDb); // these could be backgrounded
+    }
+  }
 
-    // TODO: Implement notification handling
+  // Filter notifications for thread mutes (placeholder for future implementation)
+  filterNotifsForThreadMutes(notifs: Notif[]): Promise<Notif[]> {
+    // TODO: Implement thread mute filtering
+    // For now, return all notifications unfiltered
+    return Promise.resolve(notifs);
   }
 
   aggregateOnCommit(indexed: S) {

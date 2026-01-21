@@ -31,6 +31,9 @@ import getFeed from "./so/sprk/feed/getFeed.ts";
 import getFeedGenerator from "./so/sprk/feed/getFeedGenerator.ts";
 import getFeedGenerators from "./so/sprk/feed/getFeedGenerators.ts";
 import getServices from "./so/sprk/labeler/getServices.ts";
+import listNotifications from "./so/sprk/notification/listNotifications.ts";
+import getUnreadCount from "./so/sprk/notification/getUnreadCount.ts";
+import updateSeen from "./so/sprk/notification/updateSeen.ts";
 
 export default function (server: Server, ctx: AppContext) {
   getAccountInfos(server, ctx);
@@ -64,4 +67,7 @@ export default function (server: Server, ctx: AppContext) {
   getFeedGenerator(server, ctx);
   getFeedGenerators(server, ctx);
   getServices(server, ctx);
+  listNotifications(server, ctx);
+  getUnreadCount(server, ctx);
+  updateSeen(server, ctx);
 }

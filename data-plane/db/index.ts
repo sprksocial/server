@@ -136,6 +136,10 @@ export class Database {
           "CursorState",
           models.cursorStateSchema,
         ),
+        Notification: this.connection.model<models.NotificationDocument>(
+          "Notification",
+          models.notificationSchema,
+        ),
       };
 
       this.logger.info("Started connection to MongoDB");

@@ -9,6 +9,7 @@ import { Likes } from "./routes/likes.ts";
 import { Moderation } from "./routes/moderation.ts";
 import { Actors } from "./routes/actors.ts";
 import { Identity } from "./routes/identity.ts";
+import { Notifications } from "./routes/notifs.ts";
 import { Records } from "./routes/records.ts";
 import { Relationships } from "./routes/relationships.ts";
 import { Interactions } from "./routes/interactions.ts";
@@ -42,6 +43,7 @@ export class DataPlane {
   public moderation: Moderation;
   public actors: Actors;
   public identity: Identity;
+  public notifications: Notifications;
   public records: Records;
   public relationships: Relationships;
   public interactions: Interactions;
@@ -71,6 +73,7 @@ export class DataPlane {
     this.moderation = new Moderation(db);
     this.actors = new Actors(db);
     this.identity = new Identity(idResolver);
+    this.notifications = new Notifications(db);
     this.records = new Records(db);
     this.relationships = new Relationships(db);
     this.interactions = new Interactions(db);

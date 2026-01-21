@@ -48,6 +48,7 @@ import {
   Media,
   MediaView,
   NotFoundPost,
+  NotificationView,
   VideoMedia,
   VideoMediaView,
 } from "./types.ts";
@@ -66,7 +67,7 @@ import { Main as StrongRef } from "../lex/types/com/atproto/repo/strongRef.ts";
 import { cidFromBlobJson } from "./util.ts";
 import { uriToDid } from "../utils/uris.ts";
 import { mapDefined } from "@atp/common";
-import { FeedItem } from "../hydration/feed.ts";
+import { FeedItem, Like, Post, Reply, Repost } from "../hydration/feed.ts";
 import {
   QueryParams as GetThreadQueryParams,
   ThreadItem,
@@ -82,6 +83,9 @@ import {
   LabelerViewDetailed,
 } from "../lex/types/so/sprk/labeler/defs.ts";
 import { isSelfLabels } from "../lex/types/com/atproto/label/defs.ts";
+import { Follow } from "../hydration/graph.ts";
+import { RecordInfo } from "../hydration/util.ts";
+import { Notification } from "../data-plane/routes/notifs.ts";
 
 export class Views {
   public indexedAtEpoch?: Date | undefined;
@@ -1030,5 +1034,96 @@ export class Views {
     if (actor?.upstreamStatus === "takendown") return true;
     if (actor?.upstreamStatus === "suspended") return true;
     return false;
+  }
+
+  viewerSeesNeedsReview(
+    { did, uri }: { did?: string; uri?: string },
+    state: HydrationState,
+  ): boolean {
+    const { labels, profileViewers, ctx } = state;
+    did = did || (uri && uriToDid(uri));
+    if (!did) {
+      return true;
+    }
+    if (
+      labels?.get(did)?.needsReview ||
+      (uri && labels?.get(uri)?.needsReview)
+    ) {
+      // content marked as needs review
+      return ctx?.viewer === did || !!profileViewers?.get(did)?.following;
+    }
+    return true;
+  }
+
+  notification(
+    notif: Notification,
+    lastSeenAt: string | undefined,
+    state: HydrationState,
+  ): Un$Typed<NotificationView> | undefined {
+    if (!notif.sortAt || !notif.reason) return;
+    const uri = new AtUri(notif.uri);
+    const authorDid = notif.authorDid;
+    const author = this.profile(authorDid, state);
+    if (!author) return;
+
+    let recordInfo:
+      | Post
+      | Reply
+      | Like
+      | Repost
+      | Follow
+      | RecordInfo<ProfileRecord>
+      | undefined
+      | null;
+
+    if (uri.collection === ids.SoSprkFeedPost) {
+      recordInfo = state.posts?.get(notif.uri);
+    } else if (uri.collection === ids.SoSprkFeedReply) {
+      recordInfo = state.replies?.get(notif.uri);
+    } else if (uri.collection === ids.SoSprkFeedLike) {
+      recordInfo = state.likes?.get(notif.uri);
+    } else if (uri.collection === ids.SoSprkFeedRepost) {
+      recordInfo = state.reposts?.get(notif.uri);
+    } else if (uri.collection === ids.SoSprkGraphFollow) {
+      recordInfo = state.follows?.get(notif.uri);
+    } else if (uri.collection === ids.SoSprkActorProfile) {
+      const actor = state.actors?.get(authorDid);
+      recordInfo = actor && actor.profile && actor.profileCid
+        ? {
+          record: actor.profile,
+          cid: actor.profileCid,
+          sortedAt: actor.sortedAt ?? new Date(0), // @NOTE will be present since profile record is present
+          indexedAt: actor.indexedAt ?? new Date(0), // @NOTE will be present since profile record is present
+          takedownRef: actor.profileTakedownRef,
+        }
+        : undefined;
+    }
+    if (!recordInfo) return;
+
+    const labels = state.labels?.getBySubject(notif.uri) ?? [];
+    // selfLabels only applies to posts and profiles, safe to pass the record
+    const selfLabels = isPostRecord(recordInfo.record) ||
+        isProfileRecord(recordInfo.record)
+      ? this.selfLabels({
+        uri: notif.uri,
+        cid: recordInfo.cid,
+        record: recordInfo.record,
+      })
+      : [];
+    const indexedAt = notif.sortAt;
+    return {
+      uri: notif.uri,
+      cid: recordInfo.cid,
+      author,
+      reason: notif.reason as NotificationView["reason"],
+      reasonSubject: notif.reasonSubject || undefined,
+      record: recordInfo.record,
+      // @NOTE works with a hack in listNotifications so that when there's no last-seen time,
+      // the user's first notification is marked unread, and all previous read. in this case,
+      // the last seen time will be equal to the first notification's indexed time.
+      isRead: lastSeenAt ? lastSeenAt > indexedAt : true,
+      indexedAt: notif.sortAt,
+      labels: [...labels, ...selfLabels],
+    };
   }
 }

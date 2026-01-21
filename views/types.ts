@@ -15,6 +15,10 @@ import {
 } from "../lex/types/so/sprk/feed/defs.ts";
 import { LabelerView } from "../lex/types/so/sprk/labeler/defs.ts";
 
+export type {
+  Notification as NotificationView,
+} from "../lex/types/so/sprk/notification/listNotifications.ts";
+
 export {
   isMain as isImagesMedia,
   type Main as ImagesMedia,
