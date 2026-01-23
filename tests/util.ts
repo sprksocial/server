@@ -78,6 +78,7 @@ const DEFAULT_TEST_CONFIG: ServerConfigValues = {
   bigThreadUris: new Set(["did:web:test"]),
   maxThreadParents: 10,
   labelsFromIssuerDids: [],
+  notificationsDelayMs: 1000,
 };
 
 // ============================================================================
@@ -196,6 +197,10 @@ export async function createTestDatabase(
     Label: connection.model<models.LabelDocument>(
       "Label",
       models.labelSchema,
+    ),
+    Notification: connection.model<models.NotificationDocument>(
+      "Notification",
+      models.notificationSchema,
     ),
   };
 
