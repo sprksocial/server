@@ -19,7 +19,7 @@ export default function (server: Server, ctx: AppContext) {
     noRules,
     presentation,
   );
-  server.app.bsky.notification.getUnreadCount({
+  server.so.sprk.notification.getUnreadCount({
     auth: ctx.authVerifier.standard,
     handler: async ({ auth, params }) => {
       const viewer = auth.credentials.iss;
@@ -40,10 +40,15 @@ const skeleton = async (
     throw new InvalidRequestError("The seenAt parameter is unsupported");
   }
   const priority = params.priority ?? false;
+  
+  // Get the stored lastSeenNotifs timestamp
+  const lastSeenRes = await ctx.hydrator.dataplane.notifications
+    .getNotificationSeen(params.viewer, priority);
+  
   const res = await ctx.hydrator.dataplane.notifications
     .getUnreadNotificationCount(
       params.viewer,
-      undefined,
+      lastSeenRes.timestamp,
       priority,
     );
   return {

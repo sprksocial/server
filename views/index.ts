@@ -1111,17 +1111,62 @@ export class Views {
       })
       : [];
     const indexedAt = notif.sortAt;
+
+    // For like/repost notifications, include the subject record (post/reply) in the response
+    let recordWithSubject = recordInfo.record;
+    if (
+      (notif.reason === "like" || notif.reason === "repost") &&
+      notif.reasonSubject
+    ) {
+      const subjectUri = new AtUri(notif.reasonSubject);
+      let subjectRecord: Post | Reply | undefined;
+      const isSubjectReply = subjectUri.collection === ids.SoSprkFeedReply;
+      if (subjectUri.collection === ids.SoSprkFeedPost) {
+        subjectRecord = state.posts?.get(notif.reasonSubject) ?? undefined;
+      } else if (isSubjectReply) {
+        subjectRecord = state.replies?.get(notif.reasonSubject) ?? undefined;
+      }
+
+      // Embed subject record and media view in the notification record for client access
+      // This allows the client to display the subject's text and media preview
+      if (subjectRecord) {
+        // Get the raw media from the record and convert to view with URLs
+        const rawMedia = subjectRecord.record.media;
+        let mediaView: unknown;
+        if (rawMedia) {
+          if (isSubjectReply) {
+            // Replies only support image media
+            if (isImageMedia(rawMedia)) {
+              mediaView = this.imageMedia(
+                subjectUri.hostname,
+                rawMedia as ImageMedia,
+              );
+            }
+          } else {
+            // Posts support images or video
+            mediaView = this.media(notif.reasonSubject, rawMedia as Media);
+          }
+        }
+
+        recordWithSubject = {
+          ...recordInfo.record,
+          subject: subjectRecord.record,
+          subjectMedia: mediaView,
+        } as typeof recordInfo.record;
+      }
+    }
+
     return {
       uri: notif.uri,
       cid: recordInfo.cid,
       author,
       reason: notif.reason as NotificationView["reason"],
       reasonSubject: notif.reasonSubject || undefined,
-      record: recordInfo.record,
+      record: recordWithSubject,
       // @NOTE works with a hack in listNotifications so that when there's no last-seen time,
       // the user's first notification is marked unread, and all previous read. in this case,
       // the last seen time will be equal to the first notification's indexed time.
-      isRead: lastSeenAt ? lastSeenAt > indexedAt : true,
+      isRead: lastSeenAt ? lastSeenAt >= indexedAt : true,
       indexedAt: notif.sortAt,
       labels: [...labels, ...selfLabels],
     };

@@ -97,17 +97,31 @@ export const getAncestorsAndSelf = async (
   let height = 1;
 
   while (currentUri && height <= parentHeight) {
-    const parentReply = await db.models.Reply.findOne({ uri: currentUri })
-      .lean();
-    if (!parentReply) break;
+    // Check if parent is a Post (root) or Reply
+    const [parentPost, parentReply] = await Promise.all([
+      db.models.Post.findOne({ uri: currentUri }).lean(),
+      db.models.Reply.findOne({ uri: currentUri }).lean(),
+    ]);
 
-    ancestors.push({
-      uri: parentReply.uri,
-      height,
-    });
-
-    currentUri = parentReply.reply?.parent?.uri;
-    height++;
+    if (parentPost) {
+      // Found root post - add it and stop traversing
+      ancestors.push({
+        uri: parentPost.uri,
+        height,
+      });
+      break;
+    } else if (parentReply) {
+      // Found a reply - add it and continue traversing
+      ancestors.push({
+        uri: parentReply.uri,
+        height,
+      });
+      currentUri = parentReply.reply?.parent?.uri;
+      height++;
+    } else {
+      // Parent not found - stop traversing
+      break;
+    }
   }
 
   return ancestors;

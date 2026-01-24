@@ -668,6 +668,24 @@ export class Hydrator {
     const likeUris = collections.get(ids.SoSprkFeedLike) ?? [];
     const repostUris = collections.get(ids.SoSprkFeedRepost) ?? [];
     const followUris = collections.get(ids.SoSprkGraphFollow) ?? [];
+
+    // Collect subject URIs for like/repost notifications to hydrate their content
+    const subjectPostUris: string[] = [];
+    const subjectReplyUris: string[] = [];
+    for (const notif of notifs) {
+      if (
+        notif.reasonSubject &&
+        (notif.reason === "like" || notif.reason === "repost")
+      ) {
+        const subjectUri = new AtUri(notif.reasonSubject);
+        if (subjectUri.collection === ids.SoSprkFeedPost) {
+          subjectPostUris.push(notif.reasonSubject);
+        } else if (subjectUri.collection === ids.SoSprkFeedReply) {
+          subjectReplyUris.push(notif.reasonSubject);
+        }
+      }
+    }
+
     const [
       posts,
       replies,
@@ -676,6 +694,8 @@ export class Hydrator {
       follows,
       labels,
       profileState,
+      subjectPosts,
+      subjectReplies,
     ] = await Promise.all([
       this.feed.getPosts(postUris), // reason: mention, quote
       this.feed.getReplies(replyUris), // reason: reply
@@ -684,6 +704,8 @@ export class Hydrator {
       this.graph.getFollows(followUris), // reason: follow
       this.label.getLabelsForSubjects(uris, ctx.labelers),
       this.hydrateProfiles(uris.map(didFromUri), ctx),
+      this.feed.getPosts(subjectPostUris), // subjects of likes/reposts
+      this.feed.getReplies(subjectReplyUris), // subjects of likes/reposts
     ]);
     const viewerRootPostUris = new Set<string>();
     for (const notif of notifs) {
@@ -700,9 +722,11 @@ export class Hydrator {
     }
     actionTakedownLabels(postUris, posts, labels);
     actionTakedownLabels(replyUris, replies, labels);
+    actionTakedownLabels(subjectPostUris, subjectPosts, labels);
+    actionTakedownLabels(subjectReplyUris, subjectReplies, labels);
     return mergeStates(profileState, {
-      posts,
-      replies,
+      posts: mergeMaps(posts, subjectPosts),
+      replies: mergeMaps(replies, subjectReplies),
       likes,
       reposts,
       follows,

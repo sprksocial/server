@@ -13,7 +13,6 @@ import {
   RulesFnInput,
   SkeletonFnInput,
 } from "../../../../pipeline.ts";
-import { uriToDid as didFromUri } from "../../../../utils/uris.ts";
 import { Views } from "../../../../views/index.ts";
 import { resHeaders } from "../../../util.ts";
 
@@ -101,13 +100,13 @@ const paginateNotifications = async (opts: {
  */
 export const delayCursor = (
   cursorStr: string | undefined,
-  delayMs: number,
-): string => {
-  const nowMinusDelay = Date.now() - delayMs;
-  if (cursorStr === undefined) return new Date(nowMinusDelay).toISOString();
-  const cursor = new Date(cursorStr).getTime();
-  if (isNaN(cursor)) return cursorStr;
-  return new Date(Math.min(cursor, nowMinusDelay)).toISOString();
+  _delayMs: number,
+): string | undefined => {
+  // The cursor is a packed keyset cursor (base36:cid), not an ISO timestamp.
+  // We can't apply time-based delays to it without unpacking/repacking.
+  // For now, just pass through the cursor as-is.
+  // If no cursor, return undefined to fetch from the beginning.
+  return cursorStr;
 };
 
 const skeleton = async (
@@ -143,7 +142,13 @@ const skeleton = async (
   // rather than all notifications. bit of a hack to be more graceful when seen times are out of sync.
   let lastSeenAt = lastSeenRes.timestamp;
   if (!lastSeenAt && !originalCursor) {
-    lastSeenAt = res.notifications.at(0)?.sortAt;
+    // Set to 1ms before the first notification so it shows as unread (since we use >= comparison)
+    const firstSortAt = res.notifications.at(0)?.sortAt;
+    if (firstSortAt) {
+      const firstTime = new Date(firstSortAt);
+      firstTime.setMilliseconds(firstTime.getMilliseconds() - 1);
+      lastSeenAt = firstTime.toISOString();
+    }
   }
   return {
     notifs: res.notifications,
@@ -168,7 +173,9 @@ const noBlockOrMutesOrNeedsFiltering = (
 ) => {
   const { skeleton, hydration, ctx } = input;
   skeleton.notifs = skeleton.notifs.filter((item) => {
-    const did = didFromUri(item.uri);
+    // Use authorDid directly (the person who created the notification action)
+    // For likes, this is the liker; for replies, this is the replier, etc.
+    const did = item.authorDid;
     if (
       ctx.views.viewerBlockExists(did, hydration) ||
       ctx.views.viewerMuteExists(did, hydration)
@@ -178,12 +185,15 @@ const noBlockOrMutesOrNeedsFiltering = (
     // Filter out notifications from users that need review unless moots
     if (
       item.reason === "reply" ||
-      item.reason === "quote" ||
       item.reason === "mention" ||
       item.reason === "like" ||
       item.reason === "follow"
     ) {
-      if (!ctx.views.viewerSeesNeedsReview({ did, uri: item.uri }, hydration)) {
+      const seesNeedsReview = ctx.views.viewerSeesNeedsReview(
+        { did, uri: item.uri },
+        hydration,
+      );
+      if (!seesNeedsReview) {
         return false;
       }
     }

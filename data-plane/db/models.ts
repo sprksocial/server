@@ -497,6 +497,7 @@ export interface ActorDocument extends Document {
   upstreamStatus: string | null;
   keys: string[];
   services: string;
+  lastSeenNotifs: string | null;
 }
 export const actorSchema = new Schema<ActorDocument>({
   did: { type: String, required: true, unique: true, index: true },
@@ -506,6 +507,7 @@ export const actorSchema = new Schema<ActorDocument>({
   upstreamStatus: { type: String, required: false },
   keys: { type: [String], required: true },
   services: { type: String, required: true },
+  lastSeenNotifs: { type: String, required: false, default: null },
 });
 
 // preferences

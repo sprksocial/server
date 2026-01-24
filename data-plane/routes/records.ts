@@ -146,7 +146,7 @@ export class Records {
   }
 
   async getRepostRecords(uris: string[]) {
-    const result = await getRecords(this.db, uris, ids.AppBskyFeedRepost);
+    const result = await getRecords(this.db, uris, ids.SoSprkFeedRepost);
     return result;
   }
 

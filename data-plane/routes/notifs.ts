@@ -142,14 +142,11 @@ export class Notifications {
     _priority?: boolean,
   ): Promise<{ timestamp?: string }> {
     const actor = await this.db.models.Actor.findOne({ did: actorDid });
-    if (!actor) {
+    if (!actor || !actor.lastSeenNotifs) {
       return {};
     }
 
-    // For now, we don't have lastSeenNotifs on Actor model
-    // This would need to be added to track notification seen status
-    // Returning empty for now
-    return {};
+    return { timestamp: actor.lastSeenNotifs };
   }
 
   async getUnreadNotificationCount(
@@ -182,13 +179,15 @@ export class Notifications {
   }
 
   async updateNotificationSeen(
-    _actorDid: string,
-    _timestamp: string,
+    actorDid: string,
+    timestamp: string,
     _priority?: boolean,
   ): Promise<void> {
-    // This would require adding notification seen tracking to the Actor model
-    // or creating a separate ActorState model
-    // For now, this is a no-op
+    await this.db.models.Actor.findOneAndUpdate(
+      { did: actorDid },
+      { $set: { lastSeenNotifs: timestamp } },
+      { upsert: false },
+    );
   }
 
   // Helper methods
@@ -226,9 +225,10 @@ export class Notifications {
     }
 
     const subjectUris = notifsWithSubject.map((n) => n.reasonSubject as string);
+
     const existingRecords = await this.db.models.Record.find({
       uri: { $in: subjectUris },
-    }).select("uri");
+    }).select("uri").lean();
 
     const existingUris = new Set(existingRecords.map((r) => r.uri));
 
