@@ -7,6 +7,7 @@ import { IdResolver } from "@atp/identity";
 import { AuthVerifier } from "./auth-verifier.ts";
 import { ServerConfig } from "./config.ts";
 import { ParsedLabelers } from "./util.ts";
+import { PushService } from "./utils/push.ts";
 
 export type AppContext = {
   db: Database;
@@ -18,6 +19,7 @@ export type AppContext = {
   authVerifier: AuthVerifier;
   cfg: ServerConfig;
   reqLabelers: (req: Request) => ParsedLabelers;
+  pushService: PushService;
 };
 
 export type AppEnv = {

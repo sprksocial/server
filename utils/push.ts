@@ -60,11 +60,14 @@ export class PushService {
       return;
     }
 
+    // Get unread count for badge
+    const badgeCount = await this.getUnreadCount(did);
+
     const invalidTokens: string[] = [];
 
     for (const token of tokens) {
       try {
-        const success = await this.sendFcm(token, payload);
+        const success = await this.sendFcm(token, payload, badgeCount);
         if (!success) {
           invalidTokens.push(token.token);
         }
@@ -86,9 +89,147 @@ export class PushService {
     }
   }
 
+  /**
+   * Send a silent push to reset the badge count to 0
+   * Called when notifications are marked as seen
+   */
+  async sendBadgeReset(did: string): Promise<void> {
+    if (!this.config.enabled) {
+      return;
+    }
+
+    const tokens = await this.pushTokens.getTokensForDid(did);
+    if (tokens.length === 0) {
+      return;
+    }
+
+    const invalidTokens: string[] = [];
+
+    for (const token of tokens) {
+      // Only iOS needs badge reset (Android handles badges differently)
+      if (token.platform !== "ios") {
+        continue;
+      }
+
+      try {
+        const success = await this.sendSilentBadgeUpdate(token, 0);
+        if (!success) {
+          invalidTokens.push(token.token);
+        }
+      } catch (err) {
+        this.logger.error("Failed to send badge reset", {
+          err,
+          did,
+        });
+      }
+    }
+
+    // Clean up invalid tokens
+    if (invalidTokens.length > 0) {
+      await this.pushTokens.deleteInvalidTokens(invalidTokens);
+    }
+  }
+
+  /**
+   * Get unread notification count for a user
+   */
+  private async getUnreadCount(did: string): Promise<number> {
+    try {
+      // Get last seen timestamp
+      const actor = await this.db.models.Actor.findOne({ did }).lean();
+      const lastSeen = actor?.lastSeenNotifs;
+
+      // Build query for unread notifications
+      const filter: Record<string, unknown> = { did };
+      if (lastSeen) {
+        filter.sortAt = { $gt: lastSeen };
+      }
+
+      const count = await this.db.models.Notification.countDocuments(filter);
+      return count;
+    } catch (err) {
+      this.logger.error("Failed to get unread count", { err, did });
+      return 1; // Default to 1 if we can't get the count
+    }
+  }
+
+  /**
+   * Send a silent push to update badge without showing notification
+   */
+  private async sendSilentBadgeUpdate(
+    token: PushToken,
+    badge: number,
+  ): Promise<boolean> {
+    if (!this.fcmServiceAccount) {
+      return true;
+    }
+
+    const accessToken = await this.getFcmAccessToken();
+    if (!accessToken) {
+      return true;
+    }
+
+    // Silent push with only badge update (no notification content)
+    const message = {
+      message: {
+        token: token.token,
+        apns: {
+          headers: {
+            "apns-push-type": "background",
+            "apns-priority": "5", // Low priority for background
+          },
+          payload: {
+            aps: {
+              "content-available": 1,
+              badge: badge,
+            },
+          },
+        },
+      },
+    };
+
+    const projectId = this.fcmServiceAccount.project_id;
+    const url =
+      `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`;
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(message),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        if (
+          error.error?.details?.some(
+            (d: { errorCode?: string }) =>
+              d.errorCode === "UNREGISTERED" ||
+              d.errorCode === "INVALID_ARGUMENT",
+          )
+        ) {
+          return false;
+        }
+        this.logger.error("Badge reset FCM request failed", {
+          error,
+          status: response.status,
+        });
+      }
+
+      return true;
+    } catch (err) {
+      this.logger.error("Badge reset FCM request error", { err });
+      return true;
+    }
+  }
+
   private async sendFcm(
     token: PushToken,
     payload: PushPayload,
+    badgeCount: number,
   ): Promise<boolean> {
     if (!this.fcmServiceAccount) {
       this.logger.warn("FCM service account not configured");
@@ -129,7 +270,7 @@ export class PushService {
         payload: {
           aps: {
             sound: "default",
-            badge: 1,
+            badge: badgeCount,
           },
         },
       };

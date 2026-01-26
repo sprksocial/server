@@ -13,6 +13,7 @@ import { Views } from "../views/index.ts";
 import { IdResolver } from "@atp/identity";
 import { ServerConfig, ServerConfigValues } from "../config.ts";
 import { defaultLabelerHeader } from "../util.ts";
+import { PushService } from "../utils/push.ts";
 
 // Configure mongodb-memory-server to use a specific download directory
 // This prevents issues with empty paths when running with restricted permissions
@@ -283,6 +284,10 @@ export function createMockContext(
     modServiceDid: cfg.modServiceDid,
     adminPasses: cfg.adminPasswords,
   });
+  const pushService = new PushService(dataplane.pushTokens, mockDb, {
+    enabled: cfg.pushEnabled,
+    fcmServiceAccount: cfg.fcmServiceAccount,
+  });
 
   return {
     db: mockDb,
@@ -294,6 +299,7 @@ export function createMockContext(
     cfg,
     authVerifier,
     reqLabelers: () => defaultLabelerHeader(cfg.labelsFromIssuerDids),
+    pushService,
   };
 }
 
@@ -361,6 +367,10 @@ export async function createTestContext(
     modServiceDid: cfg.modServiceDid,
     adminPasses: cfg.adminPasswords,
   });
+  const pushService = new PushService(dataplane.pushTokens, db, {
+    enabled: cfg.pushEnabled,
+    fcmServiceAccount: cfg.fcmServiceAccount,
+  });
 
   const ctx: AppContext = {
     db,
@@ -372,6 +382,7 @@ export async function createTestContext(
     cfg,
     authVerifier,
     reqLabelers: () => defaultLabelerHeader(cfg.labelsFromIssuerDids),
+    pushService,
   };
 
   const cleanup = async () => {

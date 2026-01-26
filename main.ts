@@ -16,6 +16,7 @@ import { Views } from "./views/index.ts";
 import { AppContext, AppEnv } from "./context.ts";
 import { ServerConfig } from "./config.ts";
 import { defaultLabelerHeader, parseLabelerHeader } from "./util.ts";
+import { PushService } from "./utils/push.ts";
 
 await configureLogger();
 
@@ -78,6 +79,12 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
     return parsed;
   };
 
+  // Create push service for badge management
+  const pushService = new PushService(dataplane.pushTokens, db, {
+    enabled: cfg.pushEnabled,
+    fcmServiceAccount: cfg.fcmServiceAccount,
+  });
+
   const ctx = {
     db,
     dataplane,
@@ -88,6 +95,7 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
     cfg,
     authVerifier,
     reqLabelers,
+    pushService,
   };
 
   const app = createApp(ctx);

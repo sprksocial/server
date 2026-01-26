@@ -21,6 +21,12 @@ export default function (server: Server, ctx: AppContext) {
           true,
         ),
       ]);
+
+      // Reset badge count on iOS devices
+      // Fire and forget - don't block the response
+      ctx.pushService.sendBadgeReset(viewer).catch((err) => {
+        ctx.logger.error("Failed to send badge reset", { err, viewer });
+      });
     },
   });
 }
