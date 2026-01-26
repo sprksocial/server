@@ -68,8 +68,8 @@
             "follow",
             "mention",
             "reply",
-            "quote",
-            "starterpack-joined"
+            "like-via-repost",
+            "repost-via-repost"
           ]
         },
         "reasonSubject": { "type": "string", "format": "at-uri" },

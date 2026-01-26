@@ -620,6 +620,28 @@ export const notificationSchema = new Schema<NotificationDocument>({
   .index({ did: 1, sortAt: -1 })
   .index({ did: 1, reason: 1, sortAt: -1 });
 
+// push tokens
+
+export interface PushTokenDocument extends Document {
+  did: string;
+  token: string;
+  platform: "ios" | "android" | "web";
+  appId: string;
+  serviceDid: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export const pushTokenSchema = new Schema<PushTokenDocument>({
+  did: { type: String, required: true, index: true },
+  token: { type: String, required: true },
+  platform: { type: String, required: true, enum: ["ios", "android", "web"] },
+  appId: { type: String, required: true },
+  serviceDid: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  updatedAt: { type: String, required: true },
+})
+  .index({ did: 1, token: 1, platform: 1, appId: 1 }, { unique: true });
+
 // Apply plugin to schemas that extend AuthoredDocument
 ([
   profileSchema,
@@ -658,4 +680,5 @@ export interface DatabaseModels {
   Preference: Model<PreferenceDocument>;
   CursorState: Model<CursorStateDocument>;
   Notification: Model<NotificationDocument>;
+  PushToken: Model<PushTokenDocument>;
 }

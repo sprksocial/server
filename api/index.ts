@@ -34,6 +34,8 @@ import getServices from "./so/sprk/labeler/getServices.ts";
 import listNotifications from "./so/sprk/notification/listNotifications.ts";
 import getUnreadCount from "./so/sprk/notification/getUnreadCount.ts";
 import updateSeen from "./so/sprk/notification/updateSeen.ts";
+import registerPush from "./so/sprk/notification/registerPush.ts";
+import unregisterPush from "./so/sprk/notification/unregisterPush.ts";
 
 export default function (server: Server, ctx: AppContext) {
   getAccountInfos(server, ctx);
@@ -70,4 +72,6 @@ export default function (server: Server, ctx: AppContext) {
   listNotifications(server, ctx);
   getUnreadCount(server, ctx);
   updateSeen(server, ctx);
+  registerPush(server, ctx);
+  unregisterPush(server, ctx);
 }

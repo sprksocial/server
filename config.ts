@@ -33,6 +33,14 @@ export interface ServerConfigValues {
   plcUrl?: string;
 
   labelsFromIssuerDids: string[];
+
+  // Push notifications
+  pushEnabled: boolean;
+  fcmServiceAccount?: string;
+  apnsKeyId?: string;
+  apnsTeamId?: string;
+  apnsKeyPath?: string;
+  apnsTopic?: string;
 }
 
 export class ServerConfig {
@@ -76,6 +84,14 @@ export class ServerConfig {
 
     const labelsFromIssuerDids = envList("SPRK_LABELS_FROM_ISSUER_DIDS") ?? [];
 
+    // Push notifications
+    const pushEnabled = Deno.env.get("SPRK_PUSH_ENABLED") === "true";
+    const fcmServiceAccount = envStr("SPRK_FCM_SERVICE_ACCOUNT");
+    const apnsKeyId = envStr("SPRK_APNS_KEY_ID");
+    const apnsTeamId = envStr("SPRK_APNS_TEAM_ID");
+    const apnsKeyPath = envStr("SPRK_APNS_KEY_PATH");
+    const apnsTopic = envStr("SPRK_APNS_TOPIC");
+
     return new ServerConfig({
       version,
       debugMode,
@@ -102,6 +118,12 @@ export class ServerConfig {
       relayUrl,
       plcUrl,
       labelsFromIssuerDids,
+      pushEnabled,
+      fcmServiceAccount,
+      apnsKeyId,
+      apnsTeamId,
+      apnsKeyPath,
+      apnsTopic,
     });
   }
 
@@ -185,5 +207,25 @@ export class ServerConfig {
 
   get labelsFromIssuerDids() {
     return this.cfg.labelsFromIssuerDids;
+  }
+
+  // Push notifications
+  get pushEnabled() {
+    return this.cfg.pushEnabled;
+  }
+  get fcmServiceAccount() {
+    return this.cfg.fcmServiceAccount;
+  }
+  get apnsKeyId() {
+    return this.cfg.apnsKeyId;
+  }
+  get apnsTeamId() {
+    return this.cfg.apnsTeamId;
+  }
+  get apnsKeyPath() {
+    return this.cfg.apnsKeyPath;
+  }
+  get apnsTopic() {
+    return this.cfg.apnsTopic;
   }
 }

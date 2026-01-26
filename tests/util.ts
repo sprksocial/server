@@ -79,6 +79,7 @@ const DEFAULT_TEST_CONFIG: ServerConfigValues = {
   maxThreadParents: 10,
   labelsFromIssuerDids: [],
   notificationsDelayMs: 1000,
+  pushEnabled: false,
 };
 
 // ============================================================================
@@ -201,6 +202,10 @@ export async function createTestDatabase(
     Notification: connection.model<models.NotificationDocument>(
       "Notification",
       models.notificationSchema,
+    ),
+    PushToken: connection.model<models.PushTokenDocument>(
+      "PushToken",
+      models.pushTokenSchema,
     ),
   };
 

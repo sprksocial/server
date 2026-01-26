@@ -173,6 +173,7 @@ import type * as SoSprkVideoGetUploadLimits from "./types/so/sprk/video/getUploa
 import type * as SoSprkNotificationRegisterPush from "./types/so/sprk/notification/registerPush.ts";
 import type * as SoSprkNotificationPutPreferences from "./types/so/sprk/notification/putPreferences.ts";
 import type * as SoSprkNotificationUpdateSeen from "./types/so/sprk/notification/updateSeen.ts";
+import type * as SoSprkNotificationUnregisterPush from "./types/so/sprk/notification/unregisterPush.ts";
 import type * as SoSprkNotificationListNotifications from "./types/so/sprk/notification/listNotifications.ts";
 import type * as SoSprkNotificationGetUnreadCount from "./types/so/sprk/notification/getUnreadCount.ts";
 import type * as SoSprkGraphGetSuggestedFollowsByActor from "./types/so/sprk/graph/getSuggestedFollowsByActor.ts";
@@ -2748,6 +2749,18 @@ export class SoSprkNotificationNS {
     >,
   ) {
     const nsid = "so.sprk.notification.updateSeen"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  unregisterPush<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      SoSprkNotificationUnregisterPush.QueryParams,
+      SoSprkNotificationUnregisterPush.HandlerInput,
+      SoSprkNotificationUnregisterPush.HandlerOutput
+    >,
+  ) {
+    const nsid = "so.sprk.notification.unregisterPush"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 

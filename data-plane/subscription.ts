@@ -6,6 +6,8 @@ import { Database } from "./db/index.ts";
 import { IndexingService } from "./indexing/index.ts";
 import { getLogger, Logger } from "@logtape/logtape";
 import { ServerConfig } from "../config.ts";
+import { PushService } from "../utils/push.ts";
+import { PushTokens } from "./routes/push-tokens.ts";
 
 export class RepoSubscription {
   firehose: Firehose;
@@ -13,6 +15,7 @@ export class RepoSubscription {
   background: BackgroundQueue;
   indexingSvc: IndexingService;
   logger: Logger;
+  pushService: PushService;
   private firehoseRunning = false;
 
   constructor(
@@ -26,11 +29,24 @@ export class RepoSubscription {
     const { db, idResolver, startCursor, cfg } = opts;
     this.logger = getLogger(["appview", "subscription"]);
     this.background = new BackgroundQueue(db, this.logger);
+
+    // Create push service
+    const pushTokens = new PushTokens(db);
+    this.pushService = new PushService(pushTokens, db, {
+      enabled: cfg.pushEnabled,
+      fcmServiceAccount: cfg.fcmServiceAccount,
+      apnsKeyId: cfg.apnsKeyId,
+      apnsTeamId: cfg.apnsTeamId,
+      apnsKeyPath: cfg.apnsKeyPath,
+      apnsTopic: cfg.apnsTopic,
+    });
+
     this.indexingSvc = new IndexingService(
       db,
       cfg,
       idResolver,
       this.background,
+      this.pushService,
     );
 
     const { runner, firehose } = createFirehose({

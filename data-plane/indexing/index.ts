@@ -29,6 +29,7 @@ import * as Labeler from "./plugins/labeler.ts";
 import { RecordProcessor } from "./processor.ts";
 import { getLogger, Logger } from "@logtape/logtape";
 import { ServerConfig } from "../../config.ts";
+import { PushService } from "../../utils/push.ts";
 
 export class IndexingService {
   records: {
@@ -45,14 +46,17 @@ export class IndexingService {
     labeler: Labeler.PluginType;
   };
   logger: Logger;
+  private pushService?: PushService;
 
   constructor(
     public db: Database,
     public cfg: ServerConfig,
     public idResolver: IdResolver,
     public background: BackgroundQueue,
+    pushService?: PushService,
   ) {
     this.logger = getLogger(["appview", "indexer"]);
+    this.pushService = pushService;
     this.records = {
       post: Post.makePlugin(this.db, this.background),
       reply: Reply.makePlugin(this.db, this.background),
@@ -66,6 +70,13 @@ export class IndexingService {
       audio: Audio.makePlugin(this.db, this.background),
       labeler: Labeler.makePlugin(this.db, this.background),
     };
+
+    // Set push service on all processors
+    if (pushService) {
+      Object.values(this.records).forEach((processor) => {
+        processor.setPushService(pushService);
+      });
+    }
   }
 
   transact(txn: Database) {
@@ -74,6 +85,7 @@ export class IndexingService {
       this.cfg,
       this.idResolver,
       this.background,
+      this.pushService,
     );
   }
 

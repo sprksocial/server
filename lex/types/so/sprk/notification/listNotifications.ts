@@ -53,8 +53,8 @@ export interface Notification {
     | "follow"
     | "mention"
     | "reply"
-    | "quote"
-    | "starterpack-joined"
+    | "like-via-repost"
+    | "repost-via-repost"
     | (string & globalThis.Record<PropertyKey, never>);
   reasonSubject?: string;
   record: { [_ in string]: unknown };

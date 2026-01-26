@@ -21,6 +21,7 @@ import { Threads } from "./routes/threads.ts";
 import { Preferences } from "./routes/preferences.ts";
 import { Search } from "./routes/search.ts";
 import { Labels } from "./routes/labels.ts";
+import { PushTokens } from "./routes/push-tokens.ts";
 
 export { RepoSubscription } from "./subscription.ts";
 
@@ -55,6 +56,7 @@ export class DataPlane {
   public preferences: Preferences;
   public search: Search;
   public labels: Labels;
+  public pushTokens: PushTokens;
 
   constructor(
     db: Database,
@@ -85,5 +87,6 @@ export class DataPlane {
     this.preferences = new Preferences(db);
     this.search = new Search(db);
     this.labels = new Labels(db);
+    this.pushTokens = new PushTokens(db);
   }
 }

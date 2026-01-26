@@ -140,6 +140,10 @@ export class Database {
           "Notification",
           models.notificationSchema,
         ),
+        PushToken: this.connection.model<models.PushTokenDocument>(
+          "PushToken",
+          models.pushTokenSchema,
+        ),
       };
 
       this.logger.info("Started connection to MongoDB");

@@ -5,6 +5,7 @@ import { lexicons } from "../../lex/lexicons.ts";
 import { BackgroundQueue } from "../background.ts";
 import { Database } from "../db/index.ts";
 import { chunkArray } from "@atp/common";
+import { PushService } from "../../utils/push.ts";
 
 // @NOTE re: insertions and deletions. Due to how record updates are handled,
 // (insertFn) should have the same effect as (insertFn -> deleteFn -> insertFn).
@@ -44,6 +45,7 @@ type Notif = {
 export class RecordProcessor<T, S> {
   collection: string;
   db: Database;
+  private pushService: PushService | null = null;
 
   /**
    * RecordProcessor for handling a single AT Protocol collection.
@@ -71,6 +73,10 @@ export class RecordProcessor<T, S> {
   ) {
     this.db = appDb;
     this.collection = this.params.lexId;
+  }
+
+  setPushService(pushService: PushService) {
+    this.pushService = pushService;
   }
 
   matchesCollection(uri: AtUri): boolean {
@@ -335,6 +341,21 @@ export class RecordProcessor<T, S> {
     // Need to ensure notif deletion always happens before creation, otherwise delete may clobber in a race.
     for (const fn of runOnCommit) {
       await fn(this.appDb); // these could be backgrounded
+    }
+
+    // Queue push notifications in the background
+    if (this.pushService?.enabled && notifs.length > 0) {
+      for (const notif of notifs) {
+        this.background.add(async () => {
+          await this.pushService?.sendPush(notif.did, {
+            recipientDid: notif.did,
+            reason: notif.reason,
+            author: notif.author,
+            recordUri: notif.recordUri,
+            reasonSubject: notif.reasonSubject,
+          });
+        });
+      }
     }
   }
 

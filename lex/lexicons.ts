@@ -16375,6 +16375,49 @@ export const schemaDict = {
       },
     },
   },
+  "SoSprkNotificationUnregisterPush": {
+    "lexicon": 1,
+    "id": "so.sprk.notification.unregisterPush",
+    "defs": {
+      "main": {
+        "type": "procedure",
+        "description":
+          "The inverse of registerPush - inform a specified service that push notifications should no longer be sent to the given token for the requesting account. Requires auth.",
+        "input": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "serviceDid",
+              "token",
+              "platform",
+              "appId",
+            ],
+            "properties": {
+              "serviceDid": {
+                "type": "string",
+                "format": "did",
+              },
+              "token": {
+                "type": "string",
+              },
+              "platform": {
+                "type": "string",
+                "knownValues": [
+                  "ios",
+                  "android",
+                  "web",
+                ],
+              },
+              "appId": {
+                "type": "string",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   "SoSprkNotificationListNotifications": {
     "lexicon": 1,
     "id": "so.sprk.notification.listNotifications",
@@ -16477,8 +16520,8 @@ export const schemaDict = {
               "follow",
               "mention",
               "reply",
-              "quote",
-              "starterpack-joined",
+              "like-via-repost",
+              "repost-via-repost",
             ],
           },
           "reasonSubject": {
@@ -26785,6 +26828,7 @@ export const ids = {
   SoSprkNotificationRegisterPush: "so.sprk.notification.registerPush",
   SoSprkNotificationPutPreferences: "so.sprk.notification.putPreferences",
   SoSprkNotificationUpdateSeen: "so.sprk.notification.updateSeen",
+  SoSprkNotificationUnregisterPush: "so.sprk.notification.unregisterPush",
   SoSprkNotificationListNotifications: "so.sprk.notification.listNotifications",
   SoSprkNotificationGetUnreadCount: "so.sprk.notification.getUnreadCount",
   SoSprkGraphGetSuggestedFollowsByActor:
