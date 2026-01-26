@@ -1112,10 +1112,12 @@ export class Views {
       : [];
     const indexedAt = notif.sortAt;
 
-    // For like/repost notifications, include the subject record (post/reply) in the response
+    // For like/repost/reply notifications, include the subject record (post/reply) in the response
     let recordWithSubject = recordInfo.record;
     if (
-      (notif.reason === "like" || notif.reason === "repost") &&
+      (notif.reason === "like" ||
+        notif.reason === "repost" ||
+        notif.reason === "reply") &&
       notif.reasonSubject
     ) {
       const subjectUri = new AtUri(notif.reasonSubject);

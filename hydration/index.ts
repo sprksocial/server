@@ -669,13 +669,15 @@ export class Hydrator {
     const repostUris = collections.get(ids.SoSprkFeedRepost) ?? [];
     const followUris = collections.get(ids.SoSprkGraphFollow) ?? [];
 
-    // Collect subject URIs for like/repost notifications to hydrate their content
+    // Collect subject URIs for like/repost/reply notifications to hydrate their content
     const subjectPostUris: string[] = [];
     const subjectReplyUris: string[] = [];
     for (const notif of notifs) {
       if (
         notif.reasonSubject &&
-        (notif.reason === "like" || notif.reason === "repost")
+        (notif.reason === "like" ||
+          notif.reason === "repost" ||
+          notif.reason === "reply")
       ) {
         const subjectUri = new AtUri(notif.reasonSubject);
         if (subjectUri.collection === ids.SoSprkFeedPost) {
