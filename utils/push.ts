@@ -14,10 +14,6 @@ export interface PushPayload {
 export interface PushConfig {
   enabled: boolean;
   fcmServiceAccount?: string; // JSON string of Firebase service account
-  apnsKeyId?: string;
-  apnsTeamId?: string;
-  apnsKeyPath?: string;
-  apnsTopic?: string; // Bundle ID for iOS app
 }
 
 interface FcmServiceAccount {
@@ -34,7 +30,6 @@ export class PushService {
   private fcmAccessToken: string | null = null;
   private fcmTokenExpiry: number = 0;
   private fcmServiceAccount: FcmServiceAccount | null = null;
-  private apnsPrivateKey: CryptoKey | null = null;
 
   constructor(pushTokens: PushTokens, db: Database, config: PushConfig) {
     this.logger = getLogger(["appview", "push"]);
@@ -69,16 +64,9 @@ export class PushService {
 
     for (const token of tokens) {
       try {
-        if (token.platform === "ios") {
-          const success = await this.sendApns(token, payload);
-          if (!success) {
-            invalidTokens.push(token.token);
-          }
-        } else if (token.platform === "android") {
-          const success = await this.sendFcm(token, payload);
-          if (!success) {
-            invalidTokens.push(token.token);
-          }
+        const success = await this.sendFcm(token, payload);
+        if (!success) {
+          invalidTokens.push(token.token);
         }
       } catch (err) {
         this.logger.error("Failed to send push notification", {
@@ -113,7 +101,9 @@ export class PushService {
     }
 
     const notification = await this.buildNotificationContent(payload);
-    const message = {
+
+    // Build base message
+    const message: FcmMessage = {
       message: {
         token: token.token,
         notification: {
@@ -127,11 +117,27 @@ export class PushService {
           ...(payload.reasonSubject &&
             { reasonSubject: payload.reasonSubject }),
         },
-        android: {
-          priority: "high" as const,
-        },
       },
     };
+
+    // Add platform-specific options
+    if (token.platform === "ios") {
+      message.message.apns = {
+        headers: {
+          "apns-priority": "10",
+        },
+        payload: {
+          aps: {
+            sound: "default",
+            badge: 1,
+          },
+        },
+      };
+    } else if (token.platform === "android") {
+      message.message.android = {
+        priority: "high",
+      };
+    }
 
     const projectId = this.fcmServiceAccount.project_id;
     const url =
@@ -168,70 +174,6 @@ export class PushService {
       return true;
     } catch (err) {
       this.logger.error("FCM request error", { err });
-      return true; // Don't mark as invalid on network errors
-    }
-  }
-
-  private async sendApns(
-    token: PushToken,
-    payload: PushPayload,
-  ): Promise<boolean> {
-    if (
-      !this.config.apnsKeyId || !this.config.apnsTeamId ||
-      !this.config.apnsKeyPath
-    ) {
-      this.logger.warn("APNs not fully configured");
-      return true; // Don't mark as invalid if not configured
-    }
-
-    const jwt = await this.getApnsJwt();
-    if (!jwt) {
-      return true; // Don't mark as invalid if we can't get a JWT
-    }
-
-    const notification = await this.buildNotificationContent(payload);
-    const apnsPayload = {
-      aps: {
-        alert: {
-          title: notification.title,
-          body: notification.body,
-        },
-        sound: "default",
-        badge: 1,
-      },
-      reason: payload.reason,
-      author: payload.author,
-      recordUri: payload.recordUri,
-      ...(payload.reasonSubject && { reasonSubject: payload.reasonSubject }),
-    };
-
-    const topic = this.config.apnsTopic || token.appId;
-    const url = `https://api.push.apple.com/3/device/${token.token}`;
-
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "authorization": `bearer ${jwt}`,
-          "apns-topic": topic,
-          "apns-push-type": "alert",
-          "apns-priority": "10",
-        },
-        body: JSON.stringify(apnsPayload),
-      });
-
-      if (!response.ok) {
-        const status = response.status;
-        // 400 = Bad device token, 410 = Token is no longer active
-        if (status === 400 || status === 410) {
-          return false; // Mark as invalid
-        }
-        this.logger.error("APNs request failed", { status });
-      }
-
-      return true;
-    } catch (err) {
-      this.logger.error("APNs request error", { err });
       return true; // Don't mark as invalid on network errors
     }
   }
@@ -399,56 +341,6 @@ export class PushService {
     }
   }
 
-  private async getApnsJwt(): Promise<string | null> {
-    if (
-      !this.config.apnsKeyId || !this.config.apnsTeamId ||
-      !this.config.apnsKeyPath
-    ) {
-      return null;
-    }
-
-    try {
-      // Load APNs private key if not already loaded
-      if (!this.apnsPrivateKey) {
-        const keyData = await Deno.readTextFile(this.config.apnsKeyPath);
-        this.apnsPrivateKey = await this.importApnsKey(keyData);
-      }
-
-      const now = Math.floor(Date.now() / 1000);
-      const header = {
-        alg: "ES256",
-        kid: this.config.apnsKeyId,
-      };
-
-      const claim = {
-        iss: this.config.apnsTeamId,
-        iat: now,
-      };
-
-      const encoder = new TextEncoder();
-      const headerB64 = this.base64UrlEncode(
-        encoder.encode(JSON.stringify(header)),
-      );
-      const claimB64 = this.base64UrlEncode(
-        encoder.encode(JSON.stringify(claim)),
-      );
-      const unsignedJwt = `${headerB64}.${claimB64}`;
-
-      const signature = await crypto.subtle.sign(
-        { name: "ECDSA", hash: "SHA-256" },
-        this.apnsPrivateKey,
-        encoder.encode(unsignedJwt),
-      );
-
-      // Convert DER signature to raw format for JWT
-      const signatureB64 = this.base64UrlEncode(new Uint8Array(signature));
-      return `${unsignedJwt}.${signatureB64}`;
-    } catch (err) {
-      this.logger.error("Error creating APNs JWT", { err });
-      return null;
-    }
-  }
-
   private async importPrivateKey(pem: string): Promise<CryptoKey> {
     const pemContents = pem
       .replace("-----BEGIN PRIVATE KEY-----", "")
@@ -469,28 +361,35 @@ export class PushService {
     );
   }
 
-  private async importApnsKey(pem: string): Promise<CryptoKey> {
-    const pemContents = pem
-      .replace("-----BEGIN PRIVATE KEY-----", "")
-      .replace("-----END PRIVATE KEY-----", "")
-      .replace(/\n/g, "");
-
-    const binaryDer = Uint8Array.from(
-      atob(pemContents),
-      (c) => c.charCodeAt(0),
-    );
-
-    return await crypto.subtle.importKey(
-      "pkcs8",
-      binaryDer,
-      { name: "ECDSA", namedCurve: "P-256" },
-      false,
-      ["sign"],
-    );
-  }
-
   private base64UrlEncode(data: Uint8Array): string {
     const base64 = btoa(String.fromCharCode(...data));
     return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   }
+}
+
+// FCM message types
+interface FcmMessage {
+  message: {
+    token: string;
+    notification: {
+      title: string;
+      body: string;
+    };
+    data: Record<string, string>;
+    android?: {
+      priority: string;
+    };
+    apns?: {
+      headers: Record<string, string>;
+      payload: {
+        aps: {
+          sound?: string;
+          badge?: number;
+          "interruption-level"?: string;
+          "relevance-score"?: number;
+          "mutable-content"?: number;
+        };
+      };
+    };
+  };
 }

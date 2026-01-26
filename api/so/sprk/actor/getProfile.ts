@@ -16,7 +16,6 @@ export default function (server: Server, ctx: AppContext) {
   server.so.sprk.actor.getProfile({
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ auth, params, req }) => {
-
       const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
       const labelers = ctx.reqLabelers(req);
       const hydrateCtx = await ctx.hydrator.createContext({

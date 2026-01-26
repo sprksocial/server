@@ -30,15 +30,11 @@ export class RepoSubscription {
     this.logger = getLogger(["appview", "subscription"]);
     this.background = new BackgroundQueue(db, this.logger);
 
-    // Create push service
+    // Create push service (FCM handles both iOS and Android)
     const pushTokens = new PushTokens(db);
     this.pushService = new PushService(pushTokens, db, {
       enabled: cfg.pushEnabled,
       fcmServiceAccount: cfg.fcmServiceAccount,
-      apnsKeyId: cfg.apnsKeyId,
-      apnsTeamId: cfg.apnsTeamId,
-      apnsKeyPath: cfg.apnsKeyPath,
-      apnsTopic: cfg.apnsTopic,
     });
 
     this.indexingSvc = new IndexingService(
