@@ -55,7 +55,7 @@ export class Follows {
     if (followers.length === limit && followers.length > 0) {
       const lastFollower = followers[followers.length - 1];
       nextCursor = this.timeCidKeyset.pack({
-        primary: lastFollower.createdAt,
+        primary: lastFollower.indexedAt,
         secondary: lastFollower.cid,
       });
     }
@@ -88,7 +88,7 @@ export class Follows {
     if (follows.length === limit && follows.length > 0) {
       const lastFollow = follows[follows.length - 1];
       nextCursor = this.timeCidKeyset.pack({
-        primary: lastFollow.createdAt,
+        primary: lastFollow.indexedAt,
         secondary: lastFollow.cid,
       });
     }

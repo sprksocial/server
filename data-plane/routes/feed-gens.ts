@@ -32,7 +32,7 @@ export class FeedGens {
     if (feeds.length === limit && feeds.length > 0) {
       const lastFeed = feeds[feeds.length - 1];
       nextCursor = this.timeCidKeyset.pack({
-        primary: lastFeed.createdAt,
+        primary: lastFeed.indexedAt,
         secondary: lastFeed.cid,
       });
     }
@@ -96,7 +96,7 @@ export class FeedGens {
     if (feeds.length === limit && feeds.length > 0) {
       const lastFeed = feeds[feeds.length - 1];
       nextCursor = this.timeCidKeyset.pack({
-        primary: lastFeed.createdAt,
+        primary: lastFeed.indexedAt,
         secondary: lastFeed.cid,
       });
     }

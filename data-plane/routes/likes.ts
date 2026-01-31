@@ -36,7 +36,7 @@ export class Likes {
     if (likes.length === limit && likes.length > 0) {
       const lastLike = likes[likes.length - 1];
       nextCursor = this.timeCidKeyset.pack({
-        primary: lastLike.createdAt,
+        primary: lastLike.indexedAt,
         secondary: lastLike.cid,
       });
     }
@@ -87,7 +87,7 @@ export class Likes {
     if (likes.length === limit && likes.length > 0) {
       const lastLike = likes[likes.length - 1];
       nextCursor = this.timeCidKeyset.pack({
-        primary: lastLike.createdAt,
+        primary: lastLike.indexedAt,
         secondary: lastLike.cid,
       });
     }

@@ -38,7 +38,7 @@ export class Reposts {
     if (reposts.length === limit && reposts.length > 0) {
       const lastRepost = reposts[reposts.length - 1];
       nextCursor = this.timeCidKeyset.pack({
-        primary: lastRepost.createdAt,
+        primary: lastRepost.indexedAt,
         secondary: lastRepost.cid,
       });
     }
@@ -89,7 +89,7 @@ export class Reposts {
     if (reposts.length === limit && reposts.length > 0) {
       const lastRepost = reposts[reposts.length - 1];
       nextCursor = this.timeCidKeyset.pack({
-        primary: lastRepost.createdAt,
+        primary: lastRepost.indexedAt,
         secondary: lastRepost.cid,
       });
     }

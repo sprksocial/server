@@ -42,7 +42,7 @@ export class Blocks {
     if (blocks.length === limit && blocks.length > 0) {
       const lastBlock = blocks[blocks.length - 1];
       nextCursor = this.timeCidKeyset.pack({
-        primary: lastBlock.createdAt,
+        primary: lastBlock.indexedAt,
         secondary: lastBlock.cid,
       });
     }
