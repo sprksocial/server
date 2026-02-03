@@ -2,7 +2,8 @@
   "version": "5",
   "specifiers": {
     "jsr:@atp/bytes@~0.1.0-alpha.3": "0.1.0-alpha.3",
-    "jsr:@atp/common@~0.1.0-alpha.7": "0.1.0-alpha.7",
+    "jsr:@atp/common@~0.1.0-alpha.7": "0.1.0-alpha.8",
+    "jsr:@atp/common@~0.1.0-alpha.8": "0.1.0-alpha.8",
     "jsr:@atp/crypto@~0.1.0-alpha.3": "0.1.0-alpha.3",
     "jsr:@atp/identity@~0.1.0-alpha.2": "0.1.0-alpha.2",
     "jsr:@atp/lexicon@~0.1.0-alpha.4": "0.1.0-alpha.4",
@@ -33,7 +34,6 @@
     "npm:@atproto/api@~0.16.11": "0.16.11",
     "npm:@bufbuild/protobuf@1.5.0": "1.5.0",
     "npm:@ipld/dag-cbor@^9.2.5": "9.2.5",
-    "npm:@types/node@24.0.7": "24.0.7",
     "npm:dotenv@^17.2.3": "17.2.3",
     "npm:jose@^6.1.3": "6.1.3",
     "npm:lodash@*": "4.17.21",
@@ -53,8 +53,8 @@
         "npm:multiformats@^13.4.1"
       ]
     },
-    "@atp/common@0.1.0-alpha.7": {
-      "integrity": "ffb61503f39d266dbae9d7af7a0d6865a4269c6a727ada3ad1ddafb6494d86dc",
+    "@atp/common@0.1.0-alpha.8": {
+      "integrity": "c199177d10f71ec2ed7366b861a48199c0b9ad54a4c56974cdc8b4d6283e2583",
       "dependencies": [
         "jsr:@atp/bytes",
         "jsr:@logtape/file",
@@ -71,7 +71,6 @@
       "integrity": "806baa0ab1d399e7fe182a8ac4c6b9da076fcc965537dfbde81e464889492b7c",
       "dependencies": [
         "jsr:@atp/bytes",
-        "jsr:@atp/crypto",
         "jsr:@noble/curves",
         "jsr:@noble/hashes@^2.0.1"
       ]
@@ -79,14 +78,14 @@
     "@atp/identity@0.1.0-alpha.2": {
       "integrity": "a960a0772e82e7bc21c7b6694bec2fdf718df70877f455166e01fd15d5c40483",
       "dependencies": [
-        "jsr:@atp/common",
+        "jsr:@atp/common@~0.1.0-alpha.7",
         "jsr:@atp/crypto"
       ]
     },
     "@atp/lexicon@0.1.0-alpha.4": {
       "integrity": "802dcd6b93edd897fe1e4946269bc7a8f7f1c97f03b10ae6e268925325f4fc12",
       "dependencies": [
-        "jsr:@atp/common",
+        "jsr:@atp/common@~0.1.0-alpha.7",
         "jsr:@atp/syntax",
         "jsr:@zod/zod",
         "npm:multiformats@^13.4.1"
@@ -96,7 +95,7 @@
       "integrity": "1c351872f1b3310573ec112e05e49302c98ab2f600def46f4e4cb4126ca809ae",
       "dependencies": [
         "jsr:@atp/bytes",
-        "jsr:@atp/common",
+        "jsr:@atp/common@~0.1.0-alpha.7",
         "jsr:@atp/crypto",
         "jsr:@atp/lexicon",
         "jsr:@std/encoding",
@@ -108,13 +107,12 @@
     "@atp/sync@0.1.0-alpha.6": {
       "integrity": "75f1f9651565cf9e8e22f0bd9aad4ebe6238ee85019e007205cdc18dbaa22c3c",
       "dependencies": [
-        "jsr:@atp/common",
+        "jsr:@atp/common@~0.1.0-alpha.7",
         "jsr:@atp/identity",
         "jsr:@atp/lexicon",
         "jsr:@atp/repo",
         "jsr:@atp/syntax",
         "jsr:@atp/xrpc-server",
-        "npm:multiformats@^13.4.1",
         "npm:p-queue"
       ]
     },
@@ -132,7 +130,7 @@
       "integrity": "a9b0a93f5f82ab323ed566fabb55da849db8cd9598743ecbfd5be0679c43cb3f",
       "dependencies": [
         "jsr:@atp/bytes",
-        "jsr:@atp/common",
+        "jsr:@atp/common@~0.1.0-alpha.7",
         "jsr:@atp/crypto",
         "jsr:@atp/lexicon",
         "jsr:@atp/xrpc",
@@ -161,8 +159,7 @@
     "@logtape/pretty@1.3.7": {
       "integrity": "f13f1e151158d76e5b8e352b7d1a6308bf3a65d14d70f50703f8f2fca125250c",
       "dependencies": [
-        "jsr:@logtape/logtape@^1.3.7",
-        "npm:@types/node"
+        "jsr:@logtape/logtape@^1.3.7"
       ]
     },
     "@noble/curves@2.0.1": {
@@ -263,12 +260,6 @@
       "integrity": "sha512-k64Lbyb7ycCSXHSLzxVdb2xsKGPMvYZfCICXvDsI8Z65CeWQzTEKS4YmGbnqw+U9RBvLPTsB6UCmwkgsDTGWIw==",
       "dependencies": [
         "sparse-bitfield"
-      ]
-    },
-    "@types/node@24.0.7": {
-      "integrity": "sha512-YIEUUr4yf8q8oQoXPpSlnvKNVKDQlPMWrmOcgzoduo7kvA2UF0/BwJ/eMKFTiTtkNL17I0M6Xe2tvwFU7be6iw==",
-      "dependencies": [
-        "undici-types"
       ]
     },
     "@types/webidl-conversions@7.0.3": {
@@ -586,9 +577,6 @@
         "multiformats@9.9.0"
       ]
     },
-    "undici-types@7.8.0": {
-      "integrity": "sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw=="
-    },
     "webidl-conversions@7.0.0": {
       "integrity": "sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g=="
     },
@@ -616,7 +604,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@atp/bytes@~0.1.0-alpha.3",
-      "jsr:@atp/common@~0.1.0-alpha.7",
+      "jsr:@atp/common@~0.1.0-alpha.8",
       "jsr:@atp/crypto@~0.1.0-alpha.3",
       "jsr:@atp/identity@~0.1.0-alpha.2",
       "jsr:@atp/lexicon@~0.1.0-alpha.4",

@@ -12,7 +12,7 @@
   },
   "imports": {
     "@atp/bytes": "jsr:@atp/bytes@^0.1.0-alpha.3",
-    "@atp/common": "jsr:@atp/common@^0.1.0-alpha.7",
+    "@atp/common": "jsr:@atp/common@^0.1.0-alpha.8",
     "@atp/crypto": "jsr:@atp/crypto@^0.1.0-alpha.3",
     "@atp/identity": "jsr:@atp/identity@^0.1.0-alpha.2",
     "@atp/lexicon": "jsr:@atp/lexicon@^0.1.0-alpha.4",
