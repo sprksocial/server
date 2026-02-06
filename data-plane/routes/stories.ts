@@ -11,6 +11,7 @@ export interface StoryItem {
   createdAt: string;
   indexedAt: string;
   sortAt: string;
+  archived: boolean;
 }
 
 export class Stories {
@@ -23,13 +24,21 @@ export class Stories {
   }
 
   /**
-   * Get stories by URIs
+   * Get active (non-archived, non-expired) stories by URIs
    */
   async getStories(uris: string[]): Promise<StoryItem[]> {
     if (!uris.length) return [];
 
+    const twentyFourHoursAgo = new Date();
+    twentyFourHoursAgo.setHours(
+      twentyFourHoursAgo.getHours() - STORIES_EXPIRY_HOURS,
+    );
+    const minDate = twentyFourHoursAgo.toISOString();
+
     const stories = await this.db.models.Story.find({
       uri: { $in: uris },
+      archived: { $ne: true },
+      indexedAt: { $gte: minDate },
     }).lean();
 
     return stories.map((story) => ({
@@ -38,6 +47,7 @@ export class Stories {
       authorDid: story.authorDid,
       createdAt: story.createdAt,
       indexedAt: story.indexedAt,
+      archived: story.archived ?? false,
       sortAt: compositeTime(story.createdAt, story.indexedAt) ||
         story.createdAt,
     }));
@@ -65,10 +75,19 @@ export class Stories {
     );
     const minDate = twentyFourHoursAgo.toISOString();
 
-    // Build query with expiry filter
+    // Build query with expiry filter (exclude archived stories)
     const storiesQuery = this.db.models.Story.find({
       authorDid: { $in: timelineDids },
-      indexedAt: { $gte: minDate },
+      archived: { $ne: true },
+      // Keep this nested to avoid merging with keyset cursor $or filter.
+      $and: [
+        {
+          $or: [
+            { authorDid: actorDid },
+            { indexedAt: { $gte: minDate } },
+          ],
+        },
+      ],
     });
 
     // Apply pagination
@@ -91,6 +110,7 @@ export class Stories {
       authorDid: story.authorDid,
       createdAt: story.createdAt,
       indexedAt: story.indexedAt,
+      archived: story.archived ?? false,
       sortAt: compositeTime(story.createdAt, story.indexedAt) ||
         story.createdAt,
     }));
@@ -113,7 +133,6 @@ export class Stories {
 
   /**
    * Filter out expired stories (older than 24 hours)
-   * Stories from the owner are not filtered
    */
   filterExpiredStories(
     stories: StoryItem[],
@@ -125,7 +144,7 @@ export class Stories {
     );
 
     return stories.filter((story) => {
-      // If the authenticated user is the author, don't apply the 24h expiration filter
+      if (story.archived) return false;
       if (ownerDid && story.authorDid === ownerDid) return true;
       const storyDate = new Date(story.indexedAt);
       return storyDate >= twentyFourHoursAgo;

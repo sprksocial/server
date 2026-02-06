@@ -354,6 +354,7 @@ export interface StoryDocument extends AuthoredDocument {
   media: StoryMedia;
   sound?: RecordRef;
   labels?: Label[];
+  archived?: boolean;
 }
 export const storySchema = new Schema<StoryDocument>({
   ...authoredSchema,
@@ -366,6 +367,7 @@ export const storySchema = new Schema<StoryDocument>({
     required: false,
   },
   labels: { type: [Object], required: false, default: [] },
+  archived: { type: Boolean, required: true, default: false },
 })
   .index({ authorDid: 1, createdAt: -1 });
 
