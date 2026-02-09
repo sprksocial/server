@@ -21,6 +21,7 @@ import getRecord from "./com/atproto/repo/getRecord.ts";
 import resolveHandle from "./com/atproto/identity/resolveHandle.ts";
 import getStories from "./so/sprk/story/getStories.ts";
 import getStoriesTimeline from "./so/sprk/story/getTimeline.ts";
+import getStoriesArchive from "./so/sprk/story/getArchive.ts";
 import getProfiles from "./so/sprk/actor/getProfiles.ts";
 import searchPosts from "./so/sprk/feed/searchPosts.ts";
 import getActorAudios from "./so/sprk/sound/getActorAudios.ts";
@@ -60,6 +61,7 @@ export default function (server: Server, ctx: AppContext) {
   resolveHandle(server, ctx);
   getStories(server, ctx);
   getStoriesTimeline(server, ctx);
+  getStoriesArchive(server, ctx);
   searchPosts(server, ctx);
   getActorAudios(server, ctx);
   getTrendingAudios(server, ctx);

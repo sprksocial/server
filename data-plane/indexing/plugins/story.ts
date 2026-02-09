@@ -27,7 +27,6 @@ const insertFn = async (
     tags: obj.tags || [],
     createdAt: normalizeDatetimeAlways(obj.createdAt),
     indexedAt: timestamp,
-    archived: false,
   };
 
   // Use findOneAndUpdate with upsert to handle potential duplicate key errors
@@ -51,11 +50,9 @@ const deleteFn = async (
   db: Database,
   uri: AtUri,
 ): Promise<IndexedStory | null> => {
-  return await db.models.Story.findOneAndUpdate(
-    { uri: uri.toString() },
-    { archived: true },
-    { new: true },
-  );
+  return await db.models.Story.findOneAndDelete({
+    uri: uri.toString(),
+  });
 };
 
 const notifsForDelete = () => {
@@ -73,6 +70,7 @@ export const makePlugin = (
     insertFn,
     findDuplicate,
     deleteFn,
+    archiveOnDelete: true,
     notifsForInsert,
     notifsForDelete,
   });

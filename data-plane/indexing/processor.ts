@@ -30,6 +30,7 @@ type RecordProcessorParams<T, S> = {
     replacedBy: S | null,
   ) => { notifs: Notif[]; toDelete: string[] };
   updateAggregates?: (db: Database, obj: S) => Promise<void>;
+  archiveOnDelete?: boolean;
 };
 
 type Notif = {
@@ -245,8 +246,32 @@ export class RecordProcessor<T, S> {
   }
 
   async deleteRecord(uri: AtUri, cascading = false) {
-    await this.db.models.Record.deleteOne({ uri: uri.toString() });
-    await this.db.models.DuplicateRecord.deleteOne({ uri: uri.toString() });
+    const uriStr = uri.toString();
+    const record = await this.db.models.Record.findOne({ uri: uriStr }).lean();
+
+    if (record && this.params.archiveOnDelete) {
+      const isTakedown = !!record.takedownRef;
+      await this.db.models.ArchivedRecord.findOneAndUpdate(
+        { uri: uriStr },
+        {
+          uri: record.uri,
+          cid: record.cid,
+          did: record.did,
+          collectionName: record.collectionName,
+          rkey: record.rkey,
+          createdAt: record.createdAt,
+          indexedAt: record.indexedAt,
+          json: record.json,
+          archivedAt: new Date().toISOString(),
+          deleteReason: isTakedown ? "takedown" : "user_delete",
+          takedownRef: record.takedownRef || undefined,
+        },
+        { upsert: true, new: true },
+      );
+    }
+
+    await this.db.models.Record.deleteOne({ uri: uriStr });
+    await this.db.models.DuplicateRecord.deleteOne({ uri: uriStr });
 
     const deleted = await this.params.deleteFn(this.db, uri);
     if (!deleted) return;

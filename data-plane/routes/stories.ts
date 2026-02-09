@@ -1,6 +1,7 @@
 import { Database } from "../db/index.ts";
 import { TimeCidKeyset } from "../db/pagination.ts";
 import { compositeTime } from "../util.ts";
+import { ids } from "../../lex/lexicons.ts";
 
 const STORIES_EXPIRY_HOURS = 24;
 
@@ -24,7 +25,7 @@ export class Stories {
   }
 
   /**
-   * Get active (non-archived, non-expired) stories by URIs
+   * Get active (non-expired) stories by URIs
    */
   async getStories(uris: string[]): Promise<StoryItem[]> {
     if (!uris.length) return [];
@@ -37,7 +38,6 @@ export class Stories {
 
     const stories = await this.db.models.Story.find({
       uri: { $in: uris },
-      archived: { $ne: true },
       indexedAt: { $gte: minDate },
     }).lean();
 
@@ -47,7 +47,7 @@ export class Stories {
       authorDid: story.authorDid,
       createdAt: story.createdAt,
       indexedAt: story.indexedAt,
-      archived: story.archived ?? false,
+      archived: false,
       sortAt: compositeTime(story.createdAt, story.indexedAt) ||
         story.createdAt,
     }));
@@ -75,10 +75,9 @@ export class Stories {
     );
     const minDate = twentyFourHoursAgo.toISOString();
 
-    // Build query with expiry filter (exclude archived stories)
+    // Build query with expiry filter
     const storiesQuery = this.db.models.Story.find({
       authorDid: { $in: timelineDids },
-      archived: { $ne: true },
       // Keep this nested to avoid merging with keyset cursor $or filter.
       $and: [
         {
@@ -110,19 +109,76 @@ export class Stories {
       authorDid: story.authorDid,
       createdAt: story.createdAt,
       indexedAt: story.indexedAt,
-      archived: story.archived ?? false,
+      archived: false,
       sortAt: compositeTime(story.createdAt, story.indexedAt) ||
         story.createdAt,
     }));
 
     // Generate cursor from last item if we have more results
     let nextCursor: string | undefined;
-    if (hasMore && transformedStories.length > 0) {
-      const lastStory = transformedStories[transformedStories.length - 1];
-      nextCursor = this.timeCidKeyset.pack({
-        primary: lastStory.sortAt,
-        secondary: lastStory.cid,
-      });
+    if (hasMore && resultStories.length > 0) {
+      nextCursor = this.timeCidKeyset.packFromResult(resultStories);
+    }
+
+    return {
+      stories: transformedStories,
+      cursor: nextCursor,
+    };
+  }
+
+  /**
+   * Get archived stories for an author
+   */
+  async getArchive(
+    actorDid: string,
+    limit = 50,
+    cursor?: string,
+    includeTakedowns = false,
+  ): Promise<{ stories: StoryItem[]; cursor?: string }> {
+    const baseQuery: {
+      did: string;
+      collectionName: string;
+      $or?: Array<
+        { takedownRef?: { $exists: boolean } } | { takedownRef: string }
+      >;
+    } = {
+      did: actorDid,
+      collectionName: ids.SoSprkStoryPost,
+    };
+
+    if (!includeTakedowns) {
+      baseQuery.$or = [
+        { takedownRef: { $exists: false } },
+        { takedownRef: "" },
+      ];
+    }
+
+    const storiesQuery = this.db.models.ArchivedRecord.find(baseQuery);
+
+    const paginatedQuery = this.timeCidKeyset.paginate(storiesQuery, {
+      limit: limit + 1,
+      cursor,
+      direction: "desc",
+    });
+
+    const stories = await paginatedQuery.exec();
+    const hasMore = stories.length > limit;
+    const resultStories = hasMore ? stories.slice(0, limit) : stories;
+
+    const transformedStories: StoryItem[] = resultStories.map((story) => ({
+      uri: story.uri,
+      cid: story.cid,
+      authorDid: story.did,
+      createdAt: story.createdAt,
+      indexedAt: story.indexedAt,
+      archived: true,
+      sortAt: compositeTime(story.createdAt, story.indexedAt) ||
+        story.createdAt,
+    }));
+
+    let nextCursor: string | undefined;
+    if (hasMore && resultStories.length > 0) {
+      nextCursor = this.timeCidKeyset.packFromResult(resultStories);
     }
 
     return {
@@ -144,7 +200,6 @@ export class Stories {
     );
 
     return stories.filter((story) => {
-      if (story.archived) return false;
       if (ownerDid && story.authorDid === ownerDid) return true;
       const storyDate = new Date(story.indexedAt);
       return storyDate >= twentyFourHoursAgo;

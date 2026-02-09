@@ -20753,6 +20753,52 @@ export const schemaDict = {
       },
     },
   },
+  "SoSprkStoryGetArchive": {
+    "lexicon": 1,
+    "id": "so.sprk.story.getArchive",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Get archived stories for the requesting account. Requires auth.",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+            },
+            "cursor": {
+              "type": "string",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "stories",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "stories": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.story.defs#storyView",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   "SoSprkStoryGetStories": {
     "lexicon": 1,
     "id": "so.sprk.story.getStories",
@@ -26889,6 +26935,7 @@ export const ids = {
   SoSprkActorProfile: "so.sprk.actor.profile",
   SoSprkStoryDefs: "so.sprk.story.defs",
   SoSprkStoryGetTimeline: "so.sprk.story.getTimeline",
+  SoSprkStoryGetArchive: "so.sprk.story.getArchive",
   SoSprkStoryGetStories: "so.sprk.story.getStories",
   SoSprkStoryPost: "so.sprk.story.post",
   SoSprkLabelerDefs: "so.sprk.labeler.defs",

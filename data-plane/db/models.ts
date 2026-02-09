@@ -107,6 +107,20 @@ export interface RecordDocument extends Document {
   takedownRef: string;
   invalidReplyRoot?: boolean;
 }
+
+export interface ArchivedRecordDocument extends Document {
+  uri: string;
+  cid: string;
+  did: string;
+  collectionName: string;
+  rkey: string;
+  createdAt: string;
+  indexedAt: string;
+  json: string;
+  archivedAt: string;
+  deleteReason: "user_delete" | "takedown";
+  takedownRef?: string;
+}
 export const recordSchema = new Schema<RecordDocument>({
   uri: { type: String, required: true, unique: true, index: true },
   cid: { type: String, required: true },
@@ -120,6 +134,25 @@ export const recordSchema = new Schema<RecordDocument>({
   takedownRef: { type: String, required: false },
   invalidReplyRoot: { type: Boolean, required: false },
 });
+
+export const archivedRecordSchema = new Schema<ArchivedRecordDocument>({
+  uri: { type: String, required: true, unique: true, index: true },
+  cid: { type: String, required: true },
+  did: { type: String, required: true, index: true },
+  collectionName: { type: String, required: true, index: true },
+  rkey: { type: String, required: true },
+  createdAt: { type: String, required: true },
+  indexedAt: { type: String, required: true },
+  json: { type: String, required: true },
+  archivedAt: { type: String, required: true },
+  deleteReason: {
+    type: String,
+    required: true,
+    enum: ["user_delete", "takedown"],
+  },
+  takedownRef: { type: String, required: false },
+})
+  .index({ did: 1, collectionName: 1, indexedAt: -1 });
 
 // duplicate records
 
@@ -354,7 +387,6 @@ export interface StoryDocument extends AuthoredDocument {
   media: StoryMedia;
   sound?: RecordRef;
   labels?: Label[];
-  archived?: boolean;
 }
 export const storySchema = new Schema<StoryDocument>({
   ...authoredSchema,
@@ -367,7 +399,6 @@ export const storySchema = new Schema<StoryDocument>({
     required: false,
   },
   labels: { type: [Object], required: false, default: [] },
-  archived: { type: Boolean, required: true, default: false },
 })
   .index({ authorDid: 1, createdAt: -1 });
 
@@ -661,6 +692,7 @@ export const pushTokenSchema = new Schema<PushTokenDocument>({
 
 export interface DatabaseModels {
   Record: Model<RecordDocument>;
+  ArchivedRecord: Model<ArchivedRecordDocument>;
   DuplicateRecord: Model<DuplicateRecordDocument>;
   Like: Model<LikeDocument>;
   Post: Model<PostDocument>;

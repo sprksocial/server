@@ -56,6 +56,10 @@ export class Database {
           "Record",
           models.recordSchema,
         ),
+        ArchivedRecord: this.connection.model<models.ArchivedRecordDocument>(
+          "ArchivedRecord",
+          models.archivedRecordSchema,
+        ),
         DuplicateRecord: this.connection.model<models.DuplicateRecordDocument>(
           "DuplicateRecord",
           models.duplicateRecordSchema,

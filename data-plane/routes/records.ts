@@ -60,6 +60,49 @@ export async function getRecords(
   return { records };
 }
 
+export async function getArchivedRecords(
+  db: Database,
+  uris: string[],
+  collection?: string,
+): Promise<{
+  records: Array<Record>;
+}> {
+  const validUris = collection
+    ? uris.filter((uri) => new AtUri(uri).collection === collection)
+    : uris;
+
+  const res = validUris.length
+    ? await db.models.ArchivedRecord.find({
+      uri: { $in: validUris },
+    })
+    : [];
+
+  const byUri = keyBy(res, "uri");
+
+  const records: Record[] = uris.map((uri) => {
+    const row = byUri.get(uri);
+    const createdAt = row?.createdAt
+      ? new Date(row.createdAt).toISOString()
+      : undefined;
+    const indexedAt = row?.indexedAt
+      ? new Date(row.indexedAt).toISOString()
+      : undefined;
+
+    return {
+      record: row?.json ?? JSON.stringify(null),
+      uri,
+      cid: row?.cid,
+      createdAt,
+      indexedAt,
+      sortedAt: compositeTime(createdAt, indexedAt),
+      takenDown: !!row?.takedownRef,
+      takedownRef: row?.takedownRef || undefined,
+    };
+  });
+
+  return { records };
+}
+
 // Helper function to get post records with metadata
 async function getPostRecords(
   db: Database,
@@ -157,6 +200,11 @@ export class Records {
 
   async getStoryRecords(uris: string[]) {
     const result = await getRecords(this.db, uris, ids.SoSprkStoryPost);
+    return result;
+  }
+
+  async getArchivedStoryRecords(uris: string[]) {
+    const result = await getArchivedRecords(this.db, uris, ids.SoSprkStoryPost);
     return result;
   }
 }

@@ -216,6 +216,7 @@ import type * as SoSprkActorSearchActors from "./types/so/sprk/actor/searchActor
 import type * as SoSprkActorGetProfiles from "./types/so/sprk/actor/getProfiles.ts";
 import type * as SoSprkActorGetPreferences from "./types/so/sprk/actor/getPreferences.ts";
 import type * as SoSprkStoryGetTimeline from "./types/so/sprk/story/getTimeline.ts";
+import type * as SoSprkStoryGetArchive from "./types/so/sprk/story/getArchive.ts";
 import type * as SoSprkStoryGetStories from "./types/so/sprk/story/getStories.ts";
 import type * as SoSprkLabelerGetServices from "./types/so/sprk/labeler/getServices.ts";
 import type * as ComAtprotoTempDereferenceScope from "./types/com/atproto/temp/dereferenceScope.ts";
@@ -3313,6 +3314,18 @@ export class SoSprkStoryNS {
     >,
   ) {
     const nsid = "so.sprk.story.getTimeline"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getArchive<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      SoSprkStoryGetArchive.QueryParams,
+      SoSprkStoryGetArchive.HandlerInput,
+      SoSprkStoryGetArchive.HandlerOutput
+    >,
+  ) {
+    const nsid = "so.sprk.story.getArchive"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
