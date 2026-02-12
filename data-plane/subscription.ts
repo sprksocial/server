@@ -4,7 +4,6 @@ import { Event as FirehoseEvent, Firehose, MemoryRunner } from "@atp/sync";
 import { BackgroundQueue } from "./background.ts";
 import { Database } from "./db/index.ts";
 import { IndexingService } from "./indexing/index.ts";
-import { getLogger, Logger } from "@logtape/logtape";
 import { ServerConfig } from "../config.ts";
 import { PushService } from "../utils/push.ts";
 import { PushTokens } from "./routes/push-tokens.ts";
@@ -14,7 +13,6 @@ export class RepoSubscription {
   runner: MemoryRunner;
   background: BackgroundQueue;
   indexingSvc: IndexingService;
-  logger: Logger;
   pushService: PushService;
   private firehoseRunning = false;
 
@@ -27,8 +25,7 @@ export class RepoSubscription {
     },
   ) {
     const { db, idResolver, startCursor, cfg } = opts;
-    this.logger = getLogger(["appview", "subscription"]);
-    this.background = new BackgroundQueue(db, this.logger);
+    this.background = new BackgroundQueue(db);
 
     // Create push service (FCM handles both iOS and Android)
     const pushTokens = new PushTokens(db);
@@ -49,7 +46,6 @@ export class RepoSubscription {
       idResolver,
       service: cfg.relayUrl,
       indexingSvc: this.indexingSvc,
-      logger: this.logger,
       db,
       startCursor,
     });
@@ -58,7 +54,7 @@ export class RepoSubscription {
   }
 
   start() {
-    this.logger.info("Starting firehose subscription");
+    console.info("Starting firehose subscription");
     this.firehoseRunning = true;
     this.firehose.start();
   }
@@ -74,7 +70,6 @@ export class RepoSubscription {
       idResolver: this.opts.idResolver,
       service: this.opts.cfg.relayUrl,
       indexingSvc: this.indexingSvc,
-      logger: this.logger,
       db: this.opts.db,
       startCursor,
     });
@@ -94,7 +89,7 @@ export class RepoSubscription {
         await this.firehose.destroy();
         this.firehoseRunning = false;
       }
-      this.logger.info("Processing remaining runner tasks...");
+      console.info("Processing remaining runner tasks...");
       if (this.opts.cfg.debugMode) {
         const timeoutMs = 10000;
         // Runner destroy with timeout and proper timer cleanup
@@ -108,7 +103,7 @@ export class RepoSubscription {
           });
           await Promise.race([this.runner.destroy(), timeoutPromise]);
         } catch (e) {
-          this.logger.warn("Runner destroy timed out; continuing shutdown", {
+          console.warn("Runner destroy timed out; continuing shutdown", {
             e,
           });
         } finally {
@@ -128,7 +123,7 @@ export class RepoSubscription {
           });
           await Promise.race([this.background.processAll(), timeoutPromise]);
         } catch (e) {
-          this.logger.warn("Runner destroy timed out; continuing shutdown", {
+          console.warn("Runner destroy timed out; continuing shutdown", {
             e,
           });
         } finally {
@@ -142,7 +137,7 @@ export class RepoSubscription {
         await this.background.processAll();
       }
     } catch (error) {
-      this.logger.error("Error during subscription destroy", { error });
+      console.error("Error during subscription destroy", { error });
       throw error;
     }
   }
@@ -152,25 +147,24 @@ function createFirehose(opts: {
   idResolver: IdResolver;
   service?: string;
   indexingSvc: IndexingService;
-  logger: Logger;
   db: Database;
   startCursor?: number;
 }): { firehose: Firehose; runner: MemoryRunner } {
-  const { idResolver, service, indexingSvc, logger, db, startCursor } = opts;
+  const { idResolver, service, indexingSvc, db, startCursor } = opts;
 
   const runner = new MemoryRunner({
     startCursor,
     setCursorInterval: 30000, // Save cursor every 30 seconds
     setCursor: async (cursor: number) => {
       await db.saveCursorState(cursor);
-      logger.info("Cursor saved to database", { cursor });
+      console.info("Cursor saved to database", { cursor });
     },
   });
   const firehose = new Firehose({
     idResolver,
     runner,
     service,
-    onError: (err: Error) => logger.error("error in subscription", { err }),
+    onError: (err: Error) => console.error("error in subscription", { err }),
     handleEvent: async (evt: FirehoseEvent) => {
       if (evt.event === "identity") {
         await indexingSvc.indexHandle(evt.did, evt.time, true);

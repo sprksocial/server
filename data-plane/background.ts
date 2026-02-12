@@ -1,6 +1,5 @@
 import PQueue from "p-queue";
 import { Database } from "./db/index.ts";
-import { Logger } from "@logtape/logtape";
 
 // A simple queue for in-process, out-of-band/backgrounded work
 
@@ -10,7 +9,7 @@ export class BackgroundQueue {
   private processAllInterval: number | null = null;
   private isProcessingAll = false;
 
-  constructor(public db: Database, public logger: Logger) {}
+  constructor(public db: Database) {}
 
   add(task: Task) {
     if (this.destroyed) {
@@ -23,7 +22,7 @@ export class BackgroundQueue {
         if (
           err.message?.includes("Client must be connected") && this.destroyed
         ) {
-          this.logger.debug(
+          console.debug(
             "Ignoring MongoDB connection error during shutdown",
             { err: err.message },
           );
@@ -33,14 +32,14 @@ export class BackgroundQueue {
         // Check for MongoDB duplicate key errors
         const mongoError = err as { code?: number };
         if (mongoError.code === 11000) {
-          this.logger.warn(
+          console.warn(
             "Ignoring duplicate key error in background task",
             { err: err.message },
           );
           return;
         }
 
-        this.logger.error("background queue task failed", { err });
+        console.error("background queue task failed", { err });
       });
   }
 
@@ -73,7 +72,7 @@ export class BackgroundQueue {
 
       await Promise.race([processPromise, timeoutPromise]);
     } catch (error) {
-      this.logger.error(
+      console.error(
         "Background queue processing failed or timed out",
         { error },
       );

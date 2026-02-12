@@ -6,7 +6,6 @@ import { createApp } from "../main.ts";
 import { AppContext, AppEnv } from "../context.ts";
 import { Database } from "../data-plane/db/index.ts";
 import { createAuthVerifier } from "../auth-verifier.ts";
-import { getLogger } from "@logtape/logtape";
 import { DataPlane } from "../data-plane/index.ts";
 import { Hydrator } from "../hydration/index.ts";
 import { Views } from "../views/index.ts";
@@ -265,7 +264,6 @@ export function createMockContext(
   configOverrides: Partial<ServerConfigValues> = {},
 ): AppContext {
   const cfg = new ServerConfig({ ...DEFAULT_TEST_CONFIG, ...configOverrides });
-  const appLogger = getLogger(["appview"]);
   const idResolver = new IdResolver();
 
   // Create mock database that doesn't actually connect
@@ -298,7 +296,6 @@ export function createMockContext(
     dataplane,
     hydrator,
     views,
-    logger: appLogger,
     idResolver,
     cfg,
     authVerifier,
@@ -319,7 +316,6 @@ export async function createTestContext(
 ): Promise<{ ctx: AppContext; cleanup: () => Promise<void> }> {
   const testDb = await createTestDatabase(options);
   const cfg = new ServerConfig({ ...DEFAULT_TEST_CONFIG, ...configOverrides });
-  const appLogger = getLogger(["appview"]);
   const idResolver = new IdResolver();
 
   // Create a wrapper Database object that uses the test connection and models
@@ -327,7 +323,6 @@ export async function createTestContext(
     connection: testDb.connection,
     models: testDb.models,
     idResolver,
-    logger: getLogger(["appview", "database"]),
     connect: () => Promise.resolve(),
     disconnect: async () => {
       await testDb.cleanup();
@@ -381,7 +376,6 @@ export async function createTestContext(
     dataplane,
     hydrator,
     views,
-    logger: appLogger,
     idResolver,
     cfg,
     authVerifier,

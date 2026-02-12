@@ -27,7 +27,6 @@ import * as Story from "./plugins/story.ts";
 import * as Audio from "./plugins/audio.ts";
 import * as Labeler from "./plugins/labeler.ts";
 import { RecordProcessor } from "./processor.ts";
-import { getLogger, Logger } from "@logtape/logtape";
 import { ServerConfig } from "../../config.ts";
 import { PushService } from "../../utils/push.ts";
 
@@ -45,7 +44,6 @@ export class IndexingService {
     audio: Audio.PluginType;
     labeler: Labeler.PluginType;
   };
-  logger: Logger;
   private pushService?: PushService;
 
   constructor(
@@ -55,7 +53,6 @@ export class IndexingService {
     public background: BackgroundQueue,
     pushService?: PushService,
   ) {
-    this.logger = getLogger(["appview", "indexer"]);
     this.pushService = pushService;
     this.records = {
       post: Post.makePlugin(this.db, this.background),
@@ -143,7 +140,7 @@ export class IndexingService {
       );
     } catch (err) {
       // Log the error but don't throw - this prevents the firehose from crashing
-      this.logger.warn(
+      console.warn(
         "Failed to index handle, skipping",
         { err, did, timestamp },
       );
@@ -157,7 +154,7 @@ export class IndexingService {
           { upsert: true, new: true },
         );
       } catch (dbErr) {
-        this.logger.error(
+        console.error(
           "Failed to update actor record after handle resolution failure",
           { err: dbErr, did },
         );
@@ -170,7 +167,7 @@ export class IndexingService {
 
     const actorExists = await this.db.models.Actor.findOne({ did }).lean();
     if (!actorExists) {
-      this.logger.info(
+      console.info(
         `indexRepo: No actor record found for ${did}, indexing handle first`,
       );
       await this.indexHandle(did, now);
@@ -192,7 +189,7 @@ export class IndexingService {
     const repoRecords = formatCheckout(did, verifiedRepo);
     const diff = findDiffFromCheckout(currRecords, repoRecords);
 
-    this.logger.info(`Indexing ${diff.length} records for ${did}:`);
+    console.info(`Indexing ${diff.length} records for ${did}:`);
 
     await Promise.all(
       diff.map(async (op) => {
@@ -212,12 +209,12 @@ export class IndexingService {
           }
         } catch (err) {
           if (err instanceof ValidationError) {
-            this.logger.warn(
+            console.warn(
               "skipping indexing of invalid record",
               { did, commit, uri: uri.toString(), cid: cid.toString() },
             );
           } else {
-            this.logger.error(
+            console.error(
               "skipping indexing due to error processing record",
               { err, did, commit, uri: uri.toString(), cid: cid.toString() },
             );
@@ -304,7 +301,7 @@ export class IndexingService {
         return null;
       }
     } catch (err) {
-      this.logger.warn(
+      console.warn(
         "Failed to check if actor is hosted, assuming not hosted",
         { err, did },
       );

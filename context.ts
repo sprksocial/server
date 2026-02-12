@@ -1,4 +1,3 @@
-import { Logger } from "@logtape/logtape";
 import { Database } from "./data-plane/db/index.ts";
 import { DataPlane } from "./data-plane/index.ts";
 import { Hydrator } from "./hydration/index.ts";
@@ -14,7 +13,6 @@ export type AppContext = {
   dataplane: DataPlane;
   hydrator: Hydrator;
   views: Views;
-  logger: Logger;
   idResolver: IdResolver;
   authVerifier: AuthVerifier;
   cfg: ServerConfig;

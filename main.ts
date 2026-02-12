@@ -9,16 +9,12 @@ import wellKnown from "./api/well-known.ts";
 import health from "./api/health.ts";
 import { IdResolver, MemoryCache } from "@atp/identity";
 import { DataPlane } from "./data-plane/index.ts";
-import { getLogger } from "@logtape/logtape";
-import { configureLogger } from "./utils/logger.ts";
 import { Hydrator } from "./hydration/index.ts";
 import { Views } from "./views/index.ts";
 import { AppContext, AppEnv } from "./context.ts";
 import { ServerConfig } from "./config.ts";
 import { defaultLabelerHeader, parseLabelerHeader } from "./util.ts";
 import { PushService } from "./utils/push.ts";
-
-await configureLogger();
 
 // Create app without starting services
 export function createApp(ctx: AppContext): Hono<AppEnv> {
@@ -44,8 +40,6 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
 
 // Setup function to create context and app
 export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
-  // Setup logger and database
-  const appLogger = getLogger(["appview"]);
   const cfg = ServerConfig.readEnv();
   const db = new Database(cfg);
   db.connect();
@@ -90,7 +84,6 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
     dataplane,
     hydrator,
     views,
-    logger: appLogger,
     idResolver,
     cfg,
     authVerifier,
@@ -111,20 +104,20 @@ export function startServer() {
   Deno.serve({
     port,
     onListen: (info) => {
-      ctx.logger.info(`Server listening on ${info.hostname}:${info.port}`);
+      console.info(`Server listening on ${info.hostname}:${info.port}`);
     },
   }, app.fetch);
 
   // Handle shutdown
   const shutdown = async (signal: string) => {
-    ctx.logger.info(`Received ${signal}; shutting down...`);
+    console.info(`Received ${signal}; shutting down...`);
     try {
-      ctx.logger.info("Disconnecting database...");
+      console.info("Disconnecting database...");
       await ctx.db.disconnect();
     } catch (err) {
-      ctx.logger.error("Error disconnecting database during shutdown", { err });
+      console.error("Error disconnecting database during shutdown", { err });
     }
-    ctx.logger.info("Shutdown complete");
+    console.info("Shutdown complete");
     Deno.exit(0);
   };
 

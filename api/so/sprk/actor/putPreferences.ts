@@ -131,7 +131,7 @@ export default function (server: Server, ctx: AppContext) {
 
         return;
       } catch (error) {
-        ctx.logger.error("Failed to put preferences", { error, userDid });
+        console.error("Failed to put preferences", { error, userDid });
         throw error;
       }
     },

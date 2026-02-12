@@ -2,12 +2,7 @@ import { RepoSubscription } from "./data-plane/subscription.ts";
 import { IdResolver } from "@atp/identity";
 import { ServerConfig } from "./config.ts";
 import { Database } from "./data-plane/db/index.ts";
-import { getLogger } from "@logtape/logtape";
-import { configureLogger } from "./utils/logger.ts";
 
-await configureLogger();
-
-const logger = getLogger(["ingester"]);
 const cfg = ServerConfig.readEnv();
 
 const idResolver = new IdResolver({ plcUrl: cfg.plcUrl });
@@ -25,4 +20,4 @@ const sub = new RepoSubscription({
 });
 
 sub.start();
-logger.info("Subscription started");
+console.info("Subscription started");

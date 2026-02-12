@@ -2,7 +2,6 @@ import mongoose, { Connection } from "mongoose";
 import { IdResolver, MemoryCache } from "@atp/identity";
 import * as models from "./models.ts";
 import { getResultFromDoc } from "../util.ts";
-import { getLogger } from "@logtape/logtape";
 import { ServerConfig } from "../../config.ts";
 
 const HOUR = 60 * 60 * 1000;
@@ -11,7 +10,7 @@ const DAY = HOUR * 24;
 export class Database {
   private connection!: Connection;
   public models!: models.DatabaseModels;
-  public logger = getLogger(["appview", "database"]);
+
   public idResolver: IdResolver;
 
   constructor(private cfg: ServerConfig) {
@@ -28,7 +27,7 @@ export class Database {
     if (!uri) {
       throw new Error("No database URI provided");
     }
-    this.logger.info(`Connecting to ${uri}`);
+    console.info(`Connecting to ${uri}`);
 
     try {
       this.connection = mongoose.createConnection(uri, {
@@ -41,13 +40,13 @@ export class Database {
 
       // Attach basic listeners for visibility
       this.connection.on("connected", () => {
-        this.logger.info("MongoDB connection established");
+        console.info("MongoDB connection established");
       });
       this.connection.on("disconnected", () => {
-        this.logger.warn("MongoDB connection disconnected");
+        console.warn("MongoDB connection disconnected");
       });
       this.connection.on("error", (err) => {
-        this.logger.error("MongoDB connection error", { err });
+        console.error("MongoDB connection error", { err });
       });
 
       // Initialize models
@@ -150,9 +149,9 @@ export class Database {
         ),
       };
 
-      this.logger.info("Started connection to MongoDB");
+      console.info("Started connection to MongoDB");
     } catch (error) {
-      this.logger.error("Failed to start connection to MongoDB", { error });
+      console.error("Failed to start connection to MongoDB", { error });
       throw error;
     }
   }
@@ -160,7 +159,7 @@ export class Database {
   async disconnect(): Promise<void> {
     if (this.connection) {
       await this.connection.close();
-      this.logger.info("Disconnected from MongoDB");
+      console.info("Disconnected from MongoDB");
     }
   }
 
@@ -177,7 +176,7 @@ export class Database {
     try {
       return await this.idResolver.handle.resolve(handle);
     } catch (err) {
-      this.logger.error("Failed to resolve handle", { err, handle });
+      console.error("Failed to resolve handle", { err, handle });
       return undefined;
     }
   }
@@ -192,7 +191,7 @@ export class Database {
         handle: data.handle,
       };
     } catch (err) {
-      this.logger.error("Failed to resolve DID", { err, did });
+      console.error("Failed to resolve DID", { err, did });
       return undefined;
     }
   }
@@ -215,7 +214,7 @@ export class Database {
       });
       return cursorState?.cursorValue || null;
     } catch (error) {
-      this.logger.error("Failed to get cursor state", { error });
+      console.error("Failed to get cursor state", { error });
       return null;
     }
   }
@@ -231,7 +230,7 @@ export class Database {
         { upsert: true },
       );
     } catch (error) {
-      this.logger.error(
+      console.error(
         "Failed to save cursor state",
         { error, cursorPosition },
       );

@@ -48,7 +48,7 @@ import {
   RecordInfo,
   urisByCollection,
 } from "./util.ts";
-import { getLogger } from "@logtape/logtape";
+
 import {
   LabelerAggs,
   Labelers,
@@ -143,8 +143,6 @@ export type FollowBlocks = HydrationMap<FollowBlock>;
 
 export type BidirectionalBlocks = HydrationMap<HydrationMap<boolean>>;
 
-const hydrationLogger = getLogger(["appview", "hydrator"]);
-
 export class Hydrator {
   actor: ActorHydrator;
   feed: FeedHydrator;
@@ -237,7 +235,7 @@ export class Hydrator {
     try {
       knownFollowers = await this.actor.getKnownFollowers(dids, ctx.viewer);
     } catch (err) {
-      hydrationLogger.error(
+      console.error(
         "Failed to get known followers for profiles",
         { err },
       );

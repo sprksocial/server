@@ -1,6 +1,5 @@
 import { IdResolver } from "@atp/identity";
 import { Database } from "./db/index.ts";
-import { getLogger, Logger } from "@logtape/logtape";
 import { Blocks } from "./routes/blocks.ts";
 import { FeedGens } from "./routes/feed-gens.ts";
 import { Feeds } from "./routes/feeds.ts";
@@ -32,7 +31,6 @@ export type ServerContext = {
 
 export class DataPlane {
   private db: Database;
-  public logger: Logger;
   private idResolver?: IdResolver;
 
   // Route handlers as root-level properties
@@ -64,7 +62,6 @@ export class DataPlane {
   ) {
     this.db = db;
     this.idResolver = idResolver;
-    this.logger = getLogger(["appview", "data-plane"]);
 
     // Initialize all route handlers
     this.blocks = new Blocks(db);

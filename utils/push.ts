@@ -1,4 +1,3 @@
-import { getLogger, Logger } from "@logtape/logtape";
 import { jsonStringToLex } from "@atp/lexicon";
 import { PushToken, PushTokens } from "../data-plane/routes/push-tokens.ts";
 import { Database } from "../data-plane/db/index.ts";
@@ -23,7 +22,6 @@ interface FcmServiceAccount {
 }
 
 export class PushService {
-  private logger: Logger;
   private pushTokens: PushTokens;
   private db: Database;
   private config: PushConfig;
@@ -32,7 +30,6 @@ export class PushService {
   private fcmServiceAccount: FcmServiceAccount | null = null;
 
   constructor(pushTokens: PushTokens, db: Database, config: PushConfig) {
-    this.logger = getLogger(["appview", "push"]);
     this.pushTokens = pushTokens;
     this.db = db;
     this.config = config;
@@ -41,7 +38,7 @@ export class PushService {
       try {
         this.fcmServiceAccount = JSON.parse(config.fcmServiceAccount);
       } catch {
-        this.logger.error("Failed to parse FCM service account JSON");
+        console.error("Failed to parse FCM service account JSON");
       }
     }
   }
@@ -72,7 +69,7 @@ export class PushService {
           invalidTokens.push(token.token);
         }
       } catch (err) {
-        this.logger.error("Failed to send push notification", {
+        console.error("Failed to send push notification", {
           err,
           platform: token.platform,
           did,
@@ -83,7 +80,7 @@ export class PushService {
     // Clean up invalid tokens
     if (invalidTokens.length > 0) {
       await this.pushTokens.deleteInvalidTokens(invalidTokens);
-      this.logger.info("Removed invalid push tokens", {
+      console.info("Removed invalid push tokens", {
         count: invalidTokens.length,
       });
     }
@@ -117,7 +114,7 @@ export class PushService {
           invalidTokens.push(token.token);
         }
       } catch (err) {
-        this.logger.error("Failed to send badge reset", {
+        console.error("Failed to send badge reset", {
           err,
           did,
         });
@@ -148,7 +145,7 @@ export class PushService {
       const count = await this.db.models.Notification.countDocuments(filter);
       return count;
     } catch (err) {
-      this.logger.error("Failed to get unread count", { err, did });
+      console.error("Failed to get unread count", { err, did });
       return 1; // Default to 1 if we can't get the count
     }
   }
@@ -213,7 +210,7 @@ export class PushService {
         ) {
           return false;
         }
-        this.logger.error("Badge reset FCM request failed", {
+        console.error("Badge reset FCM request failed", {
           error,
           status: response.status,
         });
@@ -221,7 +218,7 @@ export class PushService {
 
       return true;
     } catch (err) {
-      this.logger.error("Badge reset FCM request error", { err });
+      console.error("Badge reset FCM request error", { err });
       return true;
     }
   }
@@ -232,7 +229,7 @@ export class PushService {
     badgeCount: number,
   ): Promise<boolean> {
     if (!this.fcmServiceAccount) {
-      this.logger.warn("FCM service account not configured");
+      console.warn("FCM service account not configured");
       return true; // Don't mark as invalid if not configured
     }
 
@@ -306,7 +303,7 @@ export class PushService {
         ) {
           return false; // Mark as invalid
         }
-        this.logger.error("FCM request failed", {
+        console.error("FCM request failed", {
           error,
           status: response.status,
         });
@@ -314,7 +311,7 @@ export class PushService {
 
       return true;
     } catch (err) {
-      this.logger.error("FCM request error", { err });
+      console.error("FCM request error", { err });
       return true; // Don't mark as invalid on network errors
     }
   }
@@ -465,7 +462,7 @@ export class PushService {
       });
 
       if (!response.ok) {
-        this.logger.error("Failed to get FCM access token", {
+        console.error("Failed to get FCM access token", {
           status: response.status,
         });
         return null;
@@ -477,7 +474,7 @@ export class PushService {
 
       return this.fcmAccessToken;
     } catch (err) {
-      this.logger.error("Error getting FCM access token", { err });
+      console.error("Error getting FCM access token", { err });
       return null;
     }
   }
