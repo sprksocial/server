@@ -32,9 +32,9 @@ const insertFn = async (
 
   // Use findOneAndUpdate with upsert to handle potential duplicate key errors
   const insertedAudio = await db.models.Audio.findOneAndUpdate(
-    { uri: audio.uri },
+    { uri: uri.toString() },
     { $set: audio },
-    { upsert: true, new: true },
+    { upsert: true, new: true, includeResultMetadata: false },
   );
   return insertedAudio;
 };

@@ -1,6 +1,6 @@
 import { ensureValidRecordKey } from "@atp/syntax";
 import { InvalidRequestError } from "@atp/xrpc-server";
-import { Document, FilterQuery, Query } from "mongoose";
+import { Document, Query, QueryFilter } from "mongoose";
 
 type KeysetCursor = { primary: string; secondary: string };
 type KeysetLabeledResult = {
@@ -71,7 +71,7 @@ export abstract class GenericKeyset<R, LR extends KeysetLabeledResult> {
   getFilter<T>(
     labeled?: LR,
     direction?: "asc" | "desc",
-  ): FilterQuery<T> | undefined {
+  ): QueryFilter<T> | undefined {
     if (labeled === undefined) return undefined;
 
     // MongoDB compound key comparison using $or
@@ -84,7 +84,7 @@ export abstract class GenericKeyset<R, LR extends KeysetLabeledResult> {
             [this.secondary]: { $gt: labeled.secondary },
           },
         ],
-      } as FilterQuery<T>;
+      } as QueryFilter<T>;
     } else {
       return {
         $or: [
@@ -94,7 +94,7 @@ export abstract class GenericKeyset<R, LR extends KeysetLabeledResult> {
             [this.secondary]: { $lt: labeled.secondary },
           },
         ],
-      } as FilterQuery<T>;
+      } as QueryFilter<T>;
     }
   }
   paginate<T extends Document>(
@@ -274,12 +274,12 @@ export abstract class GenericSingleKey<R, LR extends SingleKeyLabeledResult> {
   getFilter<T>(
     labeled?: LR,
     direction?: "asc" | "desc",
-  ): FilterQuery<T> | undefined {
+  ): QueryFilter<T> | undefined {
     if (labeled === undefined) return undefined;
     if (direction === "asc") {
-      return { [this.primary]: { $gt: labeled.primary } } as FilterQuery<T>;
+      return { [this.primary]: { $gt: labeled.primary } } as QueryFilter<T>;
     }
-    return { [this.primary]: { $lt: labeled.primary } } as FilterQuery<T>;
+    return { [this.primary]: { $lt: labeled.primary } } as QueryFilter<T>;
   }
   paginate<T extends Document>(
     query: Query<T[], T>,

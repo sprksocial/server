@@ -1,4 +1,4 @@
-import { Document, Model, Schema } from "mongoose";
+import { Model, Schema } from "mongoose";
 
 interface RecordRef {
   uri: string;
@@ -23,7 +23,7 @@ function addAuthor(schema: Schema) {
 }
 
 // Base interface for documents with authorDid
-interface AuthoredDocument extends Document {
+interface AuthoredDocument {
   uri: string;
   cid: string;
   createdAt: string;
@@ -43,6 +43,8 @@ export const authoredSchema = {
 export interface MediaRef {
   $type: string;
   ref: { $link: string };
+  mimeType?: string;
+  size?: number;
 }
 export interface ImageMedia extends MediaRef {
   alt: string;
@@ -86,6 +88,11 @@ export interface StoryMedia {
   $type: string;
   video?: VideoMedia;
   image?: ImageMedia;
+  alt?: string;
+  aspectRatio?: {
+    width: number;
+    height: number;
+  };
 }
 export interface Caption {
   text: string;
@@ -94,7 +101,7 @@ export interface Caption {
 
 // records
 
-export interface RecordDocument extends Document {
+export interface RecordDocument {
   uri: string;
   cid: string;
   did: string;
@@ -108,7 +115,7 @@ export interface RecordDocument extends Document {
   invalidReplyRoot?: boolean;
 }
 
-export interface ArchivedRecordDocument extends Document {
+export interface ArchivedRecordDocument {
   uri: string;
   cid: string;
   did: string;
@@ -156,7 +163,7 @@ export const archivedRecordSchema = new Schema<ArchivedRecordDocument>({
 
 // duplicate records
 
-export interface DuplicateRecordDocument extends Document {
+export interface DuplicateRecordDocument {
   uri: string;
   cid: string;
   duplicateOf: string;
@@ -171,7 +178,7 @@ export const duplicateRecordSchema = new Schema<DuplicateRecordDocument>({
 
 // actor sync
 
-export interface ActorSyncDocument extends Document {
+export interface ActorSyncDocument {
   did: string;
   commitCid: string;
   repoRev: string | null;
@@ -348,7 +355,7 @@ export interface ReplyDocument extends AuthoredDocument {
     root: RecordRef;
     parent: RecordRef;
   };
-  media?: ImageMedia;
+  media?: ImageMedia | { images?: ImageMedia[]; [key: string]: unknown };
   langs?: string[];
   labels?: Label[];
   likeCount: number;
@@ -436,7 +443,7 @@ export const labelerSchema = new Schema<LabelerDocument>({
 
 // labels
 
-export interface LabelDocument extends Document {
+export interface LabelDocument {
   src: string;
   uri: string;
   cid: string;
@@ -460,7 +467,7 @@ export const labelSchema = new Schema<LabelDocument>({
 
 // takedowns
 
-export interface TakedownDocument extends Document {
+export interface TakedownDocument {
   targetUri: string;
   targetCid: string;
   reason: string;
@@ -481,7 +488,7 @@ export const takedownSchema = new Schema<TakedownDocument>({
 
 // repo takedowns
 
-export interface RepoTakedownDocument extends Document {
+export interface RepoTakedownDocument {
   did: string;
   reason: string;
   takenDownBy: string;
@@ -500,7 +507,7 @@ export const repoTakedownSchema = new Schema<RepoTakedownDocument>({
 
 // blobs takedowns
 
-export interface BlobTakedownDocument extends Document {
+export interface BlobTakedownDocument {
   did: string;
   cid: string;
   reason: string;
@@ -522,7 +529,7 @@ export const blobTakedownSchema = new Schema<BlobTakedownDocument>({
 
 // actors
 
-export interface ActorDocument extends Document {
+export interface ActorDocument {
   did: string;
   handle: string | null;
   indexedAt: string;
@@ -545,7 +552,7 @@ export const actorSchema = new Schema<ActorDocument>({
 
 // preferences
 
-export interface PreferenceDocument extends Document {
+export interface PreferenceDocument {
   userDid: string;
   contentLabelPrefs?: Array<{
     labelerDid?: string;
@@ -619,7 +626,7 @@ export const preferenceSchema = new Schema<PreferenceDocument>({
 
 // cursor state
 
-export interface CursorStateDocument extends Document {
+export interface CursorStateDocument {
   identifier: string; // To ensure a single document, e.g., 'last_processed_cursor'
   cursorValue: number;
   updatedAt: Date;
@@ -632,7 +639,7 @@ export const cursorStateSchema = new Schema<CursorStateDocument>({
 
 // notifications
 
-export interface NotificationDocument extends Document {
+export interface NotificationDocument {
   did: string;
   recordUri: string;
   recordCid: string;
@@ -655,7 +662,7 @@ export const notificationSchema = new Schema<NotificationDocument>({
 
 // push tokens
 
-export interface PushTokenDocument extends Document {
+export interface PushTokenDocument {
   did: string;
   token: string;
   platform: "ios" | "android" | "web";

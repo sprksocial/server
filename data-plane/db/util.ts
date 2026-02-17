@@ -1,17 +1,17 @@
-import { FilterQuery } from "mongoose";
+import { QueryFilter } from "mongoose";
 
 // MongoDB query builder for actor matching (DID or handle)
-export const actorFilter = <T>(actor: string): FilterQuery<T> => {
+export const actorFilter = <T>(actor: string): QueryFilter<T> => {
   if (actor.startsWith("did:")) {
-    return { did: actor } as FilterQuery<T>;
+    return { did: actor } as QueryFilter<T>;
   } else {
-    return { handle: actor } as FilterQuery<T>;
+    return { handle: actor } as QueryFilter<T>;
   }
 };
 
 // Filter for documents that are not soft deleted
-export const notSoftDeletedFilter = <T>(): FilterQuery<T> => {
-  return { takedownRef: { $exists: false } } as FilterQuery<T>;
+export const notSoftDeletedFilter = <T>(): QueryFilter<T> => {
+  return { takedownRef: { $exists: false } } as QueryFilter<T>;
 };
 
 // Check if a document is soft deleted
@@ -26,14 +26,14 @@ export const dateRangeFilter = <T>(
   field: string,
   start?: Date,
   end?: Date,
-): FilterQuery<T> => {
+): QueryFilter<T> => {
   const filter: Record<string, unknown> = {};
   if (start || end) {
     filter[field] = {};
     if (start) (filter[field] as Record<string, unknown>).$gte = start;
     if (end) (filter[field] as Record<string, unknown>).$lte = end;
   }
-  return filter as FilterQuery<T>;
+  return filter as QueryFilter<T>;
 };
 
 // Helper for pagination
@@ -45,11 +45,11 @@ export interface PaginationOptions {
 
 // Helper for creating compound filters
 export const andFilter = <T>(
-  ...filters: FilterQuery<T>[]
-): FilterQuery<T> => ({
+  ...filters: QueryFilter<T>[]
+): QueryFilter<T> => ({
   $and: filters.filter((f) => Object.keys(f).length > 0),
-} as FilterQuery<T>);
+} as QueryFilter<T>);
 
-export const orFilter = <T>(...filters: FilterQuery<T>[]): FilterQuery<T> => ({
+export const orFilter = <T>(...filters: QueryFilter<T>[]): QueryFilter<T> => ({
   $or: filters.filter((f) => Object.keys(f).length > 0),
-} as FilterQuery<T>);
+} as QueryFilter<T>);
