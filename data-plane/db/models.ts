@@ -282,6 +282,7 @@ export interface PostDocument extends AuthoredDocument {
   langs?: string[];
   labels?: Label[];
   tags?: string[];
+  crossposts?: RecordRef[];
   likeCount: number;
   replyCount: number;
   repostCount: number;
@@ -306,6 +307,7 @@ export const postSchema = new Schema<PostDocument>({
   langs: { type: [String], required: false, default: [] },
   labels: { type: [Object], required: false, default: [] },
   tags: { type: [String], required: false, default: [] },
+  crossposts: { type: [Object], required: false, default: [] },
   likeCount: { type: Number, required: true, default: 0 },
   replyCount: { type: Number, required: true, default: 0 },
   repostCount: { type: Number, required: true, default: 0 },
@@ -325,6 +327,7 @@ export interface ReplyDocument extends AuthoredDocument {
   media?: ImageMedia | { images?: ImageMedia[]; [key: string]: unknown };
   langs?: string[];
   labels?: Label[];
+  invalidReplyRoot?: boolean;
   likeCount: number;
   replyCount: number;
 }
@@ -348,6 +351,51 @@ export const replySchema = new Schema<ReplyDocument>({
   media: { type: Object, required: false },
   langs: { type: [String], required: false, default: [] },
   labels: { type: [Object], required: false, default: [] },
+  invalidReplyRoot: { type: Boolean, required: false },
+  likeCount: { type: Number, required: true, default: 0 },
+  replyCount: { type: Number, required: true, default: 0 },
+})
+  .index({ reply: 1, createdAt: -1 })
+  .index({ "reply.parent.uri": 1, authorDid: 1 })
+  .index({ "reply.root.uri": 1, createdAt: -1 });
+
+// crosspost replies
+
+export interface CrosspostReplyDocument extends AuthoredDocument {
+  text?: string;
+  facets?: Facet[];
+  reply?: {
+    root: RecordRef;
+    parent: RecordRef;
+  };
+  langs?: string[];
+  labels?: Label[];
+  tags?: string[];
+  invalidReplyRoot?: boolean;
+  likeCount: number;
+  replyCount: number;
+}
+export const crosspostReplySchema = new Schema<CrosspostReplyDocument>({
+  ...authoredSchema,
+  text: { type: String, required: false },
+  facets: { type: [Object], required: false, default: [] },
+  reply: {
+    type: {
+      root: {
+        uri: { type: String, required: true },
+        cid: { type: String, required: true },
+      },
+      parent: {
+        uri: { type: String, required: true },
+        cid: { type: String, required: true },
+      },
+    },
+    required: false,
+  },
+  langs: { type: [String], required: false, default: [] },
+  labels: { type: [Object], required: false, default: [] },
+  tags: { type: [String], required: false, default: [] },
+  invalidReplyRoot: { type: Boolean, required: false },
   likeCount: { type: Number, required: true, default: 0 },
   replyCount: { type: Number, required: true, default: 0 },
 })
@@ -655,6 +703,7 @@ export const pushTokenSchema = new Schema<PushTokenDocument>({
   likeSchema,
   postSchema,
   replySchema,
+  crosspostReplySchema,
   repostSchema,
   followSchema,
   blockSchema,
@@ -670,6 +719,7 @@ export interface DatabaseModels {
   Like: Model<LikeDocument>;
   Post: Model<PostDocument>;
   Reply: Model<ReplyDocument>;
+  CrosspostReply: Model<CrosspostReplyDocument>;
   Story: Model<StoryDocument>;
   Follow: Model<FollowDocument>;
   Block: Model<BlockDocument>;

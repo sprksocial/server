@@ -1,14 +1,16 @@
 import { IdResolver } from "@atp/identity";
 import { WriteOpAction } from "@atp/repo";
 import { Event as FirehoseEvent, Firehose, MemoryRunner } from "@atp/sync";
-import { BackgroundQueue } from "./background.ts";
-import { Database } from "./db/index.ts";
-import { IndexingService } from "./indexing/index.ts";
-import { ServerConfig } from "../config.ts";
-import { PushService } from "../utils/push.ts";
-import { PushTokens } from "./routes/push-tokens.ts";
+import { BackgroundQueue } from "../background.ts";
+import { Database } from "../db/index.ts";
+import { IndexingService } from "../indexing/index.ts";
+import { ServerConfig } from "../../config.ts";
+import { PushService } from "../../utils/push.ts";
+import { PushTokens } from "../routes/push-tokens.ts";
 
-export class RepoSubscription {
+const CURSOR_STATE_IDENTIFIER = "crosspost_comments_cursor";
+
+export class CrosspostRepoSubscription {
   firehose: Firehose;
   runner: MemoryRunner;
   background: BackgroundQueue;
@@ -27,7 +29,6 @@ export class RepoSubscription {
     const { db, idResolver, startCursor, cfg } = opts;
     this.background = new BackgroundQueue(db);
 
-    // Create push service (FCM handles both iOS and Android)
     const pushTokens = new PushTokens(db);
     this.pushService = new PushService(pushTokens, db, {
       enabled: cfg.pushEnabled,
@@ -42,7 +43,7 @@ export class RepoSubscription {
       this.pushService,
     );
 
-    const { runner, firehose } = createFirehose({
+    const { runner, firehose } = createCrosspostFirehose({
       idResolver,
       service: cfg.relayUrl,
       indexingSvc: this.indexingSvc,
@@ -54,7 +55,7 @@ export class RepoSubscription {
   }
 
   start() {
-    console.info("Starting firehose subscription");
+    console.info("Starting crosspost firehose subscription");
     this.firehoseRunning = true;
     this.firehose.start();
   }
@@ -62,11 +63,12 @@ export class RepoSubscription {
   async restart() {
     await this.destroy();
 
-    // Read fresh cursor from database
-    const savedCursor = await this.opts.db.getCursorState();
+    const savedCursor = await this.opts.db.getCursorState(
+      CURSOR_STATE_IDENTIFIER,
+    );
     const startCursor = savedCursor !== null ? savedCursor : undefined;
 
-    const { runner, firehose } = createFirehose({
+    const { runner, firehose } = createCrosspostFirehose({
       idResolver: this.opts.idResolver,
       service: this.opts.cfg.relayUrl,
       indexingSvc: this.indexingSvc,
@@ -92,7 +94,6 @@ export class RepoSubscription {
       console.info("Processing remaining runner tasks...");
       if (this.opts.cfg.debugMode) {
         const timeoutMs = 10000;
-        // Runner destroy with timeout and proper timer cleanup
         let destroyTimeoutId: number | undefined;
         try {
           const timeoutPromise = new Promise<never>((_, reject) => {
@@ -112,7 +113,7 @@ export class RepoSubscription {
             destroyTimeoutId = undefined;
           }
         }
-        // Background drain with timeout and proper timer cleanup
+
         let bgTimeoutId: number | undefined;
         try {
           const timeoutPromise = new Promise<never>((_, reject) => {
@@ -143,7 +144,7 @@ export class RepoSubscription {
   }
 }
 
-function createFirehose(opts: {
+function createCrosspostFirehose(opts: {
   idResolver: IdResolver;
   service?: string;
   indexingSvc: IndexingService;
@@ -154,58 +155,37 @@ function createFirehose(opts: {
 
   const runner = new MemoryRunner({
     startCursor,
-    setCursorInterval: 30000, // Save cursor every 30 seconds
+    setCursorInterval: 30000,
     setCursor: async (cursor: number) => {
-      await db.saveCursorState(cursor);
-      console.info("Cursor saved to database", { cursor });
+      await db.saveCursorState(cursor, CURSOR_STATE_IDENTIFIER);
+      console.info("Crosspost cursor saved to database", { cursor });
     },
   });
+
   const firehose = new Firehose({
     idResolver,
     runner,
     service,
-    onError: (err: Error) => console.error("error in subscription", { err }),
+    onError: (err: Error) =>
+      console.error("error in crosspost subscription", { err }),
+    excludeAccount: true,
+    excludeIdentity: true,
+    excludeSync: true,
     handleEvent: async (evt: FirehoseEvent) => {
-      if (evt.event === "identity") {
-        await indexingSvc.indexHandle(evt.did, evt.time, true);
-      } else if (evt.event === "account") {
-        if (evt.active === false && evt.status === "deleted") {
-          await indexingSvc.deleteActor(evt.did);
-        } else {
-          await indexingSvc.updateActorStatus(
-            evt.did,
-            evt.active,
-            evt.status,
-          );
-        }
-      } else if (evt.event === "sync") {
-        await Promise.all([
-          indexingSvc.setCommitLastSeen(evt.did, evt.cid, evt.rev),
-          indexingSvc.indexHandle(evt.did, evt.time),
-        ]);
-      } else {
-        const indexFn = evt.event === "delete"
-          ? indexingSvc.deleteRecord(evt.uri)
-          : indexingSvc.indexRecord(
-            evt.uri,
-            evt.cid,
-            evt.record,
-            evt.event === "create"
-              ? WriteOpAction.Create
-              : WriteOpAction.Update,
-            evt.time,
-          );
-
-        await Promise.all([
-          indexFn,
-          indexingSvc.setCommitLastSeen(evt.did, evt.commit, evt.rev),
-          indexingSvc.indexHandle(evt.did, evt.time),
-        ]);
+      if (evt.event === "create" || evt.event === "update") {
+        await indexingSvc.indexRecord(
+          evt.uri,
+          evt.cid,
+          evt.record,
+          evt.event === "create" ? WriteOpAction.Create : WriteOpAction.Update,
+          evt.time,
+        );
+      } else if (evt.event === "delete") {
+        await indexingSvc.deleteRecord(evt.uri);
       }
     },
-    filterCollections: [
-      "so.sprk.*",
-    ],
+    filterCollections: ["app.bsky.feed.post"],
   });
+
   return { firehose, runner };
 }

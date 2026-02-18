@@ -36,6 +36,11 @@
             "maxLength": 8,
             "items": { "type": "string", "maxLength": 640, "maxGraphemes": 64 }
           },
+          "crossposts": {
+            "type": "array",
+            "description": "Records created for external services for this post",
+            "items": { "type": "ref", "ref": "com.atproto.repo.strongRef" }
+          },
           "createdAt": {
             "type": "string",
             "format": "datetime",

@@ -23,11 +23,17 @@ export const getDescendents = async (
   }> = [];
 
   // Get direct replies (depth 1)
-  const directReplies = await db.models.Reply.find({
-    "reply.parent.uri": uri,
-  }).lean();
+  const [directReplies, directCrosspostReplies] = await Promise.all([
+    db.models.Reply.find({
+      "reply.parent.uri": uri,
+    }).lean(),
+    db.models.CrosspostReply.find({
+      "reply.parent.uri": uri,
+    }).lean(),
+  ]);
+  const directChildren = [...directReplies, ...directCrosspostReplies];
 
-  for (const reply of directReplies) {
+  for (const reply of directChildren) {
     descendents.push({
       uri: reply.uri,
       depth: 1,
@@ -39,18 +45,24 @@ export const getDescendents = async (
 
   // Get nested replies (depth > 1)
   if (depth > 1) {
-    const processedUris = new Set(directReplies.map((r) => r.uri));
-    const toProcess = [...directReplies.map((r) => ({ uri: r.uri, depth: 1 }))];
+    const processedUris = new Set(directChildren.map((r) => r.uri));
+    const toProcess = [...directChildren.map((r) => ({ uri: r.uri, depth: 1 }))];
 
     while (toProcess.length > 0) {
       const current = toProcess.shift()!;
       if (current.depth >= depth) continue;
 
-      const nestedReplies = await db.models.Reply.find({
-        "reply.parent.uri": current.uri,
-      }).lean();
+      const [nestedReplies, nestedCrosspostReplies] = await Promise.all([
+        db.models.Reply.find({
+          "reply.parent.uri": current.uri,
+        }).lean(),
+        db.models.CrosspostReply.find({
+          "reply.parent.uri": current.uri,
+        }).lean(),
+      ]);
+      const nestedChildren = [...nestedReplies, ...nestedCrosspostReplies];
 
-      for (const reply of nestedReplies) {
+      for (const reply of nestedChildren) {
         if (processedUris.has(reply.uri)) continue;
         processedUris.add(reply.uri);
 
@@ -84,7 +96,11 @@ export const getAncestorsAndSelf = async (
   }> = [];
 
   // Start with the current post
-  const currentPost = await db.models.Reply.findOne({ uri }).lean();
+  const [currentReply, currentCrosspostReply] = await Promise.all([
+    db.models.Reply.findOne({ uri }).lean(),
+    db.models.CrosspostReply.findOne({ uri }).lean(),
+  ]);
+  const currentPost = currentReply || currentCrosspostReply;
   if (!currentPost) return ancestors;
 
   ancestors.push({
@@ -98,9 +114,10 @@ export const getAncestorsAndSelf = async (
 
   while (currentUri && height <= parentHeight) {
     // Check if parent is a Post (root) or Reply
-    const [parentPost, parentReply] = await Promise.all([
+    const [parentPost, parentReply, parentCrosspostReply] = await Promise.all([
       db.models.Post.findOne({ uri: currentUri }).lean(),
       db.models.Reply.findOne({ uri: currentUri }).lean(),
+      db.models.CrosspostReply.findOne({ uri: currentUri }).lean(),
     ]);
 
     if (parentPost) {
@@ -117,6 +134,13 @@ export const getAncestorsAndSelf = async (
         height,
       });
       currentUri = parentReply.reply?.parent?.uri;
+      height++;
+    } else if (parentCrosspostReply) {
+      ancestors.push({
+        uri: parentCrosspostReply.uri,
+        height,
+      });
+      currentUri = parentCrosspostReply.reply?.parent?.uri;
       height++;
     } else {
       // Parent not found - stop traversing

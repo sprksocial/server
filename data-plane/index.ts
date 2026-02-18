@@ -22,7 +22,7 @@ import { Search } from "./routes/search.ts";
 import { Labels } from "./routes/labels.ts";
 import { PushTokens } from "./routes/push-tokens.ts";
 
-export { RepoSubscription } from "./subscription.ts";
+export { RepoSubscription } from "./subscription/index.ts";
 
 export type ServerContext = {
   db: Database;

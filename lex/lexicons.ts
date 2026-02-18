@@ -19182,6 +19182,15 @@ export const schemaDict = {
                 "maxGraphemes": 64,
               },
             },
+            "crossposts": {
+              "type": "array",
+              "description":
+                "Records created for external services for this post",
+              "items": {
+                "type": "ref",
+                "ref": "lex:com.atproto.repo.strongRef",
+              },
+            },
             "createdAt": {
               "type": "string",
               "format": "datetime",

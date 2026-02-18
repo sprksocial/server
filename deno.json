@@ -2,12 +2,13 @@
   "tasks": {
     "dev:db": "mongod --dbpath ./devdb",
     "dev:api": "deno run -A --watch main.ts",
-    "dev:ingest": "deno run -A --watch ingest.ts",
+    "dev:ingest": "deno run -A --watch ingest/index.ts",
+    "dev:ingest:crosspost": "deno run -A --watch ingest/crosspost.ts",
     "dev": {
       "dependencies": ["dev:db", "dev:api", "dev:ingest"]
     },
     "codegen": "deno run -A jsr:@atp/lex-gen@^0.1.0-alpha.2 server -o ./lex -i ./lexicons",
-    "start": "deno run -A --env-file main.ts",
+    "start": "deno run -A main.ts",
     "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
   },
   "imports": {

@@ -167,6 +167,18 @@ const updateAggregates = async (db: Database, like: IndexedLike) => {
         { new: true },
       );
     }
+
+    const existingCrosspostReply = await db.models.CrosspostReply.findOne({
+      uri: like.subject,
+    });
+
+    if (existingCrosspostReply) {
+      await db.models.CrosspostReply.findOneAndUpdate(
+        { uri: like.subject },
+        { $set: { likeCount } },
+        { new: true },
+      );
+    }
   }
 };
 

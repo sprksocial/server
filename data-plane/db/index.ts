@@ -71,6 +71,10 @@ export class Database {
           "Reply",
           models.replySchema,
         ),
+        CrosspostReply: this.connection.model<models.CrosspostReplyDocument>(
+          "CrosspostReply",
+          models.crosspostReplySchema,
+        ),
         Story: this.connection.model<models.StoryDocument>(
           "Story",
           models.storySchema,
@@ -203,22 +207,25 @@ export class Database {
     return getResultFromDoc(doc);
   }
 
-  async getCursorState(): Promise<number | null> {
+  async getCursorState(identifier = "last_processed_cursor"): Promise<number | null> {
     try {
       const cursorState = await this.models.CursorState.findOne({
-        identifier: "last_processed_cursor",
+        identifier,
       });
       return cursorState?.cursorValue || null;
     } catch (error) {
-      console.error("Failed to get cursor state", { error });
+      console.error("Failed to get cursor state", { error, identifier });
       return null;
     }
   }
 
-  async saveCursorState(cursorPosition: number): Promise<void> {
+  async saveCursorState(
+    cursorPosition: number,
+    identifier = "last_processed_cursor",
+  ): Promise<void> {
     try {
       await this.models.CursorState.findOneAndUpdate(
-        { identifier: "last_processed_cursor" },
+        { identifier },
         {
           cursorValue: cursorPosition,
           updatedAt: new Date(),
@@ -228,7 +235,7 @@ export class Database {
     } catch (error) {
       console.error(
         "Failed to save cursor state",
-        { error, cursorPosition },
+        { error, cursorPosition, identifier },
       );
     }
   }

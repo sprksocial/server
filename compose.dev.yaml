@@ -70,7 +70,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["deno", "run", "-A", "--watch", "ingest.ts"]
+    command: ["deno", "run", "-A", "--watch", "ingest/index.ts"]
     environment:
       NODE_ENV: development
       HOST: 0.0.0.0

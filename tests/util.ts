@@ -147,6 +147,10 @@ export async function createTestDatabase(
     Like: connection.model<models.LikeDocument>("Like", models.likeSchema),
     Post: connection.model<models.PostDocument>("Post", models.postSchema),
     Reply: connection.model<models.ReplyDocument>("Reply", models.replySchema),
+    CrosspostReply: connection.model<models.CrosspostReplyDocument>(
+      "CrosspostReply",
+      models.crosspostReplySchema,
+    ),
     Story: connection.model<models.StoryDocument>("Story", models.storySchema),
     Follow: connection.model<models.FollowDocument>(
       "Follow",

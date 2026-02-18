@@ -1,26 +1,16 @@
 import { CID } from "multiformats/cid";
 import { AtUri } from "@atp/syntax";
-import * as lex from "../../../lex/lexicons.ts";
-import { isMain as isMediaImage } from "../../../lex/types/so/sprk/media/image.ts";
-import {
-  Record as ReplyRecord,
-  ReplyRef,
-} from "../../../lex/types/so/sprk/feed/reply.ts";
-import { Record as GateRecord } from "../../../lex/types/so/sprk/feed/threadgate.ts";
+import * as lex from "../../../../lex/lexicons.ts";
+import { Record as BskyPostRecord } from "../../../../lex/types/app/bsky/feed/post.ts";
 import {
   isLink,
   isMention,
-} from "../../../lex/types/so/sprk/richtext/facet.ts";
-import { BackgroundQueue } from "../../background.ts";
-import { Database } from "../../db/index.ts";
-import { ReplyDocument } from "../../db/models.ts";
-import {
-  getAncestorsAndSelf,
-  getDescendents,
-  invalidReplyRoot as checkInvalidReplyRoot,
-} from "../../util.ts";
-import { RecordProcessor } from "../processor.ts";
-import { jsonToLex } from "@atp/lexicon";
+} from "../../../../lex/types/app/bsky/richtext/facet.ts";
+import { BackgroundQueue } from "../../../background.ts";
+import { Database } from "../../../db/index.ts";
+import { CrosspostReplyDocument } from "../../../db/models.ts";
+import { getAncestorsAndSelf, getDescendents } from "../../../util.ts";
+import { RecordProcessor } from "../../processor.ts";
 
 type Ancestor = {
   uri: string;
@@ -34,7 +24,7 @@ type Descendent = {
   sortAt: string;
 };
 type IndexedReply = {
-  reply: ReplyDocument;
+  reply: CrosspostReplyDocument;
   facets?: { type: "mention" | "link"; value: string }[];
   media?: {
     cid?: string;
@@ -42,10 +32,9 @@ type IndexedReply = {
   };
   ancestors?: Ancestor[];
   descendents?: Descendent[];
-  threadgate?: GateRecord;
 };
 
-const lexId = lex.ids.SoSprkFeedReply;
+const lexId = lex.ids.AppBskyFeedPost;
 
 const REPLY_NOTIF_DEPTH = 5;
 
@@ -53,28 +42,67 @@ const insertFn = async (
   db: Database,
   uri: AtUri,
   cid: CID,
-  obj: ReplyRecord,
+  obj: BskyPostRecord,
   timestamp: string,
 ): Promise<IndexedReply | null> => {
+  if (!obj.reply) {
+    return null;
+  }
+
+  const sparkPost = await db.models.Post.findOne({
+    "crossposts.uri": obj.reply.root.uri,
+  });
+  if (!sparkPost) {
+    return null;
+  }
+
+  const mappedRoot = {
+    uri: sparkPost.uri,
+    cid: sparkPost.cid,
+  };
+
+  let mappedParent = {
+    uri: obj.reply.parent.uri,
+    cid: obj.reply.parent.cid,
+  };
+
+  if (
+    sparkPost.crossposts?.some((crosspost) =>
+      crosspost.uri === obj.reply?.parent.uri
+    )
+  ) {
+    mappedParent = {
+      uri: sparkPost.uri,
+      cid: sparkPost.cid,
+    };
+  } else {
+    const [parentReply, parentCrosspostReply] = await Promise.all([
+      db.models.Reply.findOne({
+        uri: obj.reply.parent.uri,
+      }),
+      db.models.CrosspostReply.findOne({
+        uri: obj.reply.parent.uri,
+      }),
+    ]);
+    const parent = parentReply || parentCrosspostReply;
+    if (parent) {
+      mappedParent = {
+        uri: parent.uri,
+        cid: parent.cid,
+      };
+    }
+  }
+
   const reply = {
     uri: uri.toString(),
     cid: cid.toString(),
     authorDid: uri.host,
     text: obj.text || "",
     facets: obj.facets || [],
-    reply: obj.reply
-      ? {
-        root: {
-          uri: obj.reply.root.uri,
-          cid: obj.reply.root.cid,
-        },
-        parent: {
-          uri: obj.reply.parent.uri,
-          cid: obj.reply.parent.cid,
-        },
-      }
-      : null,
-    media: obj.media,
+    reply: {
+      root: mappedRoot,
+      parent: mappedParent,
+    },
     langs: obj.langs || [],
     labels: obj.labels || null,
     tags: obj.tags || [],
@@ -82,25 +110,19 @@ const insertFn = async (
     indexedAt: timestamp,
   };
 
-  // Use findOneAndUpdate with upsert to handle potential duplicate key errors
-  const insertedReply = await db.models.Reply.findOneAndUpdate(
+  const insertedReply = await db.models.CrosspostReply.findOneAndUpdate(
     { uri: reply.uri },
     { $set: reply },
     { upsert: true, new: true },
   );
 
-  if (obj.reply) {
-    const { invalidReplyRoot } = await validateReply(
-      db,
-      obj.reply,
+  const { invalidReplyRoot } = await validateCrosspostReply(db, insertedReply);
+  if (invalidReplyRoot) {
+    Object.assign(insertedReply, { invalidReplyRoot });
+    await db.models.CrosspostReply.updateOne(
+      { uri: reply.uri },
+      { $set: { invalidReplyRoot } },
     );
-    if (invalidReplyRoot) {
-      Object.assign(insertedReply, { invalidReplyRoot });
-      await db.models.Reply.updateOne(
-        { uri: reply.uri },
-        { $set: { invalidReplyRoot } },
-      );
-    }
   }
 
   const facets = (obj.facets || [])
@@ -121,21 +143,6 @@ const insertFn = async (
       return [];
     });
 
-  // Embed processing - embeds are stored inline in the Post model
-  let media: {
-    postUri?: string;
-    cid?: string;
-    alt?: string;
-  } = {};
-  if (isMediaImage(obj.media)) {
-    const imageMedia = {
-      postUri: uri.toString(),
-      cid: obj.media.image.ref.toString(),
-      alt: obj.media.alt as string,
-    };
-    media = imageMedia;
-  }
-
   const ancestors = await getAncestorsAndSelf(db, {
     uri: reply.uri,
     parentHeight: REPLY_NOTIF_DEPTH,
@@ -148,7 +155,7 @@ const insertFn = async (
   return {
     reply: insertedReply,
     facets,
-    media,
+    media: {},
     ancestors,
     descendents,
   };
@@ -196,9 +203,6 @@ const notifsForInsert = (obj: IndexedReply) => {
     }
   }
 
-  const threadgateHiddenReplies = obj.threadgate?.hiddenReplies || [];
-
-  // reply notifications
   for (const ancestor of obj.ancestors ?? []) {
     if (ancestor.uri === obj.reply.uri) continue;
     if (ancestor.height < REPLY_NOTIF_DEPTH) {
@@ -212,13 +216,9 @@ const notifsForInsert = (obj: IndexedReply) => {
         recordCid: obj.reply.cid,
         sortAt: obj.reply.createdAt,
       });
-      // found hidden reply, don't notify any higher ancestors
-      if (threadgateHiddenReplies.includes(ancestorUri.toString())) break;
     }
   }
 
-  // descendents indicate out-of-order indexing: need to notify
-  // everything upwards of the current reply
   for (const descendent of obj.descendents ?? []) {
     for (const ancestor of obj.ancestors ?? []) {
       const totalHeight = descendent.depth + ancestor.height;
@@ -245,7 +245,9 @@ const deleteFn = async (
   uri: AtUri,
 ): Promise<IndexedReply | null> => {
   const uriStr = uri.toString();
-  const deleted = await db.models.Reply.findOneAndDelete({ uri: uriStr });
+  const deleted = await db.models.CrosspostReply.findOneAndDelete({
+    uri: uriStr,
+  });
 
   if (!deleted) {
     return null;
@@ -253,7 +255,7 @@ const deleteFn = async (
 
   return {
     reply: deleted,
-    facets: [], // Not used
+    facets: [],
   };
 };
 
@@ -273,7 +275,12 @@ const updateAggregates = async (db: Database, replyIdx: IndexedReply) => {
     const parentPost = await db.models.Post.findOne({
       uri: replyIdx.reply.reply?.parent.uri,
     });
-    const [parentReply, parentCrosspostReply, nativeReplyCount, crosspostReplyCount] = await Promise.all([
+    const [
+      parentReply,
+      parentCrosspostReply,
+      nativeReplyCount,
+      crosspostReplyCount,
+    ] = await Promise.all([
       db.models.Reply.findOne({
         uri: replyIdx.reply.reply?.parent.uri,
       }),
@@ -311,7 +318,7 @@ const updateAggregates = async (db: Database, replyIdx: IndexedReply) => {
   }
 };
 
-export type PluginType = RecordProcessor<ReplyRecord, IndexedReply>;
+export type PluginType = RecordProcessor<BskyPostRecord, IndexedReply>;
 
 export const makePlugin = (
   db: Database,
@@ -330,41 +337,35 @@ export const makePlugin = (
 
 export default makePlugin;
 
-async function validateReply(
+async function validateCrosspostReply(
   db: Database,
-  reply: ReplyRef,
+  reply: CrosspostReplyDocument,
 ) {
-  const replyRefs = await getReplyRefs(db, reply);
-  const invalidReplyRoot = !replyRefs.parent ||
-    checkInvalidReplyRoot(reply, replyRefs.parent);
-  return {
-    invalidReplyRoot,
-  };
-}
+  const parentUri = reply.reply?.parent?.uri;
+  const rootUri = reply.reply?.root?.uri;
+  if (!parentUri || !rootUri) {
+    return { invalidReplyRoot: true };
+  }
 
-async function getReplyRefs(db: Database, reply: ReplyRef) {
-  const replyRoot = reply.root.uri;
-  const replyParent = reply.parent.uri;
-
-  const [root, parent] = await Promise.all([
-    db.models.Record.findOne({ uri: replyRoot }).lean(),
-    db.models.Record.findOne({ uri: replyParent }).lean(),
+  const [parentPost, parentReply, parentCrosspostReply] = await Promise.all([
+    db.models.Post.findOne({ uri: parentUri }).lean(),
+    db.models.Reply.findOne({ uri: parentUri }).lean(),
+    db.models.CrosspostReply.findOne({ uri: parentUri }).lean(),
   ]);
+  const parent = parentReply || parentCrosspostReply;
+
+  if (!parentPost && !parent) {
+    return { invalidReplyRoot: true };
+  }
+
+  if (parentPost) {
+    return {
+      invalidReplyRoot: parentUri !== rootUri,
+    };
+  }
 
   return {
-    root: root && root.json
-      ? {
-        uri: root.uri,
-        invalidReplyRoot: root.invalidReplyRoot ?? null,
-        record: jsonToLex(root.json) as ReplyRecord,
-      }
-      : null,
-    parent: parent && parent.json
-      ? {
-        uri: parent.uri,
-        invalidReplyRoot: parent.invalidReplyRoot ?? null,
-        record: jsonToLex(parent.json) as ReplyRecord,
-      }
-      : null,
+    invalidReplyRoot: !!parent?.invalidReplyRoot ||
+      parent?.reply?.root?.uri !== rootUri,
   };
 }

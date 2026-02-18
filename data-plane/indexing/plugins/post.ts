@@ -74,6 +74,7 @@ const insertFn = async (
     langs: obj.langs || [],
     labels: obj.labels || null,
     tags: obj.tags || [],
+    crossposts: obj.crossposts || [],
     createdAt: obj.createdAt,
     indexedAt: timestamp,
   };

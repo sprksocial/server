@@ -29,12 +29,16 @@ export class Interactions {
     }
 
     // Get pre-computed counts from Post, Reply, and Generator documents
-    const [posts, replies, generators] = await Promise.all([
+    const [posts, replies, crosspostReplies, generators] = await Promise.all([
       this.db.models.Post.find(
         { uri: { $in: uris } },
         { uri: 1, likeCount: 1, replyCount: 1, repostCount: 1 },
       ),
       this.db.models.Reply.find(
+        { uri: { $in: uris } },
+        { uri: 1, likeCount: 1, replyCount: 1 },
+      ),
+      this.db.models.CrosspostReply.find(
         { uri: { $in: uris } },
         { uri: 1, likeCount: 1, replyCount: 1 },
       ),
@@ -56,6 +60,11 @@ export class Interactions {
     }
 
     for (const reply of replies) {
+      likesMap.set(reply.uri, reply.likeCount ?? 0);
+      repliesMap.set(reply.uri, reply.replyCount ?? 0);
+    }
+
+    for (const reply of crosspostReplies) {
       likesMap.set(reply.uri, reply.likeCount ?? 0);
       repliesMap.set(reply.uri, reply.replyCount ?? 0);
     }
@@ -172,7 +181,7 @@ export class Interactions {
 
     // Query likes, reposts, and replies by followed users on the subject URIs
     // All queries are batched and parallelized for optimal performance
-    const [likes, reposts, replies] = await Promise.all([
+    const [likes, reposts, replies, crosspostReplies] = await Promise.all([
       this.db.models.Like.find({
         subject: { $in: subjectUris },
         authorDid: { $in: followedDids },
@@ -188,6 +197,13 @@ export class Interactions {
         .sort({ indexedAt: -1 })
         .lean(),
       this.db.models.Reply.find({
+        "reply.parent.uri": { $in: subjectUris },
+        authorDid: { $in: followedDids },
+      })
+        .select("uri cid reply.parent.uri authorDid indexedAt text")
+        .sort({ indexedAt: -1 })
+        .lean(),
+      this.db.models.CrosspostReply.find({
         "reply.parent.uri": { $in: subjectUris },
         authorDid: { $in: followedDids },
       })
@@ -233,6 +249,22 @@ export class Interactions {
 
     // Add replies
     for (const reply of replies) {
+      const parentUri = reply.reply?.parent?.uri;
+      if (!parentUri) continue;
+      const interactions = results.get(parentUri);
+      if (interactions) {
+        interactions.push({
+          type: "reply",
+          uri: reply.uri,
+          cid: reply.cid,
+          authorDid: reply.authorDid,
+          indexedAt: String(reply.indexedAt),
+          text: reply.text,
+        });
+      }
+    }
+
+    for (const reply of crosspostReplies) {
       const parentUri = reply.reply?.parent?.uri;
       if (!parentUri) continue;
       const interactions = results.get(parentUri);
