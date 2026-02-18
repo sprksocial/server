@@ -1,7 +1,6 @@
 import { Database } from "../db/index.ts";
 import { TimeCidKeyset } from "../db/pagination.ts";
 import { compositeTime } from "../util.ts";
-import { ids } from "../../lex/lexicons.ts";
 
 const STORIES_EXPIRY_HOURS = 24;
 
@@ -115,67 +114,6 @@ export class Stories {
     }));
 
     // Generate cursor from last item if we have more results
-    let nextCursor: string | undefined;
-    if (hasMore && resultStories.length > 0) {
-      nextCursor = this.timeCidKeyset.packFromResult(resultStories);
-    }
-
-    return {
-      stories: transformedStories,
-      cursor: nextCursor,
-    };
-  }
-
-  /**
-   * Get archived stories for an author
-   */
-  async getArchive(
-    actorDid: string,
-    limit = 50,
-    cursor?: string,
-    includeTakedowns = false,
-  ): Promise<{ stories: StoryItem[]; cursor?: string }> {
-    const baseQuery: {
-      did: string;
-      collectionName: string;
-      $or?: Array<
-        { takedownRef?: { $exists: boolean } } | { takedownRef: string }
-      >;
-    } = {
-      did: actorDid,
-      collectionName: ids.SoSprkStoryPost,
-    };
-
-    if (!includeTakedowns) {
-      baseQuery.$or = [
-        { takedownRef: { $exists: false } },
-        { takedownRef: "" },
-      ];
-    }
-
-    const storiesQuery = this.db.models.ArchivedRecord.find(baseQuery);
-
-    const paginatedQuery = this.timeCidKeyset.paginate(storiesQuery, {
-      limit: limit + 1,
-      cursor,
-      direction: "desc",
-    });
-
-    const stories = await paginatedQuery.exec();
-    const hasMore = stories.length > limit;
-    const resultStories = hasMore ? stories.slice(0, limit) : stories;
-
-    const transformedStories: StoryItem[] = resultStories.map((story) => ({
-      uri: story.uri,
-      cid: story.cid,
-      authorDid: story.did,
-      createdAt: story.createdAt,
-      indexedAt: story.indexedAt,
-      archived: true,
-      sortAt: compositeTime(story.createdAt, story.indexedAt) ||
-        story.createdAt,
-    }));
-
     let nextCursor: string | undefined;
     if (hasMore && resultStories.length > 0) {
       nextCursor = this.timeCidKeyset.packFromResult(resultStories);

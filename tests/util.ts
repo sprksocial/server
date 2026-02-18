@@ -140,10 +140,6 @@ export async function createTestDatabase(
       "Record",
       models.recordSchema,
     ),
-    ArchivedRecord: connection.model<models.ArchivedRecordDocument>(
-      "ArchivedRecord",
-      models.archivedRecordSchema,
-    ),
     DuplicateRecord: connection.model<models.DuplicateRecordDocument>(
       "DuplicateRecord",
       models.duplicateRecordSchema,

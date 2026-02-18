@@ -114,20 +114,6 @@ export interface RecordDocument {
   takedownRef: string;
   invalidReplyRoot?: boolean;
 }
-
-export interface ArchivedRecordDocument {
-  uri: string;
-  cid: string;
-  did: string;
-  collectionName: string;
-  rkey: string;
-  createdAt: string;
-  indexedAt: string;
-  json: string;
-  archivedAt: string;
-  deleteReason: "user_delete" | "takedown";
-  takedownRef?: string;
-}
 export const recordSchema = new Schema<RecordDocument>({
   uri: { type: String, required: true, unique: true, index: true },
   cid: { type: String, required: true },
@@ -141,25 +127,6 @@ export const recordSchema = new Schema<RecordDocument>({
   takedownRef: { type: String, required: false },
   invalidReplyRoot: { type: Boolean, required: false },
 });
-
-export const archivedRecordSchema = new Schema<ArchivedRecordDocument>({
-  uri: { type: String, required: true, unique: true, index: true },
-  cid: { type: String, required: true },
-  did: { type: String, required: true, index: true },
-  collectionName: { type: String, required: true, index: true },
-  rkey: { type: String, required: true },
-  createdAt: { type: String, required: true },
-  indexedAt: { type: String, required: true },
-  json: { type: String, required: true },
-  archivedAt: { type: String, required: true },
-  deleteReason: {
-    type: String,
-    required: true,
-    enum: ["user_delete", "takedown"],
-  },
-  takedownRef: { type: String, required: false },
-})
-  .index({ did: 1, collectionName: 1, indexedAt: -1 });
 
 // duplicate records
 
@@ -699,7 +666,6 @@ export const pushTokenSchema = new Schema<PushTokenDocument>({
 
 export interface DatabaseModels {
   Record: Model<RecordDocument>;
-  ArchivedRecord: Model<ArchivedRecordDocument>;
   DuplicateRecord: Model<DuplicateRecordDocument>;
   Like: Model<LikeDocument>;
   Post: Model<PostDocument>;

@@ -70,7 +70,6 @@ export const makePlugin = (
     insertFn,
     findDuplicate,
     deleteFn,
-    archiveOnDelete: true,
     notifsForInsert,
     notifsForDelete,
   });
