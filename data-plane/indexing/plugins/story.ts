@@ -33,7 +33,7 @@ const insertFn = async (
   const insertedStory = await db.models.Story.findOneAndUpdate(
     { uri: story.uri },
     story,
-    { upsert: true, new: true },
+    { upsert: true, returnDocument: "after" },
   );
   return insertedStory;
 };

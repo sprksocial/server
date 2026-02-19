@@ -37,7 +37,7 @@ const insertFn = async (
   const insertedRepost = await db.models.Repost.findOneAndUpdate(
     { uri: repost.uri },
     { $set: repost },
-    { upsert: true, new: true },
+    { upsert: true, returnDocument: "after" },
   );
   return insertedRepost;
 };
@@ -137,7 +137,7 @@ const updateAggregates = async (db: Database, repost: IndexedRepost) => {
     await db.models.Post.findOneAndUpdate(
       { uri: repost.subject },
       { $set: { repostCount } },
-      { new: true },
+      { returnDocument: "after" },
     );
   }
 
@@ -153,7 +153,7 @@ const updateAggregates = async (db: Database, repost: IndexedRepost) => {
     await db.models.Profile.findOneAndUpdate(
       { authorDid: repost.authorDid },
       { $set: { repostCount: authorRepostCount } },
-      { new: true },
+      { returnDocument: "after" },
     );
   }
 };

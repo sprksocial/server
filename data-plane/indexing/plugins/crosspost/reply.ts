@@ -113,7 +113,7 @@ const insertFn = async (
   const insertedReply = await db.models.CrosspostReply.findOneAndUpdate(
     { uri: reply.uri },
     { $set: reply },
-    { upsert: true, new: true },
+    { upsert: true, returnDocument: "after" },
   );
 
   const { invalidReplyRoot } = await validateCrosspostReply(db, insertedReply);
@@ -300,19 +300,19 @@ const updateAggregates = async (db: Database, replyIdx: IndexedReply) => {
       await db.models.Post.findOneAndUpdate(
         { uri: replyIdx.reply.reply?.parent.uri },
         { $set: { replyCount } },
-        { new: true },
+        { returnDocument: "after" },
       );
     } else if (parentReply) {
       await db.models.Reply.findOneAndUpdate(
         { uri: replyIdx.reply.reply?.parent.uri },
         { $set: { replyCount } },
-        { new: true },
+        { returnDocument: "after" },
       );
     } else if (parentCrosspostReply) {
       await db.models.CrosspostReply.findOneAndUpdate(
         { uri: replyIdx.reply.reply?.parent.uri },
         { $set: { replyCount } },
-        { new: true },
+        { returnDocument: "after" },
       );
     }
   }

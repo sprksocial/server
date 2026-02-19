@@ -37,7 +37,7 @@ const insertFn = async (
   const insertedLike = await db.models.Like.findOneAndUpdate(
     { uri: like.uri },
     { $set: like },
-    { upsert: true, new: true },
+    { upsert: true, returnDocument: "after" },
   );
   return insertedLike;
 };
@@ -140,7 +140,7 @@ const updateAggregates = async (db: Database, like: IndexedLike) => {
       await db.models.Generator.findOneAndUpdate(
         { uri: like.subject },
         { $set: { likeCount } },
-        { new: true },
+        { returnDocument: "after" },
       );
     }
   } else {
@@ -152,7 +152,7 @@ const updateAggregates = async (db: Database, like: IndexedLike) => {
       await db.models.Post.findOneAndUpdate(
         { uri: like.subject },
         { $set: { likeCount } },
-        { new: true },
+        { returnDocument: "after" },
       );
     }
 
@@ -164,7 +164,7 @@ const updateAggregates = async (db: Database, like: IndexedLike) => {
       await db.models.Reply.findOneAndUpdate(
         { uri: like.subject },
         { $set: { likeCount } },
-        { new: true },
+        { returnDocument: "after" },
       );
     }
 
@@ -176,7 +176,7 @@ const updateAggregates = async (db: Database, like: IndexedLike) => {
       await db.models.CrosspostReply.findOneAndUpdate(
         { uri: like.subject },
         { $set: { likeCount } },
-        { new: true },
+        { returnDocument: "after" },
       );
     }
   }

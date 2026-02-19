@@ -128,7 +128,7 @@ export class RecordProcessor<T, S> {
           duplicateOf: found.toString(),
           indexedAt: timestamp,
         },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: "after" },
       );
       return;
     }
@@ -146,7 +146,7 @@ export class RecordProcessor<T, S> {
         createdAt,
         indexedAt: timestamp,
       },
-      { upsert: true, new: true },
+      { upsert: true, returnDocument: "after" },
     );
 
     const inserted = await this.params.insertFn(
@@ -201,7 +201,7 @@ export class RecordProcessor<T, S> {
     await this.db.models.Record.findOneAndUpdate(
       { uri: uri.toString() },
       updateData,
-      { new: true },
+      { returnDocument: "after" },
     );
 
     // If the updated record was a dupe, update dupe info for it
@@ -214,7 +214,7 @@ export class RecordProcessor<T, S> {
           duplicateOf: dupe.toString(),
           indexedAt: timestamp,
         },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: "after" },
       );
     } else {
       await this.db.models.DuplicateRecord.deleteOne({ uri: uri.toString() });

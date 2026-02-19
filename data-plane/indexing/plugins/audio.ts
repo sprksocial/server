@@ -34,7 +34,7 @@ const insertFn = async (
   const insertedAudio = await db.models.Audio.findOneAndUpdate(
     { uri: uri.toString() },
     { $set: audio },
-    { upsert: true, new: true, includeResultMetadata: false },
+    { upsert: true, returnDocument: "after", includeResultMetadata: false },
   );
   return insertedAudio;
 };

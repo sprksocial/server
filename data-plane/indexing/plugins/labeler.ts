@@ -30,7 +30,7 @@ const insertFn = async (
   const insertedLabeler = await db.models.Labeler.findOneAndUpdate(
     { uri: labeler.uri },
     { $set: labeler },
-    { upsert: true, new: true },
+    { upsert: true, returnDocument: "after" },
   );
   return insertedLabeler;
 };

@@ -82,7 +82,7 @@ const insertFn = async (
   const insertedPost = await db.models.Post.findOneAndUpdate(
     { uri: post.uri },
     { $set: post },
-    { upsert: true, new: true },
+    { upsert: true, returnDocument: "after" },
   );
 
   const facets = (obj.caption?.facets || [])
@@ -278,7 +278,7 @@ const updateAggregates = async (db: Database, postIdx: IndexedPost) => {
     await db.models.Profile.findOneAndUpdate(
       { authorDid: postIdx.post.authorDid },
       { $set: { postsCount } },
-      { new: true },
+      { returnDocument: "after" },
     );
   }
 };

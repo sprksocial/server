@@ -60,7 +60,7 @@ export class Moderation {
         takenDownAt: new Date().toISOString(),
         applied: true,
       },
-      { upsert: true, new: true },
+      { upsert: true, returnDocument: "after" },
     );
 
     return { success: true };

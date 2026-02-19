@@ -29,7 +29,7 @@ const insertFn = async (
   const insertedFollow = await db.models.Follow.findOneAndUpdate(
     { uri: follow.uri },
     { $set: follow },
-    { upsert: true, new: true },
+    { upsert: true, returnDocument: "after" },
   );
   return insertedFollow;
 };
@@ -94,7 +94,7 @@ const updateAggregates = async (db: Database, follow: IndexedFollow) => {
     await db.models.Profile.findOneAndUpdate(
       { authorDid: follow.subject },
       { $set: { followersCount } },
-      { new: true },
+      { returnDocument: "after" },
     );
   }
 
@@ -113,7 +113,7 @@ const updateAggregates = async (db: Database, follow: IndexedFollow) => {
     await db.models.Profile.findOneAndUpdate(
       { authorDid: follow.authorDid },
       { $set: { followsCount } },
-      { new: true },
+      { returnDocument: "after" },
     );
   }
 };

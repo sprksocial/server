@@ -29,7 +29,7 @@ const insertFn = async (
   const insertedBlock = await db.models.Block.findOneAndUpdate(
     { uri: block.uri },
     { $set: block },
-    { upsert: true, new: true },
+    { upsert: true, returnDocument: "after" },
   );
   return insertedBlock;
 };

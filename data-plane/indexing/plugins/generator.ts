@@ -43,7 +43,7 @@ const insertFn = async (
   const insertedGenerator = await db.models.Generator.findOneAndUpdate(
     { uri: generator.uri },
     { $set: generator },
-    { upsert: true, new: true },
+    { upsert: true, returnDocument: "after" },
   );
   return insertedGenerator;
 };

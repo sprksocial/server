@@ -139,7 +139,7 @@ export class IndexingService {
       await this.db.models.Actor.findOneAndUpdate(
         { did },
         { did, ...actorInfo },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: "after" },
       );
     } catch (err) {
       // Log the error but don't throw - this prevents the firehose from crashing
@@ -154,7 +154,7 @@ export class IndexingService {
         await this.db.models.Actor.findOneAndUpdate(
           { did },
           { did, ...actorInfo },
-          { upsert: true, new: true },
+          { upsert: true, returnDocument: "after" },
         );
       } catch (dbErr) {
         console.error(
@@ -253,7 +253,7 @@ export class IndexingService {
         commitCid: commit.toString(),
         repoRev: rev ?? null,
       },
-      { upsert: true, new: true },
+      { upsert: true, returnDocument: "after" },
     );
   }
 
