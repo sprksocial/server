@@ -18820,6 +18820,125 @@ export const schemaDict = {
       },
     },
   },
+  "SoSprkFeedGetCrosspostThread": {
+    "lexicon": 1,
+    "id": "so.sprk.feed.getCrosspostThread",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Get crosspost thread items for an anchor. Mirrors getPostThread shape but uses isolated crosspost-thread traversal.",
+        "parameters": {
+          "type": "params",
+          "required": [
+            "anchor",
+          ],
+          "properties": {
+            "anchor": {
+              "type": "string",
+              "format": "at-uri",
+              "description":
+                "Reference (AT-URI) to anchor post or reply record.",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+            },
+            "cursor": {
+              "type": "string",
+            },
+            "depth": {
+              "type": "integer",
+              "description":
+                "How many levels of descendant depth should be included in response.",
+              "default": 6,
+              "minimum": 0,
+              "maximum": 1000,
+            },
+            "parentHeight": {
+              "type": "integer",
+              "description":
+                "How many levels of parent (and grandparent, etc) items to include.",
+              "default": 80,
+              "minimum": 0,
+              "maximum": 1000,
+            },
+            "sort": {
+              "type": "string",
+              "description": "Sorting for thread replies.",
+              "knownValues": [
+                "newest",
+                "oldest",
+                "top",
+              ],
+              "default": "oldest",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "thread",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "thread": {
+                "type": "array",
+                "description":
+                  "A flat list of thread items. The depth of each item is indicated by the depth property inside the item.",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:so.sprk.feed.getCrosspostThread#threadItem",
+                },
+              },
+              "threadgate": {
+                "type": "ref",
+                "ref": "lex:so.sprk.feed.defs#threadgateView",
+              },
+            },
+          },
+        },
+        "errors": [
+          {
+            "name": "NotFound",
+          },
+        ],
+      },
+      "threadItem": {
+        "type": "object",
+        "required": [
+          "uri",
+          "depth",
+          "value",
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "depth": {
+            "type": "integer",
+            "description":
+              "The nesting level of this item in the thread. Depth 0 means the anchor item.",
+          },
+          "value": {
+            "type": "union",
+            "refs": [
+              "lex:so.sprk.feed.defs#threadViewPost",
+              "lex:so.sprk.feed.defs#notFoundPost",
+              "lex:so.sprk.feed.defs#blockedPost",
+            ],
+          },
+        },
+      },
+    },
+  },
   "SoSprkFeedGetFeed": {
     "lexicon": 1,
     "id": "so.sprk.feed.getFeed",
@@ -26873,6 +26992,7 @@ export const ids = {
   SoSprkFeedDescribeFeedGenerator: "so.sprk.feed.describeFeedGenerator",
   SoSprkFeedSearchPosts: "so.sprk.feed.searchPosts",
   SoSprkFeedGetPosts: "so.sprk.feed.getPosts",
+  SoSprkFeedGetCrosspostThread: "so.sprk.feed.getCrosspostThread",
   SoSprkFeedGetFeed: "so.sprk.feed.getFeed",
   SoSprkFeedReply: "so.sprk.feed.reply",
   SoSprkFeedGetFeedSkeleton: "so.sprk.feed.getFeedSkeleton",

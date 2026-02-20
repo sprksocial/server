@@ -77,15 +77,7 @@ export class Stories {
     // Build query with expiry filter
     const storiesQuery = this.db.models.Story.find({
       authorDid: { $in: timelineDids },
-      // Keep this nested to avoid merging with keyset cursor $or filter.
-      $and: [
-        {
-          $or: [
-            { authorDid: actorDid },
-            { indexedAt: { $gte: minDate } },
-          ],
-        },
-      ],
+      indexedAt: { $gte: minDate },
     });
 
     // Apply pagination
@@ -130,7 +122,6 @@ export class Stories {
    */
   filterExpiredStories(
     stories: StoryItem[],
-    ownerDid?: string,
   ): StoryItem[] {
     const twentyFourHoursAgo = new Date();
     twentyFourHoursAgo.setHours(
@@ -138,7 +129,6 @@ export class Stories {
     );
 
     return stories.filter((story) => {
-      if (ownerDid && story.authorDid === ownerDid) return true;
       const storyDate = new Date(story.indexedAt);
       return storyDate >= twentyFourHoursAgo;
     });

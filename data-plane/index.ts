@@ -21,6 +21,7 @@ import { Preferences } from "./routes/preferences.ts";
 import { Search } from "./routes/search.ts";
 import { Labels } from "./routes/labels.ts";
 import { PushTokens } from "./routes/push-tokens.ts";
+import { CrosspostThread } from "./routes/crosspost-threads.ts";
 
 export { RepoSubscription } from "./subscription/index.ts";
 
@@ -55,6 +56,7 @@ export class DataPlane {
   public search: Search;
   public labels: Labels;
   public pushTokens: PushTokens;
+  public crosspostThread: CrosspostThread;
 
   constructor(
     db: Database,
@@ -85,5 +87,6 @@ export class DataPlane {
     this.search = new Search(db);
     this.labels = new Labels(db);
     this.pushTokens = new PushTokens(db);
+    this.crosspostThread = new CrosspostThread(db);
   }
 }

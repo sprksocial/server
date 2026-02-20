@@ -199,6 +199,7 @@ import type * as SoSprkFeedGetRepostedBy from "./types/so/sprk/feed/getRepostedB
 import type * as SoSprkFeedDescribeFeedGenerator from "./types/so/sprk/feed/describeFeedGenerator.ts";
 import type * as SoSprkFeedSearchPosts from "./types/so/sprk/feed/searchPosts.ts";
 import type * as SoSprkFeedGetPosts from "./types/so/sprk/feed/getPosts.ts";
+import type * as SoSprkFeedGetCrosspostThread from "./types/so/sprk/feed/getCrosspostThread.ts";
 import type * as SoSprkFeedGetFeed from "./types/so/sprk/feed/getFeed.ts";
 import type * as SoSprkFeedGetFeedSkeleton from "./types/so/sprk/feed/getFeedSkeleton.ts";
 import type * as SoSprkFeedGetSuggestedFeeds from "./types/so/sprk/feed/getSuggestedFeeds.ts";
@@ -3077,6 +3078,18 @@ export class SoSprkFeedNS {
     >,
   ) {
     const nsid = "so.sprk.feed.getPosts"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getCrosspostThread<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      SoSprkFeedGetCrosspostThread.QueryParams,
+      SoSprkFeedGetCrosspostThread.HandlerInput,
+      SoSprkFeedGetCrosspostThread.HandlerOutput
+    >,
+  ) {
+    const nsid = "so.sprk.feed.getCrosspostThread"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 

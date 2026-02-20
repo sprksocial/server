@@ -128,19 +128,14 @@ const hydration = async (
 };
 
 const rules = (inputs: RulesFnInput<Context, Params, Skeleton>): Skeleton => {
-  const { ctx, params, skeleton, hydration } = inputs;
-  const viewer = params.hydrateCtx.viewer!;
+  const { ctx, skeleton, hydration } = inputs;
 
-  // Filter out expired stories (24 hours, except for owner's stories)
-  // Note: The dataplane already filters expired stories, but we do an additional
-  // check here for stories from the viewer (which shouldn't be filtered)
+  // Filter out expired stories (24 hours)
+  // Note: The dataplane already filters expired stories, so we only ensure
+  // records still exist after hydration.
   const activeStories = skeleton.stories.filter((uri) => {
     const storyInfo = hydration.stories?.get(uri);
     if (!storyInfo) return false;
-
-    // If the authenticated user is the author, don't apply the 24h expiration filter
-    const authorDid = uriToDid(uri);
-    if (authorDid === viewer) return true;
 
     // The dataplane already filtered expired stories, so we just check if it exists
     return true;

@@ -152,17 +152,12 @@ const hydration = async (
 };
 
 const rules = (inputs: RulesFnInput<Context, Params, Skeleton>): Skeleton => {
-  const { ctx, params, skeleton, hydration } = inputs;
-  const viewer = params.viewer;
+  const { ctx, skeleton, hydration } = inputs;
 
-  // Filter out expired stories (24 hours, except for owner's stories)
+  // Filter out expired stories (24 hours)
   const activeStories = skeleton.stories.filter((uri) => {
     const storyInfo = hydration.stories?.get(uri);
     if (!storyInfo) return false;
-
-    // If the authenticated user is the author, don't apply the 24h expiration filter
-    const authorDid = uriToDid(uri);
-    if (viewer && authorDid === viewer) return true;
 
     // Check if story is expired (older than 24 hours)
     const twentyFourHoursAgo = new Date();
