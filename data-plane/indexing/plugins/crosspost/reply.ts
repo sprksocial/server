@@ -165,79 +165,8 @@ const findDuplicate = (): AtUri | null => {
   return null;
 };
 
-const notifsForInsert = (obj: IndexedReply) => {
-  const notifs: Array<{
-    did: string;
-    reason: string;
-    author: string;
-    recordUri: string;
-    recordCid: string;
-    sortAt: string;
-    reasonSubject?: string;
-  }> = [];
-  const notified = new Set([obj.reply.authorDid]);
-  const maybeNotify = (notif: {
-    did: string;
-    reason: string;
-    author: string;
-    recordUri: string;
-    recordCid: string;
-    sortAt: string;
-    reasonSubject?: string;
-  }) => {
-    if (!notified.has(notif.did)) {
-      notified.add(notif.did);
-      notifs.push(notif);
-    }
-  };
-  for (const facet of obj.facets ?? []) {
-    if (facet.type === "mention") {
-      maybeNotify({
-        did: facet.value,
-        reason: "mention",
-        author: obj.reply.authorDid,
-        recordUri: obj.reply.uri,
-        recordCid: obj.reply.cid,
-        sortAt: obj.reply.createdAt,
-      });
-    }
-  }
-
-  for (const ancestor of obj.ancestors ?? []) {
-    if (ancestor.uri === obj.reply.uri) continue;
-    if (ancestor.height < REPLY_NOTIF_DEPTH) {
-      const ancestorUri = new AtUri(ancestor.uri);
-      maybeNotify({
-        did: ancestorUri.host,
-        reason: "reply",
-        reasonSubject: ancestorUri.toString(),
-        author: obj.reply.authorDid,
-        recordUri: obj.reply.uri,
-        recordCid: obj.reply.cid,
-        sortAt: obj.reply.createdAt,
-      });
-    }
-  }
-
-  for (const descendent of obj.descendents ?? []) {
-    for (const ancestor of obj.ancestors ?? []) {
-      const totalHeight = descendent.depth + ancestor.height;
-      if (totalHeight < REPLY_NOTIF_DEPTH) {
-        const ancestorUri = new AtUri(ancestor.uri);
-        maybeNotify({
-          did: ancestorUri.host,
-          reason: "reply",
-          reasonSubject: ancestorUri.toString(),
-          author: descendent.creator,
-          recordUri: descendent.uri,
-          recordCid: descendent.cid,
-          sortAt: descendent.sortAt,
-        });
-      }
-    }
-  }
-
-  return notifs;
+const notifsForInsert = (_obj: IndexedReply) => {
+  return [];
 };
 
 const deleteFn = async (
