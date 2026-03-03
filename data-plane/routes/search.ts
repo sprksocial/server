@@ -106,31 +106,44 @@ export class Search {
     const handlePrefix = cleanedTerm.toLowerCase();
     const handleRangeEnd = `${handlePrefix}\uffff`;
 
-    const [matchingActors, matchingProfiles] = await Promise.all([
-      this.db.models.Actor.find({
-        handle: {
-          $gte: handlePrefix,
-          $lt: handleRangeEnd,
-        },
-      })
-        .select("did -_id")
-        .sort({ handle: 1 })
-        .limit(candidateLimit)
-        .lean(),
-      this.db.models.Profile.find({
-        $text: { $search: cleanedTerm },
-      })
-        .select("authorDid -_id")
-        .limit(candidateLimit)
-        .lean(),
-    ]);
+    const matchingActors = await this.db.models.Actor.find({
+      handle: {
+        $gte: handlePrefix,
+        $lt: handleRangeEnd,
+      },
+    })
+      .select("did -_id")
+      .sort({ handle: 1 })
+      .limit(candidateLimit)
+      .lean();
 
-    const dids = Array.from(
-      new Set([
-        ...matchingActors.map((actor) => actor.did),
-        ...matchingProfiles.map((profile) => profile.authorDid),
-      ]),
-    ).slice(0, safeLimit);
+    const handleDids = matchingActors.map((actor) => actor.did);
+    const profileQuery = handleDids.length > 0
+      ? {
+        $or: [
+          { authorDid: { $in: handleDids } },
+          { $text: { $search: cleanedTerm } },
+        ],
+      }
+      : { $text: { $search: cleanedTerm } };
+    const matchingProfiles = await this.db.models.Profile.find(profileQuery)
+      .select("authorDid -_id")
+      .limit(candidateLimit * 2)
+      .lean();
+
+    const handleDidSet = new Set(handleDids);
+    const handleProfileDidSet = new Set(
+      matchingProfiles.map((p) => p.authorDid),
+    );
+    const handleProfileDids = handleDids.filter((did) =>
+      handleProfileDidSet.has(did)
+    );
+    const includedDids = new Set(handleProfileDids);
+    const textProfileDids = matchingProfiles
+      .map((profile) => profile.authorDid)
+      .filter((did) => !includedDids.has(did) && !handleDidSet.has(did));
+
+    const dids = [...handleProfileDids, ...textProfileDids].slice(0, safeLimit);
 
     return {
       dids,
