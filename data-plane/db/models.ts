@@ -94,6 +94,10 @@ export interface StoryMedia {
     height: number;
   };
 }
+export interface StoryEmbed {
+  $type: string;
+  [key: string]: unknown;
+}
 export interface Caption {
   text: string;
   facets?: Facet[];
@@ -227,7 +231,8 @@ export const profileSchema = new Schema<ProfileDocument>({
   followersCount: { type: Number, required: true, default: 0 },
   followsCount: { type: Number, required: true, default: 0 },
 })
-  .index({ displayName: "text", description: "text" });
+  .index({ displayName: "text", description: "text" })
+  .index({ indexedAt: -1, authorDid: -1 });
 
 // audio
 

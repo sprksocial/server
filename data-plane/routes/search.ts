@@ -19,26 +19,46 @@ export class Search {
 
   async actors(term: string, limit = 50, cursor?: string) {
     const cleanedTerm = cleanQuery(term);
-    const regex = new RegExp(cleanedTerm, "i");
+    if (!cleanedTerm) {
+      return {
+        dids: [],
+        cursor: undefined,
+      };
+    }
 
-    // First, find Actor DIDs that match the handle
-    const matchingActors = await this.db.models.Actor.find({
-      handle: { $regex: regex },
-    }).select("did").lean();
-    const actorDids = matchingActors.map((actor) => actor.did);
+    const handlePrefix = cleanedTerm.toLowerCase();
+    const handleRangeEnd = `${handlePrefix}\uffff`;
 
-    // Build a single Profile query that searches displayName or handle (via authorDid)
-    const queryConditions: Array<Record<string, unknown>> = [
-      { displayName: { $regex: regex } },
-    ];
+    const [matchingActors, matchingProfiles] = await Promise.all([
+      this.db.models.Actor.find({
+        handle: {
+          $gte: handlePrefix,
+          $lt: handleRangeEnd,
+        },
+      }).select("did -_id").lean(),
+      this.db.models.Profile.find({
+        $text: { $search: cleanedTerm },
+      }).select("authorDid -_id").lean(),
+    ]);
 
-    if (actorDids.length > 0) {
-      queryConditions.push({ authorDid: { $in: actorDids } });
+    const matchingActorDids = matchingActors.map((actor) => actor.did);
+    const matchingProfileDids = matchingProfiles.map((profile) =>
+      profile.authorDid
+    );
+    const dids = Array.from(
+      new Set([...matchingActorDids, ...matchingProfileDids]),
+    );
+
+    if (dids.length === 0) {
+      return {
+        dids: [],
+        cursor: undefined,
+      };
     }
 
     const profilesQuery = this.db.models.Profile.find({
-      $or: queryConditions,
-    }).populate("actor");
+      authorDid: { $in: dids },
+    }).select("authorDid indexedAt -_id");
 
     const paginatedQuery = this.indexedAtDidKeyset.paginate(
       profilesQuery,

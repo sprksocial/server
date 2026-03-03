@@ -25,14 +25,29 @@ export default function (server: Server, ctx: AppContext) {
   server.so.sprk.actor.searchActors({
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ auth, params, req }) => {
-      const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
+      const cleanedQuery = params.q?.trim() ?? "";
       const labelers = ctx.reqLabelers(req);
+      if (!cleanedQuery) {
+        return {
+          encoding: "application/json",
+          body: {
+            actors: [],
+          },
+          headers: resHeaders({ labelers }),
+        };
+      }
+
+      const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
       const hydrateCtx = await ctx.hydrator.createContext({
         viewer,
         labelers,
         includeTakedowns,
       });
-      const results = await searchActors({ ...params, hydrateCtx }, ctx);
+      const results = await searchActors({
+        ...params,
+        q: cleanedQuery,
+        hydrateCtx,
+      }, ctx);
       return {
         encoding: "application/json",
         body: results,
@@ -46,7 +61,12 @@ export default function (server: Server, ctx: AppContext) {
 
 const skeleton = async (inputs: SkeletonFnInput<Context, Params>) => {
   const { ctx, params } = inputs;
-  const term = params.q ?? "";
+  const term = params.q?.trim() ?? "";
+  if (!term) {
+    return {
+      dids: [],
+    };
+  }
 
   const res = await ctx.dataplane.search.actors(
     term,
