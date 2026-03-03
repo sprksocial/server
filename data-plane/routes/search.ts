@@ -93,6 +93,50 @@ export class Search {
     };
   }
 
+  async actorsTypeahead(term: string, limit = 10) {
+    const cleanedTerm = cleanQuery(term);
+    if (!cleanedTerm) {
+      return {
+        dids: [],
+      };
+    }
+
+    const safeLimit = Math.max(1, Math.min(limit, 100));
+    const candidateLimit = safeLimit * 3;
+    const handlePrefix = cleanedTerm.toLowerCase();
+    const handleRangeEnd = `${handlePrefix}\uffff`;
+
+    const [matchingActors, matchingProfiles] = await Promise.all([
+      this.db.models.Actor.find({
+        handle: {
+          $gte: handlePrefix,
+          $lt: handleRangeEnd,
+        },
+      })
+        .select("did -_id")
+        .sort({ handle: 1 })
+        .limit(candidateLimit)
+        .lean(),
+      this.db.models.Profile.find({
+        $text: { $search: cleanedTerm },
+      })
+        .select("authorDid -_id")
+        .limit(candidateLimit)
+        .lean(),
+    ]);
+
+    const dids = Array.from(
+      new Set([
+        ...matchingActors.map((actor) => actor.did),
+        ...matchingProfiles.map((profile) => profile.authorDid),
+      ]),
+    ).slice(0, safeLimit);
+
+    return {
+      dids,
+    };
+  }
+
   async posts(term: string, limit = 50, cursor?: string) {
     const { q, author } = parsePostSearchQuery(term);
 

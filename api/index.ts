@@ -18,6 +18,7 @@ import getBlocks from "./so/sprk/graph/getBlocks.ts";
 import putPreferences from "./so/sprk/actor/putPreferences.ts";
 import getPreferences from "./so/sprk/actor/getPreferences.ts";
 import searchActors from "./so/sprk/actor/searchActors.ts";
+import searchActorsTypeahead from "./so/sprk/actor/searchActorsTypeahead.ts";
 import getRecord from "./com/atproto/repo/getRecord.ts";
 import resolveHandle from "./com/atproto/identity/resolveHandle.ts";
 import getStories from "./so/sprk/story/getStories.ts";
@@ -58,6 +59,7 @@ export default function (server: Server, ctx: AppContext) {
   putPreferences(server, ctx);
   getPreferences(server, ctx);
   searchActors(server, ctx);
+  searchActorsTypeahead(server, ctx);
   getRecord(server, ctx);
   resolveHandle(server, ctx);
   getStories(server, ctx);
