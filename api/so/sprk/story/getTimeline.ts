@@ -104,27 +104,7 @@ const hydration = async (
   inputs: HydrationFnInput<Context, Params, Skeleton>,
 ): Promise<HydrationState> => {
   const { ctx, params, skeleton } = inputs;
-
-  // Get author DIDs for actor hydration (can be computed before fetching)
-  const authorDids = [
-    ...new Set(
-      skeleton.stories.map((uri) => uriToDid(uri)),
-    ),
-  ];
-
-  // Parallelize stories and actors hydration
-  const [stories, actors] = await Promise.all([
-    ctx.hydrator.story.getStories(
-      skeleton.stories,
-      params.hydrateCtx.includeTakedowns || false,
-    ),
-    ctx.hydrator.actor.getActors(authorDids, params.hydrateCtx),
-  ]);
-
-  return {
-    stories,
-    actors,
-  };
+  return await ctx.hydrator.hydrateStories(skeleton.stories, params.hydrateCtx);
 };
 
 const rules = (inputs: RulesFnInput<Context, Params, Skeleton>): Skeleton => {

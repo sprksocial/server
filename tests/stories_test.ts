@@ -1,4 +1,10 @@
 import { assertEquals } from "@std/assert";
+import { HydrationState } from "../hydration/index.ts";
+import { Actor } from "../hydration/actor.ts";
+import { HydrationMap, RecordInfo } from "../hydration/util.ts";
+import { Record as PostRecord } from "../lex/types/so/sprk/feed/post.ts";
+import { Record as StoryRecord } from "../lex/types/so/sprk/story/post.ts";
+import { Views } from "../views/index.ts";
 import { createTestContext, TEST_USERS } from "./util.ts";
 
 const VALID_BLOB_CID =
@@ -181,6 +187,545 @@ Deno.test({
         } finally {
           await cleanup();
         }
+      },
+    );
+
+    await t.step(
+      "hydrateStories fully hydrates embedded post metadata",
+      async () => {
+        const { ctx, cleanup } = await createTestContext({
+          actors: false,
+          profiles: false,
+          posts: false,
+          replies: false,
+          stories: false,
+          likes: false,
+          reposts: false,
+          follows: false,
+          blocks: false,
+          audio: false,
+          generators: false,
+          preferences: false,
+          records: false,
+          actorSync: false,
+        });
+
+        try {
+          const now = new Date();
+          const nowIso = now.toISOString();
+          const storyAuthorDid = TEST_USERS[0].did;
+          const postAuthorDid = TEST_USERS[1].did;
+          const storyUri =
+            `at://${storyAuthorDid}/so.sprk.story.post/story-hydrated`;
+          const postUri =
+            `at://${postAuthorDid}/so.sprk.feed.post/post-hydrated`;
+          const soundUri =
+            `at://${postAuthorDid}/so.sprk.sound.audio/sound-hydrated`;
+
+          await ctx.db.models.Actor.create([
+            {
+              did: storyAuthorDid,
+              handle: "story-author.test",
+              indexedAt: nowIso,
+              keys: [],
+              services: "[]",
+            },
+            {
+              did: postAuthorDid,
+              handle: "post-author.test",
+              indexedAt: nowIso,
+              keys: [],
+              services: "[]",
+            },
+          ]);
+
+          const soundRecord = {
+            $type: "so.sprk.sound.audio",
+            sound: {
+              $type: "blob",
+              ref: { $link: VALID_BLOB_CID },
+              mimeType: "audio/mpeg",
+              size: 12345,
+            },
+            title: "Hydrated Sound",
+            createdAt: nowIso,
+          };
+          const postRecord = {
+            $type: "so.sprk.feed.post",
+            media: {
+              $type: "so.sprk.media.images",
+              images: [{
+                $type: "so.sprk.media.image",
+                image: {
+                  $type: "blob",
+                  ref: { $link: VALID_BLOB_CID },
+                  mimeType: "image/jpeg",
+                  size: 22222,
+                },
+                alt: "Hydrated post image",
+              }],
+            },
+            sound: { uri: soundUri, cid: VALID_BLOB_CID },
+            createdAt: nowIso,
+          };
+          const storyRecord = {
+            $type: "so.sprk.story.post",
+            media: {
+              $type: "so.sprk.media.image",
+              image: {
+                $type: "blob",
+                ref: { $link: VALID_BLOB_CID },
+                mimeType: "image/jpeg",
+                size: 11111,
+              },
+              alt: "Hydrated story image",
+              aspectRatio: { width: 1080, height: 1920 },
+            },
+            embeds: [
+              {
+                $type: "so.sprk.embed.post",
+                placement: {
+                  frame: { x: 1000, y: 1000, w: 7000, h: 2500 },
+                },
+                post: { uri: postUri, cid: VALID_BLOB_CID },
+              },
+            ],
+            createdAt: nowIso,
+          };
+
+          await ctx.db.models.Audio.create({
+            uri: soundUri,
+            cid: VALID_BLOB_CID,
+            authorDid: postAuthorDid,
+            createdAt: nowIso,
+            indexedAt: nowIso,
+            sound: soundRecord.sound,
+            title: soundRecord.title,
+            useCount: 8,
+          });
+
+          await ctx.db.models.Post.create({
+            uri: postUri,
+            cid: VALID_BLOB_CID,
+            authorDid: postAuthorDid,
+            createdAt: nowIso,
+            indexedAt: nowIso,
+            caption: { text: "Hydrated post caption" },
+            media: postRecord.media,
+            sound: postRecord.sound,
+            labels: [],
+            tags: [],
+            likeCount: 17,
+            replyCount: 4,
+            repostCount: 2,
+          });
+
+          await ctx.db.models.Record.create([
+            {
+              uri: soundUri,
+              cid: VALID_BLOB_CID,
+              did: postAuthorDid,
+              collectionName: "so.sprk.sound.audio",
+              rkey: "sound-hydrated",
+              createdAt: nowIso,
+              indexedAt: nowIso,
+              json: JSON.stringify(soundRecord),
+              takenDown: false,
+            },
+            {
+              uri: postUri,
+              cid: VALID_BLOB_CID,
+              did: postAuthorDid,
+              collectionName: "so.sprk.feed.post",
+              rkey: "post-hydrated",
+              createdAt: nowIso,
+              indexedAt: nowIso,
+              json: JSON.stringify(postRecord),
+              takenDown: false,
+            },
+            {
+              uri: storyUri,
+              cid: VALID_BLOB_CID,
+              did: storyAuthorDid,
+              collectionName: "so.sprk.story.post",
+              rkey: "story-hydrated",
+              createdAt: nowIso,
+              indexedAt: nowIso,
+              json: JSON.stringify(storyRecord),
+              takenDown: false,
+            },
+          ]);
+
+          const hydrateCtx = await ctx.hydrator.createContext({
+            viewer: storyAuthorDid,
+            labelers: ctx.reqLabelers(new Request("https://example.com")),
+          });
+
+          const hydration = await ctx.hydrator.hydrateStories(
+            [storyUri],
+            hydrateCtx,
+          );
+          const storyView = ctx.views.story(storyUri, hydration);
+          const embed = storyView?.embeds?.[0] as {
+            post: {
+              $type?: string;
+              likeCount?: number;
+              replyCount?: number;
+              repostCount?: number;
+              viewer?: unknown;
+              sound?: { uri: string };
+            };
+          } | undefined;
+
+          assertEquals(embed?.post.$type, "so.sprk.feed.defs#postView");
+          assertEquals(embed?.post.likeCount, 17);
+          assertEquals(embed?.post.replyCount, 4);
+          assertEquals(embed?.post.repostCount, 2);
+          assertEquals(embed?.post.viewer !== undefined, true);
+          assertEquals(embed?.post.sound?.uri, soundUri);
+        } finally {
+          await cleanup();
+        }
+      },
+    );
+
+    await t.step(
+      "story view hydrates mention and post embeds",
+      () => {
+        const now = new Date();
+        const storyAuthorDid = TEST_USERS[0].did;
+        const mentionDid = TEST_USERS[1].did;
+        const postAuthorDid = TEST_USERS[2].did;
+        const storyUri =
+          `at://${storyAuthorDid}/so.sprk.story.post/embed-story`;
+        const postUri = `at://${postAuthorDid}/so.sprk.feed.post/embed-post`;
+
+        const storyRecord = {
+          $type: "so.sprk.story.post",
+          createdAt: now.toISOString(),
+          media: {
+            $type: "so.sprk.media.image",
+            image: {
+              ref: { $link: VALID_BLOB_CID },
+              mimeType: "image/jpeg",
+              size: 12345,
+            },
+            alt: "Story image",
+            aspectRatio: { width: 1080, height: 1920 },
+          },
+          embeds: [
+            {
+              $type: "so.sprk.embed.mention",
+              placement: {
+                frame: { x: 1000, y: 1000, w: 3000, h: 1000 },
+              },
+              did: mentionDid,
+            },
+            {
+              $type: "so.sprk.embed.post",
+              placement: {
+                frame: { x: 800, y: 5000, w: 8400, h: 3000 },
+              },
+              post: {
+                uri: postUri,
+                cid:
+                  "bafyreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyaa",
+              },
+            },
+          ],
+        } as unknown as StoryRecord;
+
+        const postRecord = {
+          $type: "so.sprk.feed.post",
+          createdAt: now.toISOString(),
+          media: {
+            $type: "so.sprk.media.images",
+            images: [{
+              $type: "so.sprk.media.image",
+              image: {
+                ref: { $link: VALID_BLOB_CID },
+                mimeType: "image/jpeg",
+                size: 22222,
+              },
+              alt: "Embedded post image",
+            }],
+          },
+        } as unknown as PostRecord;
+
+        const stories = new HydrationMap<RecordInfo<StoryRecord>>();
+        stories.set(storyUri, {
+          record: storyRecord,
+          cid: "bafyreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvybb",
+          sortedAt: now,
+          indexedAt: now,
+          takedownRef: undefined,
+        });
+
+        const posts = new HydrationMap<RecordInfo<PostRecord>>();
+        posts.set(postUri, {
+          record: postRecord,
+          cid: "bafyreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvycc",
+          sortedAt: now,
+          indexedAt: now,
+          takedownRef: undefined,
+        });
+
+        const actors = new HydrationMap<Actor>();
+        actors.set(storyAuthorDid, {
+          did: storyAuthorDid,
+          handle: "story-author.test",
+          createdAt: now,
+          sortedAt: now,
+        });
+        actors.set(mentionDid, {
+          did: mentionDid,
+          handle: "mentioned-user.test",
+          createdAt: now,
+          sortedAt: now,
+        });
+        actors.set(postAuthorDid, {
+          did: postAuthorDid,
+          handle: "post-author.test",
+          createdAt: now,
+          sortedAt: now,
+        });
+
+        const state: HydrationState = {
+          stories,
+          posts,
+          actors,
+        };
+
+        const views = new Views({
+          mediaCdn: "https://media.example.com",
+          thumbCdn: "https://thumb.example.com",
+          videoCdn: "https://video.example.com",
+        });
+
+        const view = views.story(storyUri, state);
+        assertEquals(view?.embeds?.length, 2);
+
+        const mentionView = view?.embeds?.[0] as {
+          $type: string;
+          did: string;
+          actor?: { did: string };
+        };
+        assertEquals(mentionView.$type, "so.sprk.embed.mention#view");
+        assertEquals(mentionView.did, mentionDid);
+        assertEquals(mentionView.actor?.did, mentionDid);
+
+        const postView = view?.embeds?.[1] as {
+          $type: string;
+          post: { $type?: string; uri: string };
+        };
+        assertEquals(postView.$type, "so.sprk.embed.post#view");
+        assertEquals(postView.post.$type, "so.sprk.feed.defs#postView");
+        assertEquals(postView.post.uri, postUri);
+      },
+    );
+
+    await t.step(
+      "story view ignores malformed post embeds",
+      () => {
+        const now = new Date();
+        const storyAuthorDid = TEST_USERS[0].did;
+        const storyUri =
+          `at://${storyAuthorDid}/so.sprk.story.post/bad-embed-story`;
+
+        const storyRecord = {
+          $type: "so.sprk.story.post",
+          createdAt: now.toISOString(),
+          media: {
+            $type: "so.sprk.media.image",
+            image: {
+              ref: { $link: VALID_BLOB_CID },
+              mimeType: "image/jpeg",
+              size: 12345,
+            },
+            alt: "Story image",
+            aspectRatio: { width: 1080, height: 1920 },
+          },
+          embeds: [
+            {
+              $type: "so.sprk.embed.post",
+              placement: {
+                frame: { x: 800, y: 5000, w: 8400, h: 3000 },
+              },
+            },
+          ],
+        } as unknown as StoryRecord;
+
+        const stories = new HydrationMap<RecordInfo<StoryRecord>>();
+        stories.set(storyUri, {
+          record: storyRecord,
+          cid: "bafyreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvydd",
+          sortedAt: now,
+          indexedAt: now,
+          takedownRef: undefined,
+        });
+
+        const actors = new HydrationMap<Actor>();
+        actors.set(storyAuthorDid, {
+          did: storyAuthorDid,
+          handle: "story-author.test",
+          createdAt: now,
+          sortedAt: now,
+        });
+
+        const state: HydrationState = {
+          stories,
+          actors,
+        };
+
+        const views = new Views({
+          mediaCdn: "https://media.example.com",
+          thumbCdn: "https://thumb.example.com",
+          videoCdn: "https://video.example.com",
+        });
+
+        const view = views.story(storyUri, state);
+        assertEquals(view?.embeds, undefined);
+      },
+    );
+
+    await t.step(
+      "story view ignores mention embed missing did",
+      () => {
+        const now = new Date();
+        const storyAuthorDid = TEST_USERS[0].did;
+        const storyUri =
+          `at://${storyAuthorDid}/so.sprk.story.post/no-did-mention-story`;
+
+        const storyRecord = {
+          $type: "so.sprk.story.post",
+          createdAt: now.toISOString(),
+          media: {
+            $type: "so.sprk.media.image",
+            image: {
+              ref: { $link: VALID_BLOB_CID },
+              mimeType: "image/jpeg",
+              size: 12345,
+            },
+            alt: "Story image",
+            aspectRatio: { width: 1080, height: 1920 },
+          },
+          embeds: [
+            {
+              $type: "so.sprk.embed.mention",
+              placement: {
+                frame: { x: 1000, y: 1000, w: 3000, h: 1000 },
+              },
+              // did is intentionally absent
+            },
+          ],
+        } as unknown as StoryRecord;
+
+        const stories = new HydrationMap<RecordInfo<StoryRecord>>();
+        stories.set(storyUri, {
+          record: storyRecord,
+          cid: "bafyreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyee",
+          sortedAt: now,
+          indexedAt: now,
+          takedownRef: undefined,
+        });
+
+        const actors = new HydrationMap<Actor>();
+        actors.set(storyAuthorDid, {
+          did: storyAuthorDid,
+          handle: "story-author.test",
+          createdAt: now,
+          sortedAt: now,
+        });
+
+        const state: HydrationState = { stories, actors };
+
+        const views = new Views({
+          mediaCdn: "https://media.example.com",
+          thumbCdn: "https://thumb.example.com",
+          videoCdn: "https://video.example.com",
+        });
+
+        const view = views.story(storyUri, state);
+        assertEquals(view?.embeds, undefined);
+      },
+    );
+
+    await t.step(
+      "story view ignores embeds missing placement",
+      () => {
+        const now = new Date();
+        const storyAuthorDid = TEST_USERS[0].did;
+        const mentionDid = TEST_USERS[1].did;
+        const postAuthorDid = TEST_USERS[2].did;
+        const storyUri =
+          `at://${storyAuthorDid}/so.sprk.story.post/no-placement-story`;
+        const postUri =
+          `at://${postAuthorDid}/so.sprk.feed.post/no-placement-post`;
+
+        const storyRecord = {
+          $type: "so.sprk.story.post",
+          createdAt: now.toISOString(),
+          media: {
+            $type: "so.sprk.media.image",
+            image: {
+              ref: { $link: VALID_BLOB_CID },
+              mimeType: "image/jpeg",
+              size: 12345,
+            },
+            alt: "Story image",
+            aspectRatio: { width: 1080, height: 1920 },
+          },
+          embeds: [
+            {
+              $type: "so.sprk.embed.mention",
+              // placement is intentionally absent
+              did: mentionDid,
+            },
+            {
+              $type: "so.sprk.embed.post",
+              // placement is intentionally absent
+              post: {
+                uri: postUri,
+                cid:
+                  "bafyreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyff",
+              },
+            },
+          ],
+        } as unknown as StoryRecord;
+
+        const stories = new HydrationMap<RecordInfo<StoryRecord>>();
+        stories.set(storyUri, {
+          record: storyRecord,
+          cid: "bafyreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvygg",
+          sortedAt: now,
+          indexedAt: now,
+          takedownRef: undefined,
+        });
+
+        const actors = new HydrationMap<Actor>();
+        actors.set(storyAuthorDid, {
+          did: storyAuthorDid,
+          handle: "story-author.test",
+          createdAt: now,
+          sortedAt: now,
+        });
+        actors.set(mentionDid, {
+          did: mentionDid,
+          handle: "mentioned-user.test",
+          createdAt: now,
+          sortedAt: now,
+        });
+
+        const state: HydrationState = { stories, actors };
+
+        const views = new Views({
+          mediaCdn: "https://media.example.com",
+          thumbCdn: "https://thumb.example.com",
+          videoCdn: "https://video.example.com",
+        });
+
+        const view = views.story(storyUri, state);
+        assertEquals(view?.embeds, undefined);
       },
     );
   },

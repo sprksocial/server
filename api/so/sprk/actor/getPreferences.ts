@@ -3,7 +3,6 @@ import { AppContext } from "../../../../context.ts";
 import {
   ContentLabelPref,
   MutedWord,
-  PostInteractionSettingsPref,
   Preferences,
   SavedFeed,
   ThreadViewPref,
@@ -107,16 +106,6 @@ export default function (server: Server, ctx: AppContext) {
           preferences.push({
             $type: "so.sprk.actor.defs#labelersPref",
             labelers: userPref.labelersPref.labelers,
-          });
-        }
-
-        if (userPref.postInteractionSettingsPref) {
-          preferences.push({
-            $type: "so.sprk.actor.defs#postInteractionSettingsPref",
-            threadgateAllowRules: userPref.postInteractionSettingsPref
-              .threadgateAllowRules as PostInteractionSettingsPref[
-                "threadgateAllowRules"
-              ],
           });
         }
 

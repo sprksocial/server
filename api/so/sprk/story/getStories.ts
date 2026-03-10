@@ -126,29 +126,7 @@ const hydration = async (
   inputs: HydrationFnInput<Context, Params, Skeleton>,
 ): Promise<HydrationState> => {
   const { ctx, params, skeleton } = inputs;
-  // Hydrate stories
-  const stories = await ctx.hydrator.story.getStories(
-    skeleton.stories,
-    params.hydrateCtx.includeTakedowns || false,
-  );
-
-  // Get author DIDs for actor hydration
-  const authorDids = [
-    ...new Set(
-      skeleton.stories.map((uri) => uriToDid(uri)),
-    ),
-  ];
-
-  // Hydrate actors (profiles)
-  const actors = await ctx.hydrator.actor.getActors(
-    authorDids,
-    params.hydrateCtx,
-  );
-
-  return {
-    stories,
-    actors,
-  };
+  return await ctx.hydrator.hydrateStories(skeleton.stories, params.hydrateCtx);
 };
 
 const rules = (inputs: RulesFnInput<Context, Params, Skeleton>): Skeleton => {

@@ -3,6 +3,7 @@ import { AtUri } from "@atp/syntax";
 import { DataPlane } from "../data-plane/index.ts";
 import { ids } from "../lex/lexicons.ts";
 import { Record as ProfileRecord } from "../lex/types/so/sprk/actor/profile.ts";
+import { Record as StoryRecord } from "../lex/types/so/sprk/story/post.ts";
 import { uriToDid as didFromUri } from "../utils/uris.ts";
 import {
   ActivitySubscriptionStates,
@@ -572,6 +573,82 @@ export class Hydrator {
     ctx: HydrateCtx,
   ): Promise<HydrationState> {
     return this.hydratePosts(refs, ctx);
+  }
+
+  // so.sprk.story.defs#storyView
+  // - story
+  //   - profile
+  //     - list basic
+  // - embeds (story record)
+  //   - mention
+  //     - profile
+  //       - list basic
+  //   - post
+  //     - postView / blockedPost / notFoundPost
+  //       - profile
+  //         - list basic
+  async hydrateStories(
+    uris: string[],
+    ctx: HydrateCtx,
+  ): Promise<HydrationState> {
+    const stories = await this.story.getStories(uris, ctx.includeTakedowns);
+
+    const storyAuthorDids = uris.map(didFromUri);
+    const embedPostUris = new Set<string>();
+    const mentionDids = new Set<string>();
+
+    for (const story of stories.values()) {
+      if (!story) continue;
+      const record = story.record as StoryRecord;
+      for (const embed of record.embeds ?? []) {
+        if (
+          embed &&
+          typeof embed === "object" &&
+          "$type" in embed &&
+          (embed as { $type?: string }).$type === "so.sprk.embed.post"
+        ) {
+          const postUri = (embed as { post?: { uri?: string } }).post?.uri;
+          if (postUri) {
+            embedPostUris.add(postUri);
+          }
+        } else if (
+          embed &&
+          typeof embed === "object" &&
+          "$type" in embed &&
+          (embed as { $type?: string }).$type === "so.sprk.embed.mention"
+        ) {
+          const did = (embed as { did?: string }).did;
+          if (did) {
+            mentionDids.add(did);
+          }
+        }
+      }
+    }
+
+    const postUris: string[] = [];
+    for (const postUri of embedPostUris) {
+      try {
+        didFromUri(postUri);
+        postUris.push(postUri);
+      } catch {
+        continue;
+      }
+    }
+    const profileDids = Array.from(
+      new Set<string>([
+        ...storyAuthorDids,
+        ...mentionDids,
+      ]),
+    );
+
+    const [postState, profileState] = await Promise.all([
+      postUris.length > 0
+        ? this.hydratePosts(postUris.map((uri) => ({ uri })), ctx)
+        : Promise.resolve<HydrationState>({}),
+      this.hydrateProfiles(profileDids, ctx),
+    ]);
+
+    return mergeManyStates(profileState, postState, { stories, ctx });
   }
 
   // so.sprk.feed.defs#generatorView

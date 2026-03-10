@@ -413,6 +413,7 @@ export const crosspostReplySchema = new Schema<CrosspostReplyDocument>({
 export interface StoryDocument extends AuthoredDocument {
   media: StoryMedia;
   sound?: RecordRef;
+  embeds?: StoryEmbed[];
   labels?: Label[];
 }
 export const storySchema = new Schema<StoryDocument>({
@@ -425,6 +426,7 @@ export const storySchema = new Schema<StoryDocument>({
     },
     required: false,
   },
+  embeds: { type: [Object], required: false, default: [] },
   labels: { type: [Object], required: false, default: [] },
 })
   .index({ authorDid: 1, createdAt: -1 });

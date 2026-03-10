@@ -6,6 +6,7 @@ import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as SoSprkActorDefs from "../actor/defs.ts";
 import type * as SoSprkMediaImage from "../media/image.ts";
 import type * as SoSprkMediaVideo from "../media/video.ts";
+import type * as SoSprkEmbedDefs from "../embed/defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.story.defs";
@@ -19,6 +20,7 @@ export interface StoryView {
   media?: $Typed<SoSprkMediaImage.View> | $Typed<SoSprkMediaVideo.View> | {
     $type: string;
   };
+  embeds?: SoSprkEmbedDefs.Views;
   indexedAt: string;
 }
 

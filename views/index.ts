@@ -25,6 +25,8 @@ import {
   ThreadViewPost,
 } from "../lex/types/so/sprk/feed/defs.ts";
 import { StoriesByAuthor, StoryView } from "../lex/types/so/sprk/story/defs.ts";
+import { Main as MentionEmbed } from "../lex/types/so/sprk/embed/mention.ts";
+import { Main as PostEmbed } from "../lex/types/so/sprk/embed/post.ts";
 import {
   isRecord as isReplyRecord,
   Record as ReplyRecord,
@@ -427,9 +429,69 @@ export class Views {
       author,
       record: storyInfo.record,
       media: mediaRecord ? this.storyMedia(uri, mediaRecord) : undefined,
+      embeds: this.storyEmbeds(storyInfo.record.embeds, state),
       indexedAt: this.indexedAt(storyInfo)?.toISOString() ??
         new Date().toISOString(),
     };
+  }
+
+  private isMentionEmbedRecord(embed: unknown): embed is MentionEmbed {
+    if (!embed || typeof embed !== "object") return false;
+    const e = embed as Record<string, unknown>;
+    return e["$type"] === "so.sprk.embed.mention" &&
+      typeof e["did"] === "string" &&
+      (e["did"] as string).length > 0 &&
+      !!e["placement"] &&
+      typeof e["placement"] === "object" &&
+      !!(e["placement"] as Record<string, unknown>)["frame"] &&
+      typeof (e["placement"] as Record<string, unknown>)["frame"] === "object";
+  }
+
+  private isPostEmbedRecord(embed: unknown): embed is PostEmbed {
+    if (!embed || typeof embed !== "object") return false;
+    const e = embed as Record<string, unknown>;
+    const post = e["post"] as Record<string, unknown> | undefined;
+    return e["$type"] === "so.sprk.embed.post" &&
+      typeof post?.["uri"] === "string" &&
+      !!e["placement"] &&
+      typeof e["placement"] === "object" &&
+      !!(e["placement"] as Record<string, unknown>)["frame"] &&
+      typeof (e["placement"] as Record<string, unknown>)["frame"] === "object";
+  }
+
+  storyEmbeds(
+    embeds: unknown,
+    state: HydrationState,
+  ): StoryView["embeds"] | undefined {
+    if (!Array.isArray(embeds) || embeds.length === 0) {
+      return undefined;
+    }
+
+    const views = mapDefined(embeds, (embed) => {
+      if (this.isMentionEmbedRecord(embed)) {
+        return {
+          $type: "so.sprk.embed.mention#view",
+          placement: embed.placement,
+          did: embed.did,
+          actor: this.profileBasic(embed.did, state),
+        };
+      }
+
+      if (this.isPostEmbedRecord(embed)) {
+        const embedded = this.maybePost(embed.post.uri, state);
+        return {
+          $type: "so.sprk.embed.post#view",
+          placement: embed.placement,
+          post: isReplyView(embedded)
+            ? this.notFoundPost(embed.post.uri)
+            : embedded,
+        };
+      }
+
+      return undefined;
+    });
+
+    return views.length > 0 ? views as StoryView["embeds"] : undefined;
   }
 
   storiesByAuthor(

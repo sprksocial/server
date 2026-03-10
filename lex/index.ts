@@ -2641,6 +2641,7 @@ export class SoNS {
 export class SoSprkNS {
   _server: Server;
   video: SoSprkVideoNS;
+  embed: SoSprkEmbedNS;
   notification: SoSprkNotificationNS;
   graph: SoSprkGraphNS;
   feed: SoSprkFeedNS;
@@ -2654,6 +2655,7 @@ export class SoSprkNS {
   constructor(server: Server) {
     this._server = server;
     this.video = new SoSprkVideoNS(server);
+    this.embed = new SoSprkEmbedNS(server);
     this.notification = new SoSprkNotificationNS(server);
     this.graph = new SoSprkGraphNS(server);
     this.feed = new SoSprkFeedNS(server);
@@ -2707,6 +2709,14 @@ export class SoSprkVideoNS {
   ) {
     const nsid = "so.sprk.video.getUploadLimits"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
+  }
+}
+
+export class SoSprkEmbedNS {
+  _server: Server;
+
+  constructor(server: Server) {
+    this._server = server;
   }
 }
 

@@ -5,7 +5,6 @@ import { validate as _validate } from "../../../../lexicons.ts";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef.ts";
-import type * as SoSprkFeedThreadgate from "../feed/threadgate.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.actor.defs";
@@ -173,7 +172,6 @@ export type Preferences = (
   | $Typed<MutedWordsPref>
   | $Typed<HiddenPostsPref>
   | $Typed<LabelersPref>
-  | $Typed<PostInteractionSettingsPref>
   | { $type: string }
 )[];
 
@@ -405,30 +403,4 @@ export function isLabelerPrefItem<V>(v: V) {
 
 export function validateLabelerPrefItem<V>(v: V) {
   return validate<LabelerPrefItem & V>(v, id, hashLabelerPrefItem);
-}
-
-/** Default post interaction settings for the account. These values should be applied as default values when creating new posts. These refs should mirror the threadgate and postgate records exactly. */
-export interface PostInteractionSettingsPref {
-  $type?: "so.sprk.actor.defs#postInteractionSettingsPref";
-  /** Matches threadgate record. List of rules defining who can reply to this users posts. If value is an empty array, no one can reply. If value is undefined, anyone can reply. */
-  threadgateAllowRules?: (
-    | $Typed<SoSprkFeedThreadgate.MentionRule>
-    | $Typed<SoSprkFeedThreadgate.FollowerRule>
-    | $Typed<SoSprkFeedThreadgate.FollowingRule>
-    | { $type: string }
-  )[];
-}
-
-const hashPostInteractionSettingsPref = "postInteractionSettingsPref";
-
-export function isPostInteractionSettingsPref<V>(v: V) {
-  return is$typed(v, id, hashPostInteractionSettingsPref);
-}
-
-export function validatePostInteractionSettingsPref<V>(v: V) {
-  return validate<PostInteractionSettingsPref & V>(
-    v,
-    id,
-    hashPostInteractionSettingsPref,
-  );
 }

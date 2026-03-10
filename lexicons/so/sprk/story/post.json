@@ -18,6 +18,10 @@
             "type": "ref",
             "ref": "com.atproto.repo.strongRef"
           },
+          "embeds": {
+            "type": "ref",
+            "ref": "so.sprk.embed.defs#embeds"
+          },
           "labels": {
             "type": "union",
             "description": "Self-label values for this story. Effectively content warnings.",

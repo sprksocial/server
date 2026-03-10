@@ -17,6 +17,10 @@
           "type": "union",
           "refs": ["so.sprk.media.image#view", "so.sprk.media.video#view"]
         },
+        "embeds": {
+          "type": "ref",
+          "ref": "so.sprk.embed.defs#views"
+        },
         "indexedAt": { "type": "string", "format": "datetime" }
       }
     },

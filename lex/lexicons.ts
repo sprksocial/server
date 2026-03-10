@@ -16281,6 +16281,197 @@ export const schemaDict = {
       },
     },
   },
+  "SoSprkEmbedDefs": {
+    "lexicon": 1,
+    "id": "so.sprk.embed.defs",
+    "description": "Shared definitions for Spark interactive embeds.",
+    "defs": {
+      "embeds": {
+        "type": "array",
+        "items": {
+          "type": "union",
+          "refs": [
+            "lex:so.sprk.embed.mention",
+            "lex:so.sprk.embed.post",
+          ],
+        },
+      },
+      "views": {
+        "type": "array",
+        "items": {
+          "type": "union",
+          "refs": [
+            "lex:so.sprk.embed.mention#view",
+            "lex:so.sprk.embed.post#view",
+          ],
+        },
+      },
+      "placement": {
+        "type": "object",
+        "description":
+          "Placement and layer metadata for an embed on a media canvas.",
+        "required": [
+          "frame",
+        ],
+        "properties": {
+          "frame": {
+            "type": "ref",
+            "ref": "lex:so.sprk.embed.defs#frame",
+          },
+          "mediaRef": {
+            "type": "ref",
+            "ref": "lex:so.sprk.embed.defs#mediaRef",
+          },
+          "zIndex": {
+            "type": "integer",
+            "minimum": 0,
+          },
+          "rotation": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 359,
+          },
+        },
+      },
+      "frame": {
+        "type": "object",
+        "description":
+          "Bounding box in 10,000-based normalized coordinates relative to media canvas dimensions.",
+        "required": [
+          "x",
+          "y",
+          "w",
+          "h",
+        ],
+        "properties": {
+          "x": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000,
+          },
+          "y": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000,
+          },
+          "w": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+          },
+          "h": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+          },
+        },
+      },
+      "mediaRef": {
+        "type": "object",
+        "description":
+          "Optional media locator for records containing multiple media items.",
+        "required": [
+          "index",
+        ],
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 0,
+          },
+        },
+      },
+    },
+  },
+  "SoSprkEmbedMention": {
+    "lexicon": 1,
+    "id": "so.sprk.embed.mention",
+    "description": "Interactive mention embed.",
+    "defs": {
+      "main": {
+        "type": "object",
+        "required": [
+          "placement",
+          "did",
+        ],
+        "properties": {
+          "placement": {
+            "type": "ref",
+            "ref": "lex:so.sprk.embed.defs#placement",
+          },
+          "did": {
+            "type": "string",
+            "format": "did",
+          },
+        },
+      },
+      "view": {
+        "type": "object",
+        "required": [
+          "placement",
+          "did",
+        ],
+        "properties": {
+          "placement": {
+            "type": "ref",
+            "ref": "lex:so.sprk.embed.defs#placement",
+          },
+          "did": {
+            "type": "string",
+            "format": "did",
+          },
+          "actor": {
+            "type": "ref",
+            "ref": "lex:so.sprk.actor.defs#profileViewBasic",
+          },
+        },
+      },
+    },
+  },
+  "SoSprkEmbedPost": {
+    "lexicon": 1,
+    "id": "so.sprk.embed.post",
+    "description": "Interactive post embed.",
+    "defs": {
+      "main": {
+        "type": "object",
+        "required": [
+          "placement",
+          "post",
+        ],
+        "properties": {
+          "placement": {
+            "type": "ref",
+            "ref": "lex:so.sprk.embed.defs#placement",
+          },
+          "post": {
+            "type": "ref",
+            "ref": "lex:com.atproto.repo.strongRef",
+          },
+        },
+      },
+      "view": {
+        "type": "object",
+        "required": [
+          "placement",
+          "post",
+        ],
+        "properties": {
+          "placement": {
+            "type": "ref",
+            "ref": "lex:so.sprk.embed.defs#placement",
+          },
+          "post": {
+            "type": "union",
+            "refs": [
+              "lex:so.sprk.feed.defs#postView",
+              "lex:so.sprk.feed.defs#notFoundPost",
+              "lex:so.sprk.feed.defs#blockedPost",
+            ],
+          },
+        },
+      },
+    },
+  },
   "SoSprkNotificationRegisterPush": {
     "lexicon": 1,
     "id": "so.sprk.notification.registerPush",
@@ -18199,63 +18390,6 @@ export const schemaDict = {
       },
     },
   },
-  "SoSprkFeedPostgate": {
-    "lexicon": 1,
-    "id": "so.sprk.feed.postgate",
-    "defs": {
-      "main": {
-        "type": "record",
-        "key": "tid",
-        "description":
-          "Record defining interaction rules for a post. The record key (rkey) of the postgate record must match the record key of the post, and that record must be in the same repository.",
-        "record": {
-          "type": "object",
-          "required": [
-            "post",
-            "createdAt",
-          ],
-          "properties": {
-            "createdAt": {
-              "type": "string",
-              "format": "datetime",
-            },
-            "post": {
-              "type": "string",
-              "format": "at-uri",
-              "description": "Reference (AT-URI) to the post record.",
-            },
-            "detachedEmbeddingUris": {
-              "type": "array",
-              "maxLength": 50,
-              "items": {
-                "type": "string",
-                "format": "at-uri",
-              },
-              "description":
-                "List of AT-URIs embedding this post that the author has detached from.",
-            },
-            "embeddingRules": {
-              "description":
-                "List of rules defining who can embed this post. If value is an empty array or is undefined, no particular rules apply and anyone can embed.",
-              "type": "array",
-              "maxLength": 5,
-              "items": {
-                "type": "union",
-                "refs": [
-                  "lex:so.sprk.feed.postgate#disableRule",
-                ],
-              },
-            },
-          },
-        },
-      },
-      "disableRule": {
-        "type": "object",
-        "description": "Disables embedding of this post.",
-        "properties": {},
-      },
-    },
-  },
   "SoSprkFeedThreadgate": {
     "lexicon": 1,
     "id": "so.sprk.feed.threadgate",
@@ -20160,7 +20294,6 @@ export const schemaDict = {
             "lex:so.sprk.actor.defs#mutedWordsPref",
             "lex:so.sprk.actor.defs#hiddenPostsPref",
             "lex:so.sprk.actor.defs#labelersPref",
-            "lex:so.sprk.actor.defs#postInteractionSettingsPref",
           ],
         },
       },
@@ -20423,28 +20556,6 @@ export const schemaDict = {
           "did": {
             "type": "string",
             "format": "did",
-          },
-        },
-      },
-      "postInteractionSettingsPref": {
-        "type": "object",
-        "description":
-          "Default post interaction settings for the account. These values should be applied as default values when creating new posts. These refs should mirror the threadgate and postgate records exactly.",
-        "required": [],
-        "properties": {
-          "threadgateAllowRules": {
-            "description":
-              "Matches threadgate record. List of rules defining who can reply to this users posts. If value is an empty array, no one can reply. If value is undefined, anyone can reply.",
-            "type": "array",
-            "maxLength": 5,
-            "items": {
-              "type": "union",
-              "refs": [
-                "lex:so.sprk.feed.threadgate#mentionRule",
-                "lex:so.sprk.feed.threadgate#followerRule",
-                "lex:so.sprk.feed.threadgate#followingRule",
-              ],
-            },
           },
         },
       },
@@ -20785,6 +20896,10 @@ export const schemaDict = {
               "lex:so.sprk.media.video#view",
             ],
           },
+          "embeds": {
+            "type": "ref",
+            "ref": "lex:so.sprk.embed.defs#views",
+          },
           "indexedAt": {
             "type": "string",
             "format": "datetime",
@@ -20952,6 +21067,10 @@ export const schemaDict = {
             "sound": {
               "type": "ref",
               "ref": "lex:com.atproto.repo.strongRef",
+            },
+            "embeds": {
+              "type": "ref",
+              "ref": "lex:so.sprk.embed.defs#embeds",
             },
             "labels": {
               "type": "union",
@@ -26953,6 +27072,9 @@ export const ids = {
   SoSprkVideoDefs: "so.sprk.video.defs",
   SoSprkVideoGetJobStatus: "so.sprk.video.getJobStatus",
   SoSprkVideoGetUploadLimits: "so.sprk.video.getUploadLimits",
+  SoSprkEmbedDefs: "so.sprk.embed.defs",
+  SoSprkEmbedMention: "so.sprk.embed.mention",
+  SoSprkEmbedPost: "so.sprk.embed.post",
   SoSprkNotificationRegisterPush: "so.sprk.notification.registerPush",
   SoSprkNotificationPutPreferences: "so.sprk.notification.putPreferences",
   SoSprkNotificationUpdateSeen: "so.sprk.notification.updateSeen",
@@ -26982,7 +27104,6 @@ export const ids = {
   SoSprkFeedGetFeedGenerator: "so.sprk.feed.getFeedGenerator",
   SoSprkFeedGetAuthorFeed: "so.sprk.feed.getAuthorFeed",
   SoSprkFeedGetLikes: "so.sprk.feed.getLikes",
-  SoSprkFeedPostgate: "so.sprk.feed.postgate",
   SoSprkFeedThreadgate: "so.sprk.feed.threadgate",
   SoSprkFeedGetPostThread: "so.sprk.feed.getPostThread",
   SoSprkFeedGetActorLikes: "so.sprk.feed.getActorLikes",

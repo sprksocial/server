@@ -7,7 +7,6 @@ import {
   LabelersPref,
   MutedWordsPref,
   PersonalDetailsPref,
-  PostInteractionSettingsPref,
   SavedFeedsPref,
   ThreadViewPref,
 } from "../../../../lex/types/so/sprk/actor/defs.ts";
@@ -103,16 +102,6 @@ export default function (server: Server, ctx: AppContext) {
               const p = pref as LabelersPref;
               updateData.labelersPref = {
                 labelers: p.labelers ?? [],
-              };
-              break;
-            }
-            case "so.sprk.actor.defs#postInteractionSettingsPref": {
-              const p = pref as PostInteractionSettingsPref;
-              updateData.postInteractionSettingsPref = {
-                threadgateAllowRules: p.threadgateAllowRules as Array<{
-                  $type: string;
-                  [key: string]: unknown;
-                }>,
               };
               break;
             }

@@ -23,8 +23,8 @@ const insertFn = async (
     authorDid: uri.host,
     media: obj.media,
     sound: obj.sound,
+    embeds: obj.embeds || [],
     labels: obj.labels || null,
-    tags: obj.tags || [],
     createdAt: normalizeDatetimeAlways(obj.createdAt),
     indexedAt: timestamp,
   };
