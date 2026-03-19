@@ -26,7 +26,6 @@ import * as Repost from "./plugins/repost.ts";
 import * as Story from "./plugins/story.ts";
 import * as Audio from "./plugins/audio.ts";
 import * as Labeler from "./plugins/labeler.ts";
-import * as CrosspostReply from "./plugins/crosspost/reply.ts";
 import { RecordProcessor } from "./processor.ts";
 import { ServerConfig } from "../../config.ts";
 import { PushService } from "../../utils/push.ts";
@@ -44,7 +43,6 @@ export class IndexingService {
     story: Story.PluginType;
     audio: Audio.PluginType;
     labeler: Labeler.PluginType;
-    crosspostReply: CrosspostReply.PluginType;
   };
   private pushService?: PushService;
 
@@ -68,7 +66,6 @@ export class IndexingService {
       story: Story.makePlugin(this.db, this.background),
       audio: Audio.makePlugin(this.db, this.background),
       labeler: Labeler.makePlugin(this.db, this.background),
-      crosspostReply: CrosspostReply.makePlugin(this.db, this.background),
     };
 
     // Set push service on all processors

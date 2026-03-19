@@ -156,6 +156,14 @@ export class Database {
     }
   }
 
+  async waitForConnection(): Promise<void> {
+    if (!this.connection) {
+      throw new Error("Database not connected");
+    }
+
+    await this.connection.asPromise();
+  }
+
   async disconnect(): Promise<void> {
     if (this.connection) {
       await this.connection.close();
@@ -169,6 +177,15 @@ export class Database {
       throw new Error("Database not connected");
     }
     await db.admin().ping();
+  }
+
+  async command<T>(command: Record<string, unknown>): Promise<T> {
+    const db = this.connection?.db;
+    if (!db) {
+      throw new Error("Database not connected");
+    }
+
+    return await db.command(command) as T;
   }
 
   // Add methods for DID resolution
@@ -207,7 +224,9 @@ export class Database {
     return getResultFromDoc(doc);
   }
 
-  async getCursorState(identifier = "last_processed_cursor"): Promise<number | null> {
+  async getCursorState(
+    identifier = "last_processed_cursor",
+  ): Promise<number | null> {
     try {
       const cursorState = await this.models.CursorState.findOne({
         identifier,

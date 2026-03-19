@@ -204,9 +204,7 @@ Deno.test({
         const secondRes = await app.request(
           `/xrpc/so.sprk.feed.getCrosspostThread?anchor=${
             encodeURIComponent(parentUri)
-          }&depth=5&parentHeight=5&sort=oldest&limit=2&cursor=${
-            firstBody.cursor
-          }`,
+          }&depth=5&parentHeight=5&sort=oldest&limit=2&cursor=${firstBody.cursor}`,
         );
         assertEquals(secondRes.status, 200);
         const secondBody = await secondRes.json() as OutputSchema;
@@ -218,9 +216,7 @@ Deno.test({
         const thirdRes = await app.request(
           `/xrpc/so.sprk.feed.getCrosspostThread?anchor=${
             encodeURIComponent(parentUri)
-          }&depth=5&parentHeight=5&sort=oldest&limit=2&cursor=${
-            secondBody.cursor
-          }`,
+          }&depth=5&parentHeight=5&sort=oldest&limit=2&cursor=${secondBody.cursor}`,
         );
         assertEquals(thirdRes.status, 200);
         const thirdBody = await thirdRes.json() as OutputSchema;
@@ -295,48 +291,57 @@ Deno.test({
         );
       });
 
-      await t.step("hides taken-down thread records for standard viewers", async () => {
-        await ctx.db.models.Record.create({
-          uri: reply4Uri,
-          cid: reply4Cid,
-          did: TEST_USERS[3].did,
-          collectionName: "app.bsky.feed.post",
-          rkey: "cross4",
-          createdAt: time4,
-          indexedAt: time4,
-          json: JSON.stringify({
-            $type: "app.bsky.feed.post",
-            text: "reply-4",
+      await t.step(
+        "hides taken-down thread records for standard viewers",
+        async () => {
+          await ctx.db.models.Record.create({
+            uri: reply4Uri,
+            cid: reply4Cid,
+            did: TEST_USERS[3].did,
+            collectionName: "app.bsky.feed.post",
+            rkey: "cross4",
             createdAt: time4,
-          }),
-          takedownRef: "TAKEDOWN",
-        });
+            indexedAt: time4,
+            json: JSON.stringify({
+              $type: "app.bsky.feed.post",
+              text: "reply-4",
+              createdAt: time4,
+            }),
+            takedownRef: "TAKEDOWN",
+          });
 
-        const res = await app.request(
-          `/xrpc/so.sprk.feed.getCrosspostThread?anchor=${
-            encodeURIComponent(parentUri)
-          }&depth=5&parentHeight=5&sort=oldest&limit=50`,
-        );
-        assertEquals(res.status, 200);
-        const body = await res.json() as OutputSchema;
-        assertEquals(body.thread.some((item) => item.uri === reply4Uri), false);
-      });
+          const res = await app.request(
+            `/xrpc/so.sprk.feed.getCrosspostThread?anchor=${
+              encodeURIComponent(parentUri)
+            }&depth=5&parentHeight=5&sort=oldest&limit=50`,
+          );
+          assertEquals(res.status, 200);
+          const body = await res.json() as OutputSchema;
+          assertEquals(
+            body.thread.some((item) => item.uri === reply4Uri),
+            false,
+          );
+        },
+      );
 
-      await t.step("stops on cyclic ancestors and keeps anchor at depth 0", async () => {
-        const res = await app.request(
-          `/xrpc/so.sprk.feed.getCrosspostThread?anchor=${
-            encodeURIComponent(cycleAUri)
-          }&depth=0&parentHeight=10&sort=oldest&limit=50`,
-        );
-        assertEquals(res.status, 200);
+      await t.step(
+        "stops on cyclic ancestors and keeps anchor at depth 0",
+        async () => {
+          const res = await app.request(
+            `/xrpc/so.sprk.feed.getCrosspostThread?anchor=${
+              encodeURIComponent(cycleAUri)
+            }&depth=0&parentHeight=10&sort=oldest&limit=50`,
+          );
+          assertEquals(res.status, 200);
 
-        const body = await res.json() as OutputSchema;
-        assertEquals(body.thread.length, 2);
-        assertEquals(body.thread[0].uri, cycleBUri);
-        assertEquals(body.thread[0].depth, -1);
-        assertEquals(body.thread[1].uri, cycleAUri);
-        assertEquals(body.thread[1].depth, 0);
-      });
+          const body = await res.json() as OutputSchema;
+          assertEquals(body.thread.length, 2);
+          assertEquals(body.thread[0].uri, cycleBUri);
+          assertEquals(body.thread[0].depth, -1);
+          assertEquals(body.thread[1].uri, cycleAUri);
+          assertEquals(body.thread[1].depth, 0);
+        },
+      );
     } finally {
       await cleanup();
     }

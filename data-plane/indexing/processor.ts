@@ -30,6 +30,7 @@ type RecordProcessorParams<T, S> = {
     replacedBy: S | null,
   ) => { notifs: Notif[]; toDelete: string[] };
   updateAggregates?: (db: Database, obj: S) => Promise<void>;
+  deleteRecordIfInsertReturnsNull?: boolean;
 };
 
 type Notif = {
@@ -156,11 +157,19 @@ export class RecordProcessor<T, S> {
       obj,
       timestamp,
     );
-    if (inserted) {
-      this.aggregateOnCommit(inserted);
-      if (!opts?.disableNotifs) {
-        this.handleNotifs({ inserted });
+    if (!inserted) {
+      if (this.params.deleteRecordIfInsertReturnsNull) {
+        await this.db.models.Record.deleteOne({ uri: uri.toString() });
+        await this.db.models.DuplicateRecord.deleteOne({
+          uri: uri.toString(),
+        });
       }
+      return;
+    }
+
+    this.aggregateOnCommit(inserted);
+    if (!opts?.disableNotifs) {
+      this.handleNotifs({ inserted });
     }
   }
 
@@ -234,6 +243,16 @@ export class RecordProcessor<T, S> {
       timestamp,
     );
     if (!inserted) {
+      if (this.params.deleteRecordIfInsertReturnsNull) {
+        await this.db.models.Record.deleteOne({ uri: uri.toString() });
+        await this.db.models.DuplicateRecord.deleteOne({
+          uri: uri.toString(),
+        });
+        if (!opts?.disableNotifs) {
+          await this.handleNotifs({ deleted });
+        }
+        return;
+      }
       throw new Error(
         "Record update failed: removed from index but could not be replaced",
       );
