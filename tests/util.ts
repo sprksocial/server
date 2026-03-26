@@ -213,6 +213,8 @@ export async function createTestDatabase(
     ),
   };
 
+  await connection.asPromise();
+
   // Seed data
   await seedTestData(dbModels, opts);
 
@@ -273,7 +275,7 @@ export function createMockContext(
     ping: () => Promise.resolve(),
     models: {},
     getCursorState: () => Promise.resolve(null),
-    saveCursorState: () => Promise.resolve(),
+    saveCursorState: () => Promise.resolve(true),
     idResolver,
   } as unknown as Database;
 
@@ -342,6 +344,7 @@ export async function createTestContext(
         },
         { upsert: true },
       );
+      return true;
     },
     resolveHandle: async (handle: string) => {
       return await idResolver.handle.resolve(handle);

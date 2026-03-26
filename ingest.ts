@@ -1,11 +1,14 @@
 import { RepoSubscription } from "./data-plane/subscription.ts";
-import { IdResolver } from "@atp/identity";
+import { IdResolver, MemoryCache } from "@atp/identity";
 import { ServerConfig } from "./config.ts";
 import { Database } from "./data-plane/db/index.ts";
 
 const cfg = ServerConfig.readEnv();
 
-const idResolver = new IdResolver({ plcUrl: cfg.plcUrl });
+const idResolver = new IdResolver({
+  plcUrl: cfg.plcUrl,
+  didCache: new MemoryCache(),
+});
 const db = new Database(cfg);
 db.connect();
 

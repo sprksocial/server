@@ -46,7 +46,9 @@ export const getDescendents = async (
   // Get nested replies (depth > 1)
   if (depth > 1) {
     const processedUris = new Set(directChildren.map((r) => r.uri));
-    const toProcess = [...directChildren.map((r) => ({ uri: r.uri, depth: 1 }))];
+    const toProcess = [
+      ...directChildren.map((r) => ({ uri: r.uri, depth: 1 })),
+    ];
 
     while (toProcess.length > 0) {
       const current = toProcess.shift()!;

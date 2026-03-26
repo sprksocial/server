@@ -15,6 +15,7 @@ export class Database {
 
   constructor(private cfg: ServerConfig) {
     this.idResolver = new IdResolver({
+      plcUrl: this.cfg.plcUrl,
       didCache: new MemoryCache(HOUR, DAY),
     });
   }
@@ -241,7 +242,7 @@ export class Database {
   async saveCursorState(
     cursorPosition: number,
     identifier = "last_processed_cursor",
-  ): Promise<void> {
+  ): Promise<boolean> {
     try {
       await this.models.CursorState.findOneAndUpdate(
         { identifier },
@@ -251,11 +252,13 @@ export class Database {
         },
         { upsert: true },
       );
+      return true;
     } catch (error) {
       console.error(
         "Failed to save cursor state",
         { error, cursorPosition, identifier },
       );
+      return false;
     }
   }
 }

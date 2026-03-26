@@ -273,17 +273,18 @@ const updateAggregates = async (db: Database, replyIdx: IndexedReply) => {
     const parentPost = await db.models.Post.findOne({
       uri: replyIdx.reply.reply?.parent.uri,
     });
-    const [parentReply, parentCrosspostReply, nativeReplyCount] = await Promise.all([
-      db.models.Reply.findOne({
-        uri: replyIdx.reply.reply?.parent.uri,
-      }),
-      db.models.CrosspostReply.findOne({
-        uri: replyIdx.reply.reply?.parent.uri,
-      }),
-      db.models.Reply.countDocuments({
-        "reply.parent.uri": replyIdx.reply.reply.parent.uri,
-      }),
-    ]);
+    const [parentReply, parentCrosspostReply, nativeReplyCount] = await Promise
+      .all([
+        db.models.Reply.findOne({
+          uri: replyIdx.reply.reply?.parent.uri,
+        }),
+        db.models.CrosspostReply.findOne({
+          uri: replyIdx.reply.reply?.parent.uri,
+        }),
+        db.models.Reply.countDocuments({
+          "reply.parent.uri": replyIdx.reply.reply.parent.uri,
+        }),
+      ]);
     const replyCount = nativeReplyCount;
 
     if (parentPost) {

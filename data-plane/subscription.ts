@@ -156,8 +156,10 @@ function createFirehose(opts: {
     startCursor,
     setCursorInterval: 30000, // Save cursor every 30 seconds
     setCursor: async (cursor: number) => {
-      await db.saveCursorState(cursor);
-      console.info("Cursor saved to database", { cursor });
+      const didSave = await db.saveCursorState(cursor);
+      if (didSave) {
+        console.info("Cursor saved to database", { cursor });
+      }
     },
   });
   const firehose = new Firehose({
