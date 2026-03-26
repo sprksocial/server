@@ -1,12 +1,12 @@
 import { IdResolver } from "@atp/identity";
 import { WriteOpAction } from "@atp/repo";
 import { Event as FirehoseEvent, Firehose, MemoryRunner } from "@atp/sync";
-import { BackgroundQueue } from "../background.ts";
-import { Database } from "../db/index.ts";
-import { IndexingService } from "../indexing/index.ts";
-import { ServerConfig } from "../../config.ts";
-import { PushService } from "../../utils/push.ts";
-import { PushTokens } from "../routes/push-tokens.ts";
+import { BackgroundQueue } from "./background.ts";
+import { Database } from "./db/index.ts";
+import { IndexingService } from "./indexing/index.ts";
+import { ServerConfig } from "./../config.ts";
+import { PushService } from "./../utils/push.ts";
+import { PushTokens } from "./routes/push-tokens.ts";
 
 export class RepoSubscription {
   firehose: Firehose;

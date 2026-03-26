@@ -1,7 +1,7 @@
-import { RepoSubscription } from "../data-plane/subscription/index.ts";
+import { RepoSubscription } from "./data-plane/subscription.ts";
 import { IdResolver } from "@atp/identity";
-import { ServerConfig } from "../config.ts";
-import { Database } from "../data-plane/db/index.ts";
+import { ServerConfig } from "./config.ts";
+import { Database } from "./data-plane/db/index.ts";
 
 const cfg = ServerConfig.readEnv();
 
