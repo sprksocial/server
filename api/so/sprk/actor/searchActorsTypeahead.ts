@@ -66,7 +66,11 @@ const skeleton = async (inputs: SkeletonFnInput<Context, Params>) => {
     };
   }
 
-  const res = await ctx.dataplane.search.actorsTypeahead(term, params.limit);
+  const res = await ctx.dataplane.search.actorsTypeahead(
+    term,
+    params.limit,
+    params.hydrateCtx.viewer,
+  );
   return {
     dids: res.dids,
   };

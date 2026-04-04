@@ -93,7 +93,7 @@ export class Search {
     };
   }
 
-  async actorsTypeahead(term: string, limit = 10) {
+  async actorsTypeahead(term: string, limit = 10, viewerDid?: string | null) {
     const cleanedTerm = cleanQuery(term);
     if (!cleanedTerm) {
       return {
@@ -127,9 +127,13 @@ export class Search {
       }
       : { $text: { $search: cleanedTerm } };
     const matchingProfiles = await this.db.models.Profile.find(profileQuery)
-      .select("authorDid -_id")
+      .select("authorDid followersCount -_id")
       .limit(candidateLimit * 2)
       .lean();
+
+    const followerCountMap = new Map<string, number>(
+      matchingProfiles.map((p) => [p.authorDid, p.followersCount ?? 0]),
+    );
 
     const handleDidSet = new Set(handleDids);
     const handleProfileDidSet = new Set(
@@ -143,10 +147,32 @@ export class Search {
       .map((profile) => profile.authorDid)
       .filter((did) => !includedDids.has(did) && !handleDidSet.has(did));
 
-    const dids = [...handleProfileDids, ...textProfileDids].slice(0, safeLimit);
+    // Sort each group by follower count descending
+    const byFollowers = (a: string, b: string) =>
+      (followerCountMap.get(b) ?? 0) - (followerCountMap.get(a) ?? 0);
+    handleProfileDids.sort(byFollowers);
+    textProfileDids.sort(byFollowers);
+
+    let candidates = [...handleProfileDids, ...textProfileDids].slice(
+      0,
+      safeLimit * 2,
+    );
+
+    // Boost accounts the viewer already follows to the front
+    if (viewerDid && candidates.length > 0) {
+      const viewerFollows = await this.db.models.Follow.find({
+        authorDid: viewerDid,
+        subject: { $in: candidates },
+      }).select("subject -_id").lean();
+      const followedSet = new Set(viewerFollows.map((f) => f.subject));
+      candidates = [
+        ...candidates.filter((did) => followedSet.has(did)),
+        ...candidates.filter((did) => !followedSet.has(did)),
+      ];
+    }
 
     return {
-      dids,
+      dids: candidates.slice(0, safeLimit),
     };
   }
 
