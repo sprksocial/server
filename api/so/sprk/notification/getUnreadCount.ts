@@ -6,19 +6,16 @@ import { QueryParams } from "../../../../lex/types/so/sprk/notification/getUnrea
 import {
   createPipeline,
   HydrationFnInput,
-  noRules,
   PresentationFnInput,
   SkeletonFnInput,
 } from "../../../../pipeline.ts";
-import { Views } from "../../../../views/index.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  const getUnreadCount = createPipeline(
+  const getUnreadCount = createPipeline({
     skeleton,
     hydration,
-    noRules,
     presentation,
-  );
+  });
   server.so.sprk.notification.getUnreadCount({
     auth: ctx.authVerifier.standard,
     handler: async ({ auth, params }) => {
@@ -71,7 +68,6 @@ const presentation = (
 
 type Context = {
   hydrator: Hydrator;
-  views: Views;
 };
 
 type Params = QueryParams & {

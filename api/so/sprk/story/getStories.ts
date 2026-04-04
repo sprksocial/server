@@ -1,4 +1,4 @@
-import { dedupeStrs, mapDefined } from "@atp/common";
+import { dedupeStrs } from "@atp/common";
 import { AppContext } from "../../../../context.ts";
 import {
   HydrateCtx,
@@ -12,14 +12,16 @@ import {
 } from "../../../../lex/types/so/sprk/story/getStories.ts";
 import {
   createPipeline,
+  filterSkeletonList,
   HydrationFnInput,
+  mapSkeletonList,
   PresentationFnInput,
   RulesFnInput,
   SkeletonFnInput,
 } from "../../../../pipeline.ts";
 import { uriToDid } from "../../../../utils/uris.ts";
 import { Views } from "../../../../views/index.ts";
-import { resHeaders } from "../../../util.ts";
+import { createHydrateCtxFromAuth, resHeaders } from "../../../util.ts";
 
 // Constants
 const MAX_STORIES_LIMIT = 25;
@@ -54,15 +56,16 @@ function validateUris(uris: string[]): { valid: string[]; invalid: string[] } {
 }
 
 export default function (server: Server, ctx: AppContext) {
-  const getStories = createPipeline(skeleton, hydration, rules, presentation);
+  const getStories = createPipeline({
+    skeleton,
+    hydration,
+    rules,
+    presentation,
+  });
   server.so.sprk.story.getStories({
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth, req }) => {
-      const viewer = auth.credentials.type === "standard"
-        ? auth.credentials.iss
-        : null;
-      const labelers = ctx.reqLabelers(req);
-      const hydrateCtx = await ctx.hydrator.createContext({ viewer, labelers });
+      const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
 
       // Ensure uris is an array
       const uriArray = Array.isArray(params.uris) ? params.uris : [params.uris];
@@ -102,7 +105,7 @@ export default function (server: Server, ctx: AppContext) {
       }
 
       const result = await getStories(
-        { ...params, uris: validUris, hydrateCtx, viewer: viewer || null },
+        { ...params, uris: validUris, hydrateCtx, viewer: hydrateCtx.viewer },
         ctx,
       );
 
@@ -132,33 +135,29 @@ const hydration = async (
 const rules = (inputs: RulesFnInput<Context, Params, Skeleton>): Skeleton => {
   const { ctx, skeleton, hydration } = inputs;
 
-  // Filter out expired stories (24 hours)
-  const activeStories = skeleton.stories.filter((uri) => {
+  const activeStories = filterSkeletonList(skeleton, "stories", (uri) => {
     const storyInfo = hydration.stories?.get(uri);
     if (!storyInfo) return false;
 
-    // Check if story is expired (older than 24 hours)
     const twentyFourHoursAgo = new Date();
     twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
-    const storyDate = storyInfo.indexedAt;
-    return storyDate >= twentyFourHoursAgo;
+    return storyInfo.indexedAt >= twentyFourHoursAgo;
   });
 
-  // Filter out blocked stories
-  const accessibleStories = activeStories.filter((uri) => {
-    const authorDid = uriToDid(uri);
-    return !ctx.views.viewerBlockExists(authorDid, hydration);
-  });
-
-  return { stories: accessibleStories };
+  return filterSkeletonList(
+    activeStories,
+    "stories",
+    (uri) => !ctx.views.viewerBlockExists(uriToDid(uri), hydration),
+  );
 };
 
 const presentation = (
   inputs: PresentationFnInput<Context, Params, Skeleton>,
 ): OutputSchema => {
   const { ctx, skeleton, hydration } = inputs;
-  const storyViews = mapDefined(
-    skeleton.stories,
+  const storyViews = mapSkeletonList(
+    skeleton,
+    "stories",
     (uri) => ctx.views.story(uri, hydration),
   );
 

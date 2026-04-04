@@ -1,4 +1,3 @@
-import { mapDefined } from "@atp/common";
 import { InvalidRequestError } from "@atp/xrpc-server";
 import { AppContext } from "../../../../context.ts";
 import {
@@ -10,31 +9,31 @@ import { Server } from "../../../../lex/index.ts";
 import { QueryParams } from "../../../../lex/types/so/sprk/graph/getFollowers.ts";
 import {
   createPipeline,
+  filterSkeletonList,
   HydrationFnInput,
+  mapSkeletonList,
   PresentationFnInput,
   RulesFnInput,
   SkeletonFnInput,
 } from "../../../../pipeline.ts";
 import { Views } from "../../../../views/index.ts";
-import { clearlyBadCursor, resHeaders } from "../../../util.ts";
+import {
+  clearlyBadCursor,
+  createHydrateCtxFromAuth,
+  resHeaders,
+} from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  const getFollows = createPipeline(
+  const getFollows = createPipeline({
     skeleton,
     hydration,
-    noBlocks,
+    rules: noBlocks,
     presentation,
-  );
+  });
   server.so.sprk.graph.getFollows({
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth, req }) => {
-      const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
-      const labelers = ctx.reqLabelers(req);
-      const hydrateCtx = await ctx.hydrator.createContext({
-        labelers,
-        viewer,
-        includeTakedowns,
-      });
+      const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
 
       // @TODO ensure canViewTakedowns gets threaded through and applied properly
       const result = await getFollows({ ...params, hydrateCtx }, ctx);
@@ -96,7 +95,7 @@ const hydration = async (
 const noBlocks = (input: RulesFnInput<Context, Params, SkeletonState>) => {
   const { skeleton, params, hydration, ctx } = input;
   const viewer = params.hydrateCtx.viewer;
-  skeleton.followUris = skeleton.followUris.filter((followUri) => {
+  return filterSkeletonList(skeleton, "followUris", (followUri) => {
     const follow = hydration.follows?.get(followUri);
     if (!follow) return false;
     return (
@@ -105,14 +104,13 @@ const noBlocks = (input: RulesFnInput<Context, Params, SkeletonState>) => {
         !ctx.views.viewerBlockExists(follow.record.subject, hydration))
     );
   });
-  return skeleton;
 };
 
 const presentation = (
   input: PresentationFnInput<Context, Params, SkeletonState>,
 ) => {
   const { ctx, hydration, skeleton, params } = input;
-  const { subjectDid, followUris, cursor } = skeleton;
+  const { subjectDid, cursor } = skeleton;
   const isNoHosted = (did: string) => ctx.views.actorIsNoHosted(did, hydration);
 
   const subject = ctx.views.profile(subjectDid, hydration);
@@ -123,7 +121,7 @@ const presentation = (
     throw new InvalidRequestError(`Actor not found: ${params.actor}`);
   }
 
-  const follows = mapDefined(followUris, (followUri) => {
+  const follows = mapSkeletonList(skeleton, "followUris", (followUri) => {
     const followDid = hydration.follows?.get(followUri)?.record.subject;
     if (!followDid) return;
     if (!params.hydrateCtx.includeTakedowns && isNoHosted(followDid)) {

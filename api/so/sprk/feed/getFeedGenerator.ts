@@ -1,23 +1,17 @@
 import { AppContext } from "../../../../context.ts";
 import { Server } from "../../../../lex/index.ts";
-import { resHeaders } from "../../../util.ts";
+import { createHydrateCtxFromAuth, resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.feed.getFeedGenerator({
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth, req }) => {
-      const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
-      const labelers = ctx.reqLabelers(req);
-      const hydrateCtx = await ctx.hydrator.createContext({
-        labelers,
-        viewer,
-        includeTakedowns,
-      });
+      const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
 
       // Parallelize hydration with repoRev fetch
       const [hydrationState, repoRev] = await Promise.all([
         ctx.hydrator.hydrateFeedGens([params.feed], hydrateCtx),
-        ctx.hydrator.actor.getRepoRevSafe(viewer),
+        ctx.hydrator.actor.getRepoRevSafe(hydrateCtx.viewer),
       ]);
 
       // Create generator view
@@ -41,6 +35,7 @@ export default function (server: Server, ctx: AppContext) {
         },
         headers: resHeaders({
           repoRev,
+          labelers: hydrateCtx.labelers,
         }),
       };
     },

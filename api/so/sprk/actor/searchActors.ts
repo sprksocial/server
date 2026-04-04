@@ -1,4 +1,3 @@
-import { mapDefined } from "@atp/common";
 import { AppContext } from "../../../../context.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
 import { HydrateCtx, Hydrator } from "../../../../hydration/index.ts";
@@ -7,21 +6,23 @@ import { Server } from "../../../../lex/index.ts";
 import { QueryParams } from "../../../../lex/types/so/sprk/actor/searchActors.ts";
 import {
   createPipeline,
+  filterSkeletonList,
   HydrationFnInput,
+  mapSkeletonList,
   PresentationFnInput,
   RulesFnInput,
   SkeletonFnInput,
 } from "../../../../pipeline.ts";
 import { Views } from "../../../../views/index.ts";
-import { resHeaders } from "../../../util.ts";
+import { createHydrateCtxFromAuth, resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  const searchActors = createPipeline(
+  const searchActors = createPipeline({
     skeleton,
     hydration,
-    noBlocks,
+    rules: noBlocks,
     presentation,
-  );
+  });
   server.so.sprk.actor.searchActors({
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ auth, params, req }) => {
@@ -37,12 +38,7 @@ export default function (server: Server, ctx: AppContext) {
         };
       }
 
-      const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
-      const hydrateCtx = await ctx.hydrator.createContext({
-        viewer,
-        labelers,
-        includeTakedowns,
-      });
+      const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
       const results = await searchActors({
         ...params,
         q: cleanedQuery,
@@ -88,18 +84,20 @@ const hydration = async (
 
 const noBlocks = (inputs: RulesFnInput<Context, Params, Skeleton>) => {
   const { ctx, skeleton, hydration } = inputs;
-  skeleton.dids = skeleton.dids.filter(
+  return filterSkeletonList(
+    skeleton,
+    "dids",
     (did) => !ctx.views.viewerBlockExists(did, hydration),
   );
-  return skeleton;
 };
 
 const presentation = (
   inputs: PresentationFnInput<Context, Params, Skeleton>,
 ) => {
   const { ctx, skeleton, hydration } = inputs;
-  const actors = mapDefined(
-    skeleton.dids,
+  const actors = mapSkeletonList(
+    skeleton,
+    "dids",
     (did) => ctx.views.profile(did, hydration),
   );
   return {

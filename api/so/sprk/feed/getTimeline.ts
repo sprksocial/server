@@ -1,4 +1,3 @@
-import { mapDefined } from "@atp/common";
 import { AppContext } from "../../../../context.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
 import { FeedItem } from "../../../../hydration/feed.ts";
@@ -10,23 +9,35 @@ import {
 import { parseString } from "../../../../hydration/util.ts";
 import { Server } from "../../../../lex/index.ts";
 import { QueryParams } from "../../../../lex/types/so/sprk/feed/getTimeline.ts";
-import { createPipeline } from "../../../../pipeline.ts";
+import {
+  createPipeline,
+  filterSkeletonList,
+  mapSkeletonList,
+} from "../../../../pipeline.ts";
 import { Views } from "../../../../views/index.ts";
-import { clearlyBadCursor, resHeaders } from "../../../util.ts";
+import {
+  clearlyBadCursor,
+  createHydrateCtxFromAuth,
+  resHeaders,
+} from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  const getTimeline = createPipeline(
+  const getTimeline = createPipeline({
     skeleton,
     hydration,
-    noBlocksOrMutes,
+    rules: noBlocksOrMutes,
     presentation,
-  );
+  });
   server.so.sprk.feed.getTimeline({
     auth: ctx.authVerifier.standard,
     handler: async ({ params, auth, req }) => {
       const viewer = auth.credentials.iss;
-      const labelers = ctx.reqLabelers(req);
-      const hydrateCtx = await ctx.hydrator.createContext({ viewer, labelers });
+      const hydrateCtx = await createHydrateCtxFromAuth(
+        ctx,
+        req,
+        auth,
+        { viewer },
+      );
 
       // Parallelize pipeline execution with repoRev fetch
       const [result, repoRev] = await Promise.all([
@@ -86,12 +97,11 @@ const noBlocksOrMutes = (inputs: {
   hydration: HydrationState;
 }): Skeleton => {
   const { ctx, skeleton, hydration } = inputs;
-  skeleton.items = skeleton.items.filter((item) => {
+  return filterSkeletonList(skeleton, "items", (item) => {
     const bam = ctx.views.feedItemBlocksAndMutes(item, hydration);
     return !bam.authorBlocked &&
       !bam.authorMuted;
   });
-  return skeleton;
 };
 
 const presentation = (inputs: {
@@ -100,8 +110,9 @@ const presentation = (inputs: {
   hydration: HydrationState;
 }) => {
   const { ctx, skeleton, hydration } = inputs;
-  const feed = mapDefined(
-    skeleton.items,
+  const feed = mapSkeletonList(
+    skeleton,
+    "items",
     (item) => ctx.views.feedViewPost(item, hydration),
   );
   return { feed, cursor: skeleton.cursor };

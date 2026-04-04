@@ -1,4 +1,4 @@
-import { mapDefined, noUndefinedVals } from "@atp/common";
+import { noUndefinedVals } from "@atp/common";
 import { ResponseType, XrpcClient, XRPCError } from "@atp/xrpc";
 import {
   InvalidRequestError,
@@ -20,12 +20,18 @@ import { QueryParams as GetFeedParams } from "../../../../lex/types/so/sprk/feed
 import { OutputSchema as SkeletonOutput } from "../../../../lex/types/so/sprk/feed/getFeedSkeleton.ts";
 import {
   createPipeline,
+  filterSkeletonList,
   HydrationFnInput,
+  mapSkeletonList,
   PresentationFnInput,
   RulesFnInput,
   SkeletonFnInput,
 } from "../../../../pipeline.ts";
-import { resHeaders, SPRK_USER_AGENT } from "../../../util.ts";
+import {
+  createHydrateCtxFromAuth,
+  resHeaders,
+  SPRK_USER_AGENT,
+} from "../../../util.ts";
 
 type GetIdentityByDidResponse = {
   did: string;
@@ -36,12 +42,12 @@ type GetIdentityByDidResponse = {
 };
 
 export default function (server: Server, ctx: AppContext) {
-  const getFeed = createPipeline(
+  const getFeed = createPipeline({
     skeleton,
     hydration,
-    noBlocksOrMutes,
+    rules: noBlocksOrMutes,
     presentation,
-  );
+  });
   server.so.sprk.feed.getFeed({
     auth: ctx.authVerifier.standardOptionalParameterized({
       lxmCheck: (method) => {
@@ -53,9 +59,7 @@ export default function (server: Server, ctx: AppContext) {
       skipAudCheck: true,
     }),
     handler: async ({ params, auth, req }) => {
-      const viewer = auth.credentials.iss;
-      const labelers = ctx.reqLabelers(req);
-      const hydrateCtx = await ctx.hydrator.createContext({ viewer, labelers });
+      const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
       const headers = noUndefinedVals({
         "user-agent": SPRK_USER_AGENT,
         authorization: req.headers.get("authorization") as string,
@@ -75,7 +79,7 @@ export default function (server: Server, ctx: AppContext) {
         body: result,
         headers: {
           ...(feedResHeaders ?? {}),
-          ...resHeaders({}),
+          ...resHeaders({ labelers: hydrateCtx.labelers }),
           "server-timing": serverTimingHeader([timerSkele, timerHydr]),
         },
       };
@@ -122,22 +126,20 @@ const hydration = async (
 
 const noBlocksOrMutes = (inputs: RulesFnInput<Context, Params, Skeleton>) => {
   const { ctx, skeleton, hydration } = inputs;
-  skeleton.items = skeleton.items.filter((item) => {
+  return filterSkeletonList(skeleton, "items", (item) => {
     const bam = ctx.views.feedItemBlocksAndMutes(item, hydration);
     return (
       !bam.authorBlocked &&
       !bam.authorMuted
     );
   });
-
-  return skeleton;
 };
 
 const presentation = (
   inputs: PresentationFnInput<Context, Params, Skeleton>,
 ) => {
   const { ctx, skeleton, hydration } = inputs;
-  const feed = mapDefined(skeleton.items, (item) => {
+  const feed = mapSkeletonList(skeleton, "items", (item) => {
     const post = ctx.views.feedViewPost(item, hydration);
     if (!post) return;
     return {

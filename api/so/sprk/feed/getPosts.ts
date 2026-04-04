@@ -1,25 +1,30 @@
-import { dedupeStrs, mapDefined } from "@atp/common";
+import { dedupeStrs } from "@atp/common";
 import { AppContext } from "../../../../context.ts";
-import {
-  HydrateCtx,
-  HydrationState,
-  Hydrator,
-} from "../../../../hydration/index.ts";
+import { HydrateCtx, Hydrator } from "../../../../hydration/index.ts";
 import { Server } from "../../../../lex/index.ts";
 import { QueryParams } from "../../../../lex/types/so/sprk/feed/getPosts.ts";
-import { createPipeline } from "../../../../pipeline.ts";
+import {
+  createPipeline,
+  filterSkeletonList,
+  mapSkeletonList,
+  type PresentationFnInput,
+  type RulesFnInput,
+} from "../../../../pipeline.ts";
 import { uriToDid as creatorFromUri } from "../../../../utils/uris.ts";
 import { Views } from "../../../../views/index.ts";
-import { resHeaders } from "../../../util.ts";
+import { createHydrateCtxFromAuth, resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  const getPosts = createPipeline(skeleton, hydration, noBlocks, presentation);
+  const getPosts = createPipeline({
+    skeleton,
+    hydration,
+    rules: noBlocks,
+    presentation,
+  });
   server.so.sprk.feed.getPosts({
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth, req }) => {
-      const viewer = auth.credentials.iss;
-      const labelers = ctx.reqLabelers(req);
-      const hydrateCtx = await ctx.hydrator.createContext({ viewer, labelers });
+      const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
 
       const results = await getPosts({ ...params, hydrateCtx }, ctx);
 
@@ -50,28 +55,22 @@ const hydration = (inputs: {
   );
 };
 
-const noBlocks = (inputs: {
-  ctx: Context;
-  skeleton: Skeleton;
-  hydration: HydrationState;
-}) => {
+const noBlocks = (inputs: RulesFnInput<Context, Params, Skeleton>) => {
   const { ctx, skeleton, hydration } = inputs;
-  skeleton.posts = skeleton.posts.filter((uri) => {
-    const creator = creatorFromUri(uri);
-    return !ctx.views.viewerBlockExists(creator, hydration);
-  });
-  return skeleton;
+  return filterSkeletonList(
+    skeleton,
+    "posts",
+    (uri) => !ctx.views.viewerBlockExists(creatorFromUri(uri), hydration),
+  );
 };
 
-const presentation = (inputs: {
-  ctx: Context;
-  params: Params;
-  skeleton: Skeleton;
-  hydration: HydrationState;
-}) => {
+const presentation = (
+  inputs: PresentationFnInput<Context, Params, Skeleton>,
+) => {
   const { ctx, skeleton, hydration } = inputs;
-  const posts = mapDefined(
-    skeleton.posts,
+  const posts = mapSkeletonList(
+    skeleton,
+    "posts",
     (uri) => ctx.views.post(uri, hydration),
   );
   return { posts };

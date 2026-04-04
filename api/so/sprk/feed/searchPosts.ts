@@ -1,39 +1,34 @@
-import { mapDefined } from "@atp/common";
 import { ServerConfig } from "../../../../config.ts";
 import { AppContext } from "../../../../context.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
-import {
-  parsePostSearchQuery,
-  PostSearchQuery,
-} from "../../../../data-plane/util.ts";
 import { HydrateCtx, Hydrator } from "../../../../hydration/index.ts";
 import { parseString } from "../../../../hydration/util.ts";
 import { Server } from "../../../../lex/index.ts";
 import { QueryParams } from "../../../../lex/types/so/sprk/feed/searchPosts.ts";
 import {
   createPipeline,
+  filterSkeletonList,
   HydrationFnInput,
+  mapSkeletonList,
   PresentationFnInput,
   RulesFnInput,
   SkeletonFnInput,
 } from "../../../../pipeline.ts";
 import { uriToDid as creatorFromUri } from "../../../../utils/uris.ts";
 import { Views } from "../../../../views/index.ts";
-import { resHeaders } from "../../../util.ts";
+import { createHydrateCtxFromAuth, resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  const searchPosts = createPipeline(
+  const searchPosts = createPipeline({
     skeleton,
     hydration,
-    noBlocksOrTagged,
+    rules: noBlocksOrTagged,
     presentation,
-  );
+  });
   server.so.sprk.feed.searchPosts({
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ auth, params, req }) => {
-      const { viewer } = ctx.authVerifier.parseCreds(auth);
-      const labelers = ctx.reqLabelers(req);
-      const hydrateCtx = await ctx.hydrator.createContext({ viewer, labelers });
+      const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
       const results = await searchPosts(
         { ...params, hydrateCtx },
         ctx,
@@ -51,8 +46,6 @@ export default function (server: Server, ctx: AppContext) {
 
 const skeleton = async (inputs: SkeletonFnInput<Context, Params>) => {
   const { ctx, params } = inputs;
-  const parsedQuery = parsePostSearchQuery(params.q);
-
   const res = await ctx.dataplane.search.posts(
     params.q,
     params.limit,
@@ -61,7 +54,6 @@ const skeleton = async (inputs: SkeletonFnInput<Context, Params>) => {
   return {
     posts: res.uris,
     cursor: parseString(res.cursor),
-    parsedQuery,
   };
 };
 
@@ -79,9 +71,9 @@ const hydration = async (
 const noBlocksOrTagged = (inputs: RulesFnInput<Context, Params, Skeleton>) => {
   const { ctx, params, skeleton, hydration } = inputs;
 
-  skeleton.posts = skeleton.posts.filter((uri) => {
+  return filterSkeletonList(skeleton, "posts", (uri) => {
     const post = hydration.posts?.get(uri);
-    if (!post) return;
+    if (!post) return false;
 
     const creator = creatorFromUri(uri);
     const isPostByViewer = creator === params.hydrateCtx.viewer;
@@ -93,14 +85,13 @@ const noBlocksOrTagged = (inputs: RulesFnInput<Context, Params, Skeleton>) => {
     if (ctx.views.viewerBlockExists(creator, hydration)) return false;
     return true;
   });
-  return skeleton;
 };
 
 const presentation = (
   inputs: PresentationFnInput<Context, Params, Skeleton>,
 ) => {
   const { ctx, skeleton, hydration } = inputs;
-  const posts = mapDefined(skeleton.posts, (uri) => {
+  const posts = mapSkeletonList(skeleton, "posts", (uri) => {
     const post = hydration.posts?.get(uri);
     if (!post) return;
 
@@ -128,5 +119,4 @@ type Skeleton = {
   posts: string[];
   hitsTotal?: number;
   cursor?: string;
-  parsedQuery: PostSearchQuery;
 };

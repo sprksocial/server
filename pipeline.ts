@@ -1,22 +1,48 @@
+import { mapDefined } from "@atp/common";
 import { HydrationState } from "./hydration/index.ts";
 
+export type SkeletonFn<Context, Params, Skeleton> = (
+  input: SkeletonFnInput<Context, Params>,
+) => Promise<Skeleton> | Skeleton;
+
+export type HydrationFn<Context, Params, Skeleton> = (
+  input: HydrationFnInput<Context, Params, Skeleton>,
+) => Promise<HydrationState>;
+
+export type RulesFn<Context, Params, Skeleton> = (
+  input: RulesFnInput<Context, Params, Skeleton>,
+) => Skeleton;
+
+export type PresentationFn<Context, Params, Skeleton, View> = (
+  input: PresentationFnInput<Context, Params, Skeleton>,
+) => View;
+
+export type PipelineDefinition<Params, Skeleton, View, Context> = {
+  skeleton: SkeletonFn<Context, Params, Skeleton>;
+  hydration: HydrationFn<Context, Params, Skeleton>;
+  rules?: RulesFn<Context, Params, Skeleton>;
+  presentation: PresentationFn<Context, Params, Skeleton, View>;
+};
+
 export function createPipeline<Params, Skeleton, View, Context>(
-  skeletonFn: (
-    input: SkeletonFnInput<Context, Params>,
-  ) => Promise<Skeleton> | Skeleton,
-  hydrationFn: (
-    input: HydrationFnInput<Context, Params, Skeleton>,
-  ) => Promise<HydrationState>,
-  rulesFn: (input: RulesFnInput<Context, Params, Skeleton>) => Skeleton,
-  presentationFn: (
-    input: PresentationFnInput<Context, Params, Skeleton>,
-  ) => View,
+  definition: PipelineDefinition<Params, Skeleton, View, Context>,
+): (params: Params, ctx: Context) => Promise<View>;
+export function createPipeline<Params, Skeleton, View, Context>(
+  definition: PipelineDefinition<Params, Skeleton, View, Context>,
 ) {
+  const applyRules = definition.rules ??
+    ((input: RulesFnInput<Context, Params, Skeleton>) => input.skeleton);
+
   return async (params: Params, ctx: Context) => {
-    const skeleton = await skeletonFn({ ctx, params });
-    const hydration = await hydrationFn({ ctx, params, skeleton });
-    const appliedRules = rulesFn({ ctx, params, skeleton, hydration });
-    return presentationFn({ ctx, params, skeleton: appliedRules, hydration });
+    const skeleton = await definition.skeleton({ ctx, params });
+    const hydration = await definition.hydration({ ctx, params, skeleton });
+    const appliedRules = applyRules({ ctx, params, skeleton, hydration });
+    return definition.presentation({
+      ctx,
+      params,
+      skeleton: appliedRules,
+      hydration,
+    });
   };
 }
 
@@ -45,6 +71,36 @@ export type PresentationFnInput<Context, Params, Skeleton> = {
   hydration: HydrationState;
 };
 
-export function noRules<S>(input: { skeleton: S }) {
-  return input.skeleton;
+type SkeletonListKey<S> = {
+  [K in keyof S]: S[K] extends readonly unknown[] ? K : never;
+}[keyof S];
+
+type SkeletonListItem<T> = T extends readonly (infer Item)[] ? Item : never;
+
+export function filterSkeletonList<
+  Skeleton extends Record<string, unknown>,
+  Key extends SkeletonListKey<Skeleton>,
+>(
+  skeleton: Skeleton,
+  key: Key,
+  predicate: (item: SkeletonListItem<Skeleton[Key]>) => boolean,
+): Skeleton {
+  const items = skeleton[key] as SkeletonListItem<Skeleton[Key]>[];
+  return {
+    ...skeleton,
+    [key]: items.filter(predicate),
+  } as Skeleton;
+}
+
+export function mapSkeletonList<
+  Skeleton extends Record<string, unknown>,
+  Key extends SkeletonListKey<Skeleton>,
+  View,
+>(
+  skeleton: Skeleton,
+  key: Key,
+  mapper: (item: SkeletonListItem<Skeleton[Key]>) => View | undefined,
+): View[] {
+  const items = skeleton[key] as SkeletonListItem<Skeleton[Key]>[];
+  return mapDefined(items, mapper);
 }

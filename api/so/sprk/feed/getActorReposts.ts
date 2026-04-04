@@ -1,39 +1,47 @@
-import { mapDefined } from "@atp/common";
 import { InvalidRequestError } from "@atp/xrpc-server";
 import { AppContext } from "../../../../context.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
 import { FeedItem } from "../../../../hydration/feed.ts";
 import {
   HydrateCtx,
-  HydrationState,
   Hydrator,
   mergeManyStates,
 } from "../../../../hydration/index.ts";
 import { parseString } from "../../../../hydration/util.ts";
 import { Server } from "../../../../lex/index.ts";
 import { QueryParams } from "../../../../lex/types/so/sprk/feed/getActorLikes.ts";
-import { createPipeline } from "../../../../pipeline.ts";
+import {
+  createPipeline,
+  filterSkeletonList,
+  mapSkeletonList,
+  type PresentationFnInput,
+  type RulesFnInput,
+} from "../../../../pipeline.ts";
 import { uriToDid as creatorFromUri } from "../../../../utils/uris.ts";
 import { Views } from "../../../../views/index.ts";
-import { clearlyBadCursor, resHeaders } from "../../../util.ts";
+import {
+  clearlyBadCursor,
+  createHydrateCtxFromAuth,
+  resHeaders,
+} from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  const getActorReposts = createPipeline(
+  const getActorReposts = createPipeline({
     skeleton,
     hydration,
-    noPostBlocks,
+    rules: noPostBlocks,
     presentation,
-  );
+  });
   server.so.sprk.feed.getActorReposts({
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth, req }) => {
-      const viewer = auth.credentials.iss;
-      const labelers = ctx.reqLabelers(req);
-      const hydrateCtx = await ctx.hydrator.createContext({ labelers, viewer });
+      const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
 
       const result = await getActorReposts({ ...params, hydrateCtx }, ctx);
 
-      const repoRev = await ctx.hydrator.actor.getRepoRevSafe(viewer);
+      const repoRev = await ctx.hydrator.actor.getRepoRevSafe(
+        hydrateCtx.viewer,
+      );
 
       return {
         encoding: "application/json",
@@ -112,11 +120,7 @@ const hydration = async (inputs: {
   });
 };
 
-const noPostBlocks = (inputs: {
-  ctx: Context;
-  skeleton: Skeleton;
-  hydration: HydrationState;
-}) => {
+const noPostBlocks = (inputs: RulesFnInput<Context, Params, Skeleton>) => {
   const { ctx, skeleton, hydration } = inputs;
 
   // Check if viewer is blocking or blocked by the actor (reposter)
@@ -138,29 +142,25 @@ const noPostBlocks = (inputs: {
   // - viewer is blocking or blocked by the post author, OR
   // - actor (reposter) is blocking or blocked by the post author
   const actorBlocks = hydration.bidirectionalBlocks?.get(skeleton.actorDid);
-  skeleton.items = skeleton.items.filter((item) => {
+  return filterSkeletonList(skeleton, "items", (item) => {
     const creator = creatorFromUri(item.post.uri);
-    // Check viewer <-> post author blocks
     if (ctx.views.viewerBlockExists(creator, hydration)) {
       return false;
     }
-    // Check actor (reposter) <-> post author blocks
     if (actorBlocks?.get(creator)) {
       return false;
     }
     return true;
   });
-  return skeleton;
 };
 
-const presentation = (inputs: {
-  ctx: Context;
-  skeleton: Skeleton;
-  hydration: HydrationState;
-}) => {
+const presentation = (
+  inputs: PresentationFnInput<Context, Params, Skeleton>,
+) => {
   const { ctx, skeleton, hydration } = inputs;
-  const feed = mapDefined(
-    skeleton.items,
+  const feed = mapSkeletonList(
+    skeleton,
+    "items",
     (item) => ctx.views.feedViewPost(item, hydration),
   );
   return {

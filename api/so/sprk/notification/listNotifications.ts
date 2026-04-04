@@ -1,4 +1,3 @@
-import { mapDefined } from "@atp/common";
 import { InvalidRequestError } from "@atp/xrpc-server";
 import { ServerConfig } from "../../../../config.ts";
 import { AppContext } from "../../../../context.ts";
@@ -8,27 +7,33 @@ import { Server } from "../../../../lex/index.ts";
 import { QueryParams } from "../../../../lex/types/so/sprk/notification/listNotifications.ts";
 import {
   createPipeline,
+  filterSkeletonList,
   HydrationFnInput,
+  mapSkeletonList,
   PresentationFnInput,
   RulesFnInput,
   SkeletonFnInput,
 } from "../../../../pipeline.ts";
 import { Views } from "../../../../views/index.ts";
-import { resHeaders } from "../../../util.ts";
+import { createHydrateCtxFromAuth, resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  const listNotifications = createPipeline(
+  const listNotifications = createPipeline({
     skeleton,
     hydration,
-    noBlockOrMutesOrNeedsFiltering,
+    rules: noBlockOrMutesOrNeedsFiltering,
     presentation,
-  );
+  });
   server.so.sprk.notification.listNotifications({
     auth: ctx.authVerifier.standard,
     handler: async ({ params, auth, req }) => {
       const viewer = auth.credentials.iss;
-      const labelers = ctx.reqLabelers(req);
-      const hydrateCtx = await ctx.hydrator.createContext({ labelers, viewer });
+      const hydrateCtx = await createHydrateCtxFromAuth(
+        ctx,
+        req,
+        auth,
+        { viewer },
+      );
       const result = await listNotifications(
         { ...params, hydrateCtx: hydrateCtx.copy({ viewer }) },
         ctx,
@@ -172,7 +177,7 @@ const noBlockOrMutesOrNeedsFiltering = (
   input: RulesFnInput<Context, Params, SkeletonState>,
 ) => {
   const { skeleton, hydration, ctx } = input;
-  skeleton.notifs = skeleton.notifs.filter((item) => {
+  return filterSkeletonList(skeleton, "notifs", (item) => {
     // Use authorDid directly (the person who created the notification action)
     // For likes, this is the liker; for replies, this is the replier, etc.
     const did = item.authorDid;
@@ -199,16 +204,16 @@ const noBlockOrMutesOrNeedsFiltering = (
     }
     return true;
   });
-  return skeleton;
 };
 
 const presentation = (
   input: PresentationFnInput<Context, Params, SkeletonState>,
 ) => {
   const { skeleton, hydration, ctx } = input;
-  const { notifs, lastSeenNotifs, cursor } = skeleton;
-  const notifications = mapDefined(
-    notifs,
+  const { lastSeenNotifs, cursor } = skeleton;
+  const notifications = mapSkeletonList(
+    skeleton,
+    "notifs",
     (notif) => ctx.views.notification(notif, lastSeenNotifs, hydration),
   );
   return {

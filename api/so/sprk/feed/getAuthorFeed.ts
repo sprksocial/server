@@ -1,4 +1,3 @@
-import { mapDefined } from "@atp/common";
 import { InvalidRequestError } from "@atp/xrpc-server";
 import { AppContext } from "../../../../context.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
@@ -13,33 +12,35 @@ import {
 import { parseString } from "../../../../hydration/util.ts";
 import { Server } from "../../../../lex/index.ts";
 import { QueryParams } from "../../../../lex/types/so/sprk/feed/getAuthorFeed.ts";
-import { createPipeline } from "../../../../pipeline.ts";
+import {
+  createPipeline,
+  filterSkeletonList,
+  mapSkeletonList,
+} from "../../../../pipeline.ts";
 import { safePinnedPost, uriToDid } from "../../../../utils/uris.ts";
 import { Views } from "../../../../views/index.ts";
-import { clearlyBadCursor, resHeaders } from "../../../util.ts";
+import {
+  clearlyBadCursor,
+  createHydrateCtxFromAuth,
+  resHeaders,
+} from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  const getAuthorFeed = createPipeline(
+  const getAuthorFeed = createPipeline({
     skeleton,
     hydration,
-    noBlocksOrMutes,
+    rules: noBlocksOrMutes,
     presentation,
-  );
+  });
   server.so.sprk.feed.getAuthorFeed({
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth, req }) => {
-      const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
-      const labelers = ctx.reqLabelers(req);
-      const hydrateCtx = await ctx.hydrator.createContext({
-        labelers,
-        viewer,
-        includeTakedowns,
-      });
+      const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
 
       // Parallelize pipeline execution with repoRev fetch
       const [result, repoRev] = await Promise.all([
         getAuthorFeed({ ...params, hydrateCtx }, ctx),
-        ctx.hydrator.actor.getRepoRevSafe(viewer),
+        ctx.hydrator.actor.getRepoRevSafe(hydrateCtx.viewer),
       ]);
 
       return {
@@ -157,9 +158,7 @@ const noBlocksOrMutes = (inputs: {
     );
   };
 
-  skeleton.items = skeleton.items.filter(checkBlocksAndMutes);
-
-  return skeleton;
+  return filterSkeletonList(skeleton, "items", checkBlocksAndMutes);
 };
 
 const presentation = (inputs: {
@@ -168,8 +167,9 @@ const presentation = (inputs: {
   hydration: HydrationState;
 }) => {
   const { ctx, skeleton, hydration } = inputs;
-  const feed = mapDefined(
-    skeleton.items,
+  const feed = mapSkeletonList(
+    skeleton,
+    "items",
     (item) => ctx.views.feedViewPost(item, hydration),
   );
   return { feed, cursor: skeleton.cursor };

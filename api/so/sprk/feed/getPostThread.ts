@@ -13,35 +13,31 @@ import {
 import {
   createPipeline,
   HydrationFnInput,
-  noRules,
   PresentationFnInput,
   SkeletonFnInput,
 } from "../../../../pipeline.ts";
 import { Views } from "../../../../views/index.ts";
-import { ATPROTO_REPO_REV, resHeaders } from "../../../util.ts";
+import {
+  ATPROTO_REPO_REV,
+  createHydrateCtxFromAuth,
+  resHeaders,
+} from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  const getPostThread = createPipeline(
+  const getPostThread = createPipeline({
     skeleton,
     hydration,
-    noRules, // handled in presentation: 3p block-violating replies are turned to #blockedPost, viewer blocks turned to #notFoundPost.
     presentation,
-  );
+  });
   server.so.sprk.feed.getPostThread({
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth, req, res }) => {
-      const { viewer, includeTakedowns, include3pBlocks } = ctx.authVerifier
-        .parseCreds(auth);
-      const labelers = ctx.reqLabelers(req);
-      const hydrateCtx = await ctx.hydrator.createContext({
-        labelers,
-        viewer,
-        includeTakedowns,
-        include3pBlocks,
-      });
+      const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
 
       // Start repoRev fetch early so it runs in parallel with the pipeline
-      const repoRevPromise = ctx.hydrator.actor.getRepoRevSafe(viewer);
+      const repoRevPromise = ctx.hydrator.actor.getRepoRevSafe(
+        hydrateCtx.viewer,
+      );
 
       let result: OutputSchema;
       try {

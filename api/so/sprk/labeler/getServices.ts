@@ -1,19 +1,14 @@
 import { mapDefined } from "@atp/common";
 import { AppContext } from "../../../../context.ts";
 import { Server } from "../../../../lex/index.ts";
-import { resHeaders } from "../../../util.ts";
+import { createHydrateCtxFromAuth, resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
   server.so.sprk.labeler.getServices({
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth, req }) => {
       const { dids, detailed } = params;
-      const viewer = auth.credentials.iss;
-      const labelers = ctx.reqLabelers(req);
-      const hydrateCtx = await ctx.hydrator.createContext({
-        viewer,
-        labelers,
-      });
+      const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
       const hydration = await ctx.hydrator.hydrateLabelers(dids, hydrateCtx);
 
       const views = mapDefined(dids, (did) => {

@@ -6,21 +6,33 @@ import { QueryParams } from "../../../../lex/types/so/sprk/graph/getBlocks.ts";
 import {
   createPipeline,
   HydrationFnInput,
-  noRules,
+  mapSkeletonList,
   PresentationFnInput,
   SkeletonFnInput,
 } from "../../../../pipeline.ts";
 import { Views } from "../../../../views/index.ts";
-import { clearlyBadCursor, resHeaders } from "../../../util.ts";
+import {
+  clearlyBadCursor,
+  createHydrateCtxFromAuth,
+  resHeaders,
+} from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  const getBlocks = createPipeline(skeleton, hydration, noRules, presentation);
+  const getBlocks = createPipeline({
+    skeleton,
+    hydration,
+    presentation,
+  });
   server.so.sprk.graph.getBlocks({
     auth: ctx.authVerifier.standard,
     handler: async ({ params, auth, req }) => {
       const viewer = auth.credentials.iss;
-      const labelers = ctx.reqLabelers(req);
-      const hydrateCtx = await ctx.hydrator.createContext({ labelers, viewer });
+      const hydrateCtx = await createHydrateCtxFromAuth(
+        ctx,
+        req,
+        auth,
+        { viewer },
+      );
       const result = await getBlocks(
         { ...params, hydrateCtx: hydrateCtx.copy({ viewer }) },
         ctx,
@@ -66,10 +78,12 @@ const presentation = (
   input: PresentationFnInput<Context, Params, SkeletonState>,
 ) => {
   const { ctx, hydration, skeleton } = input;
-  const { blockedDids, cursor } = skeleton;
-  const blocks = mapDefined(blockedDids, (did) => {
-    return ctx.views.profile(did, hydration);
-  });
+  const { cursor } = skeleton;
+  const blocks = mapSkeletonList(
+    skeleton,
+    "blockedDids",
+    (did) => ctx.views.profile(did, hydration),
+  );
   return { blocks, cursor };
 };
 

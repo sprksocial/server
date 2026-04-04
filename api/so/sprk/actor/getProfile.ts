@@ -7,24 +7,24 @@ import {
 } from "../../../../hydration/index.ts";
 import { Server } from "../../../../lex/index.ts";
 import { QueryParams } from "../../../../lex/types/so/sprk/actor/getProfile.ts";
-import { createPipeline, noRules } from "../../../../pipeline.ts";
+import { createPipeline } from "../../../../pipeline.ts";
 import { Views } from "../../../../views/index.ts";
-import { resHeaders } from "../../../util.ts";
+import { createHydrateCtxFromAuth, resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  const getProfile = createPipeline(skeleton, hydration, noRules, presentation);
+  const getProfile = createPipeline({
+    skeleton,
+    hydration,
+    presentation,
+  });
   server.so.sprk.actor.getProfile({
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ auth, params, req }) => {
-      const { viewer, includeTakedowns } = ctx.authVerifier.parseCreds(auth);
-      const labelers = ctx.reqLabelers(req);
-      const hydrateCtx = await ctx.hydrator.createContext({
-        labelers,
-        viewer,
-        includeTakedowns,
-      });
+      const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
       const result = await getProfile({ ...params, hydrateCtx }, ctx);
-      const repoRev = await ctx.hydrator.actor.getRepoRevSafe(viewer);
+      const repoRev = await ctx.hydrator.actor.getRepoRevSafe(
+        hydrateCtx.viewer,
+      );
 
       return {
         encoding: "application/json",

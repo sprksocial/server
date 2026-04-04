@@ -1,3 +1,11 @@
+import type {
+  ModServiceOutput,
+  NullOutput,
+  RoleOutput,
+  StandardOutput,
+} from "../auth-verifier.ts";
+import type { AppContext } from "../context.ts";
+import type { HydrateCtx, HydrateCtxVals } from "../hydration/index.ts";
 import { formatLabelerHeader, ParsedLabelers } from "../util.ts";
 
 export const SPRK_USER_AGENT = "SprkAppView";
@@ -24,4 +32,27 @@ export const resHeaders = (
 
 export const clearlyBadCursor = (cursor?: string) => {
   return !!cursor?.includes("::");
+};
+
+type HydrateCtxAuth =
+  | StandardOutput
+  | RoleOutput
+  | NullOutput
+  | ModServiceOutput;
+
+export const createHydrateCtxFromAuth = (
+  ctx: AppContext,
+  req: Request,
+  auth: HydrateCtxAuth,
+  overrides: Partial<HydrateCtxVals> = {},
+): Promise<HydrateCtx> => {
+  const labelers = ctx.reqLabelers(req);
+  const { canPerformTakedown: _canPerformTakedown, ...hydrateVals } = ctx
+    .authVerifier.parseCreds(auth);
+
+  return ctx.hydrator.createContext({
+    labelers,
+    ...hydrateVals,
+    ...overrides,
+  });
 };
