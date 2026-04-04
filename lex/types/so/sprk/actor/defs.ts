@@ -5,6 +5,7 @@ import { validate as _validate } from "../../../../lexicons.ts";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef.ts";
+import type * as SoSprkStoryDefs from "../story/defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.actor.defs";
@@ -45,6 +46,8 @@ export interface ProfileView {
   createdAt?: string;
   viewer?: ViewerState;
   labels?: (ComAtprotoLabelDefs.Label)[];
+  /** Recent stories from this profile author. */
+  stories?: (SoSprkStoryDefs.StoryView)[];
 }
 
 const hashProfileView = "profileView";
@@ -75,7 +78,7 @@ export interface ProfileViewDetailed {
   labels?: (ComAtprotoLabelDefs.Label)[];
   pinnedPost?: ComAtprotoRepoStrongRef.Main;
   /** Recent stories from this profile author. */
-  stories?: (ComAtprotoRepoStrongRef.Main)[];
+  stories?: (SoSprkStoryDefs.StoryView)[];
 }
 
 const hashProfileViewDetailed = "profileViewDetailed";

@@ -20117,6 +20117,14 @@ export const schemaDict = {
               "ref": "lex:com.atproto.label.defs#label",
             },
           },
+          "stories": {
+            "type": "array",
+            "description": "Recent stories from this profile author.",
+            "items": {
+              "type": "ref",
+              "ref": "lex:so.sprk.story.defs#storyView",
+            },
+          },
         },
       },
       "profileViewDetailed": {
@@ -20193,7 +20201,7 @@ export const schemaDict = {
             "description": "Recent stories from this profile author.",
             "items": {
               "type": "ref",
-              "ref": "lex:com.atproto.repo.strongRef",
+              "ref": "lex:so.sprk.story.defs#storyView",
             },
           },
         },

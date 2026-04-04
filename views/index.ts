@@ -727,6 +727,10 @@ export class Views {
     if (!actor) return;
     const basicView = this.profileBasic(did, state);
     if (!basicView) return;
+    const stories = mapDefined(
+      state.actorStoryRefs?.get(did) ?? [],
+      (story) => this.story(story.uri, state),
+    );
     return {
       ...basicView,
       $type: "so.sprk.actor.defs#profileView",
@@ -737,6 +741,7 @@ export class Views {
           indexedAt: actor.indexedAt,
         }).toISOString()
         : undefined,
+      stories: stories.length > 0 ? stories : undefined,
     };
   }
 

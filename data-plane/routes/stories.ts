@@ -135,6 +135,34 @@ export class Stories {
   }
 
   /**
+   * Get active stories grouped by actor DID
+   */
+  async getActorStories(
+    dids: string[],
+  ): Promise<Map<string, { uri: string; cid: string }[]>> {
+    if (!dids.length) return new Map();
+
+    const twentyFourHoursAgo = new Date();
+    twentyFourHoursAgo.setHours(
+      twentyFourHoursAgo.getHours() - STORIES_EXPIRY_HOURS,
+    );
+    const minDate = twentyFourHoursAgo.toISOString();
+
+    const stories = await this.db.models.Story.find({
+      authorDid: { $in: dids },
+      indexedAt: { $gte: minDate },
+    }).sort({ indexedAt: 1 }).lean();
+
+    const result = new Map<string, { uri: string; cid: string }[]>();
+    for (const story of stories) {
+      const existing = result.get(story.authorDid) ?? [];
+      existing.push({ uri: story.uri, cid: story.cid });
+      result.set(story.authorDid, existing);
+    }
+    return result;
+  }
+
+  /**
    * Get blocked author DIDs for a viewer
    */
   async getBlockedAuthors(

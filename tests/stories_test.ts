@@ -728,5 +728,118 @@ Deno.test({
         assertEquals(view?.embeds, undefined);
       },
     );
+
+    await t.step(
+      "hydrateProfiles returns hydrated story views on profiles",
+      async () => {
+        const { ctx, cleanup } = await createTestContext({
+          actors: true,
+          profiles: false,
+          posts: false,
+          replies: false,
+          stories: false,
+          likes: false,
+          reposts: false,
+          follows: false,
+          blocks: false,
+          audio: false,
+          generators: false,
+          preferences: false,
+          records: false,
+          actorSync: false,
+        });
+
+        try {
+          const now = new Date().toISOString();
+          const did = TEST_USERS[0].did;
+          const profileUri = `at://${did}/so.sprk.actor.profile/self`;
+          const storyUri = `at://${did}/so.sprk.story.post/profile-story`;
+
+          await ctx.db.models.Record.create([
+            {
+              uri: profileUri,
+              cid: `${VALID_BLOB_CID}profile`,
+              did,
+              collectionName: "so.sprk.actor.profile",
+              rkey: "self",
+              createdAt: now,
+              indexedAt: now,
+              json: JSON.stringify({
+                $type: "so.sprk.actor.profile",
+                displayName: "Alice",
+                createdAt: now,
+              }),
+              takedownRef: "",
+            },
+            {
+              uri: storyUri,
+              cid: `${VALID_BLOB_CID}story`,
+              did,
+              collectionName: "so.sprk.story.post",
+              rkey: "profile-story",
+              createdAt: now,
+              indexedAt: now,
+              json: JSON.stringify({
+                $type: "so.sprk.story.post",
+                createdAt: now,
+                media: {
+                  $type: "so.sprk.media.image",
+                  image: {
+                    $type: "blob",
+                    ref: { $link: VALID_BLOB_CID },
+                    mimeType: "image/jpeg",
+                    size: 12345,
+                  },
+                  alt: "Profile story",
+                  aspectRatio: { width: 1080, height: 1920 },
+                },
+              }),
+              takedownRef: "",
+            },
+          ]);
+
+          await ctx.db.models.Story.create({
+            uri: storyUri,
+            cid: `${VALID_BLOB_CID}story`,
+            authorDid: did,
+            createdAt: now,
+            indexedAt: now,
+            media: {
+              $type: "so.sprk.media.image",
+              image: {
+                $type: "blob",
+                ref: { $link: VALID_BLOB_CID },
+                mimeType: "image/jpeg",
+                size: 12345,
+              },
+              alt: "Profile story",
+              aspectRatio: { width: 1080, height: 1920 },
+            },
+            labels: [],
+          });
+
+          const hydrateCtx = await ctx.hydrator.createContext({
+            viewer: null,
+            labelers: ctx.reqLabelers(new Request("https://example.com")),
+          });
+
+          const hydration = await ctx.hydrator.hydrateProfiles(
+            [did],
+            hydrateCtx,
+          );
+          const profile = ctx.views.profile(did, hydration);
+
+          assertEquals(profile?.stories?.length, 1);
+          assertEquals(profile?.stories?.[0].uri, storyUri);
+          assertEquals(profile?.stories?.[0].author.did, did);
+          assertEquals(
+            (profile?.stories?.[0].record as { $type?: string }).$type,
+            "so.sprk.story.post",
+          );
+        } finally {
+          await cleanup();
+        }
+      },
+    );
   },
 });

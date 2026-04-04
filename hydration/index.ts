@@ -108,6 +108,7 @@ export type HydrationState = {
   sounds?: Sounds;
   soundAggs?: SoundAggs;
   stories?: Stories;
+  actorStoryRefs?: ActorStoryRefs;
 
   postBlocks?: PostBlocks;
   reposts?: Reposts;
@@ -143,6 +144,7 @@ export type FollowBlock = boolean;
 export type FollowBlocks = HydrationMap<FollowBlock>;
 
 export type BidirectionalBlocks = HydrationMap<HydrationMap<boolean>>;
+export type ActorStoryRefs = HydrationMap<ItemRef[]>;
 
 export class Hydrator {
   actor: ActorHydrator;
@@ -190,21 +192,48 @@ export class Hydrator {
   async hydrateProfiles(
     dids: string[],
     ctx: HydrateCtx,
+    opts: {
+      includeStories?: boolean;
+    } = {},
   ): Promise<HydrationState> {
+    const includeStories = opts.includeStories ?? true;
     const includeTakedowns = ctx.includeTakedowns || ctx.includeActorTakedowns;
-    const [actors, labels, profileViewersState] = await Promise.all([
-      this.actor.getActors(dids, {
-        includeTakedowns,
-      }),
-      this.label.getLabelsForSubjects(labelSubjectsForDid(dids), ctx.labelers),
-      this.hydrateProfileViewers(dids, ctx),
-    ]);
+    const [actors, labels, profileViewersState, actorStories] = await Promise
+      .all([
+        this.actor.getActors(dids, {
+          includeTakedowns,
+        }),
+        this.label.getLabelsForSubjects(
+          labelSubjectsForDid(dids),
+          ctx.labelers,
+        ),
+        this.hydrateProfileViewers(dids, ctx),
+        includeStories
+          ? this.story.getActorStories(dids)
+          : Promise.resolve(new HydrationMap<ItemRef[]>()),
+      ]);
+    let actorStoryRefs: ActorStoryRefs | undefined;
+    let storyState: HydrationState = {};
+    if (includeStories) {
+      actorStoryRefs = actorStories;
+      const storyUris = new Set<string>();
+      for (const [_did, stories] of actorStories) {
+        if (!stories) continue;
+        for (const story of stories) {
+          storyUris.add(story.uri);
+        }
+      }
+      if (storyUris.size > 0) {
+        storyState = await this.hydrateStories(Array.from(storyUris), ctx);
+      }
+    }
     if (!includeTakedowns) {
       actionTakedownLabels(dids, actors, labels);
     }
-    return mergeStates(profileViewersState ?? {}, {
+    return mergeManyStates(profileViewersState ?? {}, storyState, {
       actors,
       labels,
+      actorStoryRefs,
       ctx,
     });
   }
@@ -217,7 +246,7 @@ export class Hydrator {
     dids: string[],
     ctx: HydrateCtx,
   ): Promise<HydrationState> {
-    return this.hydrateProfiles(dids, ctx);
+    return this.hydrateProfiles(dids, ctx, { includeStories: false });
   }
 
   // so.sprk.actor.defs#profileViewDetailed
@@ -254,13 +283,16 @@ export class Hydrator {
     const allKnownFollowerDids = Array.from(knownFollowers.values())
       .filter(Boolean)
       .flatMap((f) => f!.followers);
-    const allDids = Array.from(new Set(dids.concat(allKnownFollowerDids)));
-    const [state, profileAggs, bidirectionalBlocks] = await Promise.all([
-      this.hydrateProfiles(allDids, ctx),
-      this.actor.getProfileAggregates(dids),
-      this.hydrateBidirectionalBlocks(subjectsToKnownFollowersMap),
-    ]);
-    return mergeManyStates(state, {
+    const [state, knownFollowerState, profileAggs, bidirectionalBlocks] =
+      await Promise.all([
+        this.hydrateProfiles(dids, ctx),
+        allKnownFollowerDids.length > 0
+          ? this.hydrateProfilesBasic(allKnownFollowerDids, ctx)
+          : Promise.resolve<HydrationState>({}),
+        this.actor.getProfileAggregates(dids),
+        this.hydrateBidirectionalBlocks(subjectsToKnownFollowersMap),
+      ]);
+    return mergeManyStates(state, knownFollowerState, {
       profileAggs,
       knownFollowers,
       ctx,
@@ -419,7 +451,7 @@ export class Hydrator {
         : Promise.resolve<PostViewerStates | undefined>(undefined),
       this.label.getLabelsForSubjects(allUris, ctx.labelers),
       this.hydratePostBlocks(state.posts!, state.replies!),
-      this.hydrateProfiles(allProfileDids, ctx),
+      this.hydrateProfilesBasic(allProfileDids, ctx),
       this.feed.getThreadContexts(threadRefs),
       this.hydrateSounds(Array.from(soundUris), ctx),
       this.hydrateBidirectionalBlocks(subjectsToInteractorsMap),
@@ -645,7 +677,7 @@ export class Hydrator {
       postUris.length > 0
         ? this.hydratePosts(postUris.map((uri) => ({ uri })), ctx)
         : Promise.resolve<HydrationState>({}),
-      this.hydrateProfiles(profileDids, ctx),
+      this.hydrateProfilesBasic(profileDids, ctx),
     ]);
 
     return mergeManyStates(profileState, postState, { stories, ctx });
@@ -692,7 +724,7 @@ export class Hydrator {
   ): Promise<HydrationState> {
     const [likes, profileState] = await Promise.all([
       this.feed.getLikes(uris, ctx.includeTakedowns),
-      this.hydrateProfiles(uris.map(didFromUri), ctx),
+      this.hydrateProfilesBasic(uris.map(didFromUri), ctx),
     ]);
 
     const pairs: RelationshipPair[] = [];
@@ -723,7 +755,7 @@ export class Hydrator {
   async hydrateReposts(uris: string[], ctx: HydrateCtx) {
     const [reposts, profileState] = await Promise.all([
       this.feed.getReposts(uris, ctx.includeTakedowns),
-      this.hydrateProfiles(uris.map(didFromUri), ctx),
+      this.hydrateProfilesBasic(uris.map(didFromUri), ctx),
     ]);
     return mergeStates(profileState, { reposts, ctx });
   }
@@ -780,7 +812,7 @@ export class Hydrator {
       this.feed.getReposts(repostUris), // reason: repost
       this.graph.getFollows(followUris), // reason: follow
       this.label.getLabelsForSubjects(uris, ctx.labelers),
-      this.hydrateProfiles(uris.map(didFromUri), ctx),
+      this.hydrateProfilesBasic(uris.map(didFromUri), ctx),
       this.feed.getPosts(subjectPostUris), // subjects of likes/reposts
       this.feed.getReplies(subjectReplyUris), // subjects of likes/reposts
     ]);
@@ -823,7 +855,7 @@ export class Hydrator {
     const [sounds, soundAggs, profileState] = await Promise.all([
       this.feed.getSounds(uris, ctx.includeTakedowns),
       this.feed.getSoundAggregates(uris.map((uri) => ({ uri }))),
-      this.hydrateProfiles(uris.map(didFromUri), ctx),
+      this.hydrateProfilesBasic(uris.map(didFromUri), ctx),
     ]);
     return mergeStates(profileState, { sounds, soundAggs, ctx });
   }
@@ -1113,6 +1145,7 @@ export const mergeStates = (
     sounds: mergeMaps(stateA.sounds, stateB.sounds),
     soundAggs: mergeMaps(stateA.soundAggs, stateB.soundAggs),
     stories: mergeMaps(stateA.stories, stateB.stories),
+    actorStoryRefs: mergeMaps(stateA.actorStoryRefs, stateB.actorStoryRefs),
     postBlocks: mergeMaps(stateA.postBlocks, stateB.postBlocks),
     reposts: mergeMaps(stateA.reposts, stateB.reposts),
     follows: mergeMaps(stateA.follows, stateB.follows),
