@@ -20,6 +20,7 @@ import { Views } from "../../../../views/index.ts";
 import {
   ATPROTO_REPO_REV,
   createHydrateCtxFromAuth,
+  getThreadDepth,
   resHeaders,
 } from "../../../util.ts";
 
@@ -70,7 +71,13 @@ const skeleton = async (inputs: SkeletonFnInput<Context, Params>) => {
     const res = await ctx.dataplane.threads.getThread(
       anchor,
       params.parentHeight,
-      getDepth(ctx, anchor, params),
+      getThreadDepth({
+        anchor,
+        depth: params.depth,
+        maxThreadDepth: ctx.cfg.maxThreadDepth,
+        bigThreadUris: ctx.cfg.bigThreadUris,
+        bigThreadDepth: ctx.cfg.bigThreadDepth,
+      }),
     );
     return {
       anchor,
@@ -103,7 +110,13 @@ const presentation = (
 ) => {
   const { ctx, params, skeleton, hydration } = inputs;
   const thread = ctx.views.thread(skeleton, hydration, {
-    depth: getDepth(ctx, skeleton.anchor, params),
+    depth: getThreadDepth({
+      anchor: skeleton.anchor,
+      depth: params.depth,
+      maxThreadDepth: ctx.cfg.maxThreadDepth,
+      bigThreadUris: ctx.cfg.bigThreadUris,
+      bigThreadDepth: ctx.cfg.bigThreadDepth,
+    }),
   });
   if (isNotFoundPost(thread)) {
     // @TODO technically this could be returned as a NotFoundPost based on lexicon
@@ -127,12 +140,4 @@ type Params = QueryParams & { hydrateCtx: HydrateCtx };
 type Skeleton = {
   anchor: string;
   uris: string[];
-};
-
-const getDepth = (ctx: Context, anchor: string, params: Params) => {
-  let maxDepth = ctx.cfg.maxThreadDepth;
-  if (ctx.cfg.bigThreadUris.has(anchor) && ctx.cfg.bigThreadDepth) {
-    maxDepth = ctx.cfg.bigThreadDepth;
-  }
-  return maxDepth ? Math.min(maxDepth, params.depth) : params.depth;
 };

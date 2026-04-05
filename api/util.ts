@@ -56,3 +56,17 @@ export const createHydrateCtxFromAuth = (
     ...overrides,
   });
 };
+
+export const getThreadDepth = (opts: {
+  anchor: string;
+  depth: number;
+  maxThreadDepth?: number;
+  bigThreadUris: Set<string>;
+  bigThreadDepth?: number;
+}): number => {
+  let max = opts.maxThreadDepth;
+  if (opts.bigThreadUris.has(opts.anchor) && opts.bigThreadDepth) {
+    max = opts.bigThreadDepth;
+  }
+  return max ? Math.min(max, opts.depth) : opts.depth;
+};
