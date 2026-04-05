@@ -260,6 +260,7 @@ export class PushService {
 
     // Add platform-specific options
     if (token.platform === "ios") {
+      const threadId = this.getThreadId(payload);
       message.message.apns = {
         headers: {
           "apns-priority": "10",
@@ -268,12 +269,17 @@ export class PushService {
           aps: {
             sound: "default",
             badge: badgeCount,
+            "thread-id": threadId,
           },
         },
       };
     } else if (token.platform === "android") {
+      const threadId = this.getThreadId(payload);
       message.message.android = {
         priority: "high",
+        notification: {
+          tag: threadId,
+        },
       };
     }
 
@@ -503,6 +509,16 @@ export class PushService {
     const base64 = btoa(String.fromCharCode(...data));
     return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   }
+
+  private getThreadId(payload: PushPayload): string {
+    if (payload.reason === "follow") {
+      return "follows";
+    }
+    if (payload.reasonSubject) {
+      return payload.reasonSubject;
+    }
+    return payload.recordUri;
+  }
 }
 
 // FCM message types
@@ -516,6 +532,9 @@ interface FcmMessage {
     data: Record<string, string>;
     android?: {
       priority: string;
+      notification?: {
+        tag?: string;
+      };
     };
     apns?: {
       headers: Record<string, string>;
@@ -526,6 +545,7 @@ interface FcmMessage {
           "interruption-level"?: string;
           "relevance-score"?: number;
           "mutable-content"?: number;
+          "thread-id"?: string;
         };
       };
     };
