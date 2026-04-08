@@ -283,7 +283,7 @@ Deno.test({
             },
             embeds: [
               {
-                $type: "so.sprk.embed.post",
+                $type: "so.sprk.embed.record",
                 placement: {
                   frame: { x: 1000, y: 1000, w: 7000, h: 2500 },
                 },
@@ -422,7 +422,7 @@ Deno.test({
               did: mentionDid,
             },
             {
-              $type: "so.sprk.embed.post",
+              $type: "so.sprk.embed.record",
               placement: {
                 frame: { x: 800, y: 5000, w: 8400, h: 3000 },
               },
@@ -518,7 +518,7 @@ Deno.test({
           $type: string;
           post: { $type?: string; uri: string };
         };
-        assertEquals(postView.$type, "so.sprk.embed.post#view");
+        assertEquals(postView.$type, "so.sprk.embed.record#view");
         assertEquals(postView.post.$type, "so.sprk.feed.defs#postView");
         assertEquals(postView.post.uri, postUri);
       },
@@ -547,7 +547,7 @@ Deno.test({
           },
           embeds: [
             {
-              $type: "so.sprk.embed.post",
+              $type: "so.sprk.embed.record",
               placement: {
                 frame: { x: 800, y: 5000, w: 8400, h: 3000 },
               },
@@ -682,7 +682,7 @@ Deno.test({
               did: mentionDid,
             },
             {
-              $type: "so.sprk.embed.post",
+              $type: "so.sprk.embed.record",
               // placement is intentionally absent
               post: {
                 uri: postUri,

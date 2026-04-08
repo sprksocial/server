@@ -7,14 +7,14 @@
       "type": "array",
       "items": {
         "type": "union",
-        "refs": ["so.sprk.embed.mention", "so.sprk.embed.post"]
+        "refs": ["so.sprk.embed.mention", "so.sprk.embed.record"]
       }
     },
     "views": {
       "type": "array",
       "items": {
         "type": "union",
-        "refs": ["so.sprk.embed.mention#view", "so.sprk.embed.post#view"]
+        "refs": ["so.sprk.embed.mention#view", "so.sprk.embed.record#view"]
       }
     },
     "placement": {

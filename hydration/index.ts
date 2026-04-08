@@ -637,7 +637,7 @@ export class Hydrator {
           embed &&
           typeof embed === "object" &&
           "$type" in embed &&
-          (embed as { $type?: string }).$type === "so.sprk.embed.post"
+          (embed as { $type?: string }).$type === "so.sprk.embed.record"
         ) {
           const postUri = (embed as { post?: { uri?: string } }).post?.uri;
           if (postUri) {

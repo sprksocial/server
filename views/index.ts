@@ -451,7 +451,7 @@ export class Views {
     if (!embed || typeof embed !== "object") return false;
     const e = embed as Record<string, unknown>;
     const post = e["post"] as Record<string, unknown> | undefined;
-    return e["$type"] === "so.sprk.embed.post" &&
+    return e["$type"] === "so.sprk.embed.record" &&
       typeof post?.["uri"] === "string" &&
       !!e["placement"] &&
       typeof e["placement"] === "object" &&
@@ -480,7 +480,7 @@ export class Views {
       if (this.isPostEmbedRecord(embed)) {
         const embedded = this.maybePost(embed.post.uri, state);
         return {
-          $type: "so.sprk.embed.post#view",
+          $type: "so.sprk.embed.record#view",
           placement: embed.placement,
           post: isReplyView(embedded)
             ? this.notFoundPost(embed.post.uri)

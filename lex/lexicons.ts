@@ -16292,7 +16292,7 @@ export const schemaDict = {
           "type": "union",
           "refs": [
             "lex:so.sprk.embed.mention",
-            "lex:so.sprk.embed.post",
+            "lex:so.sprk.embed.record",
           ],
         },
       },
@@ -16302,7 +16302,7 @@ export const schemaDict = {
           "type": "union",
           "refs": [
             "lex:so.sprk.embed.mention#view",
-            "lex:so.sprk.embed.post#view",
+            "lex:so.sprk.embed.record#view",
           ],
         },
       },
@@ -16382,6 +16382,51 @@ export const schemaDict = {
       },
     },
   },
+  "SoSprkEmbedRecord": {
+    "lexicon": 1,
+    "id": "so.sprk.embed.record",
+    "description": "Interactive record embed.",
+    "defs": {
+      "main": {
+        "type": "object",
+        "required": [
+          "placement",
+          "post",
+        ],
+        "properties": {
+          "placement": {
+            "type": "ref",
+            "ref": "lex:so.sprk.embed.defs#placement",
+          },
+          "post": {
+            "type": "ref",
+            "ref": "lex:com.atproto.repo.strongRef",
+          },
+        },
+      },
+      "view": {
+        "type": "object",
+        "required": [
+          "placement",
+          "post",
+        ],
+        "properties": {
+          "placement": {
+            "type": "ref",
+            "ref": "lex:so.sprk.embed.defs#placement",
+          },
+          "post": {
+            "type": "union",
+            "refs": [
+              "lex:so.sprk.feed.defs#postView",
+              "lex:so.sprk.feed.defs#notFoundPost",
+              "lex:so.sprk.feed.defs#blockedPost",
+            ],
+          },
+        },
+      },
+    },
+  },
   "SoSprkEmbedMention": {
     "lexicon": 1,
     "id": "so.sprk.embed.mention",
@@ -16422,51 +16467,6 @@ export const schemaDict = {
           "actor": {
             "type": "ref",
             "ref": "lex:so.sprk.actor.defs#profileViewBasic",
-          },
-        },
-      },
-    },
-  },
-  "SoSprkEmbedPost": {
-    "lexicon": 1,
-    "id": "so.sprk.embed.post",
-    "description": "Interactive post embed.",
-    "defs": {
-      "main": {
-        "type": "object",
-        "required": [
-          "placement",
-          "post",
-        ],
-        "properties": {
-          "placement": {
-            "type": "ref",
-            "ref": "lex:so.sprk.embed.defs#placement",
-          },
-          "post": {
-            "type": "ref",
-            "ref": "lex:com.atproto.repo.strongRef",
-          },
-        },
-      },
-      "view": {
-        "type": "object",
-        "required": [
-          "placement",
-          "post",
-        ],
-        "properties": {
-          "placement": {
-            "type": "ref",
-            "ref": "lex:so.sprk.embed.defs#placement",
-          },
-          "post": {
-            "type": "union",
-            "refs": [
-              "lex:so.sprk.feed.defs#postView",
-              "lex:so.sprk.feed.defs#notFoundPost",
-              "lex:so.sprk.feed.defs#blockedPost",
-            ],
           },
         },
       },
@@ -27081,8 +27081,8 @@ export const ids = {
   SoSprkVideoGetJobStatus: "so.sprk.video.getJobStatus",
   SoSprkVideoGetUploadLimits: "so.sprk.video.getUploadLimits",
   SoSprkEmbedDefs: "so.sprk.embed.defs",
+  SoSprkEmbedRecord: "so.sprk.embed.record",
   SoSprkEmbedMention: "so.sprk.embed.mention",
-  SoSprkEmbedPost: "so.sprk.embed.post",
   SoSprkNotificationRegisterPush: "so.sprk.notification.registerPush",
   SoSprkNotificationPutPreferences: "so.sprk.notification.putPreferences",
   SoSprkNotificationUpdateSeen: "so.sprk.notification.updateSeen",

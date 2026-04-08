@@ -8,10 +8,10 @@ import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongR
 import type * as SoSprkFeedDefs from "../feed/defs.ts";
 
 const is$typed = _is$typed, validate = _validate;
-const id = "so.sprk.embed.post";
+const id = "so.sprk.embed.record";
 
 export interface Main {
-  $type?: "so.sprk.embed.post";
+  $type?: "so.sprk.embed.record";
   placement: SoSprkEmbedDefs.Placement;
   post: ComAtprotoRepoStrongRef.Main;
 }
@@ -27,7 +27,7 @@ export function validateMain<V>(v: V) {
 }
 
 export interface View {
-  $type?: "so.sprk.embed.post#view";
+  $type?: "so.sprk.embed.record#view";
   placement: SoSprkEmbedDefs.Placement;
   post:
     | $Typed<SoSprkFeedDefs.PostView>

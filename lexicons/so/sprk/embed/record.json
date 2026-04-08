@@ -1,7 +1,7 @@
 {
   "lexicon": 1,
-  "id": "so.sprk.embed.post",
-  "description": "Interactive post embed.",
+  "id": "so.sprk.embed.record",
+  "description": "Interactive record embed.",
   "defs": {
     "main": {
       "type": "object",

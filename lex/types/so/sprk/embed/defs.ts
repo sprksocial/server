@@ -4,17 +4,17 @@
 import { validate as _validate } from "../../../../lexicons.ts";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as SoSprkEmbedMention from "./mention.ts";
-import type * as SoSprkEmbedPost from "./post.ts";
+import type * as SoSprkEmbedRecord from "./record.ts";
 
 const is$typed = _is$typed, validate = _validate;
 const id = "so.sprk.embed.defs";
 
 export type Embeds =
-  ($Typed<SoSprkEmbedMention.Main> | $Typed<SoSprkEmbedPost.Main> | {
+  ($Typed<SoSprkEmbedMention.Main> | $Typed<SoSprkEmbedRecord.Main> | {
     $type: string;
   })[];
 export type Views =
-  ($Typed<SoSprkEmbedMention.View> | $Typed<SoSprkEmbedPost.View> | {
+  ($Typed<SoSprkEmbedMention.View> | $Typed<SoSprkEmbedRecord.View> | {
     $type: string;
   })[];
 
