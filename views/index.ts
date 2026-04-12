@@ -26,7 +26,7 @@ import {
 } from "../lex/types/so/sprk/feed/defs.ts";
 import { StoriesByAuthor, StoryView } from "../lex/types/so/sprk/story/defs.ts";
 import { Main as MentionEmbed } from "../lex/types/so/sprk/embed/mention.ts";
-import { Main as PostEmbed } from "../lex/types/so/sprk/embed/post.ts";
+import { Main as RecordEmbed } from "../lex/types/so/sprk/embed/record.ts";
 import {
   isRecord as isReplyRecord,
   Record as ReplyRecord,
@@ -435,7 +435,7 @@ export class Views {
     };
   }
 
-  private isMentionEmbedRecord(embed: unknown): embed is MentionEmbed {
+  private isMentionEmbed(embed: unknown): embed is MentionEmbed {
     if (!embed || typeof embed !== "object") return false;
     const e = embed as Record<string, unknown>;
     return e["$type"] === "so.sprk.embed.mention" &&
@@ -447,7 +447,7 @@ export class Views {
       typeof (e["placement"] as Record<string, unknown>)["frame"] === "object";
   }
 
-  private isPostEmbedRecord(embed: unknown): embed is PostEmbed {
+  private isRecordEmbed(embed: unknown): embed is RecordEmbed {
     if (!embed || typeof embed !== "object") return false;
     const e = embed as Record<string, unknown>;
     const post = e["post"] as Record<string, unknown> | undefined;
@@ -468,7 +468,7 @@ export class Views {
     }
 
     const views = mapDefined(embeds, (embed) => {
-      if (this.isMentionEmbedRecord(embed)) {
+      if (this.isMentionEmbed(embed)) {
         return {
           $type: "so.sprk.embed.mention#view",
           placement: embed.placement,
@@ -477,7 +477,7 @@ export class Views {
         };
       }
 
-      if (this.isPostEmbedRecord(embed)) {
+      if (this.isRecordEmbed(embed)) {
         const embedded = this.maybePost(embed.post.uri, state);
         return {
           $type: "so.sprk.embed.record#view",
