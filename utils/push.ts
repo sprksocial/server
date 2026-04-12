@@ -8,6 +8,7 @@ export interface PushPayload {
   author: string;
   recordUri: string;
   reasonSubject?: string;
+  threadRootUri?: string;
 }
 
 export interface PushConfig {
@@ -254,13 +255,15 @@ export class PushService {
           recordUri: payload.recordUri,
           ...(payload.reasonSubject &&
             { reasonSubject: payload.reasonSubject }),
+          ...(payload.threadRootUri &&
+            { threadRootUri: payload.threadRootUri }),
         },
       },
     };
 
     // Add platform-specific options
     if (token.platform === "ios") {
-      const threadId = this.getThreadId(payload);
+      const threadId = this.getIosThreadId(payload);
       message.message.apns = {
         headers: {
           "apns-priority": "10",
@@ -274,7 +277,7 @@ export class PushService {
         },
       };
     } else if (token.platform === "android") {
-      const threadId = this.getThreadId(payload);
+      const threadId = this.getAndroidTag(payload);
       message.message.android = {
         priority: "high",
         notification: {
@@ -510,9 +513,26 @@ export class PushService {
     return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   }
 
-  private getThreadId(payload: PushPayload): string {
+  private getIosThreadId(payload: PushPayload): string {
     if (payload.reason === "follow") {
       return "follows";
+    }
+    if (payload.reason === "reply") {
+      return payload.threadRootUri ?? payload.reasonSubject ??
+        payload.recordUri;
+    }
+    if (payload.reasonSubject) {
+      return payload.reasonSubject;
+    }
+    return payload.recordUri;
+  }
+
+  private getAndroidTag(payload: PushPayload): string {
+    if (payload.reason === "follow") {
+      return "follows";
+    }
+    if (payload.reason === "reply") {
+      return payload.reasonSubject ?? payload.recordUri;
     }
     if (payload.reasonSubject) {
       return payload.reasonSubject;

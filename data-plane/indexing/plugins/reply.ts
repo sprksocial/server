@@ -167,6 +167,7 @@ const notifsForInsert = (obj: IndexedReply) => {
     recordCid: string;
     sortAt: string;
     reasonSubject?: string;
+    threadRootUri?: string;
   }> = [];
   const notified = new Set([obj.reply.authorDid]);
   const maybeNotify = (notif: {
@@ -177,6 +178,7 @@ const notifsForInsert = (obj: IndexedReply) => {
     recordCid: string;
     sortAt: string;
     reasonSubject?: string;
+    threadRootUri?: string;
   }) => {
     if (!notified.has(notif.did)) {
       notified.add(notif.did);
@@ -211,6 +213,7 @@ const notifsForInsert = (obj: IndexedReply) => {
         recordUri: obj.reply.uri,
         recordCid: obj.reply.cid,
         sortAt: obj.reply.createdAt,
+        threadRootUri: obj.reply.reply?.root.uri,
       });
       // found hidden reply, don't notify any higher ancestors
       if (threadgateHiddenReplies.includes(ancestorUri.toString())) break;
@@ -232,6 +235,7 @@ const notifsForInsert = (obj: IndexedReply) => {
           recordUri: descendent.uri,
           recordCid: descendent.cid,
           sortAt: descendent.sortAt,
+          threadRootUri: obj.reply.reply?.root.uri,
         });
       }
     }

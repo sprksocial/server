@@ -41,6 +41,7 @@ type Notif = {
   recordCid: string;
   sortAt: string;
   reasonSubject?: string;
+  threadRootUri?: string;
 };
 
 export class RecordProcessor<T, S> {
@@ -374,6 +375,7 @@ export class RecordProcessor<T, S> {
             author: notif.author,
             recordUri: notif.recordUri,
             reasonSubject: notif.reasonSubject,
+            threadRootUri: notif.threadRootUri,
           });
         });
       }
