@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -40,11 +41,13 @@ export interface TimelineItem {
 
 const hashTimelineItem = "timelineItem";
 
-export function isTimelineItem<V>(v: V) {
+export function isTimelineItem<V>(v: V): v is TimelineItem & V {
   return is$typed(v, id, hashTimelineItem);
 }
 
-export function validateTimelineItem<V>(v: V) {
+export function validateTimelineItem<V>(
+  v: V,
+): ValidationResult<TimelineItem & V> {
   return validate<TimelineItem & V>(v, id, hashTimelineItem);
 }
 
@@ -93,10 +96,12 @@ export interface TimelineItemSummary {
 
 const hashTimelineItemSummary = "timelineItemSummary";
 
-export function isTimelineItemSummary<V>(v: V) {
+export function isTimelineItemSummary<V>(v: V): v is TimelineItemSummary & V {
   return is$typed(v, id, hashTimelineItemSummary);
 }
 
-export function validateTimelineItemSummary<V>(v: V) {
+export function validateTimelineItemSummary<V>(
+  v: V,
+): ValidationResult<TimelineItemSummary & V> {
   return validate<TimelineItemSummary & V>(v, id, hashTimelineItemSummary);
 }

@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -16,11 +17,13 @@ export interface NotFoundActor {
 
 const hashNotFoundActor = "notFoundActor";
 
-export function isNotFoundActor<V>(v: V) {
+export function isNotFoundActor<V>(v: V): v is NotFoundActor & V {
   return is$typed(v, id, hashNotFoundActor);
 }
 
-export function validateNotFoundActor<V>(v: V) {
+export function validateNotFoundActor<V>(
+  v: V,
+): ValidationResult<NotFoundActor & V> {
   return validate<NotFoundActor & V>(v, id, hashNotFoundActor);
 }
 
@@ -36,10 +39,12 @@ export interface Relationship {
 
 const hashRelationship = "relationship";
 
-export function isRelationship<V>(v: V) {
+export function isRelationship<V>(v: V): v is Relationship & V {
   return is$typed(v, id, hashRelationship);
 }
 
-export function validateRelationship<V>(v: V) {
+export function validateRelationship<V>(
+  v: V,
+): ValidationResult<Relationship & V> {
   return validate<Relationship & V>(v, id, hashRelationship);
 }

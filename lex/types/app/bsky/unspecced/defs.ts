@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as AppBskyActorDefs from "../actor/defs.ts";
 import type * as AppBskyFeedDefs from "../feed/defs.ts";
@@ -16,11 +17,13 @@ export interface SkeletonSearchPost {
 
 const hashSkeletonSearchPost = "skeletonSearchPost";
 
-export function isSkeletonSearchPost<V>(v: V) {
+export function isSkeletonSearchPost<V>(v: V): v is SkeletonSearchPost & V {
   return is$typed(v, id, hashSkeletonSearchPost);
 }
 
-export function validateSkeletonSearchPost<V>(v: V) {
+export function validateSkeletonSearchPost<V>(
+  v: V,
+): ValidationResult<SkeletonSearchPost & V> {
   return validate<SkeletonSearchPost & V>(v, id, hashSkeletonSearchPost);
 }
 
@@ -31,11 +34,13 @@ export interface SkeletonSearchActor {
 
 const hashSkeletonSearchActor = "skeletonSearchActor";
 
-export function isSkeletonSearchActor<V>(v: V) {
+export function isSkeletonSearchActor<V>(v: V): v is SkeletonSearchActor & V {
   return is$typed(v, id, hashSkeletonSearchActor);
 }
 
-export function validateSkeletonSearchActor<V>(v: V) {
+export function validateSkeletonSearchActor<V>(
+  v: V,
+): ValidationResult<SkeletonSearchActor & V> {
   return validate<SkeletonSearchActor & V>(v, id, hashSkeletonSearchActor);
 }
 
@@ -46,11 +51,15 @@ export interface SkeletonSearchStarterPack {
 
 const hashSkeletonSearchStarterPack = "skeletonSearchStarterPack";
 
-export function isSkeletonSearchStarterPack<V>(v: V) {
+export function isSkeletonSearchStarterPack<V>(
+  v: V,
+): v is SkeletonSearchStarterPack & V {
   return is$typed(v, id, hashSkeletonSearchStarterPack);
 }
 
-export function validateSkeletonSearchStarterPack<V>(v: V) {
+export function validateSkeletonSearchStarterPack<V>(
+  v: V,
+): ValidationResult<SkeletonSearchStarterPack & V> {
   return validate<SkeletonSearchStarterPack & V>(
     v,
     id,
@@ -68,11 +77,13 @@ export interface TrendingTopic {
 
 const hashTrendingTopic = "trendingTopic";
 
-export function isTrendingTopic<V>(v: V) {
+export function isTrendingTopic<V>(v: V): v is TrendingTopic & V {
   return is$typed(v, id, hashTrendingTopic);
 }
 
-export function validateTrendingTopic<V>(v: V) {
+export function validateTrendingTopic<V>(
+  v: V,
+): ValidationResult<TrendingTopic & V> {
   return validate<TrendingTopic & V>(v, id, hashTrendingTopic);
 }
 
@@ -90,11 +101,13 @@ export interface SkeletonTrend {
 
 const hashSkeletonTrend = "skeletonTrend";
 
-export function isSkeletonTrend<V>(v: V) {
+export function isSkeletonTrend<V>(v: V): v is SkeletonTrend & V {
   return is$typed(v, id, hashSkeletonTrend);
 }
 
-export function validateSkeletonTrend<V>(v: V) {
+export function validateSkeletonTrend<V>(
+  v: V,
+): ValidationResult<SkeletonTrend & V> {
   return validate<SkeletonTrend & V>(v, id, hashSkeletonTrend);
 }
 
@@ -112,11 +125,11 @@ export interface TrendView {
 
 const hashTrendView = "trendView";
 
-export function isTrendView<V>(v: V) {
+export function isTrendView<V>(v: V): v is TrendView & V {
   return is$typed(v, id, hashTrendView);
 }
 
-export function validateTrendView<V>(v: V) {
+export function validateTrendView<V>(v: V): ValidationResult<TrendView & V> {
   return validate<TrendView & V>(v, id, hashTrendView);
 }
 
@@ -137,11 +150,13 @@ export interface ThreadItemPost {
 
 const hashThreadItemPost = "threadItemPost";
 
-export function isThreadItemPost<V>(v: V) {
+export function isThreadItemPost<V>(v: V): v is ThreadItemPost & V {
   return is$typed(v, id, hashThreadItemPost);
 }
 
-export function validateThreadItemPost<V>(v: V) {
+export function validateThreadItemPost<V>(
+  v: V,
+): ValidationResult<ThreadItemPost & V> {
   return validate<ThreadItemPost & V>(v, id, hashThreadItemPost);
 }
 
@@ -151,11 +166,15 @@ export interface ThreadItemNoUnauthenticated {
 
 const hashThreadItemNoUnauthenticated = "threadItemNoUnauthenticated";
 
-export function isThreadItemNoUnauthenticated<V>(v: V) {
+export function isThreadItemNoUnauthenticated<V>(
+  v: V,
+): v is ThreadItemNoUnauthenticated & V {
   return is$typed(v, id, hashThreadItemNoUnauthenticated);
 }
 
-export function validateThreadItemNoUnauthenticated<V>(v: V) {
+export function validateThreadItemNoUnauthenticated<V>(
+  v: V,
+): ValidationResult<ThreadItemNoUnauthenticated & V> {
   return validate<ThreadItemNoUnauthenticated & V>(
     v,
     id,
@@ -169,11 +188,13 @@ export interface ThreadItemNotFound {
 
 const hashThreadItemNotFound = "threadItemNotFound";
 
-export function isThreadItemNotFound<V>(v: V) {
+export function isThreadItemNotFound<V>(v: V): v is ThreadItemNotFound & V {
   return is$typed(v, id, hashThreadItemNotFound);
 }
 
-export function validateThreadItemNotFound<V>(v: V) {
+export function validateThreadItemNotFound<V>(
+  v: V,
+): ValidationResult<ThreadItemNotFound & V> {
   return validate<ThreadItemNotFound & V>(v, id, hashThreadItemNotFound);
 }
 
@@ -184,11 +205,13 @@ export interface ThreadItemBlocked {
 
 const hashThreadItemBlocked = "threadItemBlocked";
 
-export function isThreadItemBlocked<V>(v: V) {
+export function isThreadItemBlocked<V>(v: V): v is ThreadItemBlocked & V {
   return is$typed(v, id, hashThreadItemBlocked);
 }
 
-export function validateThreadItemBlocked<V>(v: V) {
+export function validateThreadItemBlocked<V>(
+  v: V,
+): ValidationResult<ThreadItemBlocked & V> {
   return validate<ThreadItemBlocked & V>(v, id, hashThreadItemBlocked);
 }
 
@@ -208,11 +231,13 @@ export interface AgeAssuranceState {
 
 const hashAgeAssuranceState = "ageAssuranceState";
 
-export function isAgeAssuranceState<V>(v: V) {
+export function isAgeAssuranceState<V>(v: V): v is AgeAssuranceState & V {
   return is$typed(v, id, hashAgeAssuranceState);
 }
 
-export function validateAgeAssuranceState<V>(v: V) {
+export function validateAgeAssuranceState<V>(
+  v: V,
+): ValidationResult<AgeAssuranceState & V> {
   return validate<AgeAssuranceState & V>(v, id, hashAgeAssuranceState);
 }
 
@@ -243,10 +268,12 @@ export interface AgeAssuranceEvent {
 
 const hashAgeAssuranceEvent = "ageAssuranceEvent";
 
-export function isAgeAssuranceEvent<V>(v: V) {
+export function isAgeAssuranceEvent<V>(v: V): v is AgeAssuranceEvent & V {
   return is$typed(v, id, hashAgeAssuranceEvent);
 }
 
-export function validateAgeAssuranceEvent<V>(v: V) {
+export function validateAgeAssuranceEvent<V>(
+  v: V,
+): ValidationResult<AgeAssuranceEvent & V> {
   return validate<AgeAssuranceEvent & V>(v, id, hashAgeAssuranceEvent);
 }

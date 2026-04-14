@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as ComAtprotoAdminDefs from "../../../com/atproto/admin/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef.ts";
@@ -39,6 +40,7 @@ export interface ModEventView {
     | $Typed<ModEventPriorityScore>
     | $Typed<AgeAssuranceEvent>
     | $Typed<AgeAssuranceOverrideEvent>
+    | $Typed<AgeAssurancePurgeEvent>
     | $Typed<RevokeAccountCredentialsEvent>
     | $Typed<ScheduleTakedownEvent>
     | $Typed<CancelScheduledTakedownEvent>
@@ -58,11 +60,13 @@ export interface ModEventView {
 
 const hashModEventView = "modEventView";
 
-export function isModEventView<V>(v: V) {
+export function isModEventView<V>(v: V): v is ModEventView & V {
   return is$typed(v, id, hashModEventView);
 }
 
-export function validateModEventView<V>(v: V) {
+export function validateModEventView<V>(
+  v: V,
+): ValidationResult<ModEventView & V> {
   return validate<ModEventView & V>(v, id, hashModEventView);
 }
 
@@ -91,6 +95,7 @@ export interface ModEventViewDetail {
     | $Typed<ModEventPriorityScore>
     | $Typed<AgeAssuranceEvent>
     | $Typed<AgeAssuranceOverrideEvent>
+    | $Typed<AgeAssurancePurgeEvent>
     | $Typed<RevokeAccountCredentialsEvent>
     | $Typed<ScheduleTakedownEvent>
     | $Typed<CancelScheduledTakedownEvent>
@@ -109,11 +114,13 @@ export interface ModEventViewDetail {
 
 const hashModEventViewDetail = "modEventViewDetail";
 
-export function isModEventViewDetail<V>(v: V) {
+export function isModEventViewDetail<V>(v: V): v is ModEventViewDetail & V {
   return is$typed(v, id, hashModEventViewDetail);
 }
 
-export function validateModEventViewDetail<V>(v: V) {
+export function validateModEventViewDetail<V>(
+  v: V,
+): ValidationResult<ModEventViewDetail & V> {
   return validate<ModEventViewDetail & V>(v, id, hashModEventViewDetail);
 }
 
@@ -169,11 +176,13 @@ export interface SubjectStatusView {
 
 const hashSubjectStatusView = "subjectStatusView";
 
-export function isSubjectStatusView<V>(v: V) {
+export function isSubjectStatusView<V>(v: V): v is SubjectStatusView & V {
   return is$typed(v, id, hashSubjectStatusView);
 }
 
-export function validateSubjectStatusView<V>(v: V) {
+export function validateSubjectStatusView<V>(
+  v: V,
+): ValidationResult<SubjectStatusView & V> {
   return validate<SubjectStatusView & V>(v, id, hashSubjectStatusView);
 }
 
@@ -190,11 +199,13 @@ export interface SubjectView {
 
 const hashSubjectView = "subjectView";
 
-export function isSubjectView<V>(v: V) {
+export function isSubjectView<V>(v: V): v is SubjectView & V {
   return is$typed(v, id, hashSubjectView);
 }
 
-export function validateSubjectView<V>(v: V) {
+export function validateSubjectView<V>(
+  v: V,
+): ValidationResult<SubjectView & V> {
   return validate<SubjectView & V>(v, id, hashSubjectView);
 }
 
@@ -215,11 +226,13 @@ export interface AccountStats {
 
 const hashAccountStats = "accountStats";
 
-export function isAccountStats<V>(v: V) {
+export function isAccountStats<V>(v: V): v is AccountStats & V {
   return is$typed(v, id, hashAccountStats);
 }
 
-export function validateAccountStats<V>(v: V) {
+export function validateAccountStats<V>(
+  v: V,
+): ValidationResult<AccountStats & V> {
   return validate<AccountStats & V>(v, id, hashAccountStats);
 }
 
@@ -246,11 +259,13 @@ export interface RecordsStats {
 
 const hashRecordsStats = "recordsStats";
 
-export function isRecordsStats<V>(v: V) {
+export function isRecordsStats<V>(v: V): v is RecordsStats & V {
   return is$typed(v, id, hashRecordsStats);
 }
 
-export function validateRecordsStats<V>(v: V) {
+export function validateRecordsStats<V>(
+  v: V,
+): ValidationResult<RecordsStats & V> {
   return validate<RecordsStats & V>(v, id, hashRecordsStats);
 }
 
@@ -269,11 +284,13 @@ export interface AccountStrike {
 
 const hashAccountStrike = "accountStrike";
 
-export function isAccountStrike<V>(v: V) {
+export function isAccountStrike<V>(v: V): v is AccountStrike & V {
   return is$typed(v, id, hashAccountStrike);
 }
 
-export function validateAccountStrike<V>(v: V) {
+export function validateAccountStrike<V>(
+  v: V,
+): ValidationResult<AccountStrike & V> {
   return validate<AccountStrike & V>(v, id, hashAccountStrike);
 }
 
@@ -285,13 +302,13 @@ export type SubjectReviewState =
   | (string & globalThis.Record<PropertyKey, never>);
 
 /** Moderator review status of a subject: Open. Indicates that the subject needs to be reviewed by a moderator */
-export const REVIEWOPEN = `${id}#reviewOpen`;
+export const REVIEWOPEN: string = `${id}#reviewOpen`;
 /** Moderator review status of a subject: Escalated. Indicates that the subject was escalated for review by a moderator */
-export const REVIEWESCALATED = `${id}#reviewEscalated`;
+export const REVIEWESCALATED: string = `${id}#reviewEscalated`;
 /** Moderator review status of a subject: Closed. Indicates that the subject was already reviewed and resolved by a moderator */
-export const REVIEWCLOSED = `${id}#reviewClosed`;
+export const REVIEWCLOSED: string = `${id}#reviewClosed`;
 /** Moderator review status of a subject: Unnecessary. Indicates that the subject does not need a review at the moment but there is probably some moderation related metadata available for it */
-export const REVIEWNONE = `${id}#reviewNone`;
+export const REVIEWNONE: string = `${id}#reviewNone`;
 
 /** Take down a subject permanently or temporarily */
 export interface ModEventTakedown {
@@ -316,11 +333,13 @@ export interface ModEventTakedown {
 
 const hashModEventTakedown = "modEventTakedown";
 
-export function isModEventTakedown<V>(v: V) {
+export function isModEventTakedown<V>(v: V): v is ModEventTakedown & V {
   return is$typed(v, id, hashModEventTakedown);
 }
 
-export function validateModEventTakedown<V>(v: V) {
+export function validateModEventTakedown<V>(
+  v: V,
+): ValidationResult<ModEventTakedown & V> {
   return validate<ModEventTakedown & V>(v, id, hashModEventTakedown);
 }
 
@@ -339,11 +358,15 @@ export interface ModEventReverseTakedown {
 
 const hashModEventReverseTakedown = "modEventReverseTakedown";
 
-export function isModEventReverseTakedown<V>(v: V) {
+export function isModEventReverseTakedown<V>(
+  v: V,
+): v is ModEventReverseTakedown & V {
   return is$typed(v, id, hashModEventReverseTakedown);
 }
 
-export function validateModEventReverseTakedown<V>(v: V) {
+export function validateModEventReverseTakedown<V>(
+  v: V,
+): ValidationResult<ModEventReverseTakedown & V> {
   return validate<ModEventReverseTakedown & V>(
     v,
     id,
@@ -360,11 +383,15 @@ export interface ModEventResolveAppeal {
 
 const hashModEventResolveAppeal = "modEventResolveAppeal";
 
-export function isModEventResolveAppeal<V>(v: V) {
+export function isModEventResolveAppeal<V>(
+  v: V,
+): v is ModEventResolveAppeal & V {
   return is$typed(v, id, hashModEventResolveAppeal);
 }
 
-export function validateModEventResolveAppeal<V>(v: V) {
+export function validateModEventResolveAppeal<V>(
+  v: V,
+): ValidationResult<ModEventResolveAppeal & V> {
   return validate<ModEventResolveAppeal & V>(v, id, hashModEventResolveAppeal);
 }
 
@@ -378,11 +405,13 @@ export interface ModEventComment {
 
 const hashModEventComment = "modEventComment";
 
-export function isModEventComment<V>(v: V) {
+export function isModEventComment<V>(v: V): v is ModEventComment & V {
   return is$typed(v, id, hashModEventComment);
 }
 
-export function validateModEventComment<V>(v: V) {
+export function validateModEventComment<V>(
+  v: V,
+): ValidationResult<ModEventComment & V> {
   return validate<ModEventComment & V>(v, id, hashModEventComment);
 }
 
@@ -397,11 +426,13 @@ export interface ModEventReport {
 
 const hashModEventReport = "modEventReport";
 
-export function isModEventReport<V>(v: V) {
+export function isModEventReport<V>(v: V): v is ModEventReport & V {
   return is$typed(v, id, hashModEventReport);
 }
 
-export function validateModEventReport<V>(v: V) {
+export function validateModEventReport<V>(
+  v: V,
+): ValidationResult<ModEventReport & V> {
   return validate<ModEventReport & V>(v, id, hashModEventReport);
 }
 
@@ -417,11 +448,13 @@ export interface ModEventLabel {
 
 const hashModEventLabel = "modEventLabel";
 
-export function isModEventLabel<V>(v: V) {
+export function isModEventLabel<V>(v: V): v is ModEventLabel & V {
   return is$typed(v, id, hashModEventLabel);
 }
 
-export function validateModEventLabel<V>(v: V) {
+export function validateModEventLabel<V>(
+  v: V,
+): ValidationResult<ModEventLabel & V> {
   return validate<ModEventLabel & V>(v, id, hashModEventLabel);
 }
 
@@ -434,11 +467,15 @@ export interface ModEventPriorityScore {
 
 const hashModEventPriorityScore = "modEventPriorityScore";
 
-export function isModEventPriorityScore<V>(v: V) {
+export function isModEventPriorityScore<V>(
+  v: V,
+): v is ModEventPriorityScore & V {
   return is$typed(v, id, hashModEventPriorityScore);
 }
 
-export function validateModEventPriorityScore<V>(v: V) {
+export function validateModEventPriorityScore<V>(
+  v: V,
+): ValidationResult<ModEventPriorityScore & V> {
   return validate<ModEventPriorityScore & V>(v, id, hashModEventPriorityScore);
 }
 
@@ -472,11 +509,13 @@ export interface AgeAssuranceEvent {
 
 const hashAgeAssuranceEvent = "ageAssuranceEvent";
 
-export function isAgeAssuranceEvent<V>(v: V) {
+export function isAgeAssuranceEvent<V>(v: V): v is AgeAssuranceEvent & V {
   return is$typed(v, id, hashAgeAssuranceEvent);
 }
 
-export function validateAgeAssuranceEvent<V>(v: V) {
+export function validateAgeAssuranceEvent<V>(
+  v: V,
+): ValidationResult<AgeAssuranceEvent & V> {
   return validate<AgeAssuranceEvent & V>(v, id, hashAgeAssuranceEvent);
 }
 
@@ -496,15 +535,44 @@ export interface AgeAssuranceOverrideEvent {
 
 const hashAgeAssuranceOverrideEvent = "ageAssuranceOverrideEvent";
 
-export function isAgeAssuranceOverrideEvent<V>(v: V) {
+export function isAgeAssuranceOverrideEvent<V>(
+  v: V,
+): v is AgeAssuranceOverrideEvent & V {
   return is$typed(v, id, hashAgeAssuranceOverrideEvent);
 }
 
-export function validateAgeAssuranceOverrideEvent<V>(v: V) {
+export function validateAgeAssuranceOverrideEvent<V>(
+  v: V,
+): ValidationResult<AgeAssuranceOverrideEvent & V> {
   return validate<AgeAssuranceOverrideEvent & V>(
     v,
     id,
     hashAgeAssuranceOverrideEvent,
+  );
+}
+
+/** Purges all age assurance events for the subject. Only works on DID subjects. Moderator-only. */
+export interface AgeAssurancePurgeEvent {
+  $type?: "tools.ozone.moderation.defs#ageAssurancePurgeEvent";
+  /** Comment describing the reason for the purge. */
+  comment: string;
+}
+
+const hashAgeAssurancePurgeEvent = "ageAssurancePurgeEvent";
+
+export function isAgeAssurancePurgeEvent<V>(
+  v: V,
+): v is AgeAssurancePurgeEvent & V {
+  return is$typed(v, id, hashAgeAssurancePurgeEvent);
+}
+
+export function validateAgeAssurancePurgeEvent<V>(
+  v: V,
+): ValidationResult<AgeAssurancePurgeEvent & V> {
+  return validate<AgeAssurancePurgeEvent & V>(
+    v,
+    id,
+    hashAgeAssurancePurgeEvent,
   );
 }
 
@@ -517,11 +585,15 @@ export interface RevokeAccountCredentialsEvent {
 
 const hashRevokeAccountCredentialsEvent = "revokeAccountCredentialsEvent";
 
-export function isRevokeAccountCredentialsEvent<V>(v: V) {
+export function isRevokeAccountCredentialsEvent<V>(
+  v: V,
+): v is RevokeAccountCredentialsEvent & V {
   return is$typed(v, id, hashRevokeAccountCredentialsEvent);
 }
 
-export function validateRevokeAccountCredentialsEvent<V>(v: V) {
+export function validateRevokeAccountCredentialsEvent<V>(
+  v: V,
+): ValidationResult<RevokeAccountCredentialsEvent & V> {
   return validate<RevokeAccountCredentialsEvent & V>(
     v,
     id,
@@ -538,11 +610,13 @@ export interface ModEventAcknowledge {
 
 const hashModEventAcknowledge = "modEventAcknowledge";
 
-export function isModEventAcknowledge<V>(v: V) {
+export function isModEventAcknowledge<V>(v: V): v is ModEventAcknowledge & V {
   return is$typed(v, id, hashModEventAcknowledge);
 }
 
-export function validateModEventAcknowledge<V>(v: V) {
+export function validateModEventAcknowledge<V>(
+  v: V,
+): ValidationResult<ModEventAcknowledge & V> {
   return validate<ModEventAcknowledge & V>(v, id, hashModEventAcknowledge);
 }
 
@@ -553,11 +627,13 @@ export interface ModEventEscalate {
 
 const hashModEventEscalate = "modEventEscalate";
 
-export function isModEventEscalate<V>(v: V) {
+export function isModEventEscalate<V>(v: V): v is ModEventEscalate & V {
   return is$typed(v, id, hashModEventEscalate);
 }
 
-export function validateModEventEscalate<V>(v: V) {
+export function validateModEventEscalate<V>(
+  v: V,
+): ValidationResult<ModEventEscalate & V> {
   return validate<ModEventEscalate & V>(v, id, hashModEventEscalate);
 }
 
@@ -571,11 +647,13 @@ export interface ModEventMute {
 
 const hashModEventMute = "modEventMute";
 
-export function isModEventMute<V>(v: V) {
+export function isModEventMute<V>(v: V): v is ModEventMute & V {
   return is$typed(v, id, hashModEventMute);
 }
 
-export function validateModEventMute<V>(v: V) {
+export function validateModEventMute<V>(
+  v: V,
+): ValidationResult<ModEventMute & V> {
   return validate<ModEventMute & V>(v, id, hashModEventMute);
 }
 
@@ -588,11 +666,13 @@ export interface ModEventUnmute {
 
 const hashModEventUnmute = "modEventUnmute";
 
-export function isModEventUnmute<V>(v: V) {
+export function isModEventUnmute<V>(v: V): v is ModEventUnmute & V {
   return is$typed(v, id, hashModEventUnmute);
 }
 
-export function validateModEventUnmute<V>(v: V) {
+export function validateModEventUnmute<V>(
+  v: V,
+): ValidationResult<ModEventUnmute & V> {
   return validate<ModEventUnmute & V>(v, id, hashModEventUnmute);
 }
 
@@ -606,11 +686,13 @@ export interface ModEventMuteReporter {
 
 const hashModEventMuteReporter = "modEventMuteReporter";
 
-export function isModEventMuteReporter<V>(v: V) {
+export function isModEventMuteReporter<V>(v: V): v is ModEventMuteReporter & V {
   return is$typed(v, id, hashModEventMuteReporter);
 }
 
-export function validateModEventMuteReporter<V>(v: V) {
+export function validateModEventMuteReporter<V>(
+  v: V,
+): ValidationResult<ModEventMuteReporter & V> {
   return validate<ModEventMuteReporter & V>(v, id, hashModEventMuteReporter);
 }
 
@@ -623,11 +705,15 @@ export interface ModEventUnmuteReporter {
 
 const hashModEventUnmuteReporter = "modEventUnmuteReporter";
 
-export function isModEventUnmuteReporter<V>(v: V) {
+export function isModEventUnmuteReporter<V>(
+  v: V,
+): v is ModEventUnmuteReporter & V {
   return is$typed(v, id, hashModEventUnmuteReporter);
 }
 
-export function validateModEventUnmuteReporter<V>(v: V) {
+export function validateModEventUnmuteReporter<V>(
+  v: V,
+): ValidationResult<ModEventUnmuteReporter & V> {
   return validate<ModEventUnmuteReporter & V>(
     v,
     id,
@@ -658,11 +744,13 @@ export interface ModEventEmail {
 
 const hashModEventEmail = "modEventEmail";
 
-export function isModEventEmail<V>(v: V) {
+export function isModEventEmail<V>(v: V): v is ModEventEmail & V {
   return is$typed(v, id, hashModEventEmail);
 }
 
-export function validateModEventEmail<V>(v: V) {
+export function validateModEventEmail<V>(
+  v: V,
+): ValidationResult<ModEventEmail & V> {
   return validate<ModEventEmail & V>(v, id, hashModEventEmail);
 }
 
@@ -674,11 +762,13 @@ export interface ModEventDivert {
 
 const hashModEventDivert = "modEventDivert";
 
-export function isModEventDivert<V>(v: V) {
+export function isModEventDivert<V>(v: V): v is ModEventDivert & V {
   return is$typed(v, id, hashModEventDivert);
 }
 
-export function validateModEventDivert<V>(v: V) {
+export function validateModEventDivert<V>(
+  v: V,
+): ValidationResult<ModEventDivert & V> {
   return validate<ModEventDivert & V>(v, id, hashModEventDivert);
 }
 
@@ -695,11 +785,13 @@ export interface ModEventTag {
 
 const hashModEventTag = "modEventTag";
 
-export function isModEventTag<V>(v: V) {
+export function isModEventTag<V>(v: V): v is ModEventTag & V {
   return is$typed(v, id, hashModEventTag);
 }
 
-export function validateModEventTag<V>(v: V) {
+export function validateModEventTag<V>(
+  v: V,
+): ValidationResult<ModEventTag & V> {
   return validate<ModEventTag & V>(v, id, hashModEventTag);
 }
 
@@ -722,11 +814,13 @@ export interface AccountEvent {
 
 const hashAccountEvent = "accountEvent";
 
-export function isAccountEvent<V>(v: V) {
+export function isAccountEvent<V>(v: V): v is AccountEvent & V {
   return is$typed(v, id, hashAccountEvent);
 }
 
-export function validateAccountEvent<V>(v: V) {
+export function validateAccountEvent<V>(
+  v: V,
+): ValidationResult<AccountEvent & V> {
   return validate<AccountEvent & V>(v, id, hashAccountEvent);
 }
 
@@ -742,11 +836,13 @@ export interface IdentityEvent {
 
 const hashIdentityEvent = "identityEvent";
 
-export function isIdentityEvent<V>(v: V) {
+export function isIdentityEvent<V>(v: V): v is IdentityEvent & V {
   return is$typed(v, id, hashIdentityEvent);
 }
 
-export function validateIdentityEvent<V>(v: V) {
+export function validateIdentityEvent<V>(
+  v: V,
+): ValidationResult<IdentityEvent & V> {
   return validate<IdentityEvent & V>(v, id, hashIdentityEvent);
 }
 
@@ -765,11 +861,13 @@ export interface RecordEvent {
 
 const hashRecordEvent = "recordEvent";
 
-export function isRecordEvent<V>(v: V) {
+export function isRecordEvent<V>(v: V): v is RecordEvent & V {
   return is$typed(v, id, hashRecordEvent);
 }
 
-export function validateRecordEvent<V>(v: V) {
+export function validateRecordEvent<V>(
+  v: V,
+): ValidationResult<RecordEvent & V> {
   return validate<RecordEvent & V>(v, id, hashRecordEvent);
 }
 
@@ -784,11 +882,15 @@ export interface ScheduleTakedownEvent {
 
 const hashScheduleTakedownEvent = "scheduleTakedownEvent";
 
-export function isScheduleTakedownEvent<V>(v: V) {
+export function isScheduleTakedownEvent<V>(
+  v: V,
+): v is ScheduleTakedownEvent & V {
   return is$typed(v, id, hashScheduleTakedownEvent);
 }
 
-export function validateScheduleTakedownEvent<V>(v: V) {
+export function validateScheduleTakedownEvent<V>(
+  v: V,
+): ValidationResult<ScheduleTakedownEvent & V> {
   return validate<ScheduleTakedownEvent & V>(v, id, hashScheduleTakedownEvent);
 }
 
@@ -800,11 +902,15 @@ export interface CancelScheduledTakedownEvent {
 
 const hashCancelScheduledTakedownEvent = "cancelScheduledTakedownEvent";
 
-export function isCancelScheduledTakedownEvent<V>(v: V) {
+export function isCancelScheduledTakedownEvent<V>(
+  v: V,
+): v is CancelScheduledTakedownEvent & V {
   return is$typed(v, id, hashCancelScheduledTakedownEvent);
 }
 
-export function validateCancelScheduledTakedownEvent<V>(v: V) {
+export function validateCancelScheduledTakedownEvent<V>(
+  v: V,
+): ValidationResult<CancelScheduledTakedownEvent & V> {
   return validate<CancelScheduledTakedownEvent & V>(
     v,
     id,
@@ -829,11 +935,11 @@ export interface RepoView {
 
 const hashRepoView = "repoView";
 
-export function isRepoView<V>(v: V) {
+export function isRepoView<V>(v: V): v is RepoView & V {
   return is$typed(v, id, hashRepoView);
 }
 
-export function validateRepoView<V>(v: V) {
+export function validateRepoView<V>(v: V): ValidationResult<RepoView & V> {
   return validate<RepoView & V>(v, id, hashRepoView);
 }
 
@@ -857,11 +963,13 @@ export interface RepoViewDetail {
 
 const hashRepoViewDetail = "repoViewDetail";
 
-export function isRepoViewDetail<V>(v: V) {
+export function isRepoViewDetail<V>(v: V): v is RepoViewDetail & V {
   return is$typed(v, id, hashRepoViewDetail);
 }
 
-export function validateRepoViewDetail<V>(v: V) {
+export function validateRepoViewDetail<V>(
+  v: V,
+): ValidationResult<RepoViewDetail & V> {
   return validate<RepoViewDetail & V>(v, id, hashRepoViewDetail);
 }
 
@@ -872,11 +980,13 @@ export interface RepoViewNotFound {
 
 const hashRepoViewNotFound = "repoViewNotFound";
 
-export function isRepoViewNotFound<V>(v: V) {
+export function isRepoViewNotFound<V>(v: V): v is RepoViewNotFound & V {
   return is$typed(v, id, hashRepoViewNotFound);
 }
 
-export function validateRepoViewNotFound<V>(v: V) {
+export function validateRepoViewNotFound<V>(
+  v: V,
+): ValidationResult<RepoViewNotFound & V> {
   return validate<RepoViewNotFound & V>(v, id, hashRepoViewNotFound);
 }
 
@@ -893,11 +1003,11 @@ export interface RecordView {
 
 const hashRecordView = "recordView";
 
-export function isRecordView<V>(v: V) {
+export function isRecordView<V>(v: V): v is RecordView & V {
   return is$typed(v, id, hashRecordView);
 }
 
-export function validateRecordView<V>(v: V) {
+export function validateRecordView<V>(v: V): ValidationResult<RecordView & V> {
   return validate<RecordView & V>(v, id, hashRecordView);
 }
 
@@ -915,11 +1025,13 @@ export interface RecordViewDetail {
 
 const hashRecordViewDetail = "recordViewDetail";
 
-export function isRecordViewDetail<V>(v: V) {
+export function isRecordViewDetail<V>(v: V): v is RecordViewDetail & V {
   return is$typed(v, id, hashRecordViewDetail);
 }
 
-export function validateRecordViewDetail<V>(v: V) {
+export function validateRecordViewDetail<V>(
+  v: V,
+): ValidationResult<RecordViewDetail & V> {
   return validate<RecordViewDetail & V>(v, id, hashRecordViewDetail);
 }
 
@@ -930,11 +1042,13 @@ export interface RecordViewNotFound {
 
 const hashRecordViewNotFound = "recordViewNotFound";
 
-export function isRecordViewNotFound<V>(v: V) {
+export function isRecordViewNotFound<V>(v: V): v is RecordViewNotFound & V {
   return is$typed(v, id, hashRecordViewNotFound);
 }
 
-export function validateRecordViewNotFound<V>(v: V) {
+export function validateRecordViewNotFound<V>(
+  v: V,
+): ValidationResult<RecordViewNotFound & V> {
   return validate<RecordViewNotFound & V>(v, id, hashRecordViewNotFound);
 }
 
@@ -945,11 +1059,11 @@ export interface Moderation {
 
 const hashModeration = "moderation";
 
-export function isModeration<V>(v: V) {
+export function isModeration<V>(v: V): v is Moderation & V {
   return is$typed(v, id, hashModeration);
 }
 
-export function validateModeration<V>(v: V) {
+export function validateModeration<V>(v: V): ValidationResult<Moderation & V> {
   return validate<Moderation & V>(v, id, hashModeration);
 }
 
@@ -960,11 +1074,13 @@ export interface ModerationDetail {
 
 const hashModerationDetail = "moderationDetail";
 
-export function isModerationDetail<V>(v: V) {
+export function isModerationDetail<V>(v: V): v is ModerationDetail & V {
   return is$typed(v, id, hashModerationDetail);
 }
 
-export function validateModerationDetail<V>(v: V) {
+export function validateModerationDetail<V>(
+  v: V,
+): ValidationResult<ModerationDetail & V> {
   return validate<ModerationDetail & V>(v, id, hashModerationDetail);
 }
 
@@ -980,11 +1096,11 @@ export interface BlobView {
 
 const hashBlobView = "blobView";
 
-export function isBlobView<V>(v: V) {
+export function isBlobView<V>(v: V): v is BlobView & V {
   return is$typed(v, id, hashBlobView);
 }
 
-export function validateBlobView<V>(v: V) {
+export function validateBlobView<V>(v: V): ValidationResult<BlobView & V> {
   return validate<BlobView & V>(v, id, hashBlobView);
 }
 
@@ -996,11 +1112,13 @@ export interface ImageDetails {
 
 const hashImageDetails = "imageDetails";
 
-export function isImageDetails<V>(v: V) {
+export function isImageDetails<V>(v: V): v is ImageDetails & V {
   return is$typed(v, id, hashImageDetails);
 }
 
-export function validateImageDetails<V>(v: V) {
+export function validateImageDetails<V>(
+  v: V,
+): ValidationResult<ImageDetails & V> {
   return validate<ImageDetails & V>(v, id, hashImageDetails);
 }
 
@@ -1013,11 +1131,13 @@ export interface VideoDetails {
 
 const hashVideoDetails = "videoDetails";
 
-export function isVideoDetails<V>(v: V) {
+export function isVideoDetails<V>(v: V): v is VideoDetails & V {
   return is$typed(v, id, hashVideoDetails);
 }
 
-export function validateVideoDetails<V>(v: V) {
+export function validateVideoDetails<V>(
+  v: V,
+): ValidationResult<VideoDetails & V> {
   return validate<VideoDetails & V>(v, id, hashVideoDetails);
 }
 
@@ -1039,11 +1159,13 @@ export interface AccountHosting {
 
 const hashAccountHosting = "accountHosting";
 
-export function isAccountHosting<V>(v: V) {
+export function isAccountHosting<V>(v: V): v is AccountHosting & V {
   return is$typed(v, id, hashAccountHosting);
 }
 
-export function validateAccountHosting<V>(v: V) {
+export function validateAccountHosting<V>(
+  v: V,
+): ValidationResult<AccountHosting & V> {
   return validate<AccountHosting & V>(v, id, hashAccountHosting);
 }
 
@@ -1060,11 +1182,13 @@ export interface RecordHosting {
 
 const hashRecordHosting = "recordHosting";
 
-export function isRecordHosting<V>(v: V) {
+export function isRecordHosting<V>(v: V): v is RecordHosting & V {
   return is$typed(v, id, hashRecordHosting);
 }
 
-export function validateRecordHosting<V>(v: V) {
+export function validateRecordHosting<V>(
+  v: V,
+): ValidationResult<RecordHosting & V> {
   return validate<RecordHosting & V>(v, id, hashRecordHosting);
 }
 
@@ -1091,11 +1215,13 @@ export interface ReporterStats {
 
 const hashReporterStats = "reporterStats";
 
-export function isReporterStats<V>(v: V) {
+export function isReporterStats<V>(v: V): v is ReporterStats & V {
   return is$typed(v, id, hashReporterStats);
 }
 
-export function validateReporterStats<V>(v: V) {
+export function validateReporterStats<V>(
+  v: V,
+): ValidationResult<ReporterStats & V> {
   return validate<ReporterStats & V>(v, id, hashReporterStats);
 }
 
@@ -1110,20 +1236,22 @@ export interface ModTool {
 
 const hashModTool = "modTool";
 
-export function isModTool<V>(v: V) {
+export function isModTool<V>(v: V): v is ModTool & V {
   return is$typed(v, id, hashModTool);
 }
 
-export function validateModTool<V>(v: V) {
+export function validateModTool<V>(v: V): ValidationResult<ModTool & V> {
   return validate<ModTool & V>(v, id, hashModTool);
 }
 
 /** Moderation event timeline event for a PLC create operation */
-export const TIMELINEEVENTPLCCREATE = `${id}#timelineEventPlcCreate`;
+export const TIMELINEEVENTPLCCREATE: string = `${id}#timelineEventPlcCreate`;
 /** Moderation event timeline event for generic PLC operation */
-export const TIMELINEEVENTPLCOPERATION = `${id}#timelineEventPlcOperation`;
+export const TIMELINEEVENTPLCOPERATION: string =
+  `${id}#timelineEventPlcOperation`;
 /** Moderation event timeline event for a PLC tombstone operation */
-export const TIMELINEEVENTPLCTOMBSTONE = `${id}#timelineEventPlcTombstone`;
+export const TIMELINEEVENTPLCTOMBSTONE: string =
+  `${id}#timelineEventPlcTombstone`;
 
 /** View of a scheduled moderation action */
 export interface ScheduledActionView {
@@ -1167,10 +1295,12 @@ export interface ScheduledActionView {
 
 const hashScheduledActionView = "scheduledActionView";
 
-export function isScheduledActionView<V>(v: V) {
+export function isScheduledActionView<V>(v: V): v is ScheduledActionView & V {
   return is$typed(v, id, hashScheduledActionView);
 }
 
-export function validateScheduledActionView<V>(v: V) {
+export function validateScheduledActionView<V>(
+  v: V,
+): ValidationResult<ScheduledActionView & V> {
   return validate<ScheduledActionView & V>(v, id, hashScheduledActionView);
 }

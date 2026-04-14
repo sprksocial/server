@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -52,10 +53,12 @@ export interface RevokeError {
 
 const hashRevokeError = "revokeError";
 
-export function isRevokeError<V>(v: V) {
+export function isRevokeError<V>(v: V): v is RevokeError & V {
   return is$typed(v, id, hashRevokeError);
 }
 
-export function validateRevokeError<V>(v: V) {
+export function validateRevokeError<V>(
+  v: V,
+): ValidationResult<RevokeError & V> {
   return validate<RevokeError & V>(v, id, hashRevokeError);
 }

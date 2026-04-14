@@ -3112,6 +3112,7 @@ export const schemaDict = {
               "lex:tools.ozone.moderation.defs#modEventPriorityScore",
               "lex:tools.ozone.moderation.defs#ageAssuranceEvent",
               "lex:tools.ozone.moderation.defs#ageAssuranceOverrideEvent",
+              "lex:tools.ozone.moderation.defs#ageAssurancePurgeEvent",
               "lex:tools.ozone.moderation.defs#revokeAccountCredentialsEvent",
               "lex:tools.ozone.moderation.defs#scheduleTakedownEvent",
               "lex:tools.ozone.moderation.defs#cancelScheduledTakedownEvent",
@@ -3189,6 +3190,7 @@ export const schemaDict = {
               "lex:tools.ozone.moderation.defs#modEventPriorityScore",
               "lex:tools.ozone.moderation.defs#ageAssuranceEvent",
               "lex:tools.ozone.moderation.defs#ageAssuranceOverrideEvent",
+              "lex:tools.ozone.moderation.defs#ageAssurancePurgeEvent",
               "lex:tools.ozone.moderation.defs#revokeAccountCredentialsEvent",
               "lex:tools.ozone.moderation.defs#scheduleTakedownEvent",
               "lex:tools.ozone.moderation.defs#cancelScheduledTakedownEvent",
@@ -3793,7 +3795,23 @@ export const schemaDict = {
           },
           "comment": {
             "type": "string",
+            "minLength": 1,
             "description": "Comment describing the reason for the override.",
+          },
+        },
+      },
+      "ageAssurancePurgeEvent": {
+        "type": "object",
+        "description":
+          "Purges all age assurance events for the subject. Only works on DID subjects. Moderator-only.",
+        "required": [
+          "comment",
+        ],
+        "properties": {
+          "comment": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Comment describing the reason for the purge.",
           },
         },
       },
@@ -3806,6 +3824,7 @@ export const schemaDict = {
         ],
         "properties": {
           "comment": {
+            "minLength": 1,
             "type": "string",
             "description": "Comment describing the reason for the revocation.",
           },
@@ -5266,6 +5285,7 @@ export const schemaDict = {
                   "lex:tools.ozone.moderation.defs#modEventPriorityScore",
                   "lex:tools.ozone.moderation.defs#ageAssuranceEvent",
                   "lex:tools.ozone.moderation.defs#ageAssuranceOverrideEvent",
+                  "lex:tools.ozone.moderation.defs#ageAssurancePurgeEvent",
                   "lex:tools.ozone.moderation.defs#revokeAccountCredentialsEvent",
                   "lex:tools.ozone.moderation.defs#scheduleTakedownEvent",
                   "lex:tools.ozone.moderation.defs#cancelScheduledTakedownEvent",
@@ -5544,6 +5564,454 @@ export const schemaDict = {
       },
     },
   },
+  "AppBskyDraftDefs": {
+    "lexicon": 1,
+    "id": "app.bsky.draft.defs",
+    "defs": {
+      "draftWithId": {
+        "description":
+          "A draft with an identifier, used to store drafts in private storage (stash).",
+        "type": "object",
+        "required": [
+          "id",
+          "draft",
+        ],
+        "properties": {
+          "id": {
+            "description": "A TID to be used as a draft identifier.",
+            "type": "string",
+            "format": "tid",
+          },
+          "draft": {
+            "type": "ref",
+            "ref": "lex:app.bsky.draft.defs#draft",
+          },
+        },
+      },
+      "draft": {
+        "description": "A draft containing an array of draft posts.",
+        "type": "object",
+        "required": [
+          "posts",
+        ],
+        "properties": {
+          "deviceId": {
+            "type": "string",
+            "description":
+              "UUIDv4 identifier of the device that created this draft.",
+            "maxLength": 100,
+          },
+          "deviceName": {
+            "type": "string",
+            "description":
+              "The device and/or platform on which the draft was created.",
+            "maxLength": 100,
+          },
+          "posts": {
+            "description": "Array of draft posts that compose this draft.",
+            "type": "array",
+            "minLength": 1,
+            "maxLength": 100,
+            "items": {
+              "type": "ref",
+              "ref": "lex:app.bsky.draft.defs#draftPost",
+            },
+          },
+          "langs": {
+            "type": "array",
+            "description":
+              "Indicates human language of posts primary text content.",
+            "maxLength": 3,
+            "items": {
+              "type": "string",
+              "format": "language",
+            },
+          },
+          "postgateEmbeddingRules": {
+            "description":
+              "Embedding rules for the postgates to be created when this draft is published.",
+            "type": "array",
+            "maxLength": 5,
+            "items": {
+              "type": "union",
+              "refs": [
+                "lex:app.bsky.feed.postgate#disableRule",
+              ],
+            },
+          },
+          "threadgateAllow": {
+            "description":
+              "Allow-rules for the threadgate to be created when this draft is published.",
+            "type": "array",
+            "maxLength": 5,
+            "items": {
+              "type": "union",
+              "refs": [
+                "lex:app.bsky.feed.threadgate#mentionRule",
+                "lex:app.bsky.feed.threadgate#followerRule",
+                "lex:app.bsky.feed.threadgate#followingRule",
+                "lex:app.bsky.feed.threadgate#listRule",
+              ],
+            },
+          },
+        },
+      },
+      "draftPost": {
+        "description": "One of the posts that compose a draft.",
+        "type": "object",
+        "required": [
+          "text",
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 10000,
+            "maxGraphemes": 1000,
+            "description":
+              "The primary post content. It has a higher limit than post contents to allow storing a larger text that can later be refined into smaller posts.",
+          },
+          "labels": {
+            "type": "union",
+            "description":
+              "Self-label values for this post. Effectively content warnings.",
+            "refs": [
+              "lex:com.atproto.label.defs#selfLabels",
+            ],
+          },
+          "embedImages": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:app.bsky.draft.defs#draftEmbedImage",
+            },
+            "maxLength": 4,
+          },
+          "embedVideos": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:app.bsky.draft.defs#draftEmbedVideo",
+            },
+            "maxLength": 1,
+          },
+          "embedExternals": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:app.bsky.draft.defs#draftEmbedExternal",
+            },
+            "maxLength": 1,
+          },
+          "embedRecords": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:app.bsky.draft.defs#draftEmbedRecord",
+            },
+            "maxLength": 1,
+          },
+        },
+      },
+      "draftView": {
+        "description": "View to present drafts data to users.",
+        "type": "object",
+        "required": [
+          "id",
+          "draft",
+          "createdAt",
+          "updatedAt",
+        ],
+        "properties": {
+          "id": {
+            "description": "A TID to be used as a draft identifier.",
+            "type": "string",
+            "format": "tid",
+          },
+          "draft": {
+            "type": "ref",
+            "ref": "lex:app.bsky.draft.defs#draft",
+          },
+          "createdAt": {
+            "description": "The time the draft was created.",
+            "type": "string",
+            "format": "datetime",
+          },
+          "updatedAt": {
+            "description": "The time the draft was last updated.",
+            "type": "string",
+            "format": "datetime",
+          },
+        },
+      },
+      "draftEmbedLocalRef": {
+        "type": "object",
+        "required": [
+          "path",
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description":
+              "Local, on-device ref to file to be embedded. Embeds are currently device-bound for drafts.",
+            "minLength": 1,
+            "maxLength": 1024,
+          },
+        },
+      },
+      "draftEmbedCaption": {
+        "type": "object",
+        "required": [
+          "lang",
+          "content",
+        ],
+        "properties": {
+          "lang": {
+            "type": "string",
+            "format": "language",
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 10000,
+          },
+        },
+      },
+      "draftEmbedImage": {
+        "type": "object",
+        "required": [
+          "localRef",
+        ],
+        "properties": {
+          "localRef": {
+            "type": "ref",
+            "ref": "lex:app.bsky.draft.defs#draftEmbedLocalRef",
+          },
+          "alt": {
+            "type": "string",
+            "maxGraphemes": 2000,
+          },
+        },
+      },
+      "draftEmbedVideo": {
+        "type": "object",
+        "required": [
+          "localRef",
+        ],
+        "properties": {
+          "localRef": {
+            "type": "ref",
+            "ref": "lex:app.bsky.draft.defs#draftEmbedLocalRef",
+          },
+          "alt": {
+            "type": "string",
+            "maxGraphemes": 2000,
+          },
+          "captions": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:app.bsky.draft.defs#draftEmbedCaption",
+            },
+            "maxLength": 20,
+          },
+        },
+      },
+      "draftEmbedExternal": {
+        "type": "object",
+        "required": [
+          "uri",
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "uri",
+          },
+        },
+      },
+      "draftEmbedRecord": {
+        "type": "object",
+        "required": [
+          "record",
+        ],
+        "properties": {
+          "record": {
+            "type": "ref",
+            "ref": "lex:com.atproto.repo.strongRef",
+          },
+        },
+      },
+    },
+  },
+  "AppBskyDraftCreateDraft": {
+    "lexicon": 1,
+    "id": "app.bsky.draft.createDraft",
+    "defs": {
+      "main": {
+        "type": "procedure",
+        "description":
+          "Inserts a draft using private storage (stash). An upper limit of drafts might be enforced. Requires authentication.",
+        "input": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "draft",
+            ],
+            "properties": {
+              "draft": {
+                "type": "ref",
+                "ref": "lex:app.bsky.draft.defs#draft",
+              },
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "id",
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The ID of the created draft.",
+              },
+            },
+          },
+        },
+        "errors": [
+          {
+            "name": "DraftLimitReached",
+            "description":
+              "Trying to insert a new draft when the limit was already reached.",
+          },
+        ],
+      },
+    },
+  },
+  "AppBskyDraftUpdateDraft": {
+    "lexicon": 1,
+    "id": "app.bsky.draft.updateDraft",
+    "defs": {
+      "main": {
+        "type": "procedure",
+        "description":
+          "Updates a draft using private storage (stash). If the draft ID points to a non-existing ID, the update will be silently ignored. This is done because updates don't enforce draft limit, so it accepts all writes, but will ignore invalid ones. Requires authentication.",
+        "input": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "draft",
+            ],
+            "properties": {
+              "draft": {
+                "type": "ref",
+                "ref": "lex:app.bsky.draft.defs#draftWithId",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "AppBskyDraftGetDrafts": {
+    "lexicon": 1,
+    "id": "app.bsky.draft.getDrafts",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description": "Gets views of user drafts. Requires authentication.",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+            },
+            "cursor": {
+              "type": "string",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "drafts",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "drafts": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:app.bsky.draft.defs#draftView",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "AppBskyDraftDeleteDraft": {
+    "lexicon": 1,
+    "id": "app.bsky.draft.deleteDraft",
+    "defs": {
+      "main": {
+        "type": "procedure",
+        "description": "Deletes a draft by ID. Requires authentication.",
+        "input": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "id",
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "tid",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "AppBskyAuthManageLabelerService": {
+    "lexicon": 1,
+    "id": "app.bsky.authManageLabelerService",
+    "defs": {
+      "main": {
+        "type": "permission-set",
+        "title": "Manage Hosted Labeling Service",
+        "title:lang": {},
+        "detail": "Configure labeler declaration records.",
+        "detail:lang": {},
+        "permissions": [
+          {
+            "type": "permission",
+            "resource": "repo",
+            "action": [
+              "create",
+              "update",
+              "delete",
+            ],
+            "collection": [
+              "app.bsky.labeler.service",
+            ],
+          },
+        ],
+      },
+    },
+  },
   "AppBskyVideoUploadVideo": {
     "lexicon": 1,
     "id": "app.bsky.video.uploadVideo",
@@ -5688,6 +6156,508 @@ export const schemaDict = {
             },
           },
         },
+      },
+    },
+  },
+  "AppBskyContactDefs": {
+    "lexicon": 1,
+    "id": "app.bsky.contact.defs",
+    "defs": {
+      "matchAndContactIndex": {
+        "description":
+          "Associates a profile with the positional index of the contact import input in the call to `app.bsky.contact.importContacts`, so clients can know which phone caused a particular match.",
+        "type": "object",
+        "required": [
+          "match",
+          "contactIndex",
+        ],
+        "properties": {
+          "match": {
+            "description": "Profile of the matched user.",
+            "type": "ref",
+            "ref": "lex:app.bsky.actor.defs#profileView",
+          },
+          "contactIndex": {
+            "description":
+              "The index of this match in the import contact input.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999,
+          },
+        },
+      },
+      "syncStatus": {
+        "type": "object",
+        "required": [
+          "syncedAt",
+          "matchesCount",
+        ],
+        "properties": {
+          "syncedAt": {
+            "description": "Last date when contacts where imported.",
+            "type": "string",
+            "format": "datetime",
+          },
+          "matchesCount": {
+            "description":
+              "Number of existing contact matches resulting of the user imports and of their imported contacts having imported the user. Matches stop being counted when the user either follows the matched contact or dismisses the match.",
+            "type": "integer",
+            "minimum": 0,
+          },
+        },
+      },
+      "notification": {
+        "description":
+          "A stash object to be sent via bsync representing a notification to be created.",
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+        ],
+        "properties": {
+          "from": {
+            "description": "The DID of who this notification comes from.",
+            "type": "string",
+            "format": "did",
+          },
+          "to": {
+            "description": "The DID of who this notification should go to.",
+            "type": "string",
+            "format": "did",
+          },
+        },
+      },
+    },
+  },
+  "AppBskyContactSendNotification": {
+    "lexicon": 1,
+    "id": "app.bsky.contact.sendNotification",
+    "defs": {
+      "main": {
+        "type": "procedure",
+        "description":
+          "System endpoint to send notifications related to contact imports. Requires role authentication.",
+        "input": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "from",
+              "to",
+            ],
+            "properties": {
+              "from": {
+                "description": "The DID of who this notification comes from.",
+                "type": "string",
+                "format": "did",
+              },
+              "to": {
+                "description": "The DID of who this notification should go to.",
+                "type": "string",
+                "format": "did",
+              },
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "properties": {},
+          },
+        },
+      },
+    },
+  },
+  "AppBskyContactGetSyncStatus": {
+    "lexicon": 1,
+    "id": "app.bsky.contact.getSyncStatus",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Gets the user's current contact import status. Requires authentication.",
+        "parameters": {
+          "type": "params",
+          "properties": {},
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "syncStatus": {
+                "description":
+                  "If present, indicates the user has imported their contacts. If not present, indicates the user never used the feature or called `app.bsky.contact.removeData` and didn't import again since.",
+                "type": "ref",
+                "ref": "lex:app.bsky.contact.defs#syncStatus",
+              },
+            },
+          },
+        },
+        "errors": [
+          {
+            "name": "InvalidDid",
+          },
+          {
+            "name": "InternalError",
+          },
+        ],
+      },
+    },
+  },
+  "AppBskyContactStartPhoneVerification": {
+    "lexicon": 1,
+    "id": "app.bsky.contact.startPhoneVerification",
+    "defs": {
+      "main": {
+        "type": "procedure",
+        "description":
+          "Starts a phone verification flow. The phone passed will receive a code via SMS that should be passed to `app.bsky.contact.verifyPhone`. Requires authentication.",
+        "input": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "phone",
+            ],
+            "properties": {
+              "phone": {
+                "description": "The phone number to receive the code via SMS.",
+                "type": "string",
+              },
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "properties": {},
+          },
+        },
+        "errors": [
+          {
+            "name": "RateLimitExceeded",
+          },
+          {
+            "name": "InvalidDid",
+          },
+          {
+            "name": "InvalidPhone",
+          },
+          {
+            "name": "InternalError",
+          },
+        ],
+      },
+    },
+  },
+  "AppBskyContactGetMatches": {
+    "lexicon": 1,
+    "id": "app.bsky.contact.getMatches",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Returns the matched contacts (contacts that were mutually imported). Excludes dismissed matches. Requires authentication.",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+            },
+            "cursor": {
+              "type": "string",
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "matches",
+            ],
+            "properties": {
+              "cursor": {
+                "type": "string",
+              },
+              "matches": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:app.bsky.actor.defs#profileView",
+                },
+              },
+            },
+          },
+        },
+        "errors": [
+          {
+            "name": "InvalidDid",
+          },
+          {
+            "name": "InvalidLimit",
+          },
+          {
+            "name": "InvalidCursor",
+          },
+          {
+            "name": "InternalError",
+          },
+        ],
+      },
+    },
+  },
+  "AppBskyContactImportContacts": {
+    "lexicon": 1,
+    "id": "app.bsky.contact.importContacts",
+    "defs": {
+      "main": {
+        "type": "procedure",
+        "description":
+          "Import contacts for securely matching with other users. This follows the protocol explained in https://docs.bsky.app/blog/contact-import-rfc. Requires authentication.",
+        "input": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "token",
+              "contacts",
+            ],
+            "properties": {
+              "token": {
+                "description":
+                  "JWT to authenticate the call. Use the JWT received as a response to the call to `app.bsky.contact.verifyPhone`.",
+                "type": "string",
+              },
+              "contacts": {
+                "description":
+                  "List of phone numbers in global E.164 format (e.g., '+12125550123'). Phone numbers that cannot be normalized into a valid phone number will be discarded. Should not repeat the 'phone' input used in `app.bsky.contact.verifyPhone`.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                },
+                "minLength": 1,
+                "maxLength": 1000,
+              },
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "matchesAndContactIndexes",
+            ],
+            "properties": {
+              "matchesAndContactIndexes": {
+                "description":
+                  "The users that matched during import and their indexes on the input contacts, so the client can correlate with its local list.",
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:app.bsky.contact.defs#matchAndContactIndex",
+                },
+              },
+            },
+          },
+        },
+        "errors": [
+          {
+            "name": "InvalidDid",
+          },
+          {
+            "name": "InvalidContacts",
+          },
+          {
+            "name": "TooManyContacts",
+          },
+          {
+            "name": "InvalidToken",
+          },
+          {
+            "name": "InternalError",
+          },
+        ],
+      },
+    },
+  },
+  "AppBskyContactDismissMatch": {
+    "lexicon": 1,
+    "id": "app.bsky.contact.dismissMatch",
+    "defs": {
+      "main": {
+        "type": "procedure",
+        "description":
+          "Removes a match that was found via contact import. It shouldn't appear again if the same contact is re-imported. Requires authentication.",
+        "input": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "subject",
+            ],
+            "properties": {
+              "subject": {
+                "description": "The subject's DID to dismiss the match with.",
+                "type": "string",
+                "format": "did",
+              },
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "properties": {},
+          },
+        },
+        "errors": [
+          {
+            "name": "InvalidDid",
+          },
+          {
+            "name": "InternalError",
+          },
+        ],
+      },
+    },
+  },
+  "AppBskyContactRemoveData": {
+    "lexicon": 1,
+    "id": "app.bsky.contact.removeData",
+    "defs": {
+      "main": {
+        "type": "procedure",
+        "description":
+          "Removes all stored hashes used for contact matching, existing matches, and sync status. Requires authentication.",
+        "input": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "properties": {},
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "properties": {},
+          },
+        },
+        "errors": [
+          {
+            "name": "InvalidDid",
+          },
+          {
+            "name": "InternalError",
+          },
+        ],
+      },
+    },
+  },
+  "AppBskyContactVerifyPhone": {
+    "lexicon": 1,
+    "id": "app.bsky.contact.verifyPhone",
+    "defs": {
+      "main": {
+        "type": "procedure",
+        "description":
+          "Verifies control over a phone number with a code received via SMS and starts a contact import session. Requires authentication.",
+        "input": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "phone",
+              "code",
+            ],
+            "properties": {
+              "phone": {
+                "description":
+                  "The phone number to verify. Should be the same as the one passed to `app.bsky.contact.startPhoneVerification`.",
+                "type": "string",
+              },
+              "code": {
+                "description":
+                  "The code received via SMS as a result of the call to `app.bsky.contact.startPhoneVerification`.",
+                "type": "string",
+              },
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "token",
+            ],
+            "properties": {
+              "token": {
+                "description":
+                  "JWT to be used in a call to `app.bsky.contact.importContacts`. It is only valid for a single call.",
+                "type": "string",
+              },
+            },
+          },
+        },
+        "errors": [
+          {
+            "name": "RateLimitExceeded",
+          },
+          {
+            "name": "InvalidDid",
+          },
+          {
+            "name": "InvalidPhone",
+          },
+          {
+            "name": "InvalidCode",
+          },
+          {
+            "name": "InternalError",
+          },
+        ],
+      },
+    },
+  },
+  "AppBskyAuthManageNotifications": {
+    "lexicon": 1,
+    "id": "app.bsky.authManageNotifications",
+    "defs": {
+      "main": {
+        "type": "permission-set",
+        "title": "Manage Bluesky Notifications",
+        "title:lang": {},
+        "detail": "View and configure notifications for the Bluesky app.",
+        "detail:lang": {},
+        "permissions": [
+          {
+            "type": "permission",
+            "resource": "rpc",
+            "inheritAud": true,
+            "lxm": [
+              "app.bsky.notification.getPreferences",
+              "app.bsky.notification.getUnreadCount",
+              "app.bsky.notification.listActivitySubscriptions",
+              "app.bsky.notification.listNotifications",
+              "app.bsky.notification.putActivitySubscription",
+              "app.bsky.notification.putPreferences",
+              "app.bsky.notification.putPreferencesV2",
+              "app.bsky.notification.registerPush",
+              "app.bsky.notification.unregisterPush",
+              "app.bsky.notification.updateSeen",
+            ],
+          },
+        ],
       },
     },
   },
@@ -6071,10 +7041,12 @@ export const schemaDict = {
         "properties": {
           "image": {
             "type": "blob",
+            "description":
+              "The raw image file. May be up to 2 MB, formerly limited to 1 MB.",
             "accept": [
               "image/*",
             ],
-            "maxSize": 1000000,
+            "maxSize": 2000000,
           },
           "alt": {
             "type": "string",
@@ -6225,6 +7197,15 @@ export const schemaDict = {
             "type": "ref",
             "ref": "lex:app.bsky.embed.defs#aspectRatio",
           },
+          "presentation": {
+            "type": "string",
+            "description":
+              "A hint to the client about how to present the video.",
+            "knownValues": [
+              "default",
+              "gif",
+            ],
+          },
         },
       },
       "caption": {
@@ -6274,6 +7255,15 @@ export const schemaDict = {
           "aspectRatio": {
             "type": "ref",
             "ref": "lex:app.bsky.embed.defs#aspectRatio",
+          },
+          "presentation": {
+            "type": "string",
+            "description":
+              "A hint to the client about how to present the video.",
+            "knownValues": [
+              "default",
+              "gif",
+            ],
           },
         },
       },
@@ -6359,6 +7349,72 @@ export const schemaDict = {
             "format": "uri",
           },
         },
+      },
+    },
+  },
+  "AppBskyAuthDeleteContent": {
+    "lexicon": 1,
+    "id": "app.bsky.authDeleteContent",
+    "defs": {
+      "main": {
+        "type": "permission-set",
+        "title": "Delete Bluesky Content",
+        "title:lang": {},
+        "detail": "Clean up public account history: posts, reposts, and likes.",
+        "detail:lang": {},
+        "permissions": [
+          {
+            "type": "permission",
+            "resource": "repo",
+            "action": [
+              "delete",
+            ],
+            "collection": [
+              "app.bsky.feed.like",
+              "app.bsky.feed.post",
+              "app.bsky.feed.postgate",
+              "app.bsky.feed.repost",
+              "app.bsky.feed.threadgate",
+            ],
+          },
+        ],
+      },
+    },
+  },
+  "AppBskyAuthCreatePosts": {
+    "lexicon": 1,
+    "id": "app.bsky.authCreatePosts",
+    "defs": {
+      "main": {
+        "type": "permission-set",
+        "title": "Create Bluesky Posts",
+        "title:lang": {},
+        "detail": "Can not update or delete posts.",
+        "detail:lang": {},
+        "permissions": [
+          {
+            "type": "permission",
+            "resource": "rpc",
+            "inheritAud": true,
+            "lxm": [
+              "app.bsky.video.uploadVideo",
+              "app.bsky.video.getJobStatus",
+              "app.bsky.video.getUploadLimits",
+            ],
+          },
+          {
+            "type": "permission",
+            "resource": "repo",
+            "action": [
+              "create",
+            ],
+            "collection": [
+              "app.bsky.feed.post",
+              "app.bsky.feed.postgate",
+              "app.bsky.feed.threadgate",
+            ],
+          },
+        ],
       },
     },
   },
@@ -7027,6 +8083,7 @@ export const schemaDict = {
               "like-via-repost",
               "repost-via-repost",
               "subscribed-post",
+              "contact-match",
             ],
           },
           "reasonSubject": {
@@ -7206,6 +8263,54 @@ export const schemaDict = {
             "name": "BadQueryString",
           },
         ],
+      },
+    },
+  },
+  "AppBskyUnspeccedGetSuggestedUsersForExplore": {
+    "lexicon": 1,
+    "id": "app.bsky.unspecced.getSuggestedUsersForExplore",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description": "Get a list of suggested users for the Explore page",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "category": {
+              "type": "string",
+              "description": "Category of users to get suggestions for.",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 25,
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "actors",
+            ],
+            "properties": {
+              "actors": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:app.bsky.actor.defs#profileView",
+                },
+              },
+              "recIdStr": {
+                "type": "string",
+                "description":
+                  "Snowflake for this recommendation, use when submitting recommendation events.",
+              },
+            },
+          },
+        },
       },
     },
   },
@@ -7545,6 +8650,61 @@ export const schemaDict = {
       },
     },
   },
+  "AppBskyUnspeccedGetSuggestedUsersForExploreSkeleton": {
+    "lexicon": 1,
+    "id": "app.bsky.unspecced.getSuggestedUsersForExploreSkeleton",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Get a skeleton of suggested users for the Explore page. Intended to be called and hydrated by app.bsky.unspecced.getSuggestedUsersForExplore",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "viewer": {
+              "type": "string",
+              "format": "did",
+              "description":
+                "DID of the account making the request (not included for public/unauthenticated queries).",
+            },
+            "category": {
+              "type": "string",
+              "description": "Category of users to get suggestions for.",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 25,
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "dids",
+            ],
+            "properties": {
+              "dids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "did",
+                },
+              },
+              "recIdStr": {
+                "type": "string",
+                "description":
+                  "Snowflake for this recommendation, use when submitting recommendation events.",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   "AppBskyUnspeccedGetSuggestedUsers": {
     "lexicon": 1,
     "id": "app.bsky.unspecced.getSuggestedUsers",
@@ -7581,6 +8741,15 @@ export const schemaDict = {
                   "type": "ref",
                   "ref": "lex:app.bsky.actor.defs#profileView",
                 },
+              },
+              "recId": {
+                "type": "string",
+                "description": "DEPRECATED: use recIdStr instead.",
+              },
+              "recIdStr": {
+                "type": "string",
+                "description":
+                  "Snowflake for this recommendation, use when submitting recommendation events.",
               },
             },
           },
@@ -7826,6 +8995,15 @@ export const schemaDict = {
                   "type": "string",
                   "format": "did",
                 },
+              },
+              "recId": {
+                "type": "string",
+                "description": "DEPRECATED: use recIdStr instead.",
+              },
+              "recIdStr": {
+                "type": "string",
+                "description":
+                  "Snowflake for this recommendation, use when submitting recommendation events.",
               },
             },
           },
@@ -8122,6 +9300,10 @@ export const schemaDict = {
               },
               "recId": {
                 "type": "integer",
+                "description": "DEPRECATED: use recIdStr instead.",
+              },
+              "recIdStr": {
+                "type": "string",
                 "description":
                   "Snowflake for this recommendation, use when submitting recommendation events.",
               },
@@ -8260,6 +9442,160 @@ export const schemaDict = {
       },
     },
   },
+  "AppBskyUnspeccedGetOnboardingSuggestedUsersSkeleton": {
+    "lexicon": 1,
+    "id": "app.bsky.unspecced.getOnboardingSuggestedUsersSkeleton",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Get a skeleton of suggested users for onboarding. Intended to be called and hydrated by app.bsky.unspecced.getSuggestedOnboardingUsers",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "viewer": {
+              "type": "string",
+              "format": "did",
+              "description":
+                "DID of the account making the request (not included for public/unauthenticated queries).",
+            },
+            "category": {
+              "type": "string",
+              "description": "Category of users to get suggestions for.",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 25,
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "dids",
+            ],
+            "properties": {
+              "dids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "did",
+                },
+              },
+              "recId": {
+                "type": "string",
+                "description": "DEPRECATED: use recIdStr instead.",
+              },
+              "recIdStr": {
+                "type": "string",
+                "description":
+                  "Snowflake for this recommendation, use when submitting recommendation events.",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "AppBskyUnspeccedGetSuggestedUsersForDiscoverSkeleton": {
+    "lexicon": 1,
+    "id": "app.bsky.unspecced.getSuggestedUsersForDiscoverSkeleton",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Get a skeleton of suggested users for the Discover page. Intended to be called and hydrated by app.bsky.unspecced.getSuggestedUsersForDiscover",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "viewer": {
+              "type": "string",
+              "format": "did",
+              "description":
+                "DID of the account making the request (not included for public/unauthenticated queries).",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 25,
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "dids",
+            ],
+            "properties": {
+              "dids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "did",
+                },
+              },
+              "recIdStr": {
+                "type": "string",
+                "description":
+                  "Snowflake for this recommendation, use when submitting recommendation events.",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "AppBskyUnspeccedGetSuggestedUsersForDiscover": {
+    "lexicon": 1,
+    "id": "app.bsky.unspecced.getSuggestedUsersForDiscover",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description": "Get a list of suggested users for the Discover page",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 25,
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "actors",
+            ],
+            "properties": {
+              "actors": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:app.bsky.actor.defs#profileView",
+                },
+              },
+              "recIdStr": {
+                "type": "string",
+                "description":
+                  "Snowflake for this recommendation, use when submitting recommendation events.",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   "AppBskyUnspeccedGetAgeAssuranceState": {
     "lexicon": 1,
     "id": "app.bsky.unspecced.getAgeAssuranceState",
@@ -8319,6 +9655,106 @@ export const schemaDict = {
                   "type": "ref",
                   "ref": "lex:app.bsky.feed.defs#generatorView",
                 },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "AppBskyUnspeccedGetSuggestedOnboardingUsers": {
+    "lexicon": 1,
+    "id": "app.bsky.unspecced.getSuggestedOnboardingUsers",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description": "Get a list of suggested users for onboarding",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "category": {
+              "type": "string",
+              "description": "Category of users to get suggestions for.",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 25,
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "actors",
+            ],
+            "properties": {
+              "actors": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:app.bsky.actor.defs#profileView",
+                },
+              },
+              "recId": {
+                "type": "string",
+                "description": "DEPRECATED: use recIdStr instead.",
+              },
+              "recIdStr": {
+                "type": "string",
+                "description":
+                  "Snowflake for this recommendation, use when submitting recommendation events.",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  "AppBskyUnspeccedGetSuggestedUsersForSeeMore": {
+    "lexicon": 1,
+    "id": "app.bsky.unspecced.getSuggestedUsersForSeeMore",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description": "Get a list of suggested users for the See More page",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "category": {
+              "type": "string",
+              "description": "Category of users to get suggestions for.",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 25,
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "actors",
+            ],
+            "properties": {
+              "actors": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "lex:app.bsky.actor.defs#profileView",
+                },
+              },
+              "recIdStr": {
+                "type": "string",
+                "description":
+                  "Snowflake for this recommendation, use when submitting recommendation events.",
               },
             },
           },
@@ -8489,6 +9925,61 @@ export const schemaDict = {
           "subject": {
             "type": "string",
             "format": "uri",
+          },
+        },
+      },
+    },
+  },
+  "AppBskyUnspeccedGetSuggestedUsersForSeeMoreSkeleton": {
+    "lexicon": 1,
+    "id": "app.bsky.unspecced.getSuggestedUsersForSeeMoreSkeleton",
+    "defs": {
+      "main": {
+        "type": "query",
+        "description":
+          "Get a skeleton of suggested users for the See More page. Intended to be called and hydrated by app.bsky.unspecced.getSuggestedUsersForSeeMore",
+        "parameters": {
+          "type": "params",
+          "properties": {
+            "viewer": {
+              "type": "string",
+              "format": "did",
+              "description":
+                "DID of the account making the request (not included for public/unauthenticated queries).",
+            },
+            "category": {
+              "type": "string",
+              "description": "Category of users to get suggestions for.",
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 25,
+            },
+          },
+        },
+        "output": {
+          "encoding": "application/json",
+          "schema": {
+            "type": "object",
+            "required": [
+              "dids",
+            ],
+            "properties": {
+              "dids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "did",
+                },
+              },
+              "recIdStr": {
+                "type": "string",
+                "description":
+                  "Snowflake for this recommendation, use when submitting recommendation events.",
+              },
+            },
           },
         },
       },
@@ -8706,16 +10197,20 @@ export const schemaDict = {
                   "ref": "lex:app.bsky.actor.defs#profileView",
                 },
               },
+              "recIdStr": {
+                "type": "string",
+                "description":
+                  "Snowflake for this recommendation, use when submitting recommendation events.",
+              },
               "isFallback": {
                 "type": "boolean",
                 "description":
-                  "If true, response has fallen-back to generic results, and is not scoped using relativeToDid",
+                  "DEPRECATED, unused. Previously: if true, response has fallen-back to generic results, and is not scoped using relativeToDid",
                 "default": false,
               },
               "recId": {
                 "type": "integer",
-                "description":
-                  "Snowflake for this recommendation, use when submitting recommendation events.",
+                "description": "DEPRECATED: use recIdStr instead.",
               },
             },
           },
@@ -9192,6 +10687,30 @@ export const schemaDict = {
             "format": "at-uri",
             "description":
               "if the actor is followed by this DID, contains the AT-URI of the follow record",
+          },
+          "blocking": {
+            "type": "string",
+            "format": "at-uri",
+            "description":
+              "if the actor blocks this DID, this is the AT-URI of the block record",
+          },
+          "blockedBy": {
+            "type": "string",
+            "format": "at-uri",
+            "description":
+              "if the actor is blocked by this DID, contains the AT-URI of the block record",
+          },
+          "blockingByList": {
+            "type": "string",
+            "format": "at-uri",
+            "description":
+              "if the actor blocks this DID via a block list, this is the AT-URI of the listblock record",
+          },
+          "blockedByList": {
+            "type": "string",
+            "format": "at-uri",
+            "description":
+              "if the actor is blocked by this DID via a block list, contains the AT-URI of the listblock record",
           },
         },
       },
@@ -10374,6 +11893,191 @@ export const schemaDict = {
       },
     },
   },
+  "AppBskyAuthFullApp": {
+    "lexicon": 1,
+    "id": "app.bsky.authFullApp",
+    "defs": {
+      "main": {
+        "type": "permission-set",
+        "title": "Full Bluesky Social App Permissions",
+        "title:lang": {},
+        "detail":
+          "Manage all public content and interactions, private preferences and subscriptions, and other Bluesky-specific app features and data.",
+        "detail:lang": {},
+        "permissions": [
+          {
+            "type": "permission",
+            "resource": "rpc",
+            "inheritAud": true,
+            "lxm": [
+              "app.bsky.actor.getPreferences",
+              "app.bsky.actor.getProfile",
+              "app.bsky.actor.getProfiles",
+              "app.bsky.actor.getSuggestions",
+              "app.bsky.actor.putPreferences",
+              "app.bsky.actor.searchActors",
+              "app.bsky.actor.searchActorsTypeahead",
+              "app.bsky.bookmark.createBookmark",
+              "app.bsky.bookmark.deleteBookmark",
+              "app.bsky.bookmark.getBookmarks",
+              "app.bsky.contact.dismissMatch",
+              "app.bsky.contact.getMatches",
+              "app.bsky.contact.getSyncStatus",
+              "app.bsky.contact.importContacts",
+              "app.bsky.contact.removeData",
+              "app.bsky.contact.startPhoneVerification",
+              "app.bsky.contact.verifyPhone",
+              "app.bsky.feed.describeFeedGenerator",
+              "app.bsky.feed.getActorFeeds",
+              "app.bsky.feed.getActorLikes",
+              "app.bsky.feed.getAuthorFeed",
+              "app.bsky.feed.getFeed",
+              "app.bsky.feed.getFeedGenerator",
+              "app.bsky.feed.getFeedGenerators",
+              "app.bsky.feed.getFeedSkeleton",
+              "app.bsky.feed.getLikes",
+              "app.bsky.feed.getListFeed",
+              "app.bsky.feed.getPostThread",
+              "app.bsky.feed.getPosts",
+              "app.bsky.feed.getQuotes",
+              "app.bsky.feed.getRepostedBy",
+              "app.bsky.feed.getSuggestedFeeds",
+              "app.bsky.feed.getTimeline",
+              "app.bsky.feed.searchPosts",
+              "app.bsky.feed.sendInteractions",
+              "app.bsky.graph.getActorStarterPacks",
+              "app.bsky.graph.getBlocks",
+              "app.bsky.graph.getFollowers",
+              "app.bsky.graph.getFollows",
+              "app.bsky.graph.getKnownFollowers",
+              "app.bsky.graph.getList",
+              "app.bsky.graph.getListBlocks",
+              "app.bsky.graph.getListMutes",
+              "app.bsky.graph.getLists",
+              "app.bsky.graph.getListsWithMembership",
+              "app.bsky.graph.getMutes",
+              "app.bsky.graph.getRelationships",
+              "app.bsky.graph.getStarterPack",
+              "app.bsky.graph.getStarterPacks",
+              "app.bsky.graph.getStarterPacksWithMembership",
+              "app.bsky.graph.getSuggestedFollowsByActor",
+              "app.bsky.graph.muteActor",
+              "app.bsky.graph.muteActorList",
+              "app.bsky.graph.muteThread",
+              "app.bsky.graph.searchStarterPacks",
+              "app.bsky.graph.unmuteActor",
+              "app.bsky.graph.unmuteActorList",
+              "app.bsky.graph.unmuteThread",
+              "app.bsky.labeler.getServices",
+              "app.bsky.notification.getPreferences",
+              "app.bsky.notification.getUnreadCount",
+              "app.bsky.notification.listActivitySubscriptions",
+              "app.bsky.notification.listNotifications",
+              "app.bsky.notification.putActivitySubscription",
+              "app.bsky.notification.putPreferences",
+              "app.bsky.notification.putPreferencesV2",
+              "app.bsky.notification.registerPush",
+              "app.bsky.notification.unregisterPush",
+              "app.bsky.notification.updateSeen",
+              "app.bsky.unspecced.getAgeAssuranceState",
+              "app.bsky.unspecced.getConfig",
+              "app.bsky.unspecced.getOnboardingSuggestedStarterPacks",
+              "app.bsky.unspecced.getPopularFeedGenerators",
+              "app.bsky.unspecced.getPostThreadOtherV2",
+              "app.bsky.unspecced.getPostThreadV2",
+              "app.bsky.unspecced.getSuggestedFeeds",
+              "app.bsky.unspecced.getSuggestedFeedsSkeleton",
+              "app.bsky.unspecced.getSuggestedStarterPacks",
+              "app.bsky.unspecced.getSuggestedStarterPacksSkeleton",
+              "app.bsky.unspecced.getSuggestedUsers",
+              "app.bsky.unspecced.getSuggestedUsersSkeleton",
+              "app.bsky.unspecced.getSuggestionsSkeleton",
+              "app.bsky.unspecced.getTaggedSuggestions",
+              "app.bsky.unspecced.getTrendingTopics",
+              "app.bsky.unspecced.getTrends",
+              "app.bsky.unspecced.getTrendsSkeleton",
+              "app.bsky.unspecced.initAgeAssurance",
+              "app.bsky.unspecced.searchActorsSkeleton",
+              "app.bsky.unspecced.searchPostsSkeleton",
+              "app.bsky.unspecced.searchStarterPacksSkeleton",
+              "app.bsky.video.getJobStatus",
+              "app.bsky.video.getUploadLimits",
+              "app.bsky.video.uploadVideo",
+            ],
+          },
+          {
+            "type": "permission",
+            "resource": "repo",
+            "action": [
+              "create",
+              "update",
+              "delete",
+            ],
+            "collection": [
+              "app.bsky.actor.profile",
+              "app.bsky.actor.status",
+              "app.bsky.feed.like",
+              "app.bsky.feed.post",
+              "app.bsky.feed.postgate",
+              "app.bsky.feed.repost",
+              "app.bsky.feed.threadgate",
+              "app.bsky.graph.block",
+              "app.bsky.graph.follow",
+              "app.bsky.graph.list",
+              "app.bsky.graph.listblock",
+              "app.bsky.graph.listitem",
+              "app.bsky.graph.starterpack",
+              "app.bsky.notification.declaration",
+            ],
+          },
+        ],
+      },
+    },
+  },
+  "AppBskyAuthManageModeration": {
+    "lexicon": 1,
+    "id": "app.bsky.authManageModeration",
+    "defs": {
+      "main": {
+        "type": "permission-set",
+        "title": "Manage Personal Moderation",
+        "title:lang": {},
+        "detail":
+          "Control over blocks, mutes, mod lists, mod services, and preferences.",
+        "detail:lang": {},
+        "permissions": [
+          {
+            "type": "permission",
+            "resource": "rpc",
+            "inheritAud": true,
+            "lxm": [
+              "app.bsky.actor.getPreferences",
+              "app.bsky.actor.putPreferences",
+              "app.bsky.graph.muteActor",
+              "app.bsky.graph.muteActorList",
+              "app.bsky.graph.muteThread",
+              "app.bsky.graph.unmuteActor",
+              "app.bsky.graph.unmuteActorList",
+              "app.bsky.graph.unmuteThread",
+            ],
+          },
+          {
+            "type": "permission",
+            "resource": "repo",
+            "action": [
+              "create",
+              "update",
+              "delete",
+            ],
+            "collection": [
+              "app.bsky.graph.block",
+              "app.bsky.graph.listblock",
+            ],
+          },
+        ],
+      },
+    },
+  },
   "AppBskyFeedGenerator": {
     "lexicon": 1,
     "id": "app.bsky.feed.generator",
@@ -10464,6 +12168,10 @@ export const schemaDict = {
               "interactions",
             ],
             "properties": {
+              "feed": {
+                "type": "string",
+                "format": "at-uri",
+              },
               "interactions": {
                 "type": "array",
                 "items": {
@@ -12582,6 +14290,123 @@ export const schemaDict = {
       },
     },
   },
+  "AppBskyAuthViewAll": {
+    "lexicon": 1,
+    "id": "app.bsky.authViewAll",
+    "defs": {
+      "main": {
+        "type": "permission-set",
+        "title": "Read-only access to all content",
+        "title:lang": {},
+        "detail":
+          "View Bluesky network content from account perspective, and read all notifications and preferences.",
+        "detail:lang": {},
+        "permissions": [
+          {
+            "type": "permission",
+            "resource": "rpc",
+            "inheritAud": true,
+            "lxm": [
+              "app.bsky.actor.getPreferences",
+              "app.bsky.actor.getProfile",
+              "app.bsky.actor.getProfiles",
+              "app.bsky.actor.getSuggestions",
+              "app.bsky.actor.searchActors",
+              "app.bsky.actor.searchActorsTypeahead",
+              "app.bsky.bookmark.getBookmarks",
+              "app.bsky.feed.describeFeedGenerator",
+              "app.bsky.feed.getActorFeeds",
+              "app.bsky.feed.getActorLikes",
+              "app.bsky.feed.getAuthorFeed",
+              "app.bsky.feed.getFeed",
+              "app.bsky.feed.getFeedGenerator",
+              "app.bsky.feed.getFeedGenerators",
+              "app.bsky.feed.getFeedSkeleton",
+              "app.bsky.feed.getLikes",
+              "app.bsky.feed.getListFeed",
+              "app.bsky.feed.getPostThread",
+              "app.bsky.feed.getPosts",
+              "app.bsky.feed.getQuotes",
+              "app.bsky.feed.getRepostedBy",
+              "app.bsky.feed.getSuggestedFeeds",
+              "app.bsky.feed.getTimeline",
+              "app.bsky.feed.searchPosts",
+              "app.bsky.graph.getActorStarterPacks",
+              "app.bsky.graph.getBlocks",
+              "app.bsky.graph.getFollowers",
+              "app.bsky.graph.getFollows",
+              "app.bsky.graph.getKnownFollowers",
+              "app.bsky.graph.getListBlocks",
+              "app.bsky.graph.getListMutes",
+              "app.bsky.graph.getLists",
+              "app.bsky.graph.getListsWithMembership",
+              "app.bsky.graph.getMutes",
+              "app.bsky.graph.getRelationships",
+              "app.bsky.graph.getStarterPack",
+              "app.bsky.graph.getStarterPacks",
+              "app.bsky.graph.getStarterPacksWithMembership",
+              "app.bsky.graph.getSuggestedFollowsByActor",
+              "app.bsky.graph.searchStarterPacks",
+              "app.bsky.labeler.getServices",
+              "app.bsky.notification.getPreferences",
+              "app.bsky.notification.getUnreadCount",
+              "app.bsky.notification.listActivitySubscriptions",
+              "app.bsky.notification.listNotifications",
+              "app.bsky.notification.updateSeen",
+              "app.bsky.unspecced.getAgeAssuranceState",
+              "app.bsky.unspecced.getConfig",
+              "app.bsky.unspecced.getOnboardingSuggestedStarterPacks",
+              "app.bsky.unspecced.getPopularFeedGenerators",
+              "app.bsky.unspecced.getPostThreadOtherV2",
+              "app.bsky.unspecced.getPostThreadV2",
+              "app.bsky.unspecced.getSuggestedFeeds",
+              "app.bsky.unspecced.getSuggestedFeedsSkeleton",
+              "app.bsky.unspecced.getSuggestedStarterPacks",
+              "app.bsky.unspecced.getSuggestedStarterPacksSkeleton",
+              "app.bsky.unspecced.getSuggestedUsers",
+              "app.bsky.unspecced.getSuggestedUsersSkeleton",
+              "app.bsky.unspecced.getSuggestionsSkeleton",
+              "app.bsky.unspecced.getTaggedSuggestions",
+              "app.bsky.unspecced.getTrendingTopics",
+              "app.bsky.unspecced.getTrends",
+              "app.bsky.unspecced.getTrendsSkeleton",
+              "app.bsky.unspecced.searchActorsSkeleton",
+              "app.bsky.unspecced.searchPostsSkeleton",
+              "app.bsky.unspecced.searchStarterPacksSkeleton",
+              "app.bsky.video.getUploadLimits",
+            ],
+          },
+        ],
+      },
+    },
+  },
+  "AppBskyAuthManageFeedDeclarations": {
+    "lexicon": 1,
+    "id": "app.bsky.authManageFeedDeclarations",
+    "defs": {
+      "main": {
+        "type": "permission-set",
+        "title": "Manage Hosted Feeds",
+        "title:lang": {},
+        "detail": "Configure feed generator declaration records.",
+        "detail:lang": {},
+        "permissions": [
+          {
+            "type": "permission",
+            "resource": "repo",
+            "action": [
+              "create",
+              "update",
+              "delete",
+            ],
+            "collection": [
+              "app.bsky.feed.generator",
+            ],
+          },
+        ],
+      },
+    },
+  },
   "AppBskyAgeassuranceBegin": {
     "lexicon": 1,
     "id": "app.bsky.ageassurance.begin",
@@ -12729,6 +14554,7 @@ export const schemaDict = {
         "description": "The Age Assurance configuration for a specific region.",
         "required": [
           "countryCode",
+          "minAccessAge",
           "rules",
         ],
         "properties": {
@@ -12741,6 +14567,11 @@ export const schemaDict = {
             "type": "string",
             "description":
               "The ISO 3166-2 region code this configuration applies to. If omitted, the configuration applies to the entire country.",
+          },
+          "minAccessAge": {
+            "type": "integer",
+            "description":
+              "The minimum age (as a whole integer) required to use Bluesky in this region.",
           },
           "rules": {
             "type": "array",
@@ -13030,6 +14861,36 @@ export const schemaDict = {
             "ref": "lex:app.bsky.ageassurance.defs#config",
           },
         },
+      },
+    },
+  },
+  "AppBskyAuthManageProfile": {
+    "lexicon": 1,
+    "id": "app.bsky.authManageProfile",
+    "defs": {
+      "main": {
+        "type": "permission-set",
+        "title": "Manage Bluesky Profile",
+        "title:lang": {},
+        "detail":
+          "Update profile data, as well as status and public chat visibility.",
+        "detail:lang": {},
+        "permissions": [
+          {
+            "type": "permission",
+            "resource": "repo",
+            "action": [
+              "create",
+              "update",
+              "delete",
+            ],
+            "collection": [
+              "app.bsky.actor.profile",
+              "app.bsky.actor.status",
+              "app.bsky.notification.declaration",
+            ],
+          },
+        ],
       },
     },
   },
@@ -13332,6 +15193,10 @@ export const schemaDict = {
             "ref":
               "lex:app.bsky.actor.defs#profileAssociatedActivitySubscription",
           },
+          "germ": {
+            "type": "ref",
+            "ref": "lex:app.bsky.actor.defs#profileAssociatedGerm",
+          },
         },
       },
       "profileAssociatedChat": {
@@ -13346,6 +15211,26 @@ export const schemaDict = {
               "all",
               "none",
               "following",
+            ],
+          },
+        },
+      },
+      "profileAssociatedGerm": {
+        "type": "object",
+        "required": [
+          "showButtonTo",
+          "messageMeUrl",
+        ],
+        "properties": {
+          "messageMeUrl": {
+            "type": "string",
+            "format": "uri",
+          },
+          "showButtonTo": {
+            "type": "string",
+            "knownValues": [
+              "usersIFollow",
+              "everyone",
             ],
           },
         },
@@ -13514,6 +15399,7 @@ export const schemaDict = {
             "lex:app.bsky.actor.defs#savedFeedsPref",
             "lex:app.bsky.actor.defs#savedFeedsPrefV2",
             "lex:app.bsky.actor.defs#personalDetailsPref",
+            "lex:app.bsky.actor.defs#declaredAgePref",
             "lex:app.bsky.actor.defs#feedViewPref",
             "lex:app.bsky.actor.defs#threadViewPref",
             "lex:app.bsky.actor.defs#interestsPref",
@@ -13523,6 +15409,7 @@ export const schemaDict = {
             "lex:app.bsky.actor.defs#labelersPref",
             "lex:app.bsky.actor.defs#postInteractionSettingsPref",
             "lex:app.bsky.actor.defs#verificationPrefs",
+            "lex:app.bsky.actor.defs#liveEventPreferences",
           ],
         },
       },
@@ -13641,6 +15528,28 @@ export const schemaDict = {
             "type": "string",
             "format": "datetime",
             "description": "The birth date of account owner.",
+          },
+        },
+      },
+      "declaredAgePref": {
+        "type": "object",
+        "description":
+          "Read-only preference containing value(s) inferred from the user's declared birthdate. Absence of this preference object in the response indicates that the user has not made a declaration.",
+        "properties": {
+          "isOverAge13": {
+            "type": "boolean",
+            "description":
+              "Indicates if the user has declared that they are over 13 years of age.",
+          },
+          "isOverAge16": {
+            "type": "boolean",
+            "description":
+              "Indicates if the user has declared that they are over 16 years of age.",
+          },
+          "isOverAge18": {
+            "type": "boolean",
+            "description":
+              "Indicates if the user has declared that they are over 18 years of age.",
           },
         },
       },
@@ -13916,6 +15825,25 @@ export const schemaDict = {
           },
         },
       },
+      "liveEventPreferences": {
+        "type": "object",
+        "description": "Preferences for live events.",
+        "properties": {
+          "hiddenFeedIds": {
+            "description":
+              "A list of feed IDs that the user has hidden from live events.",
+            "type": "array",
+            "items": {
+              "type": "string",
+            },
+          },
+          "hideAllFeeds": {
+            "description": "Whether to hide all feeds from live events.",
+            "type": "boolean",
+            "default": false,
+          },
+        },
+      },
       "postInteractionSettingsPref": {
         "type": "object",
         "description":
@@ -13958,6 +15886,14 @@ export const schemaDict = {
           "record",
         ],
         "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+          },
+          "cid": {
+            "type": "string",
+            "format": "cid",
+          },
           "status": {
             "type": "string",
             "description": "The status for the account.",
@@ -13975,6 +15911,13 @@ export const schemaDict = {
               "lex:app.bsky.embed.external#view",
             ],
           },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "lex:com.atproto.label.defs#label",
+            },
+          },
           "expiresAt": {
             "type": "string",
             "description":
@@ -13985,6 +15928,11 @@ export const schemaDict = {
             "type": "boolean",
             "description":
               "True if the status is not expired, false if it is expired. Only present if expiration was set.",
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description":
+              "True if the user's go-live access has been disabled by a moderator, false otherwise.",
           },
         },
       },
@@ -14088,6 +16036,10 @@ export const schemaDict = {
               },
               "recId": {
                 "type": "integer",
+                "description": "DEPRECATED: use recIdStr instead.",
+              },
+              "recIdStr": {
+                "type": "string",
                 "description":
                   "Snowflake for this recommendation, use when submitting recommendation events.",
               },
@@ -15954,6 +17906,62 @@ export const schemaDict = {
             "properties": {},
           },
         },
+      },
+    },
+  },
+  "ChatBskyAuthFullChatClient": {
+    "lexicon": 1,
+    "id": "chat.bsky.authFullChatClient",
+    "defs": {
+      "main": {
+        "type": "permission-set",
+        "title": "Full Chat Client (All Conversations)",
+        "title:lang": {},
+        "detail":
+          "Control of all chat conversations and configuration management.",
+        "detail:lang": {
+          "en": "All Chat Conversations",
+        },
+        "permissions": [
+          {
+            "type": "permission",
+            "resource": "rpc",
+            "inheritAud": true,
+            "lxm": [
+              "chat.bsky.actor.deleteAccount",
+              "chat.bsky.actor.exportAccountData",
+              "chat.bsky.convo.acceptConvo",
+              "chat.bsky.convo.addReaction",
+              "chat.bsky.convo.deleteMessageForSelf",
+              "chat.bsky.convo.getConvo",
+              "chat.bsky.convo.getConvoAvailability",
+              "chat.bsky.convo.getConvoForMembers",
+              "chat.bsky.convo.getLog",
+              "chat.bsky.convo.getMessages",
+              "chat.bsky.convo.leaveConvo",
+              "chat.bsky.convo.listConvos",
+              "chat.bsky.convo.muteConvo",
+              "chat.bsky.convo.removeReaction",
+              "chat.bsky.convo.sendMessage",
+              "chat.bsky.convo.sendMessageBatch",
+              "chat.bsky.convo.unmuteConvo",
+              "chat.bsky.convo.updateAllRead",
+              "chat.bsky.convo.updateRead",
+            ],
+          },
+          {
+            "type": "permission",
+            "resource": "repo",
+            "action": [
+              "create",
+              "update",
+              "delete",
+            ],
+            "collection": [
+              "chat.bsky.actor.declaration",
+            ],
+          },
+        ],
       },
     },
   },
@@ -23256,16 +25264,13 @@ export const schemaDict = {
         "type": "string",
         "knownValues": [
           "!hide",
-          "!no-promote",
           "!warn",
           "!no-unauthenticated",
-          "dmca-violation",
-          "doxxing",
           "porn",
           "sexual",
           "nudity",
-          "nsfl",
-          "gore",
+          "graphic-media",
+          "bot",
         ],
       },
     },
@@ -23786,7 +25791,16 @@ export const schemaDict = {
     "defs": {
       "main": {
         "type": "procedure",
-        "description": "Delete the current session. Requires auth.",
+        "description":
+          "Delete the current session. Requires auth using the 'refreshJwt' (not the 'accessJwt').",
+        "errors": [
+          {
+            "name": "InvalidToken",
+          },
+          {
+            "name": "ExpiredToken",
+          },
+        ],
       },
     },
   },
@@ -24035,6 +26049,9 @@ export const schemaDict = {
                 "type": "string",
                 "format": "did",
               },
+              "didDoc": {
+                "type": "unknown",
+              },
               "email": {
                 "type": "string",
               },
@@ -24043,9 +26060,6 @@ export const schemaDict = {
               },
               "emailAuthFactor": {
                 "type": "boolean",
-              },
-              "didDoc": {
-                "type": "unknown",
               },
               "active": {
                 "type": "boolean",
@@ -24102,6 +26116,15 @@ export const schemaDict = {
               "didDoc": {
                 "type": "unknown",
               },
+              "email": {
+                "type": "string",
+              },
+              "emailConfirmed": {
+                "type": "boolean",
+              },
+              "emailAuthFactor": {
+                "type": "boolean",
+              },
               "active": {
                 "type": "boolean",
               },
@@ -24121,6 +26144,12 @@ export const schemaDict = {
         "errors": [
           {
             "name": "AccountTakedown",
+          },
+          {
+            "name": "InvalidToken",
+          },
+          {
+            "name": "ExpiredToken",
           },
         ],
       },
@@ -26910,10 +28939,27 @@ export const ids = {
   ToolsOzoneModerationGetAccountTimeline:
     "tools.ozone.moderation.getAccountTimeline",
   ToolsOzoneModerationGetRepos: "tools.ozone.moderation.getRepos",
+  AppBskyDraftDefs: "app.bsky.draft.defs",
+  AppBskyDraftCreateDraft: "app.bsky.draft.createDraft",
+  AppBskyDraftUpdateDraft: "app.bsky.draft.updateDraft",
+  AppBskyDraftGetDrafts: "app.bsky.draft.getDrafts",
+  AppBskyDraftDeleteDraft: "app.bsky.draft.deleteDraft",
+  AppBskyAuthManageLabelerService: "app.bsky.authManageLabelerService",
   AppBskyVideoUploadVideo: "app.bsky.video.uploadVideo",
   AppBskyVideoDefs: "app.bsky.video.defs",
   AppBskyVideoGetJobStatus: "app.bsky.video.getJobStatus",
   AppBskyVideoGetUploadLimits: "app.bsky.video.getUploadLimits",
+  AppBskyContactDefs: "app.bsky.contact.defs",
+  AppBskyContactSendNotification: "app.bsky.contact.sendNotification",
+  AppBskyContactGetSyncStatus: "app.bsky.contact.getSyncStatus",
+  AppBskyContactStartPhoneVerification:
+    "app.bsky.contact.startPhoneVerification",
+  AppBskyContactGetMatches: "app.bsky.contact.getMatches",
+  AppBskyContactImportContacts: "app.bsky.contact.importContacts",
+  AppBskyContactDismissMatch: "app.bsky.contact.dismissMatch",
+  AppBskyContactRemoveData: "app.bsky.contact.removeData",
+  AppBskyContactVerifyPhone: "app.bsky.contact.verifyPhone",
+  AppBskyAuthManageNotifications: "app.bsky.authManageNotifications",
   AppBskyBookmarkDefs: "app.bsky.bookmark.defs",
   AppBskyBookmarkDeleteBookmark: "app.bsky.bookmark.deleteBookmark",
   AppBskyBookmarkGetBookmarks: "app.bsky.bookmark.getBookmarks",
@@ -26924,6 +28970,8 @@ export const ids = {
   AppBskyEmbedRecordWithMedia: "app.bsky.embed.recordWithMedia",
   AppBskyEmbedVideo: "app.bsky.embed.video",
   AppBskyEmbedExternal: "app.bsky.embed.external",
+  AppBskyAuthDeleteContent: "app.bsky.authDeleteContent",
+  AppBskyAuthCreatePosts: "app.bsky.authCreatePosts",
   AppBskyNotificationDefs: "app.bsky.notification.defs",
   AppBskyNotificationRegisterPush: "app.bsky.notification.registerPush",
   AppBskyNotificationPutPreferences: "app.bsky.notification.putPreferences",
@@ -26943,9 +28991,13 @@ export const ids = {
     "app.bsky.unspecced.getSuggestedFeedsSkeleton",
   AppBskyUnspeccedSearchStarterPacksSkeleton:
     "app.bsky.unspecced.searchStarterPacksSkeleton",
+  AppBskyUnspeccedGetSuggestedUsersForExplore:
+    "app.bsky.unspecced.getSuggestedUsersForExplore",
   AppBskyUnspeccedDefs: "app.bsky.unspecced.defs",
   AppBskyUnspeccedGetOnboardingSuggestedStarterPacksSkeleton:
     "app.bsky.unspecced.getOnboardingSuggestedStarterPacksSkeleton",
+  AppBskyUnspeccedGetSuggestedUsersForExploreSkeleton:
+    "app.bsky.unspecced.getSuggestedUsersForExploreSkeleton",
   AppBskyUnspeccedGetSuggestedUsers: "app.bsky.unspecced.getSuggestedUsers",
   AppBskyUnspeccedGetPostThreadOtherV2:
     "app.bsky.unspecced.getPostThreadOtherV2",
@@ -26964,14 +29016,26 @@ export const ids = {
   AppBskyUnspeccedGetSuggestionsSkeleton:
     "app.bsky.unspecced.getSuggestionsSkeleton",
   AppBskyUnspeccedSearchPostsSkeleton: "app.bsky.unspecced.searchPostsSkeleton",
+  AppBskyUnspeccedGetOnboardingSuggestedUsersSkeleton:
+    "app.bsky.unspecced.getOnboardingSuggestedUsersSkeleton",
+  AppBskyUnspeccedGetSuggestedUsersForDiscoverSkeleton:
+    "app.bsky.unspecced.getSuggestedUsersForDiscoverSkeleton",
+  AppBskyUnspeccedGetSuggestedUsersForDiscover:
+    "app.bsky.unspecced.getSuggestedUsersForDiscover",
   AppBskyUnspeccedGetAgeAssuranceState:
     "app.bsky.unspecced.getAgeAssuranceState",
   AppBskyUnspeccedGetPopularFeedGenerators:
     "app.bsky.unspecced.getPopularFeedGenerators",
+  AppBskyUnspeccedGetSuggestedOnboardingUsers:
+    "app.bsky.unspecced.getSuggestedOnboardingUsers",
+  AppBskyUnspeccedGetSuggestedUsersForSeeMore:
+    "app.bsky.unspecced.getSuggestedUsersForSeeMore",
   AppBskyUnspeccedInitAgeAssurance: "app.bsky.unspecced.initAgeAssurance",
   AppBskyUnspeccedGetTrendingTopics: "app.bsky.unspecced.getTrendingTopics",
   AppBskyUnspeccedGetTaggedSuggestions:
     "app.bsky.unspecced.getTaggedSuggestions",
+  AppBskyUnspeccedGetSuggestedUsersForSeeMoreSkeleton:
+    "app.bsky.unspecced.getSuggestedUsersForSeeMoreSkeleton",
   AppBskyUnspeccedGetSuggestedFeeds: "app.bsky.unspecced.getSuggestedFeeds",
   AppBskyUnspeccedGetTrendsSkeleton: "app.bsky.unspecced.getTrendsSkeleton",
   AppBskyUnspeccedGetConfig: "app.bsky.unspecced.getConfig",
@@ -27008,6 +29072,8 @@ export const ids = {
   AppBskyGraphGetRelationships: "app.bsky.graph.getRelationships",
   AppBskyGraphUnmuteActor: "app.bsky.graph.unmuteActor",
   AppBskyGraphGetList: "app.bsky.graph.getList",
+  AppBskyAuthFullApp: "app.bsky.authFullApp",
+  AppBskyAuthManageModeration: "app.bsky.authManageModeration",
   AppBskyFeedGenerator: "app.bsky.feed.generator",
   AppBskyFeedSendInteractions: "app.bsky.feed.sendInteractions",
   AppBskyFeedDefs: "app.bsky.feed.defs",
@@ -27034,10 +29100,13 @@ export const ids = {
   AppBskyFeedGetActorFeeds: "app.bsky.feed.getActorFeeds",
   AppBskyFeedPost: "app.bsky.feed.post",
   AppBskyRichtextFacet: "app.bsky.richtext.facet",
+  AppBskyAuthViewAll: "app.bsky.authViewAll",
+  AppBskyAuthManageFeedDeclarations: "app.bsky.authManageFeedDeclarations",
   AppBskyAgeassuranceBegin: "app.bsky.ageassurance.begin",
   AppBskyAgeassuranceDefs: "app.bsky.ageassurance.defs",
   AppBskyAgeassuranceGetState: "app.bsky.ageassurance.getState",
   AppBskyAgeassuranceGetConfig: "app.bsky.ageassurance.getConfig",
+  AppBskyAuthManageProfile: "app.bsky.authManageProfile",
   AppBskyActorSearchActorsTypeahead: "app.bsky.actor.searchActorsTypeahead",
   AppBskyActorDefs: "app.bsky.actor.defs",
   AppBskyActorPutPreferences: "app.bsky.actor.putPreferences",
@@ -27073,6 +29142,7 @@ export const ids = {
   ChatBskyActorDeclaration: "chat.bsky.actor.declaration",
   ChatBskyActorExportAccountData: "chat.bsky.actor.exportAccountData",
   ChatBskyActorDeleteAccount: "chat.bsky.actor.deleteAccount",
+  ChatBskyAuthFullChatClient: "chat.bsky.authFullChatClient",
   ChatBskyModerationGetActorMetadata: "chat.bsky.moderation.getActorMetadata",
   ChatBskyModerationGetMessageContext: "chat.bsky.moderation.getMessageContext",
   ChatBskyModerationUpdateActorAccess: "chat.bsky.moderation.updateActorAccess",

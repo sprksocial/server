@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -33,11 +34,11 @@ export interface State {
 
 const hashState = "state";
 
-export function isState<V>(v: V) {
+export function isState<V>(v: V): v is State & V {
   return is$typed(v, id, hashState);
 }
 
-export function validateState<V>(v: V) {
+export function validateState<V>(v: V): ValidationResult<State & V> {
   return validate<State & V>(v, id, hashState);
 }
 
@@ -50,11 +51,13 @@ export interface StateMetadata {
 
 const hashStateMetadata = "stateMetadata";
 
-export function isStateMetadata<V>(v: V) {
+export function isStateMetadata<V>(v: V): v is StateMetadata & V {
   return is$typed(v, id, hashStateMetadata);
 }
 
-export function validateStateMetadata<V>(v: V) {
+export function validateStateMetadata<V>(
+  v: V,
+): ValidationResult<StateMetadata & V> {
   return validate<StateMetadata & V>(v, id, hashStateMetadata);
 }
 
@@ -66,11 +69,11 @@ export interface Config {
 
 const hashConfig = "config";
 
-export function isConfig<V>(v: V) {
+export function isConfig<V>(v: V): v is Config & V {
   return is$typed(v, id, hashConfig);
 }
 
-export function validateConfig<V>(v: V) {
+export function validateConfig<V>(v: V): ValidationResult<Config & V> {
   return validate<Config & V>(v, id, hashConfig);
 }
 
@@ -81,6 +84,8 @@ export interface ConfigRegion {
   countryCode: string;
   /** The ISO 3166-2 region code this configuration applies to. If omitted, the configuration applies to the entire country. */
   regionCode?: string;
+  /** The minimum age (as a whole integer) required to use Bluesky in this region. */
+  minAccessAge: number;
   /** The ordered list of Age Assurance rules that apply to this region. Rules should be applied in order, and the first matching rule determines the access level granted. The rules array should always include a default rule as the last item. */
   rules: (
     | $Typed<ConfigRegionRuleDefault>
@@ -96,11 +101,13 @@ export interface ConfigRegion {
 
 const hashConfigRegion = "configRegion";
 
-export function isConfigRegion<V>(v: V) {
+export function isConfigRegion<V>(v: V): v is ConfigRegion & V {
   return is$typed(v, id, hashConfigRegion);
 }
 
-export function validateConfigRegion<V>(v: V) {
+export function validateConfigRegion<V>(
+  v: V,
+): ValidationResult<ConfigRegion & V> {
   return validate<ConfigRegion & V>(v, id, hashConfigRegion);
 }
 
@@ -112,11 +119,15 @@ export interface ConfigRegionRuleDefault {
 
 const hashConfigRegionRuleDefault = "configRegionRuleDefault";
 
-export function isConfigRegionRuleDefault<V>(v: V) {
+export function isConfigRegionRuleDefault<V>(
+  v: V,
+): v is ConfigRegionRuleDefault & V {
   return is$typed(v, id, hashConfigRegionRuleDefault);
 }
 
-export function validateConfigRegionRuleDefault<V>(v: V) {
+export function validateConfigRegionRuleDefault<V>(
+  v: V,
+): ValidationResult<ConfigRegionRuleDefault & V> {
   return validate<ConfigRegionRuleDefault & V>(
     v,
     id,
@@ -135,11 +146,15 @@ export interface ConfigRegionRuleIfDeclaredOverAge {
 const hashConfigRegionRuleIfDeclaredOverAge =
   "configRegionRuleIfDeclaredOverAge";
 
-export function isConfigRegionRuleIfDeclaredOverAge<V>(v: V) {
+export function isConfigRegionRuleIfDeclaredOverAge<V>(
+  v: V,
+): v is ConfigRegionRuleIfDeclaredOverAge & V {
   return is$typed(v, id, hashConfigRegionRuleIfDeclaredOverAge);
 }
 
-export function validateConfigRegionRuleIfDeclaredOverAge<V>(v: V) {
+export function validateConfigRegionRuleIfDeclaredOverAge<V>(
+  v: V,
+): ValidationResult<ConfigRegionRuleIfDeclaredOverAge & V> {
   return validate<ConfigRegionRuleIfDeclaredOverAge & V>(
     v,
     id,
@@ -158,11 +173,15 @@ export interface ConfigRegionRuleIfDeclaredUnderAge {
 const hashConfigRegionRuleIfDeclaredUnderAge =
   "configRegionRuleIfDeclaredUnderAge";
 
-export function isConfigRegionRuleIfDeclaredUnderAge<V>(v: V) {
+export function isConfigRegionRuleIfDeclaredUnderAge<V>(
+  v: V,
+): v is ConfigRegionRuleIfDeclaredUnderAge & V {
   return is$typed(v, id, hashConfigRegionRuleIfDeclaredUnderAge);
 }
 
-export function validateConfigRegionRuleIfDeclaredUnderAge<V>(v: V) {
+export function validateConfigRegionRuleIfDeclaredUnderAge<V>(
+  v: V,
+): ValidationResult<ConfigRegionRuleIfDeclaredUnderAge & V> {
   return validate<ConfigRegionRuleIfDeclaredUnderAge & V>(
     v,
     id,
@@ -180,11 +199,15 @@ export interface ConfigRegionRuleIfAssuredOverAge {
 
 const hashConfigRegionRuleIfAssuredOverAge = "configRegionRuleIfAssuredOverAge";
 
-export function isConfigRegionRuleIfAssuredOverAge<V>(v: V) {
+export function isConfigRegionRuleIfAssuredOverAge<V>(
+  v: V,
+): v is ConfigRegionRuleIfAssuredOverAge & V {
   return is$typed(v, id, hashConfigRegionRuleIfAssuredOverAge);
 }
 
-export function validateConfigRegionRuleIfAssuredOverAge<V>(v: V) {
+export function validateConfigRegionRuleIfAssuredOverAge<V>(
+  v: V,
+): ValidationResult<ConfigRegionRuleIfAssuredOverAge & V> {
   return validate<ConfigRegionRuleIfAssuredOverAge & V>(
     v,
     id,
@@ -203,11 +226,15 @@ export interface ConfigRegionRuleIfAssuredUnderAge {
 const hashConfigRegionRuleIfAssuredUnderAge =
   "configRegionRuleIfAssuredUnderAge";
 
-export function isConfigRegionRuleIfAssuredUnderAge<V>(v: V) {
+export function isConfigRegionRuleIfAssuredUnderAge<V>(
+  v: V,
+): v is ConfigRegionRuleIfAssuredUnderAge & V {
   return is$typed(v, id, hashConfigRegionRuleIfAssuredUnderAge);
 }
 
-export function validateConfigRegionRuleIfAssuredUnderAge<V>(v: V) {
+export function validateConfigRegionRuleIfAssuredUnderAge<V>(
+  v: V,
+): ValidationResult<ConfigRegionRuleIfAssuredUnderAge & V> {
   return validate<ConfigRegionRuleIfAssuredUnderAge & V>(
     v,
     id,
@@ -226,11 +253,15 @@ export interface ConfigRegionRuleIfAccountNewerThan {
 const hashConfigRegionRuleIfAccountNewerThan =
   "configRegionRuleIfAccountNewerThan";
 
-export function isConfigRegionRuleIfAccountNewerThan<V>(v: V) {
+export function isConfigRegionRuleIfAccountNewerThan<V>(
+  v: V,
+): v is ConfigRegionRuleIfAccountNewerThan & V {
   return is$typed(v, id, hashConfigRegionRuleIfAccountNewerThan);
 }
 
-export function validateConfigRegionRuleIfAccountNewerThan<V>(v: V) {
+export function validateConfigRegionRuleIfAccountNewerThan<V>(
+  v: V,
+): ValidationResult<ConfigRegionRuleIfAccountNewerThan & V> {
   return validate<ConfigRegionRuleIfAccountNewerThan & V>(
     v,
     id,
@@ -249,11 +280,15 @@ export interface ConfigRegionRuleIfAccountOlderThan {
 const hashConfigRegionRuleIfAccountOlderThan =
   "configRegionRuleIfAccountOlderThan";
 
-export function isConfigRegionRuleIfAccountOlderThan<V>(v: V) {
+export function isConfigRegionRuleIfAccountOlderThan<V>(
+  v: V,
+): v is ConfigRegionRuleIfAccountOlderThan & V {
   return is$typed(v, id, hashConfigRegionRuleIfAccountOlderThan);
 }
 
-export function validateConfigRegionRuleIfAccountOlderThan<V>(v: V) {
+export function validateConfigRegionRuleIfAccountOlderThan<V>(
+  v: V,
+): ValidationResult<ConfigRegionRuleIfAccountOlderThan & V> {
   return validate<ConfigRegionRuleIfAccountOlderThan & V>(
     v,
     id,
@@ -300,10 +335,10 @@ export interface Event {
 
 const hashEvent = "event";
 
-export function isEvent<V>(v: V) {
+export function isEvent<V>(v: V): v is Event & V {
   return is$typed(v, id, hashEvent);
 }
 
-export function validateEvent<V>(v: V) {
+export function validateEvent<V>(v: V): ValidationResult<Event & V> {
   return validate<Event & V>(v, id, hashEvent);
 }

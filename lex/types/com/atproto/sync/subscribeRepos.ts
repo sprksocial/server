@@ -3,6 +3,7 @@
  */
 import type { CID } from "multiformats/cid";
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type { ErrorFrame } from "@atp/xrpc-server";
 
@@ -52,11 +53,11 @@ export interface Commit {
 
 const hashCommit = "commit";
 
-export function isCommit<V>(v: V) {
+export function isCommit<V>(v: V): v is Commit & V {
   return is$typed(v, id, hashCommit);
 }
 
-export function validateCommit<V>(v: V) {
+export function validateCommit<V>(v: V): ValidationResult<Commit & V> {
   return validate<Commit & V>(v, id, hashCommit);
 }
 
@@ -77,11 +78,11 @@ export interface Sync {
 
 const hashSync = "sync";
 
-export function isSync<V>(v: V) {
+export function isSync<V>(v: V): v is Sync & V {
   return is$typed(v, id, hashSync);
 }
 
-export function validateSync<V>(v: V) {
+export function validateSync<V>(v: V): ValidationResult<Sync & V> {
   return validate<Sync & V>(v, id, hashSync);
 }
 
@@ -97,11 +98,11 @@ export interface Identity {
 
 const hashIdentity = "identity";
 
-export function isIdentity<V>(v: V) {
+export function isIdentity<V>(v: V): v is Identity & V {
   return is$typed(v, id, hashIdentity);
 }
 
-export function validateIdentity<V>(v: V) {
+export function validateIdentity<V>(v: V): ValidationResult<Identity & V> {
   return validate<Identity & V>(v, id, hashIdentity);
 }
 
@@ -126,11 +127,11 @@ export interface Account {
 
 const hashAccount = "account";
 
-export function isAccount<V>(v: V) {
+export function isAccount<V>(v: V): v is Account & V {
   return is$typed(v, id, hashAccount);
 }
 
-export function validateAccount<V>(v: V) {
+export function validateAccount<V>(v: V): ValidationResult<Account & V> {
   return validate<Account & V>(v, id, hashAccount);
 }
 
@@ -142,11 +143,11 @@ export interface Info {
 
 const hashInfo = "info";
 
-export function isInfo<V>(v: V) {
+export function isInfo<V>(v: V): v is Info & V {
   return is$typed(v, id, hashInfo);
 }
 
-export function validateInfo<V>(v: V) {
+export function validateInfo<V>(v: V): ValidationResult<Info & V> {
   return validate<Info & V>(v, id, hashInfo);
 }
 
@@ -167,10 +168,10 @@ export interface RepoOp {
 
 const hashRepoOp = "repoOp";
 
-export function isRepoOp<V>(v: V) {
+export function isRepoOp<V>(v: V): v is RepoOp & V {
   return is$typed(v, id, hashRepoOp);
 }
 
-export function validateRepoOp<V>(v: V) {
+export function validateRepoOp<V>(v: V): ValidationResult<RepoOp & V> {
   return validate<RepoOp & V>(v, id, hashRepoOp);
 }

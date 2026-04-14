@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -56,11 +57,11 @@ export interface Event {
 
 const hashEvent = "event";
 
-export function isEvent<V>(v: V) {
+export function isEvent<V>(v: V): v is Event & V {
   return is$typed(v, id, hashEvent);
 }
 
-export function validateEvent<V>(v: V) {
+export function validateEvent<V>(v: V): ValidationResult<Event & V> {
   return validate<Event & V>(v, id, hashEvent);
 }
 
@@ -72,11 +73,13 @@ export interface AccountCreated {
 
 const hashAccountCreated = "accountCreated";
 
-export function isAccountCreated<V>(v: V) {
+export function isAccountCreated<V>(v: V): v is AccountCreated & V {
   return is$typed(v, id, hashAccountCreated);
 }
 
-export function validateAccountCreated<V>(v: V) {
+export function validateAccountCreated<V>(
+  v: V,
+): ValidationResult<AccountCreated & V> {
   return validate<AccountCreated & V>(v, id, hashAccountCreated);
 }
 
@@ -87,11 +90,13 @@ export interface EmailUpdated {
 
 const hashEmailUpdated = "emailUpdated";
 
-export function isEmailUpdated<V>(v: V) {
+export function isEmailUpdated<V>(v: V): v is EmailUpdated & V {
   return is$typed(v, id, hashEmailUpdated);
 }
 
-export function validateEmailUpdated<V>(v: V) {
+export function validateEmailUpdated<V>(
+  v: V,
+): ValidationResult<EmailUpdated & V> {
   return validate<EmailUpdated & V>(v, id, hashEmailUpdated);
 }
 
@@ -102,11 +107,13 @@ export interface EmailConfirmed {
 
 const hashEmailConfirmed = "emailConfirmed";
 
-export function isEmailConfirmed<V>(v: V) {
+export function isEmailConfirmed<V>(v: V): v is EmailConfirmed & V {
   return is$typed(v, id, hashEmailConfirmed);
 }
 
-export function validateEmailConfirmed<V>(v: V) {
+export function validateEmailConfirmed<V>(
+  v: V,
+): ValidationResult<EmailConfirmed & V> {
   return validate<EmailConfirmed & V>(v, id, hashEmailConfirmed);
 }
 
@@ -116,11 +123,13 @@ export interface PasswordUpdated {
 
 const hashPasswordUpdated = "passwordUpdated";
 
-export function isPasswordUpdated<V>(v: V) {
+export function isPasswordUpdated<V>(v: V): v is PasswordUpdated & V {
   return is$typed(v, id, hashPasswordUpdated);
 }
 
-export function validatePasswordUpdated<V>(v: V) {
+export function validatePasswordUpdated<V>(
+  v: V,
+): ValidationResult<PasswordUpdated & V> {
   return validate<PasswordUpdated & V>(v, id, hashPasswordUpdated);
 }
 
@@ -131,10 +140,12 @@ export interface HandleUpdated {
 
 const hashHandleUpdated = "handleUpdated";
 
-export function isHandleUpdated<V>(v: V) {
+export function isHandleUpdated<V>(v: V): v is HandleUpdated & V {
   return is$typed(v, id, hashHandleUpdated);
 }
 
-export function validateHandleUpdated<V>(v: V) {
+export function validateHandleUpdated<V>(
+  v: V,
+): ValidationResult<HandleUpdated & V> {
   return validate<HandleUpdated & V>(v, id, hashHandleUpdated);
 }

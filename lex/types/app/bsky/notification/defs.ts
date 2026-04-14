@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -13,11 +14,13 @@ export interface RecordDeleted {
 
 const hashRecordDeleted = "recordDeleted";
 
-export function isRecordDeleted<V>(v: V) {
+export function isRecordDeleted<V>(v: V): v is RecordDeleted & V {
   return is$typed(v, id, hashRecordDeleted);
 }
 
-export function validateRecordDeleted<V>(v: V) {
+export function validateRecordDeleted<V>(
+  v: V,
+): ValidationResult<RecordDeleted & V> {
   return validate<RecordDeleted & V>(v, id, hashRecordDeleted);
 }
 
@@ -32,11 +35,13 @@ export interface ChatPreference {
 
 const hashChatPreference = "chatPreference";
 
-export function isChatPreference<V>(v: V) {
+export function isChatPreference<V>(v: V): v is ChatPreference & V {
   return is$typed(v, id, hashChatPreference);
 }
 
-export function validateChatPreference<V>(v: V) {
+export function validateChatPreference<V>(
+  v: V,
+): ValidationResult<ChatPreference & V> {
   return validate<ChatPreference & V>(v, id, hashChatPreference);
 }
 
@@ -49,11 +54,13 @@ export interface FilterablePreference {
 
 const hashFilterablePreference = "filterablePreference";
 
-export function isFilterablePreference<V>(v: V) {
+export function isFilterablePreference<V>(v: V): v is FilterablePreference & V {
   return is$typed(v, id, hashFilterablePreference);
 }
 
-export function validateFilterablePreference<V>(v: V) {
+export function validateFilterablePreference<V>(
+  v: V,
+): ValidationResult<FilterablePreference & V> {
   return validate<FilterablePreference & V>(v, id, hashFilterablePreference);
 }
 
@@ -65,11 +72,11 @@ export interface Preference {
 
 const hashPreference = "preference";
 
-export function isPreference<V>(v: V) {
+export function isPreference<V>(v: V): v is Preference & V {
   return is$typed(v, id, hashPreference);
 }
 
-export function validatePreference<V>(v: V) {
+export function validatePreference<V>(v: V): ValidationResult<Preference & V> {
   return validate<Preference & V>(v, id, hashPreference);
 }
 
@@ -92,11 +99,13 @@ export interface Preferences {
 
 const hashPreferences = "preferences";
 
-export function isPreferences<V>(v: V) {
+export function isPreferences<V>(v: V): v is Preferences & V {
   return is$typed(v, id, hashPreferences);
 }
 
-export function validatePreferences<V>(v: V) {
+export function validatePreferences<V>(
+  v: V,
+): ValidationResult<Preferences & V> {
   return validate<Preferences & V>(v, id, hashPreferences);
 }
 
@@ -108,11 +117,13 @@ export interface ActivitySubscription {
 
 const hashActivitySubscription = "activitySubscription";
 
-export function isActivitySubscription<V>(v: V) {
+export function isActivitySubscription<V>(v: V): v is ActivitySubscription & V {
   return is$typed(v, id, hashActivitySubscription);
 }
 
-export function validateActivitySubscription<V>(v: V) {
+export function validateActivitySubscription<V>(
+  v: V,
+): ValidationResult<ActivitySubscription & V> {
   return validate<ActivitySubscription & V>(v, id, hashActivitySubscription);
 }
 
@@ -125,11 +136,15 @@ export interface SubjectActivitySubscription {
 
 const hashSubjectActivitySubscription = "subjectActivitySubscription";
 
-export function isSubjectActivitySubscription<V>(v: V) {
+export function isSubjectActivitySubscription<V>(
+  v: V,
+): v is SubjectActivitySubscription & V {
   return is$typed(v, id, hashSubjectActivitySubscription);
 }
 
-export function validateSubjectActivitySubscription<V>(v: V) {
+export function validateSubjectActivitySubscription<V>(
+  v: V,
+): ValidationResult<SubjectActivitySubscription & V> {
   return validate<SubjectActivitySubscription & V>(
     v,
     id,

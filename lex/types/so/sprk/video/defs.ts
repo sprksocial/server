@@ -3,6 +3,7 @@
  */
 import type { BlobRef } from "@atp/lexicon";
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as SoSprkSoundDefs from "../sound/defs.ts";
 
@@ -30,11 +31,11 @@ export interface JobStatus {
 
 const hashJobStatus = "jobStatus";
 
-export function isJobStatus<V>(v: V) {
+export function isJobStatus<V>(v: V): v is JobStatus & V {
   return is$typed(v, id, hashJobStatus);
 }
 
-export function validateJobStatus<V>(v: V) {
+export function validateJobStatus<V>(v: V): ValidationResult<JobStatus & V> {
   return validate<JobStatus & V>(v, id, hashJobStatus);
 }
 
@@ -47,10 +48,12 @@ export interface ExtractedAudio {
 
 const hashExtractedAudio = "extractedAudio";
 
-export function isExtractedAudio<V>(v: V) {
+export function isExtractedAudio<V>(v: V): v is ExtractedAudio & V {
   return is$typed(v, id, hashExtractedAudio);
 }
 
-export function validateExtractedAudio<V>(v: V) {
+export function validateExtractedAudio<V>(
+  v: V,
+): ValidationResult<ExtractedAudio & V> {
   return validate<ExtractedAudio & V>(v, id, hashExtractedAudio);
 }

@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as ToolsOzoneModerationDefs from "../moderation/defs.ts";
 
@@ -43,10 +44,12 @@ export interface VerificationView {
 
 const hashVerificationView = "verificationView";
 
-export function isVerificationView<V>(v: V) {
+export function isVerificationView<V>(v: V): v is VerificationView & V {
   return is$typed(v, id, hashVerificationView);
 }
 
-export function validateVerificationView<V>(v: V) {
+export function validateVerificationView<V>(
+  v: V,
+): ValidationResult<VerificationView & V> {
   return validate<VerificationView & V>(v, id, hashVerificationView);
 }

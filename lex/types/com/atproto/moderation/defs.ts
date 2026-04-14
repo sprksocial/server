@@ -54,19 +54,19 @@ export type ReasonType =
   | (string & globalThis.Record<PropertyKey, never>);
 
 /** Spam: frequent unwanted promotion, replies, mentions. Prefer new lexicon definition `tools.ozone.report.defs#reasonMisleadingSpam`. */
-export const REASONSPAM = `${id}#reasonSpam`;
+export const REASONSPAM: string = `${id}#reasonSpam`;
 /** Direct violation of server rules, laws, terms of service. Prefer new lexicon definition `tools.ozone.report.defs#reasonRuleOther`. */
-export const REASONVIOLATION = `${id}#reasonViolation`;
+export const REASONVIOLATION: string = `${id}#reasonViolation`;
 /** Misleading identity, affiliation, or content. Prefer new lexicon definition `tools.ozone.report.defs#reasonMisleadingOther`. */
-export const REASONMISLEADING = `${id}#reasonMisleading`;
+export const REASONMISLEADING: string = `${id}#reasonMisleading`;
 /** Unwanted or mislabeled sexual content. Prefer new lexicon definition `tools.ozone.report.defs#reasonSexualUnlabeled`. */
-export const REASONSEXUAL = `${id}#reasonSexual`;
+export const REASONSEXUAL: string = `${id}#reasonSexual`;
 /** Rude, harassing, explicit, or otherwise unwelcoming behavior. Prefer new lexicon definition `tools.ozone.report.defs#reasonHarassmentOther`. */
-export const REASONRUDE = `${id}#reasonRude`;
+export const REASONRUDE: string = `${id}#reasonRude`;
 /** Reports not falling under another report category. Prefer new lexicon definition `tools.ozone.report.defs#reasonOther`. */
-export const REASONOTHER = `${id}#reasonOther`;
+export const REASONOTHER: string = `${id}#reasonOther`;
 /** Appeal a previously taken moderation action */
-export const REASONAPPEAL = `${id}#reasonAppeal`;
+export const REASONAPPEAL: string = `${id}#reasonAppeal`;
 
 /** Tag describing a type of subject that might be reported. */
 export type SubjectType =

@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -15,11 +16,11 @@ export interface Set {
 
 const hashSet = "set";
 
-export function isSet<V>(v: V) {
+export function isSet<V>(v: V): v is Set & V {
   return is$typed(v, id, hashSet);
 }
 
-export function validateSet<V>(v: V) {
+export function validateSet<V>(v: V): ValidationResult<Set & V> {
   return validate<Set & V>(v, id, hashSet);
 }
 
@@ -34,10 +35,10 @@ export interface SetView {
 
 const hashSetView = "setView";
 
-export function isSetView<V>(v: V) {
+export function isSetView<V>(v: V): v is SetView & V {
   return is$typed(v, id, hashSetView);
 }
 
-export function validateSetView<V>(v: V) {
+export function validateSetView<V>(v: V): ValidationResult<SetView & V> {
   return validate<SetView & V>(v, id, hashSetView);
 }

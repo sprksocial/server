@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as AppBskyGraphDefs from "./defs.ts";
 
@@ -50,10 +51,12 @@ export interface ListWithMembership {
 
 const hashListWithMembership = "listWithMembership";
 
-export function isListWithMembership<V>(v: V) {
+export function isListWithMembership<V>(v: V): v is ListWithMembership & V {
   return is$typed(v, id, hashListWithMembership);
 }
 
-export function validateListWithMembership<V>(v: V) {
+export function validateListWithMembership<V>(
+  v: V,
+): ValidationResult<ListWithMembership & V> {
   return validate<ListWithMembership & V>(v, id, hashListWithMembership);
 }

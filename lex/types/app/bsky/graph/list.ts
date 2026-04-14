@@ -3,6 +3,7 @@
  */
 import type { BlobRef } from "@atp/lexicon";
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as AppBskyGraphDefs from "./defs.ts";
 import type * as AppBskyRichtextFacet from "../richtext/facet.ts";
@@ -26,11 +27,11 @@ export interface Record {
 
 const hashRecord = "main";
 
-export function isRecord<V>(v: V) {
+export function isRecord<V>(v: V): v is Record & V {
   return is$typed(v, id, hashRecord);
 }
 
-export function validateRecord<V>(v: V) {
+export function validateRecord<V>(v: V): ValidationResult<Record & V> {
   return validate<Record & V>(v, id, hashRecord, true);
 }
 

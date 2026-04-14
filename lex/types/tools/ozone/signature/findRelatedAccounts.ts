@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as ComAtprotoAdminDefs from "../../../com/atproto/admin/defs.ts";
 import type * as ToolsOzoneSignatureDefs from "./defs.ts";
@@ -44,10 +45,12 @@ export interface RelatedAccount {
 
 const hashRelatedAccount = "relatedAccount";
 
-export function isRelatedAccount<V>(v: V) {
+export function isRelatedAccount<V>(v: V): v is RelatedAccount & V {
   return is$typed(v, id, hashRelatedAccount);
 }
 
-export function validateRelatedAccount<V>(v: V) {
+export function validateRelatedAccount<V>(
+  v: V,
+): ValidationResult<RelatedAccount & V> {
   return validate<RelatedAccount & V>(v, id, hashRelatedAccount);
 }

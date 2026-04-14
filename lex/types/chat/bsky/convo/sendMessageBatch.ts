@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as ChatBskyConvoDefs from "./defs.ts";
 
@@ -44,10 +45,10 @@ export interface BatchItem {
 
 const hashBatchItem = "batchItem";
 
-export function isBatchItem<V>(v: V) {
+export function isBatchItem<V>(v: V): v is BatchItem & V {
   return is$typed(v, id, hashBatchItem);
 }
 
-export function validateBatchItem<V>(v: V) {
+export function validateBatchItem<V>(v: V): ValidationResult<BatchItem & V> {
   return validate<BatchItem & V>(v, id, hashBatchItem);
 }

@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef.ts";
@@ -26,11 +27,13 @@ export interface ProfileViewBasic {
 
 const hashProfileViewBasic = "profileViewBasic";
 
-export function isProfileViewBasic<V>(v: V) {
+export function isProfileViewBasic<V>(v: V): v is ProfileViewBasic & V {
   return is$typed(v, id, hashProfileViewBasic);
 }
 
-export function validateProfileViewBasic<V>(v: V) {
+export function validateProfileViewBasic<V>(
+  v: V,
+): ValidationResult<ProfileViewBasic & V> {
   return validate<ProfileViewBasic & V>(v, id, hashProfileViewBasic);
 }
 
@@ -52,11 +55,13 @@ export interface ProfileView {
 
 const hashProfileView = "profileView";
 
-export function isProfileView<V>(v: V) {
+export function isProfileView<V>(v: V): v is ProfileView & V {
   return is$typed(v, id, hashProfileView);
 }
 
-export function validateProfileView<V>(v: V) {
+export function validateProfileView<V>(
+  v: V,
+): ValidationResult<ProfileView & V> {
   return validate<ProfileView & V>(v, id, hashProfileView);
 }
 
@@ -83,11 +88,13 @@ export interface ProfileViewDetailed {
 
 const hashProfileViewDetailed = "profileViewDetailed";
 
-export function isProfileViewDetailed<V>(v: V) {
+export function isProfileViewDetailed<V>(v: V): v is ProfileViewDetailed & V {
   return is$typed(v, id, hashProfileViewDetailed);
 }
 
-export function validateProfileViewDetailed<V>(v: V) {
+export function validateProfileViewDetailed<V>(
+  v: V,
+): ValidationResult<ProfileViewDetailed & V> {
   return validate<ProfileViewDetailed & V>(v, id, hashProfileViewDetailed);
 }
 
@@ -100,11 +107,13 @@ export interface ProfileAssociated {
 
 const hashProfileAssociated = "profileAssociated";
 
-export function isProfileAssociated<V>(v: V) {
+export function isProfileAssociated<V>(v: V): v is ProfileAssociated & V {
   return is$typed(v, id, hashProfileAssociated);
 }
 
-export function validateProfileAssociated<V>(v: V) {
+export function validateProfileAssociated<V>(
+  v: V,
+): ValidationResult<ProfileAssociated & V> {
   return validate<ProfileAssociated & V>(v, id, hashProfileAssociated);
 }
 
@@ -119,11 +128,15 @@ export interface ProfileAssociatedChat {
 
 const hashProfileAssociatedChat = "profileAssociatedChat";
 
-export function isProfileAssociatedChat<V>(v: V) {
+export function isProfileAssociatedChat<V>(
+  v: V,
+): v is ProfileAssociatedChat & V {
   return is$typed(v, id, hashProfileAssociatedChat);
 }
 
-export function validateProfileAssociatedChat<V>(v: V) {
+export function validateProfileAssociatedChat<V>(
+  v: V,
+): ValidationResult<ProfileAssociatedChat & V> {
   return validate<ProfileAssociatedChat & V>(v, id, hashProfileAssociatedChat);
 }
 
@@ -140,11 +153,13 @@ export interface ViewerState {
 
 const hashViewerState = "viewerState";
 
-export function isViewerState<V>(v: V) {
+export function isViewerState<V>(v: V): v is ViewerState & V {
   return is$typed(v, id, hashViewerState);
 }
 
-export function validateViewerState<V>(v: V) {
+export function validateViewerState<V>(
+  v: V,
+): ValidationResult<ViewerState & V> {
   return validate<ViewerState & V>(v, id, hashViewerState);
 }
 
@@ -157,11 +172,13 @@ export interface KnownFollowers {
 
 const hashKnownFollowers = "knownFollowers";
 
-export function isKnownFollowers<V>(v: V) {
+export function isKnownFollowers<V>(v: V): v is KnownFollowers & V {
   return is$typed(v, id, hashKnownFollowers);
 }
 
-export function validateKnownFollowers<V>(v: V) {
+export function validateKnownFollowers<V>(
+  v: V,
+): ValidationResult<KnownFollowers & V> {
   return validate<KnownFollowers & V>(v, id, hashKnownFollowers);
 }
 
@@ -193,11 +210,13 @@ export interface ContentLabelPref {
 
 const hashContentLabelPref = "contentLabelPref";
 
-export function isContentLabelPref<V>(v: V) {
+export function isContentLabelPref<V>(v: V): v is ContentLabelPref & V {
   return is$typed(v, id, hashContentLabelPref);
 }
 
-export function validateContentLabelPref<V>(v: V) {
+export function validateContentLabelPref<V>(
+  v: V,
+): ValidationResult<ContentLabelPref & V> {
   return validate<ContentLabelPref & V>(v, id, hashContentLabelPref);
 }
 
@@ -211,11 +230,11 @@ export interface SavedFeed {
 
 const hashSavedFeed = "savedFeed";
 
-export function isSavedFeed<V>(v: V) {
+export function isSavedFeed<V>(v: V): v is SavedFeed & V {
   return is$typed(v, id, hashSavedFeed);
 }
 
-export function validateSavedFeed<V>(v: V) {
+export function validateSavedFeed<V>(v: V): ValidationResult<SavedFeed & V> {
   return validate<SavedFeed & V>(v, id, hashSavedFeed);
 }
 
@@ -226,11 +245,13 @@ export interface SavedFeedsPref {
 
 const hashSavedFeedsPref = "savedFeedsPref";
 
-export function isSavedFeedsPref<V>(v: V) {
+export function isSavedFeedsPref<V>(v: V): v is SavedFeedsPref & V {
   return is$typed(v, id, hashSavedFeedsPref);
 }
 
-export function validateSavedFeedsPref<V>(v: V) {
+export function validateSavedFeedsPref<V>(
+  v: V,
+): ValidationResult<SavedFeedsPref & V> {
   return validate<SavedFeedsPref & V>(v, id, hashSavedFeedsPref);
 }
 
@@ -242,11 +263,13 @@ export interface PersonalDetailsPref {
 
 const hashPersonalDetailsPref = "personalDetailsPref";
 
-export function isPersonalDetailsPref<V>(v: V) {
+export function isPersonalDetailsPref<V>(v: V): v is PersonalDetailsPref & V {
   return is$typed(v, id, hashPersonalDetailsPref);
 }
 
-export function validatePersonalDetailsPref<V>(v: V) {
+export function validatePersonalDetailsPref<V>(
+  v: V,
+): ValidationResult<PersonalDetailsPref & V> {
   return validate<PersonalDetailsPref & V>(v, id, hashPersonalDetailsPref);
 }
 
@@ -268,11 +291,13 @@ export interface FeedViewPref {
 
 const hashFeedViewPref = "feedViewPref";
 
-export function isFeedViewPref<V>(v: V) {
+export function isFeedViewPref<V>(v: V): v is FeedViewPref & V {
   return is$typed(v, id, hashFeedViewPref);
 }
 
-export function validateFeedViewPref<V>(v: V) {
+export function validateFeedViewPref<V>(
+  v: V,
+): ValidationResult<FeedViewPref & V> {
   return validate<FeedViewPref & V>(v, id, hashFeedViewPref);
 }
 
@@ -290,11 +315,13 @@ export interface ThreadViewPref {
 
 const hashThreadViewPref = "threadViewPref";
 
-export function isThreadViewPref<V>(v: V) {
+export function isThreadViewPref<V>(v: V): v is ThreadViewPref & V {
   return is$typed(v, id, hashThreadViewPref);
 }
 
-export function validateThreadViewPref<V>(v: V) {
+export function validateThreadViewPref<V>(
+  v: V,
+): ValidationResult<ThreadViewPref & V> {
   return validate<ThreadViewPref & V>(v, id, hashThreadViewPref);
 }
 
@@ -306,11 +333,13 @@ export interface InterestsPref {
 
 const hashInterestsPref = "interestsPref";
 
-export function isInterestsPref<V>(v: V) {
+export function isInterestsPref<V>(v: V): v is InterestsPref & V {
   return is$typed(v, id, hashInterestsPref);
 }
 
-export function validateInterestsPref<V>(v: V) {
+export function validateInterestsPref<V>(
+  v: V,
+): ValidationResult<InterestsPref & V> {
   return validate<InterestsPref & V>(v, id, hashInterestsPref);
 }
 
@@ -338,11 +367,11 @@ export interface MutedWord {
 
 const hashMutedWord = "mutedWord";
 
-export function isMutedWord<V>(v: V) {
+export function isMutedWord<V>(v: V): v is MutedWord & V {
   return is$typed(v, id, hashMutedWord);
 }
 
-export function validateMutedWord<V>(v: V) {
+export function validateMutedWord<V>(v: V): ValidationResult<MutedWord & V> {
   return validate<MutedWord & V>(v, id, hashMutedWord);
 }
 
@@ -354,11 +383,13 @@ export interface MutedWordsPref {
 
 const hashMutedWordsPref = "mutedWordsPref";
 
-export function isMutedWordsPref<V>(v: V) {
+export function isMutedWordsPref<V>(v: V): v is MutedWordsPref & V {
   return is$typed(v, id, hashMutedWordsPref);
 }
 
-export function validateMutedWordsPref<V>(v: V) {
+export function validateMutedWordsPref<V>(
+  v: V,
+): ValidationResult<MutedWordsPref & V> {
   return validate<MutedWordsPref & V>(v, id, hashMutedWordsPref);
 }
 
@@ -370,11 +401,13 @@ export interface HiddenPostsPref {
 
 const hashHiddenPostsPref = "hiddenPostsPref";
 
-export function isHiddenPostsPref<V>(v: V) {
+export function isHiddenPostsPref<V>(v: V): v is HiddenPostsPref & V {
   return is$typed(v, id, hashHiddenPostsPref);
 }
 
-export function validateHiddenPostsPref<V>(v: V) {
+export function validateHiddenPostsPref<V>(
+  v: V,
+): ValidationResult<HiddenPostsPref & V> {
   return validate<HiddenPostsPref & V>(v, id, hashHiddenPostsPref);
 }
 
@@ -385,11 +418,13 @@ export interface LabelersPref {
 
 const hashLabelersPref = "labelersPref";
 
-export function isLabelersPref<V>(v: V) {
+export function isLabelersPref<V>(v: V): v is LabelersPref & V {
   return is$typed(v, id, hashLabelersPref);
 }
 
-export function validateLabelersPref<V>(v: V) {
+export function validateLabelersPref<V>(
+  v: V,
+): ValidationResult<LabelersPref & V> {
   return validate<LabelersPref & V>(v, id, hashLabelersPref);
 }
 
@@ -400,10 +435,12 @@ export interface LabelerPrefItem {
 
 const hashLabelerPrefItem = "labelerPrefItem";
 
-export function isLabelerPrefItem<V>(v: V) {
+export function isLabelerPrefItem<V>(v: V): v is LabelerPrefItem & V {
   return is$typed(v, id, hashLabelerPrefItem);
 }
 
-export function validateLabelerPrefItem<V>(v: V) {
+export function validateLabelerPrefItem<V>(
+  v: V,
+): ValidationResult<LabelerPrefItem & V> {
   return validate<LabelerPrefItem & V>(v, id, hashLabelerPrefItem);
 }

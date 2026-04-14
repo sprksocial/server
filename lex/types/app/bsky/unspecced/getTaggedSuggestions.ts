@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -41,10 +42,10 @@ export interface Suggestion {
 
 const hashSuggestion = "suggestion";
 
-export function isSuggestion<V>(v: V) {
+export function isSuggestion<V>(v: V): v is Suggestion & V {
   return is$typed(v, id, hashSuggestion);
 }
 
-export function validateSuggestion<V>(v: V) {
+export function validateSuggestion<V>(v: V): ValidationResult<Suggestion & V> {
   return validate<Suggestion & V>(v, id, hashSuggestion);
 }

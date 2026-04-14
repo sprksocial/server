@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as SoSprkEmbedMention from "./mention.ts";
 import type * as SoSprkEmbedRecord from "./record.ts";
@@ -29,11 +30,11 @@ export interface Placement {
 
 const hashPlacement = "placement";
 
-export function isPlacement<V>(v: V) {
+export function isPlacement<V>(v: V): v is Placement & V {
   return is$typed(v, id, hashPlacement);
 }
 
-export function validatePlacement<V>(v: V) {
+export function validatePlacement<V>(v: V): ValidationResult<Placement & V> {
   return validate<Placement & V>(v, id, hashPlacement);
 }
 
@@ -48,11 +49,11 @@ export interface Frame {
 
 const hashFrame = "frame";
 
-export function isFrame<V>(v: V) {
+export function isFrame<V>(v: V): v is Frame & V {
   return is$typed(v, id, hashFrame);
 }
 
-export function validateFrame<V>(v: V) {
+export function validateFrame<V>(v: V): ValidationResult<Frame & V> {
   return validate<Frame & V>(v, id, hashFrame);
 }
 
@@ -64,10 +65,10 @@ export interface MediaRef {
 
 const hashMediaRef = "mediaRef";
 
-export function isMediaRef<V>(v: V) {
+export function isMediaRef<V>(v: V): v is MediaRef & V {
   return is$typed(v, id, hashMediaRef);
 }
 
-export function validateMediaRef<V>(v: V) {
+export function validateMediaRef<V>(v: V): ValidationResult<MediaRef & V> {
   return validate<MediaRef & V>(v, id, hashMediaRef);
 }

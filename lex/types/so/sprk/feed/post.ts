@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as SoSprkMediaImages from "../media/images.ts";
 import type * as SoSprkMediaVideo from "../media/video.ts";
@@ -33,11 +34,11 @@ export interface Record {
 
 const hashRecord = "main";
 
-export function isRecord<V>(v: V) {
+export function isRecord<V>(v: V): v is Record & V {
   return is$typed(v, id, hashRecord);
 }
 
-export function validateRecord<V>(v: V) {
+export function validateRecord<V>(v: V): ValidationResult<Record & V> {
   return validate<Record & V>(v, id, hashRecord, true);
 }
 
@@ -53,10 +54,10 @@ export interface CaptionRef {
 
 const hashCaptionRef = "captionRef";
 
-export function isCaptionRef<V>(v: V) {
+export function isCaptionRef<V>(v: V): v is CaptionRef & V {
   return is$typed(v, id, hashCaptionRef);
 }
 
-export function validateCaptionRef<V>(v: V) {
+export function validateCaptionRef<V>(v: V): ValidationResult<CaptionRef & V> {
   return validate<CaptionRef & V>(v, id, hashCaptionRef);
 }

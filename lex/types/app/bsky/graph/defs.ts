@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 import type * as AppBskyActorDefs from "../actor/defs.ts";
@@ -26,11 +27,13 @@ export interface ListViewBasic {
 
 const hashListViewBasic = "listViewBasic";
 
-export function isListViewBasic<V>(v: V) {
+export function isListViewBasic<V>(v: V): v is ListViewBasic & V {
   return is$typed(v, id, hashListViewBasic);
 }
 
-export function validateListViewBasic<V>(v: V) {
+export function validateListViewBasic<V>(
+  v: V,
+): ValidationResult<ListViewBasic & V> {
   return validate<ListViewBasic & V>(v, id, hashListViewBasic);
 }
 
@@ -52,11 +55,11 @@ export interface ListView {
 
 const hashListView = "listView";
 
-export function isListView<V>(v: V) {
+export function isListView<V>(v: V): v is ListView & V {
   return is$typed(v, id, hashListView);
 }
 
-export function validateListView<V>(v: V) {
+export function validateListView<V>(v: V): ValidationResult<ListView & V> {
   return validate<ListView & V>(v, id, hashListView);
 }
 
@@ -68,11 +71,13 @@ export interface ListItemView {
 
 const hashListItemView = "listItemView";
 
-export function isListItemView<V>(v: V) {
+export function isListItemView<V>(v: V): v is ListItemView & V {
   return is$typed(v, id, hashListItemView);
 }
 
-export function validateListItemView<V>(v: V) {
+export function validateListItemView<V>(
+  v: V,
+): ValidationResult<ListItemView & V> {
   return validate<ListItemView & V>(v, id, hashListItemView);
 }
 
@@ -93,11 +98,13 @@ export interface StarterPackView {
 
 const hashStarterPackView = "starterPackView";
 
-export function isStarterPackView<V>(v: V) {
+export function isStarterPackView<V>(v: V): v is StarterPackView & V {
   return is$typed(v, id, hashStarterPackView);
 }
 
-export function validateStarterPackView<V>(v: V) {
+export function validateStarterPackView<V>(
+  v: V,
+): ValidationResult<StarterPackView & V> {
   return validate<StarterPackView & V>(v, id, hashStarterPackView);
 }
 
@@ -116,11 +123,13 @@ export interface StarterPackViewBasic {
 
 const hashStarterPackViewBasic = "starterPackViewBasic";
 
-export function isStarterPackViewBasic<V>(v: V) {
+export function isStarterPackViewBasic<V>(v: V): v is StarterPackViewBasic & V {
   return is$typed(v, id, hashStarterPackViewBasic);
 }
 
-export function validateStarterPackViewBasic<V>(v: V) {
+export function validateStarterPackViewBasic<V>(
+  v: V,
+): ValidationResult<StarterPackViewBasic & V> {
   return validate<StarterPackViewBasic & V>(v, id, hashStarterPackViewBasic);
 }
 
@@ -131,11 +140,11 @@ export type ListPurpose =
   | (string & globalThis.Record<PropertyKey, never>);
 
 /** A list of actors to apply an aggregate moderation action (mute/block) on. */
-export const MODLIST = `${id}#modlist`;
+export const MODLIST: string = `${id}#modlist`;
 /** A list of actors used for curation purposes such as list feeds or interaction gating. */
-export const CURATELIST = `${id}#curatelist`;
+export const CURATELIST: string = `${id}#curatelist`;
 /** A list of actors used for only for reference purposes such as within a starter pack. */
-export const REFERENCELIST = `${id}#referencelist`;
+export const REFERENCELIST: string = `${id}#referencelist`;
 
 export interface ListViewerState {
   $type?: "app.bsky.graph.defs#listViewerState";
@@ -145,11 +154,13 @@ export interface ListViewerState {
 
 const hashListViewerState = "listViewerState";
 
-export function isListViewerState<V>(v: V) {
+export function isListViewerState<V>(v: V): v is ListViewerState & V {
   return is$typed(v, id, hashListViewerState);
 }
 
-export function validateListViewerState<V>(v: V) {
+export function validateListViewerState<V>(
+  v: V,
+): ValidationResult<ListViewerState & V> {
   return validate<ListViewerState & V>(v, id, hashListViewerState);
 }
 
@@ -162,11 +173,13 @@ export interface NotFoundActor {
 
 const hashNotFoundActor = "notFoundActor";
 
-export function isNotFoundActor<V>(v: V) {
+export function isNotFoundActor<V>(v: V): v is NotFoundActor & V {
   return is$typed(v, id, hashNotFoundActor);
 }
 
-export function validateNotFoundActor<V>(v: V) {
+export function validateNotFoundActor<V>(
+  v: V,
+): ValidationResult<NotFoundActor & V> {
   return validate<NotFoundActor & V>(v, id, hashNotFoundActor);
 }
 
@@ -178,14 +191,24 @@ export interface Relationship {
   following?: string;
   /** if the actor is followed by this DID, contains the AT-URI of the follow record */
   followedBy?: string;
+  /** if the actor blocks this DID, this is the AT-URI of the block record */
+  blocking?: string;
+  /** if the actor is blocked by this DID, contains the AT-URI of the block record */
+  blockedBy?: string;
+  /** if the actor blocks this DID via a block list, this is the AT-URI of the listblock record */
+  blockingByList?: string;
+  /** if the actor is blocked by this DID via a block list, contains the AT-URI of the listblock record */
+  blockedByList?: string;
 }
 
 const hashRelationship = "relationship";
 
-export function isRelationship<V>(v: V) {
+export function isRelationship<V>(v: V): v is Relationship & V {
   return is$typed(v, id, hashRelationship);
 }
 
-export function validateRelationship<V>(v: V) {
+export function validateRelationship<V>(
+  v: V,
+): ValidationResult<Relationship & V> {
   return validate<Relationship & V>(v, id, hashRelationship);
 }

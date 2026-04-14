@@ -55,9 +55,21 @@ import type * as ToolsOzoneModerationEmitEvent from "./types/tools/ozone/moderat
 import type * as ToolsOzoneModerationSearchRepos from "./types/tools/ozone/moderation/searchRepos.ts";
 import type * as ToolsOzoneModerationGetAccountTimeline from "./types/tools/ozone/moderation/getAccountTimeline.ts";
 import type * as ToolsOzoneModerationGetRepos from "./types/tools/ozone/moderation/getRepos.ts";
+import type * as AppBskyDraftCreateDraft from "./types/app/bsky/draft/createDraft.ts";
+import type * as AppBskyDraftUpdateDraft from "./types/app/bsky/draft/updateDraft.ts";
+import type * as AppBskyDraftGetDrafts from "./types/app/bsky/draft/getDrafts.ts";
+import type * as AppBskyDraftDeleteDraft from "./types/app/bsky/draft/deleteDraft.ts";
 import type * as AppBskyVideoUploadVideo from "./types/app/bsky/video/uploadVideo.ts";
 import type * as AppBskyVideoGetJobStatus from "./types/app/bsky/video/getJobStatus.ts";
 import type * as AppBskyVideoGetUploadLimits from "./types/app/bsky/video/getUploadLimits.ts";
+import type * as AppBskyContactSendNotification from "./types/app/bsky/contact/sendNotification.ts";
+import type * as AppBskyContactGetSyncStatus from "./types/app/bsky/contact/getSyncStatus.ts";
+import type * as AppBskyContactStartPhoneVerification from "./types/app/bsky/contact/startPhoneVerification.ts";
+import type * as AppBskyContactGetMatches from "./types/app/bsky/contact/getMatches.ts";
+import type * as AppBskyContactImportContacts from "./types/app/bsky/contact/importContacts.ts";
+import type * as AppBskyContactDismissMatch from "./types/app/bsky/contact/dismissMatch.ts";
+import type * as AppBskyContactRemoveData from "./types/app/bsky/contact/removeData.ts";
+import type * as AppBskyContactVerifyPhone from "./types/app/bsky/contact/verifyPhone.ts";
 import type * as AppBskyBookmarkDeleteBookmark from "./types/app/bsky/bookmark/deleteBookmark.ts";
 import type * as AppBskyBookmarkGetBookmarks from "./types/app/bsky/bookmark/getBookmarks.ts";
 import type * as AppBskyBookmarkCreateBookmark from "./types/app/bsky/bookmark/createBookmark.ts";
@@ -73,7 +85,9 @@ import type * as AppBskyNotificationListNotifications from "./types/app/bsky/not
 import type * as AppBskyNotificationGetUnreadCount from "./types/app/bsky/notification/getUnreadCount.ts";
 import type * as AppBskyUnspeccedGetSuggestedFeedsSkeleton from "./types/app/bsky/unspecced/getSuggestedFeedsSkeleton.ts";
 import type * as AppBskyUnspeccedSearchStarterPacksSkeleton from "./types/app/bsky/unspecced/searchStarterPacksSkeleton.ts";
+import type * as AppBskyUnspeccedGetSuggestedUsersForExplore from "./types/app/bsky/unspecced/getSuggestedUsersForExplore.ts";
 import type * as AppBskyUnspeccedGetOnboardingSuggestedStarterPacksSkeleton from "./types/app/bsky/unspecced/getOnboardingSuggestedStarterPacksSkeleton.ts";
+import type * as AppBskyUnspeccedGetSuggestedUsersForExploreSkeleton from "./types/app/bsky/unspecced/getSuggestedUsersForExploreSkeleton.ts";
 import type * as AppBskyUnspeccedGetSuggestedUsers from "./types/app/bsky/unspecced/getSuggestedUsers.ts";
 import type * as AppBskyUnspeccedGetPostThreadOtherV2 from "./types/app/bsky/unspecced/getPostThreadOtherV2.ts";
 import type * as AppBskyUnspeccedGetSuggestedStarterPacks from "./types/app/bsky/unspecced/getSuggestedStarterPacks.ts";
@@ -85,11 +99,17 @@ import type * as AppBskyUnspeccedGetTrends from "./types/app/bsky/unspecced/getT
 import type * as AppBskyUnspeccedSearchActorsSkeleton from "./types/app/bsky/unspecced/searchActorsSkeleton.ts";
 import type * as AppBskyUnspeccedGetSuggestionsSkeleton from "./types/app/bsky/unspecced/getSuggestionsSkeleton.ts";
 import type * as AppBskyUnspeccedSearchPostsSkeleton from "./types/app/bsky/unspecced/searchPostsSkeleton.ts";
+import type * as AppBskyUnspeccedGetOnboardingSuggestedUsersSkeleton from "./types/app/bsky/unspecced/getOnboardingSuggestedUsersSkeleton.ts";
+import type * as AppBskyUnspeccedGetSuggestedUsersForDiscoverSkeleton from "./types/app/bsky/unspecced/getSuggestedUsersForDiscoverSkeleton.ts";
+import type * as AppBskyUnspeccedGetSuggestedUsersForDiscover from "./types/app/bsky/unspecced/getSuggestedUsersForDiscover.ts";
 import type * as AppBskyUnspeccedGetAgeAssuranceState from "./types/app/bsky/unspecced/getAgeAssuranceState.ts";
 import type * as AppBskyUnspeccedGetPopularFeedGenerators from "./types/app/bsky/unspecced/getPopularFeedGenerators.ts";
+import type * as AppBskyUnspeccedGetSuggestedOnboardingUsers from "./types/app/bsky/unspecced/getSuggestedOnboardingUsers.ts";
+import type * as AppBskyUnspeccedGetSuggestedUsersForSeeMore from "./types/app/bsky/unspecced/getSuggestedUsersForSeeMore.ts";
 import type * as AppBskyUnspeccedInitAgeAssurance from "./types/app/bsky/unspecced/initAgeAssurance.ts";
 import type * as AppBskyUnspeccedGetTrendingTopics from "./types/app/bsky/unspecced/getTrendingTopics.ts";
 import type * as AppBskyUnspeccedGetTaggedSuggestions from "./types/app/bsky/unspecced/getTaggedSuggestions.ts";
+import type * as AppBskyUnspeccedGetSuggestedUsersForSeeMoreSkeleton from "./types/app/bsky/unspecced/getSuggestedUsersForSeeMoreSkeleton.ts";
 import type * as AppBskyUnspeccedGetSuggestedFeeds from "./types/app/bsky/unspecced/getSuggestedFeeds.ts";
 import type * as AppBskyUnspeccedGetTrendsSkeleton from "./types/app/bsky/unspecced/getTrendsSkeleton.ts";
 import type * as AppBskyUnspeccedGetConfig from "./types/app/bsky/unspecced/getConfig.ts";
@@ -1119,7 +1139,9 @@ export class AppNS {
 
 export class AppBskyNS {
   _server: Server;
+  draft: AppBskyDraftNS;
   video: AppBskyVideoNS;
+  contact: AppBskyContactNS;
   bookmark: AppBskyBookmarkNS;
   embed: AppBskyEmbedNS;
   notification: AppBskyNotificationNS;
@@ -1133,7 +1155,9 @@ export class AppBskyNS {
 
   constructor(server: Server) {
     this._server = server;
+    this.draft = new AppBskyDraftNS(server);
     this.video = new AppBskyVideoNS(server);
+    this.contact = new AppBskyContactNS(server);
     this.bookmark = new AppBskyBookmarkNS(server);
     this.embed = new AppBskyEmbedNS(server);
     this.notification = new AppBskyNotificationNS(server);
@@ -1144,6 +1168,62 @@ export class AppBskyNS {
     this.ageassurance = new AppBskyAgeassuranceNS(server);
     this.actor = new AppBskyActorNS(server);
     this.labeler = new AppBskyLabelerNS(server);
+  }
+}
+
+export class AppBskyDraftNS {
+  _server: Server;
+
+  constructor(server: Server) {
+    this._server = server;
+  }
+
+  createDraft<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyDraftCreateDraft.QueryParams,
+      AppBskyDraftCreateDraft.HandlerInput,
+      AppBskyDraftCreateDraft.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.draft.createDraft"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  updateDraft<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyDraftUpdateDraft.QueryParams,
+      AppBskyDraftUpdateDraft.HandlerInput,
+      AppBskyDraftUpdateDraft.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.draft.updateDraft"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getDrafts<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyDraftGetDrafts.QueryParams,
+      AppBskyDraftGetDrafts.HandlerInput,
+      AppBskyDraftGetDrafts.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.draft.getDrafts"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  deleteDraft<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyDraftDeleteDraft.QueryParams,
+      AppBskyDraftDeleteDraft.HandlerInput,
+      AppBskyDraftDeleteDraft.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.draft.deleteDraft"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
   }
 }
 
@@ -1187,6 +1267,110 @@ export class AppBskyVideoNS {
     >,
   ) {
     const nsid = "app.bsky.video.getUploadLimits"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+}
+
+export class AppBskyContactNS {
+  _server: Server;
+
+  constructor(server: Server) {
+    this._server = server;
+  }
+
+  sendNotification<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyContactSendNotification.QueryParams,
+      AppBskyContactSendNotification.HandlerInput,
+      AppBskyContactSendNotification.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.contact.sendNotification"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getSyncStatus<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyContactGetSyncStatus.QueryParams,
+      AppBskyContactGetSyncStatus.HandlerInput,
+      AppBskyContactGetSyncStatus.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.contact.getSyncStatus"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  startPhoneVerification<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyContactStartPhoneVerification.QueryParams,
+      AppBskyContactStartPhoneVerification.HandlerInput,
+      AppBskyContactStartPhoneVerification.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.contact.startPhoneVerification"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getMatches<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyContactGetMatches.QueryParams,
+      AppBskyContactGetMatches.HandlerInput,
+      AppBskyContactGetMatches.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.contact.getMatches"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  importContacts<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyContactImportContacts.QueryParams,
+      AppBskyContactImportContacts.HandlerInput,
+      AppBskyContactImportContacts.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.contact.importContacts"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  dismissMatch<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyContactDismissMatch.QueryParams,
+      AppBskyContactDismissMatch.HandlerInput,
+      AppBskyContactDismissMatch.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.contact.dismissMatch"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  removeData<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyContactRemoveData.QueryParams,
+      AppBskyContactRemoveData.HandlerInput,
+      AppBskyContactRemoveData.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.contact.removeData"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  verifyPhone<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyContactVerifyPhone.QueryParams,
+      AppBskyContactVerifyPhone.HandlerInput,
+      AppBskyContactVerifyPhone.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.contact.verifyPhone"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 }
@@ -1402,6 +1586,18 @@ export class AppBskyUnspeccedNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
+  getSuggestedUsersForExplore<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetSuggestedUsersForExplore.QueryParams,
+      AppBskyUnspeccedGetSuggestedUsersForExplore.HandlerInput,
+      AppBskyUnspeccedGetSuggestedUsersForExplore.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getSuggestedUsersForExplore"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
   getOnboardingSuggestedStarterPacksSkeleton<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -1412,6 +1608,18 @@ export class AppBskyUnspeccedNS {
   ) {
     const nsid =
       "app.bsky.unspecced.getOnboardingSuggestedStarterPacksSkeleton"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getSuggestedUsersForExploreSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetSuggestedUsersForExploreSkeleton.QueryParams,
+      AppBskyUnspeccedGetSuggestedUsersForExploreSkeleton.HandlerInput,
+      AppBskyUnspeccedGetSuggestedUsersForExploreSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getSuggestedUsersForExploreSkeleton"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1547,6 +1755,42 @@ export class AppBskyUnspeccedNS {
     return this._server.xrpc.method(nsid, cfg);
   }
 
+  getOnboardingSuggestedUsersSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetOnboardingSuggestedUsersSkeleton.QueryParams,
+      AppBskyUnspeccedGetOnboardingSuggestedUsersSkeleton.HandlerInput,
+      AppBskyUnspeccedGetOnboardingSuggestedUsersSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getOnboardingSuggestedUsersSkeleton"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getSuggestedUsersForDiscoverSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetSuggestedUsersForDiscoverSkeleton.QueryParams,
+      AppBskyUnspeccedGetSuggestedUsersForDiscoverSkeleton.HandlerInput,
+      AppBskyUnspeccedGetSuggestedUsersForDiscoverSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getSuggestedUsersForDiscoverSkeleton"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getSuggestedUsersForDiscover<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetSuggestedUsersForDiscover.QueryParams,
+      AppBskyUnspeccedGetSuggestedUsersForDiscover.HandlerInput,
+      AppBskyUnspeccedGetSuggestedUsersForDiscover.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getSuggestedUsersForDiscover"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
   getAgeAssuranceState<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -1568,6 +1812,30 @@ export class AppBskyUnspeccedNS {
     >,
   ) {
     const nsid = "app.bsky.unspecced.getPopularFeedGenerators"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getSuggestedOnboardingUsers<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetSuggestedOnboardingUsers.QueryParams,
+      AppBskyUnspeccedGetSuggestedOnboardingUsers.HandlerInput,
+      AppBskyUnspeccedGetSuggestedOnboardingUsers.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getSuggestedOnboardingUsers"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getSuggestedUsersForSeeMore<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetSuggestedUsersForSeeMore.QueryParams,
+      AppBskyUnspeccedGetSuggestedUsersForSeeMore.HandlerInput,
+      AppBskyUnspeccedGetSuggestedUsersForSeeMore.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getSuggestedUsersForSeeMore"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 
@@ -1604,6 +1872,18 @@ export class AppBskyUnspeccedNS {
     >,
   ) {
     const nsid = "app.bsky.unspecced.getTaggedSuggestions"; // @ts-ignore - dynamically generated
+    return this._server.xrpc.method(nsid, cfg);
+  }
+
+  getSuggestedUsersForSeeMoreSkeleton<A extends Auth = void>(
+    cfg: MethodConfigOrHandler<
+      A,
+      AppBskyUnspeccedGetSuggestedUsersForSeeMoreSkeleton.QueryParams,
+      AppBskyUnspeccedGetSuggestedUsersForSeeMoreSkeleton.HandlerInput,
+      AppBskyUnspeccedGetSuggestedUsersForSeeMoreSkeleton.HandlerOutput
+    >,
+  ) {
+    const nsid = "app.bsky.unspecced.getSuggestedUsersForSeeMoreSkeleton"; // @ts-ignore - dynamically generated
     return this._server.xrpc.method(nsid, cfg);
   }
 

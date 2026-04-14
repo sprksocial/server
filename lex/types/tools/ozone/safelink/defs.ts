@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -27,11 +28,11 @@ export interface Event {
 
 const hashEvent = "event";
 
-export function isEvent<V>(v: V) {
+export function isEvent<V>(v: V): v is Event & V {
   return is$typed(v, id, hashEvent);
 }
 
-export function validateEvent<V>(v: V) {
+export function validateEvent<V>(v: V): ValidationResult<Event & V> {
   return validate<Event & V>(v, id, hashEvent);
 }
 
@@ -76,10 +77,10 @@ export interface UrlRule {
 
 const hashUrlRule = "urlRule";
 
-export function isUrlRule<V>(v: V) {
+export function isUrlRule<V>(v: V): v is UrlRule & V {
   return is$typed(v, id, hashUrlRule);
 }
 
-export function validateUrlRule<V>(v: V) {
+export function validateUrlRule<V>(v: V): ValidationResult<UrlRule & V> {
   return validate<UrlRule & V>(v, id, hashUrlRule);
 }

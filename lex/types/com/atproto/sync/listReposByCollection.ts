@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -42,10 +43,10 @@ export interface Repo {
 
 const hashRepo = "repo";
 
-export function isRepo<V>(v: V) {
+export function isRepo<V>(v: V): v is Repo & V {
   return is$typed(v, id, hashRepo);
 }
 
-export function validateRepo<V>(v: V) {
+export function validateRepo<V>(v: V): ValidationResult<Repo & V> {
   return validate<Repo & V>(v, id, hashRepo);
 }

@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as SoSprkRichtextFacet from "../richtext/facet.ts";
 import type * as SoSprkMediaImage from "../media/image.ts";
@@ -29,11 +30,11 @@ export interface Record {
 
 const hashRecord = "main";
 
-export function isRecord<V>(v: V) {
+export function isRecord<V>(v: V): v is Record & V {
   return is$typed(v, id, hashRecord);
 }
 
-export function validateRecord<V>(v: V) {
+export function validateRecord<V>(v: V): ValidationResult<Record & V> {
   return validate<Record & V>(v, id, hashRecord, true);
 }
 
@@ -47,10 +48,10 @@ export interface ReplyRef {
 
 const hashReplyRef = "replyRef";
 
-export function isReplyRef<V>(v: V) {
+export function isReplyRef<V>(v: V): v is ReplyRef & V {
   return is$typed(v, id, hashReplyRef);
 }
 
-export function validateReplyRef<V>(v: V) {
+export function validateReplyRef<V>(v: V): ValidationResult<ReplyRef & V> {
   return validate<ReplyRef & V>(v, id, hashReplyRef);
 }

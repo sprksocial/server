@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
 import type * as AppBskyGraphDefs from "../graph/defs.ts";
@@ -33,11 +34,13 @@ export interface ProfileViewBasic {
 
 const hashProfileViewBasic = "profileViewBasic";
 
-export function isProfileViewBasic<V>(v: V) {
+export function isProfileViewBasic<V>(v: V): v is ProfileViewBasic & V {
   return is$typed(v, id, hashProfileViewBasic);
 }
 
-export function validateProfileViewBasic<V>(v: V) {
+export function validateProfileViewBasic<V>(
+  v: V,
+): ValidationResult<ProfileViewBasic & V> {
   return validate<ProfileViewBasic & V>(v, id, hashProfileViewBasic);
 }
 
@@ -62,11 +65,13 @@ export interface ProfileView {
 
 const hashProfileView = "profileView";
 
-export function isProfileView<V>(v: V) {
+export function isProfileView<V>(v: V): v is ProfileView & V {
   return is$typed(v, id, hashProfileView);
 }
 
-export function validateProfileView<V>(v: V) {
+export function validateProfileView<V>(
+  v: V,
+): ValidationResult<ProfileView & V> {
   return validate<ProfileView & V>(v, id, hashProfileView);
 }
 
@@ -98,11 +103,13 @@ export interface ProfileViewDetailed {
 
 const hashProfileViewDetailed = "profileViewDetailed";
 
-export function isProfileViewDetailed<V>(v: V) {
+export function isProfileViewDetailed<V>(v: V): v is ProfileViewDetailed & V {
   return is$typed(v, id, hashProfileViewDetailed);
 }
 
-export function validateProfileViewDetailed<V>(v: V) {
+export function validateProfileViewDetailed<V>(
+  v: V,
+): ValidationResult<ProfileViewDetailed & V> {
   return validate<ProfileViewDetailed & V>(v, id, hashProfileViewDetailed);
 }
 
@@ -114,15 +121,18 @@ export interface ProfileAssociated {
   labeler?: boolean;
   chat?: ProfileAssociatedChat;
   activitySubscription?: ProfileAssociatedActivitySubscription;
+  germ?: ProfileAssociatedGerm;
 }
 
 const hashProfileAssociated = "profileAssociated";
 
-export function isProfileAssociated<V>(v: V) {
+export function isProfileAssociated<V>(v: V): v is ProfileAssociated & V {
   return is$typed(v, id, hashProfileAssociated);
 }
 
-export function validateProfileAssociated<V>(v: V) {
+export function validateProfileAssociated<V>(
+  v: V,
+): ValidationResult<ProfileAssociated & V> {
   return validate<ProfileAssociated & V>(v, id, hashProfileAssociated);
 }
 
@@ -137,12 +147,39 @@ export interface ProfileAssociatedChat {
 
 const hashProfileAssociatedChat = "profileAssociatedChat";
 
-export function isProfileAssociatedChat<V>(v: V) {
+export function isProfileAssociatedChat<V>(
+  v: V,
+): v is ProfileAssociatedChat & V {
   return is$typed(v, id, hashProfileAssociatedChat);
 }
 
-export function validateProfileAssociatedChat<V>(v: V) {
+export function validateProfileAssociatedChat<V>(
+  v: V,
+): ValidationResult<ProfileAssociatedChat & V> {
   return validate<ProfileAssociatedChat & V>(v, id, hashProfileAssociatedChat);
+}
+
+export interface ProfileAssociatedGerm {
+  $type?: "app.bsky.actor.defs#profileAssociatedGerm";
+  messageMeUrl: string;
+  showButtonTo:
+    | "usersIFollow"
+    | "everyone"
+    | (string & globalThis.Record<PropertyKey, never>);
+}
+
+const hashProfileAssociatedGerm = "profileAssociatedGerm";
+
+export function isProfileAssociatedGerm<V>(
+  v: V,
+): v is ProfileAssociatedGerm & V {
+  return is$typed(v, id, hashProfileAssociatedGerm);
+}
+
+export function validateProfileAssociatedGerm<V>(
+  v: V,
+): ValidationResult<ProfileAssociatedGerm & V> {
+  return validate<ProfileAssociatedGerm & V>(v, id, hashProfileAssociatedGerm);
 }
 
 export interface ProfileAssociatedActivitySubscription {
@@ -157,11 +194,15 @@ export interface ProfileAssociatedActivitySubscription {
 const hashProfileAssociatedActivitySubscription =
   "profileAssociatedActivitySubscription";
 
-export function isProfileAssociatedActivitySubscription<V>(v: V) {
+export function isProfileAssociatedActivitySubscription<V>(
+  v: V,
+): v is ProfileAssociatedActivitySubscription & V {
   return is$typed(v, id, hashProfileAssociatedActivitySubscription);
 }
 
-export function validateProfileAssociatedActivitySubscription<V>(v: V) {
+export function validateProfileAssociatedActivitySubscription<V>(
+  v: V,
+): ValidationResult<ProfileAssociatedActivitySubscription & V> {
   return validate<ProfileAssociatedActivitySubscription & V>(
     v,
     id,
@@ -185,11 +226,13 @@ export interface ViewerState {
 
 const hashViewerState = "viewerState";
 
-export function isViewerState<V>(v: V) {
+export function isViewerState<V>(v: V): v is ViewerState & V {
   return is$typed(v, id, hashViewerState);
 }
 
-export function validateViewerState<V>(v: V) {
+export function validateViewerState<V>(
+  v: V,
+): ValidationResult<ViewerState & V> {
   return validate<ViewerState & V>(v, id, hashViewerState);
 }
 
@@ -202,11 +245,13 @@ export interface KnownFollowers {
 
 const hashKnownFollowers = "knownFollowers";
 
-export function isKnownFollowers<V>(v: V) {
+export function isKnownFollowers<V>(v: V): v is KnownFollowers & V {
   return is$typed(v, id, hashKnownFollowers);
 }
 
-export function validateKnownFollowers<V>(v: V) {
+export function validateKnownFollowers<V>(
+  v: V,
+): ValidationResult<KnownFollowers & V> {
   return validate<KnownFollowers & V>(v, id, hashKnownFollowers);
 }
 
@@ -231,11 +276,13 @@ export interface VerificationState {
 
 const hashVerificationState = "verificationState";
 
-export function isVerificationState<V>(v: V) {
+export function isVerificationState<V>(v: V): v is VerificationState & V {
   return is$typed(v, id, hashVerificationState);
 }
 
-export function validateVerificationState<V>(v: V) {
+export function validateVerificationState<V>(
+  v: V,
+): ValidationResult<VerificationState & V> {
   return validate<VerificationState & V>(v, id, hashVerificationState);
 }
 
@@ -254,11 +301,13 @@ export interface VerificationView {
 
 const hashVerificationView = "verificationView";
 
-export function isVerificationView<V>(v: V) {
+export function isVerificationView<V>(v: V): v is VerificationView & V {
   return is$typed(v, id, hashVerificationView);
 }
 
-export function validateVerificationView<V>(v: V) {
+export function validateVerificationView<V>(
+  v: V,
+): ValidationResult<VerificationView & V> {
   return validate<VerificationView & V>(v, id, hashVerificationView);
 }
 
@@ -268,6 +317,7 @@ export type Preferences = (
   | $Typed<SavedFeedsPref>
   | $Typed<SavedFeedsPrefV2>
   | $Typed<PersonalDetailsPref>
+  | $Typed<DeclaredAgePref>
   | $Typed<FeedViewPref>
   | $Typed<ThreadViewPref>
   | $Typed<InterestsPref>
@@ -277,6 +327,7 @@ export type Preferences = (
   | $Typed<LabelersPref>
   | $Typed<PostInteractionSettingsPref>
   | $Typed<VerificationPrefs>
+  | $Typed<LiveEventPreferences>
   | { $type: string }
 )[];
 
@@ -287,11 +338,13 @@ export interface AdultContentPref {
 
 const hashAdultContentPref = "adultContentPref";
 
-export function isAdultContentPref<V>(v: V) {
+export function isAdultContentPref<V>(v: V): v is AdultContentPref & V {
   return is$typed(v, id, hashAdultContentPref);
 }
 
-export function validateAdultContentPref<V>(v: V) {
+export function validateAdultContentPref<V>(
+  v: V,
+): ValidationResult<AdultContentPref & V> {
   return validate<AdultContentPref & V>(v, id, hashAdultContentPref);
 }
 
@@ -310,11 +363,13 @@ export interface ContentLabelPref {
 
 const hashContentLabelPref = "contentLabelPref";
 
-export function isContentLabelPref<V>(v: V) {
+export function isContentLabelPref<V>(v: V): v is ContentLabelPref & V {
   return is$typed(v, id, hashContentLabelPref);
 }
 
-export function validateContentLabelPref<V>(v: V) {
+export function validateContentLabelPref<V>(
+  v: V,
+): ValidationResult<ContentLabelPref & V> {
   return validate<ContentLabelPref & V>(v, id, hashContentLabelPref);
 }
 
@@ -332,11 +387,11 @@ export interface SavedFeed {
 
 const hashSavedFeed = "savedFeed";
 
-export function isSavedFeed<V>(v: V) {
+export function isSavedFeed<V>(v: V): v is SavedFeed & V {
   return is$typed(v, id, hashSavedFeed);
 }
 
-export function validateSavedFeed<V>(v: V) {
+export function validateSavedFeed<V>(v: V): ValidationResult<SavedFeed & V> {
   return validate<SavedFeed & V>(v, id, hashSavedFeed);
 }
 
@@ -347,11 +402,13 @@ export interface SavedFeedsPrefV2 {
 
 const hashSavedFeedsPrefV2 = "savedFeedsPrefV2";
 
-export function isSavedFeedsPrefV2<V>(v: V) {
+export function isSavedFeedsPrefV2<V>(v: V): v is SavedFeedsPrefV2 & V {
   return is$typed(v, id, hashSavedFeedsPrefV2);
 }
 
-export function validateSavedFeedsPrefV2<V>(v: V) {
+export function validateSavedFeedsPrefV2<V>(
+  v: V,
+): ValidationResult<SavedFeedsPrefV2 & V> {
   return validate<SavedFeedsPrefV2 & V>(v, id, hashSavedFeedsPrefV2);
 }
 
@@ -364,11 +421,13 @@ export interface SavedFeedsPref {
 
 const hashSavedFeedsPref = "savedFeedsPref";
 
-export function isSavedFeedsPref<V>(v: V) {
+export function isSavedFeedsPref<V>(v: V): v is SavedFeedsPref & V {
   return is$typed(v, id, hashSavedFeedsPref);
 }
 
-export function validateSavedFeedsPref<V>(v: V) {
+export function validateSavedFeedsPref<V>(
+  v: V,
+): ValidationResult<SavedFeedsPref & V> {
   return validate<SavedFeedsPref & V>(v, id, hashSavedFeedsPref);
 }
 
@@ -380,12 +439,37 @@ export interface PersonalDetailsPref {
 
 const hashPersonalDetailsPref = "personalDetailsPref";
 
-export function isPersonalDetailsPref<V>(v: V) {
+export function isPersonalDetailsPref<V>(v: V): v is PersonalDetailsPref & V {
   return is$typed(v, id, hashPersonalDetailsPref);
 }
 
-export function validatePersonalDetailsPref<V>(v: V) {
+export function validatePersonalDetailsPref<V>(
+  v: V,
+): ValidationResult<PersonalDetailsPref & V> {
   return validate<PersonalDetailsPref & V>(v, id, hashPersonalDetailsPref);
+}
+
+/** Read-only preference containing value(s) inferred from the user's declared birthdate. Absence of this preference object in the response indicates that the user has not made a declaration. */
+export interface DeclaredAgePref {
+  $type?: "app.bsky.actor.defs#declaredAgePref";
+  /** Indicates if the user has declared that they are over 13 years of age. */
+  isOverAge13?: boolean;
+  /** Indicates if the user has declared that they are over 16 years of age. */
+  isOverAge16?: boolean;
+  /** Indicates if the user has declared that they are over 18 years of age. */
+  isOverAge18?: boolean;
+}
+
+const hashDeclaredAgePref = "declaredAgePref";
+
+export function isDeclaredAgePref<V>(v: V): v is DeclaredAgePref & V {
+  return is$typed(v, id, hashDeclaredAgePref);
+}
+
+export function validateDeclaredAgePref<V>(
+  v: V,
+): ValidationResult<DeclaredAgePref & V> {
+  return validate<DeclaredAgePref & V>(v, id, hashDeclaredAgePref);
 }
 
 export interface FeedViewPref {
@@ -406,11 +490,13 @@ export interface FeedViewPref {
 
 const hashFeedViewPref = "feedViewPref";
 
-export function isFeedViewPref<V>(v: V) {
+export function isFeedViewPref<V>(v: V): v is FeedViewPref & V {
   return is$typed(v, id, hashFeedViewPref);
 }
 
-export function validateFeedViewPref<V>(v: V) {
+export function validateFeedViewPref<V>(
+  v: V,
+): ValidationResult<FeedViewPref & V> {
   return validate<FeedViewPref & V>(v, id, hashFeedViewPref);
 }
 
@@ -428,11 +514,13 @@ export interface ThreadViewPref {
 
 const hashThreadViewPref = "threadViewPref";
 
-export function isThreadViewPref<V>(v: V) {
+export function isThreadViewPref<V>(v: V): v is ThreadViewPref & V {
   return is$typed(v, id, hashThreadViewPref);
 }
 
-export function validateThreadViewPref<V>(v: V) {
+export function validateThreadViewPref<V>(
+  v: V,
+): ValidationResult<ThreadViewPref & V> {
   return validate<ThreadViewPref & V>(v, id, hashThreadViewPref);
 }
 
@@ -444,11 +532,13 @@ export interface InterestsPref {
 
 const hashInterestsPref = "interestsPref";
 
-export function isInterestsPref<V>(v: V) {
+export function isInterestsPref<V>(v: V): v is InterestsPref & V {
   return is$typed(v, id, hashInterestsPref);
 }
 
-export function validateInterestsPref<V>(v: V) {
+export function validateInterestsPref<V>(
+  v: V,
+): ValidationResult<InterestsPref & V> {
   return validate<InterestsPref & V>(v, id, hashInterestsPref);
 }
 
@@ -476,11 +566,11 @@ export interface MutedWord {
 
 const hashMutedWord = "mutedWord";
 
-export function isMutedWord<V>(v: V) {
+export function isMutedWord<V>(v: V): v is MutedWord & V {
   return is$typed(v, id, hashMutedWord);
 }
 
-export function validateMutedWord<V>(v: V) {
+export function validateMutedWord<V>(v: V): ValidationResult<MutedWord & V> {
   return validate<MutedWord & V>(v, id, hashMutedWord);
 }
 
@@ -492,11 +582,13 @@ export interface MutedWordsPref {
 
 const hashMutedWordsPref = "mutedWordsPref";
 
-export function isMutedWordsPref<V>(v: V) {
+export function isMutedWordsPref<V>(v: V): v is MutedWordsPref & V {
   return is$typed(v, id, hashMutedWordsPref);
 }
 
-export function validateMutedWordsPref<V>(v: V) {
+export function validateMutedWordsPref<V>(
+  v: V,
+): ValidationResult<MutedWordsPref & V> {
   return validate<MutedWordsPref & V>(v, id, hashMutedWordsPref);
 }
 
@@ -508,11 +600,13 @@ export interface HiddenPostsPref {
 
 const hashHiddenPostsPref = "hiddenPostsPref";
 
-export function isHiddenPostsPref<V>(v: V) {
+export function isHiddenPostsPref<V>(v: V): v is HiddenPostsPref & V {
   return is$typed(v, id, hashHiddenPostsPref);
 }
 
-export function validateHiddenPostsPref<V>(v: V) {
+export function validateHiddenPostsPref<V>(
+  v: V,
+): ValidationResult<HiddenPostsPref & V> {
   return validate<HiddenPostsPref & V>(v, id, hashHiddenPostsPref);
 }
 
@@ -523,11 +617,13 @@ export interface LabelersPref {
 
 const hashLabelersPref = "labelersPref";
 
-export function isLabelersPref<V>(v: V) {
+export function isLabelersPref<V>(v: V): v is LabelersPref & V {
   return is$typed(v, id, hashLabelersPref);
 }
 
-export function validateLabelersPref<V>(v: V) {
+export function validateLabelersPref<V>(
+  v: V,
+): ValidationResult<LabelersPref & V> {
   return validate<LabelersPref & V>(v, id, hashLabelersPref);
 }
 
@@ -538,11 +634,13 @@ export interface LabelerPrefItem {
 
 const hashLabelerPrefItem = "labelerPrefItem";
 
-export function isLabelerPrefItem<V>(v: V) {
+export function isLabelerPrefItem<V>(v: V): v is LabelerPrefItem & V {
   return is$typed(v, id, hashLabelerPrefItem);
 }
 
-export function validateLabelerPrefItem<V>(v: V) {
+export function validateLabelerPrefItem<V>(
+  v: V,
+): ValidationResult<LabelerPrefItem & V> {
   return validate<LabelerPrefItem & V>(v, id, hashLabelerPrefItem);
 }
 
@@ -558,11 +656,13 @@ export interface BskyAppStatePref {
 
 const hashBskyAppStatePref = "bskyAppStatePref";
 
-export function isBskyAppStatePref<V>(v: V) {
+export function isBskyAppStatePref<V>(v: V): v is BskyAppStatePref & V {
   return is$typed(v, id, hashBskyAppStatePref);
 }
 
-export function validateBskyAppStatePref<V>(v: V) {
+export function validateBskyAppStatePref<V>(
+  v: V,
+): ValidationResult<BskyAppStatePref & V> {
   return validate<BskyAppStatePref & V>(v, id, hashBskyAppStatePref);
 }
 
@@ -574,11 +674,13 @@ export interface BskyAppProgressGuide {
 
 const hashBskyAppProgressGuide = "bskyAppProgressGuide";
 
-export function isBskyAppProgressGuide<V>(v: V) {
+export function isBskyAppProgressGuide<V>(v: V): v is BskyAppProgressGuide & V {
   return is$typed(v, id, hashBskyAppProgressGuide);
 }
 
-export function validateBskyAppProgressGuide<V>(v: V) {
+export function validateBskyAppProgressGuide<V>(
+  v: V,
+): ValidationResult<BskyAppProgressGuide & V> {
   return validate<BskyAppProgressGuide & V>(v, id, hashBskyAppProgressGuide);
 }
 
@@ -595,11 +697,11 @@ export interface Nux {
 
 const hashNux = "nux";
 
-export function isNux<V>(v: V) {
+export function isNux<V>(v: V): v is Nux & V {
   return is$typed(v, id, hashNux);
 }
 
-export function validateNux<V>(v: V) {
+export function validateNux<V>(v: V): ValidationResult<Nux & V> {
   return validate<Nux & V>(v, id, hashNux);
 }
 
@@ -612,12 +714,35 @@ export interface VerificationPrefs {
 
 const hashVerificationPrefs = "verificationPrefs";
 
-export function isVerificationPrefs<V>(v: V) {
+export function isVerificationPrefs<V>(v: V): v is VerificationPrefs & V {
   return is$typed(v, id, hashVerificationPrefs);
 }
 
-export function validateVerificationPrefs<V>(v: V) {
+export function validateVerificationPrefs<V>(
+  v: V,
+): ValidationResult<VerificationPrefs & V> {
   return validate<VerificationPrefs & V>(v, id, hashVerificationPrefs);
+}
+
+/** Preferences for live events. */
+export interface LiveEventPreferences {
+  $type?: "app.bsky.actor.defs#liveEventPreferences";
+  /** A list of feed IDs that the user has hidden from live events. */
+  hiddenFeedIds?: (string)[];
+  /** Whether to hide all feeds from live events. */
+  hideAllFeeds: boolean;
+}
+
+const hashLiveEventPreferences = "liveEventPreferences";
+
+export function isLiveEventPreferences<V>(v: V): v is LiveEventPreferences & V {
+  return is$typed(v, id, hashLiveEventPreferences);
+}
+
+export function validateLiveEventPreferences<V>(
+  v: V,
+): ValidationResult<LiveEventPreferences & V> {
+  return validate<LiveEventPreferences & V>(v, id, hashLiveEventPreferences);
 }
 
 /** Default post interaction settings for the account. These values should be applied as default values when creating new posts. These refs should mirror the threadgate and postgate records exactly. */
@@ -638,11 +763,15 @@ export interface PostInteractionSettingsPref {
 
 const hashPostInteractionSettingsPref = "postInteractionSettingsPref";
 
-export function isPostInteractionSettingsPref<V>(v: V) {
+export function isPostInteractionSettingsPref<V>(
+  v: V,
+): v is PostInteractionSettingsPref & V {
   return is$typed(v, id, hashPostInteractionSettingsPref);
 }
 
-export function validatePostInteractionSettingsPref<V>(v: V) {
+export function validatePostInteractionSettingsPref<V>(
+  v: V,
+): ValidationResult<PostInteractionSettingsPref & V> {
   return validate<PostInteractionSettingsPref & V>(
     v,
     id,
@@ -652,24 +781,29 @@ export function validatePostInteractionSettingsPref<V>(v: V) {
 
 export interface StatusView {
   $type?: "app.bsky.actor.defs#statusView";
+  uri?: string;
+  cid?: string;
   /** The status for the account. */
   status:
     | "app.bsky.actor.status#live"
     | (string & globalThis.Record<PropertyKey, never>);
   record: { [_ in string]: unknown };
   embed?: $Typed<AppBskyEmbedExternal.View> | { $type: string };
+  labels?: (ComAtprotoLabelDefs.Label)[];
   /** The date when this status will expire. The application might choose to no longer return the status after expiration. */
   expiresAt?: string;
   /** True if the status is not expired, false if it is expired. Only present if expiration was set. */
   isActive?: boolean;
+  /** True if the user's go-live access has been disabled by a moderator, false otherwise. */
+  isDisabled?: boolean;
 }
 
 const hashStatusView = "statusView";
 
-export function isStatusView<V>(v: V) {
+export function isStatusView<V>(v: V): v is StatusView & V {
   return is$typed(v, id, hashStatusView);
 }
 
-export function validateStatusView<V>(v: V) {
+export function validateStatusView<V>(v: V): ValidationResult<StatusView & V> {
   return validate<StatusView & V>(v, id, hashStatusView);
 }

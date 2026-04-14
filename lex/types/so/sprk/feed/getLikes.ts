@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as SoSprkActorDefs from "../actor/defs.ts";
 
@@ -49,10 +50,10 @@ export interface Like {
 
 const hashLike = "like";
 
-export function isLike<V>(v: V) {
+export function isLike<V>(v: V): v is Like & V {
   return is$typed(v, id, hashLike);
 }
 
-export function validateLike<V>(v: V) {
+export function validateLike<V>(v: V): ValidationResult<Like & V> {
   return validate<Like & V>(v, id, hashLike);
 }

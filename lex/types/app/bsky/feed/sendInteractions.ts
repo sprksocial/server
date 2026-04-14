@@ -6,6 +6,7 @@ import type * as AppBskyFeedDefs from "./defs.ts";
 export type QueryParams = globalThis.Record<PropertyKey, never>;
 
 export interface InputSchema {
+  feed?: string;
   interactions: (AppBskyFeedDefs.Interaction)[];
 }
 

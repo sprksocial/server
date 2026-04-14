@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as ToolsOzoneVerificationDefs from "./defs.ts";
 
@@ -52,11 +53,13 @@ export interface VerificationInput {
 
 const hashVerificationInput = "verificationInput";
 
-export function isVerificationInput<V>(v: V) {
+export function isVerificationInput<V>(v: V): v is VerificationInput & V {
   return is$typed(v, id, hashVerificationInput);
 }
 
-export function validateVerificationInput<V>(v: V) {
+export function validateVerificationInput<V>(
+  v: V,
+): ValidationResult<VerificationInput & V> {
   return validate<VerificationInput & V>(v, id, hashVerificationInput);
 }
 
@@ -71,10 +74,10 @@ export interface GrantError {
 
 const hashGrantError = "grantError";
 
-export function isGrantError<V>(v: V) {
+export function isGrantError<V>(v: V): v is GrantError & V {
   return is$typed(v, id, hashGrantError);
 }
 
-export function validateGrantError<V>(v: V) {
+export function validateGrantError<V>(v: V): ValidationResult<GrantError & V> {
   return validate<GrantError & V>(v, id, hashGrantError);
 }

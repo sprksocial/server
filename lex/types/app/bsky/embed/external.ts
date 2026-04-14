@@ -3,6 +3,7 @@
  */
 import type { BlobRef } from "@atp/lexicon";
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -16,11 +17,11 @@ export interface Main {
 
 const hashMain = "main";
 
-export function isMain<V>(v: V) {
+export function isMain<V>(v: V): v is Main & V {
   return is$typed(v, id, hashMain);
 }
 
-export function validateMain<V>(v: V) {
+export function validateMain<V>(v: V): ValidationResult<Main & V> {
   return validate<Main & V>(v, id, hashMain);
 }
 
@@ -34,11 +35,11 @@ export interface External {
 
 const hashExternal = "external";
 
-export function isExternal<V>(v: V) {
+export function isExternal<V>(v: V): v is External & V {
   return is$typed(v, id, hashExternal);
 }
 
-export function validateExternal<V>(v: V) {
+export function validateExternal<V>(v: V): ValidationResult<External & V> {
   return validate<External & V>(v, id, hashExternal);
 }
 
@@ -49,11 +50,11 @@ export interface View {
 
 const hashView = "view";
 
-export function isView<V>(v: V) {
+export function isView<V>(v: V): v is View & V {
   return is$typed(v, id, hashView);
 }
 
-export function validateView<V>(v: V) {
+export function validateView<V>(v: V): ValidationResult<View & V> {
   return validate<View & V>(v, id, hashView);
 }
 
@@ -67,10 +68,12 @@ export interface ViewExternal {
 
 const hashViewExternal = "viewExternal";
 
-export function isViewExternal<V>(v: V) {
+export function isViewExternal<V>(v: V): v is ViewExternal & V {
   return is$typed(v, id, hashViewExternal);
 }
 
-export function validateViewExternal<V>(v: V) {
+export function validateViewExternal<V>(
+  v: V,
+): ValidationResult<ViewExternal & V> {
   return validate<ViewExternal & V>(v, id, hashViewExternal);
 }

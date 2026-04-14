@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as SoSprkActorDefs from "../actor/defs.ts";
 import type * as SoSprkMediaImage from "../media/image.ts";
@@ -26,11 +27,11 @@ export interface StoryView {
 
 const hashStoryView = "storyView";
 
-export function isStoryView<V>(v: V) {
+export function isStoryView<V>(v: V): v is StoryView & V {
   return is$typed(v, id, hashStoryView);
 }
 
-export function validateStoryView<V>(v: V) {
+export function validateStoryView<V>(v: V): ValidationResult<StoryView & V> {
   return validate<StoryView & V>(v, id, hashStoryView);
 }
 
@@ -42,11 +43,13 @@ export interface StoriesByAuthor {
 
 const hashStoriesByAuthor = "storiesByAuthor";
 
-export function isStoriesByAuthor<V>(v: V) {
+export function isStoriesByAuthor<V>(v: V): v is StoriesByAuthor & V {
   return is$typed(v, id, hashStoriesByAuthor);
 }
 
-export function validateStoriesByAuthor<V>(v: V) {
+export function validateStoriesByAuthor<V>(
+  v: V,
+): ValidationResult<StoriesByAuthor & V> {
   return validate<StoriesByAuthor & V>(v, id, hashStoriesByAuthor);
 }
 
@@ -67,10 +70,12 @@ export interface Interaction {
 
 const hashInteraction = "interaction";
 
-export function isInteraction<V>(v: V) {
+export function isInteraction<V>(v: V): v is Interaction & V {
   return is$typed(v, id, hashInteraction);
 }
 
-export function validateInteraction<V>(v: V) {
+export function validateInteraction<V>(
+  v: V,
+): ValidationResult<Interaction & V> {
   return validate<Interaction & V>(v, id, hashInteraction);
 }

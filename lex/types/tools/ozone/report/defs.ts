@@ -47,85 +47,95 @@ export type ReasonType =
   | (string & globalThis.Record<PropertyKey, never>);
 
 /** Appeal a previously taken moderation action */
-export const REASONAPPEAL = `${id}#reasonAppeal`;
+export const REASONAPPEAL: string = `${id}#reasonAppeal`;
 /** An issue not included in these options */
-export const REASONOTHER = `${id}#reasonOther`;
+export const REASONOTHER: string = `${id}#reasonOther`;
 /** Animal welfare violations */
-export const REASONVIOLENCEANIMAL = `${id}#reasonViolenceAnimal`;
+export const REASONVIOLENCEANIMAL: string = `${id}#reasonViolenceAnimal`;
 /** Threats or incitement */
-export const REASONVIOLENCETHREATS = `${id}#reasonViolenceThreats`;
+export const REASONVIOLENCETHREATS: string = `${id}#reasonViolenceThreats`;
 /** Graphic violent content */
-export const REASONVIOLENCEGRAPHICCONTENT =
+export const REASONVIOLENCEGRAPHICCONTENT: string =
   `${id}#reasonViolenceGraphicContent`;
 /** Glorification of violence */
-export const REASONVIOLENCEGLORIFICATION = `${id}#reasonViolenceGlorification`;
+export const REASONVIOLENCEGLORIFICATION: string =
+  `${id}#reasonViolenceGlorification`;
 /** Extremist content. These reports will be sent only be sent to the application's Moderation Authority. */
-export const REASONVIOLENCEEXTREMISTCONTENT =
+export const REASONVIOLENCEEXTREMISTCONTENT: string =
   `${id}#reasonViolenceExtremistContent`;
 /** Human trafficking */
-export const REASONVIOLENCETRAFFICKING = `${id}#reasonViolenceTrafficking`;
+export const REASONVIOLENCETRAFFICKING: string =
+  `${id}#reasonViolenceTrafficking`;
 /** Other violent content */
-export const REASONVIOLENCEOTHER = `${id}#reasonViolenceOther`;
+export const REASONVIOLENCEOTHER: string = `${id}#reasonViolenceOther`;
 /** Adult sexual abuse content */
-export const REASONSEXUALABUSECONTENT = `${id}#reasonSexualAbuseContent`;
+export const REASONSEXUALABUSECONTENT: string =
+  `${id}#reasonSexualAbuseContent`;
 /** Non-consensual intimate imagery */
-export const REASONSEXUALNCII = `${id}#reasonSexualNCII`;
+export const REASONSEXUALNCII: string = `${id}#reasonSexualNCII`;
 /** Deepfake adult content */
-export const REASONSEXUALDEEPFAKE = `${id}#reasonSexualDeepfake`;
+export const REASONSEXUALDEEPFAKE: string = `${id}#reasonSexualDeepfake`;
 /** Animal sexual abuse */
-export const REASONSEXUALANIMAL = `${id}#reasonSexualAnimal`;
+export const REASONSEXUALANIMAL: string = `${id}#reasonSexualAnimal`;
 /** Unlabelled adult content */
-export const REASONSEXUALUNLABELED = `${id}#reasonSexualUnlabeled`;
+export const REASONSEXUALUNLABELED: string = `${id}#reasonSexualUnlabeled`;
 /** Other sexual violence content */
-export const REASONSEXUALOTHER = `${id}#reasonSexualOther`;
+export const REASONSEXUALOTHER: string = `${id}#reasonSexualOther`;
 /** Child sexual abuse material (CSAM). These reports will be sent only be sent to the application's Moderation Authority. */
-export const REASONCHILDSAFETYCSAM = `${id}#reasonChildSafetyCSAM`;
+export const REASONCHILDSAFETYCSAM: string = `${id}#reasonChildSafetyCSAM`;
 /** Grooming or predatory behavior. These reports will be sent only be sent to the application's Moderation Authority. */
-export const REASONCHILDSAFETYGROOM = `${id}#reasonChildSafetyGroom`;
+export const REASONCHILDSAFETYGROOM: string = `${id}#reasonChildSafetyGroom`;
 /** Privacy violation involving a minor */
-export const REASONCHILDSAFETYPRIVACY = `${id}#reasonChildSafetyPrivacy`;
+export const REASONCHILDSAFETYPRIVACY: string =
+  `${id}#reasonChildSafetyPrivacy`;
 /** Harassment or bullying of minors */
-export const REASONCHILDSAFETYHARASSMENT = `${id}#reasonChildSafetyHarassment`;
+export const REASONCHILDSAFETYHARASSMENT: string =
+  `${id}#reasonChildSafetyHarassment`;
 /** Other child safety. These reports will be sent only be sent to the application's Moderation Authority. */
-export const REASONCHILDSAFETYOTHER = `${id}#reasonChildSafetyOther`;
+export const REASONCHILDSAFETYOTHER: string = `${id}#reasonChildSafetyOther`;
 /** Trolling */
-export const REASONHARASSMENTTROLL = `${id}#reasonHarassmentTroll`;
+export const REASONHARASSMENTTROLL: string = `${id}#reasonHarassmentTroll`;
 /** Targeted harassment */
-export const REASONHARASSMENTTARGETED = `${id}#reasonHarassmentTargeted`;
+export const REASONHARASSMENTTARGETED: string =
+  `${id}#reasonHarassmentTargeted`;
 /** Hate speech */
-export const REASONHARASSMENTHATESPEECH = `${id}#reasonHarassmentHateSpeech`;
+export const REASONHARASSMENTHATESPEECH: string =
+  `${id}#reasonHarassmentHateSpeech`;
 /** Doxxing */
-export const REASONHARASSMENTDOXXING = `${id}#reasonHarassmentDoxxing`;
+export const REASONHARASSMENTDOXXING: string = `${id}#reasonHarassmentDoxxing`;
 /** Other harassing or hateful content */
-export const REASONHARASSMENTOTHER = `${id}#reasonHarassmentOther`;
+export const REASONHARASSMENTOTHER: string = `${id}#reasonHarassmentOther`;
 /** Fake account or bot */
-export const REASONMISLEADINGBOT = `${id}#reasonMisleadingBot`;
+export const REASONMISLEADINGBOT: string = `${id}#reasonMisleadingBot`;
 /** Impersonation */
-export const REASONMISLEADINGIMPERSONATION =
+export const REASONMISLEADINGIMPERSONATION: string =
   `${id}#reasonMisleadingImpersonation`;
 /** Spam */
-export const REASONMISLEADINGSPAM = `${id}#reasonMisleadingSpam`;
+export const REASONMISLEADINGSPAM: string = `${id}#reasonMisleadingSpam`;
 /** Scam */
-export const REASONMISLEADINGSCAM = `${id}#reasonMisleadingScam`;
+export const REASONMISLEADINGSCAM: string = `${id}#reasonMisleadingScam`;
 /** False information about elections */
-export const REASONMISLEADINGELECTIONS = `${id}#reasonMisleadingElections`;
+export const REASONMISLEADINGELECTIONS: string =
+  `${id}#reasonMisleadingElections`;
 /** Other misleading content */
-export const REASONMISLEADINGOTHER = `${id}#reasonMisleadingOther`;
+export const REASONMISLEADINGOTHER: string = `${id}#reasonMisleadingOther`;
 /** Hacking or system attacks */
-export const REASONRULESITESECURITY = `${id}#reasonRuleSiteSecurity`;
+export const REASONRULESITESECURITY: string = `${id}#reasonRuleSiteSecurity`;
 /** Promoting or selling prohibited items or services */
-export const REASONRULEPROHIBITEDSALES = `${id}#reasonRuleProhibitedSales`;
+export const REASONRULEPROHIBITEDSALES: string =
+  `${id}#reasonRuleProhibitedSales`;
 /** Banned user returning */
-export const REASONRULEBANEVASION = `${id}#reasonRuleBanEvasion`;
+export const REASONRULEBANEVASION: string = `${id}#reasonRuleBanEvasion`;
 /** Other */
-export const REASONRULEOTHER = `${id}#reasonRuleOther`;
+export const REASONRULEOTHER: string = `${id}#reasonRuleOther`;
 /** Content promoting or depicting self-harm */
-export const REASONSELFHARMCONTENT = `${id}#reasonSelfHarmContent`;
+export const REASONSELFHARMCONTENT: string = `${id}#reasonSelfHarmContent`;
 /** Eating disorders */
-export const REASONSELFHARMED = `${id}#reasonSelfHarmED`;
+export const REASONSELFHARMED: string = `${id}#reasonSelfHarmED`;
 /** Dangerous challenges or activities */
-export const REASONSELFHARMSTUNTS = `${id}#reasonSelfHarmStunts`;
+export const REASONSELFHARMSTUNTS: string = `${id}#reasonSelfHarmStunts`;
 /** Dangerous substances or drug abuse */
-export const REASONSELFHARMSUBSTANCES = `${id}#reasonSelfHarmSubstances`;
+export const REASONSELFHARMSUBSTANCES: string =
+  `${id}#reasonSelfHarmSubstances`;
 /** Other dangerous content */
-export const REASONSELFHARMOTHER = `${id}#reasonSelfHarmOther`;
+export const REASONSELFHARMOTHER: string = `${id}#reasonSelfHarmOther`;

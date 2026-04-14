@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as AppBskyRichtextFacet from "../../../app/bsky/richtext/facet.ts";
 import type * as AppBskyEmbedRecord from "../../../app/bsky/embed/record.ts";
@@ -19,11 +20,11 @@ export interface MessageRef {
 
 const hashMessageRef = "messageRef";
 
-export function isMessageRef<V>(v: V) {
+export function isMessageRef<V>(v: V): v is MessageRef & V {
   return is$typed(v, id, hashMessageRef);
 }
 
-export function validateMessageRef<V>(v: V) {
+export function validateMessageRef<V>(v: V): ValidationResult<MessageRef & V> {
   return validate<MessageRef & V>(v, id, hashMessageRef);
 }
 
@@ -37,11 +38,13 @@ export interface MessageInput {
 
 const hashMessageInput = "messageInput";
 
-export function isMessageInput<V>(v: V) {
+export function isMessageInput<V>(v: V): v is MessageInput & V {
   return is$typed(v, id, hashMessageInput);
 }
 
-export function validateMessageInput<V>(v: V) {
+export function validateMessageInput<V>(
+  v: V,
+): ValidationResult<MessageInput & V> {
   return validate<MessageInput & V>(v, id, hashMessageInput);
 }
 
@@ -61,11 +64,13 @@ export interface MessageView {
 
 const hashMessageView = "messageView";
 
-export function isMessageView<V>(v: V) {
+export function isMessageView<V>(v: V): v is MessageView & V {
   return is$typed(v, id, hashMessageView);
 }
 
-export function validateMessageView<V>(v: V) {
+export function validateMessageView<V>(
+  v: V,
+): ValidationResult<MessageView & V> {
   return validate<MessageView & V>(v, id, hashMessageView);
 }
 
@@ -79,11 +84,13 @@ export interface DeletedMessageView {
 
 const hashDeletedMessageView = "deletedMessageView";
 
-export function isDeletedMessageView<V>(v: V) {
+export function isDeletedMessageView<V>(v: V): v is DeletedMessageView & V {
   return is$typed(v, id, hashDeletedMessageView);
 }
 
-export function validateDeletedMessageView<V>(v: V) {
+export function validateDeletedMessageView<V>(
+  v: V,
+): ValidationResult<DeletedMessageView & V> {
   return validate<DeletedMessageView & V>(v, id, hashDeletedMessageView);
 }
 
@@ -94,11 +101,13 @@ export interface MessageViewSender {
 
 const hashMessageViewSender = "messageViewSender";
 
-export function isMessageViewSender<V>(v: V) {
+export function isMessageViewSender<V>(v: V): v is MessageViewSender & V {
   return is$typed(v, id, hashMessageViewSender);
 }
 
-export function validateMessageViewSender<V>(v: V) {
+export function validateMessageViewSender<V>(
+  v: V,
+): ValidationResult<MessageViewSender & V> {
   return validate<MessageViewSender & V>(v, id, hashMessageViewSender);
 }
 
@@ -111,11 +120,13 @@ export interface ReactionView {
 
 const hashReactionView = "reactionView";
 
-export function isReactionView<V>(v: V) {
+export function isReactionView<V>(v: V): v is ReactionView & V {
   return is$typed(v, id, hashReactionView);
 }
 
-export function validateReactionView<V>(v: V) {
+export function validateReactionView<V>(
+  v: V,
+): ValidationResult<ReactionView & V> {
   return validate<ReactionView & V>(v, id, hashReactionView);
 }
 
@@ -126,11 +137,13 @@ export interface ReactionViewSender {
 
 const hashReactionViewSender = "reactionViewSender";
 
-export function isReactionViewSender<V>(v: V) {
+export function isReactionViewSender<V>(v: V): v is ReactionViewSender & V {
   return is$typed(v, id, hashReactionViewSender);
 }
 
-export function validateReactionViewSender<V>(v: V) {
+export function validateReactionViewSender<V>(
+  v: V,
+): ValidationResult<ReactionViewSender & V> {
   return validate<ReactionViewSender & V>(v, id, hashReactionViewSender);
 }
 
@@ -142,11 +155,15 @@ export interface MessageAndReactionView {
 
 const hashMessageAndReactionView = "messageAndReactionView";
 
-export function isMessageAndReactionView<V>(v: V) {
+export function isMessageAndReactionView<V>(
+  v: V,
+): v is MessageAndReactionView & V {
   return is$typed(v, id, hashMessageAndReactionView);
 }
 
-export function validateMessageAndReactionView<V>(v: V) {
+export function validateMessageAndReactionView<V>(
+  v: V,
+): ValidationResult<MessageAndReactionView & V> {
   return validate<MessageAndReactionView & V>(
     v,
     id,
@@ -173,11 +190,11 @@ export interface ConvoView {
 
 const hashConvoView = "convoView";
 
-export function isConvoView<V>(v: V) {
+export function isConvoView<V>(v: V): v is ConvoView & V {
   return is$typed(v, id, hashConvoView);
 }
 
-export function validateConvoView<V>(v: V) {
+export function validateConvoView<V>(v: V): ValidationResult<ConvoView & V> {
   return validate<ConvoView & V>(v, id, hashConvoView);
 }
 
@@ -189,11 +206,13 @@ export interface LogBeginConvo {
 
 const hashLogBeginConvo = "logBeginConvo";
 
-export function isLogBeginConvo<V>(v: V) {
+export function isLogBeginConvo<V>(v: V): v is LogBeginConvo & V {
   return is$typed(v, id, hashLogBeginConvo);
 }
 
-export function validateLogBeginConvo<V>(v: V) {
+export function validateLogBeginConvo<V>(
+  v: V,
+): ValidationResult<LogBeginConvo & V> {
   return validate<LogBeginConvo & V>(v, id, hashLogBeginConvo);
 }
 
@@ -205,11 +224,13 @@ export interface LogAcceptConvo {
 
 const hashLogAcceptConvo = "logAcceptConvo";
 
-export function isLogAcceptConvo<V>(v: V) {
+export function isLogAcceptConvo<V>(v: V): v is LogAcceptConvo & V {
   return is$typed(v, id, hashLogAcceptConvo);
 }
 
-export function validateLogAcceptConvo<V>(v: V) {
+export function validateLogAcceptConvo<V>(
+  v: V,
+): ValidationResult<LogAcceptConvo & V> {
   return validate<LogAcceptConvo & V>(v, id, hashLogAcceptConvo);
 }
 
@@ -221,11 +242,13 @@ export interface LogLeaveConvo {
 
 const hashLogLeaveConvo = "logLeaveConvo";
 
-export function isLogLeaveConvo<V>(v: V) {
+export function isLogLeaveConvo<V>(v: V): v is LogLeaveConvo & V {
   return is$typed(v, id, hashLogLeaveConvo);
 }
 
-export function validateLogLeaveConvo<V>(v: V) {
+export function validateLogLeaveConvo<V>(
+  v: V,
+): ValidationResult<LogLeaveConvo & V> {
   return validate<LogLeaveConvo & V>(v, id, hashLogLeaveConvo);
 }
 
@@ -237,11 +260,13 @@ export interface LogMuteConvo {
 
 const hashLogMuteConvo = "logMuteConvo";
 
-export function isLogMuteConvo<V>(v: V) {
+export function isLogMuteConvo<V>(v: V): v is LogMuteConvo & V {
   return is$typed(v, id, hashLogMuteConvo);
 }
 
-export function validateLogMuteConvo<V>(v: V) {
+export function validateLogMuteConvo<V>(
+  v: V,
+): ValidationResult<LogMuteConvo & V> {
   return validate<LogMuteConvo & V>(v, id, hashLogMuteConvo);
 }
 
@@ -253,11 +278,13 @@ export interface LogUnmuteConvo {
 
 const hashLogUnmuteConvo = "logUnmuteConvo";
 
-export function isLogUnmuteConvo<V>(v: V) {
+export function isLogUnmuteConvo<V>(v: V): v is LogUnmuteConvo & V {
   return is$typed(v, id, hashLogUnmuteConvo);
 }
 
-export function validateLogUnmuteConvo<V>(v: V) {
+export function validateLogUnmuteConvo<V>(
+  v: V,
+): ValidationResult<LogUnmuteConvo & V> {
   return validate<LogUnmuteConvo & V>(v, id, hashLogUnmuteConvo);
 }
 
@@ -270,11 +297,13 @@ export interface LogCreateMessage {
 
 const hashLogCreateMessage = "logCreateMessage";
 
-export function isLogCreateMessage<V>(v: V) {
+export function isLogCreateMessage<V>(v: V): v is LogCreateMessage & V {
   return is$typed(v, id, hashLogCreateMessage);
 }
 
-export function validateLogCreateMessage<V>(v: V) {
+export function validateLogCreateMessage<V>(
+  v: V,
+): ValidationResult<LogCreateMessage & V> {
   return validate<LogCreateMessage & V>(v, id, hashLogCreateMessage);
 }
 
@@ -287,11 +316,13 @@ export interface LogDeleteMessage {
 
 const hashLogDeleteMessage = "logDeleteMessage";
 
-export function isLogDeleteMessage<V>(v: V) {
+export function isLogDeleteMessage<V>(v: V): v is LogDeleteMessage & V {
   return is$typed(v, id, hashLogDeleteMessage);
 }
 
-export function validateLogDeleteMessage<V>(v: V) {
+export function validateLogDeleteMessage<V>(
+  v: V,
+): ValidationResult<LogDeleteMessage & V> {
   return validate<LogDeleteMessage & V>(v, id, hashLogDeleteMessage);
 }
 
@@ -304,11 +335,13 @@ export interface LogReadMessage {
 
 const hashLogReadMessage = "logReadMessage";
 
-export function isLogReadMessage<V>(v: V) {
+export function isLogReadMessage<V>(v: V): v is LogReadMessage & V {
   return is$typed(v, id, hashLogReadMessage);
 }
 
-export function validateLogReadMessage<V>(v: V) {
+export function validateLogReadMessage<V>(
+  v: V,
+): ValidationResult<LogReadMessage & V> {
   return validate<LogReadMessage & V>(v, id, hashLogReadMessage);
 }
 
@@ -322,11 +355,13 @@ export interface LogAddReaction {
 
 const hashLogAddReaction = "logAddReaction";
 
-export function isLogAddReaction<V>(v: V) {
+export function isLogAddReaction<V>(v: V): v is LogAddReaction & V {
   return is$typed(v, id, hashLogAddReaction);
 }
 
-export function validateLogAddReaction<V>(v: V) {
+export function validateLogAddReaction<V>(
+  v: V,
+): ValidationResult<LogAddReaction & V> {
   return validate<LogAddReaction & V>(v, id, hashLogAddReaction);
 }
 
@@ -340,10 +375,12 @@ export interface LogRemoveReaction {
 
 const hashLogRemoveReaction = "logRemoveReaction";
 
-export function isLogRemoveReaction<V>(v: V) {
+export function isLogRemoveReaction<V>(v: V): v is LogRemoveReaction & V {
   return is$typed(v, id, hashLogRemoveReaction);
 }
 
-export function validateLogRemoveReaction<V>(v: V) {
+export function validateLogRemoveReaction<V>(
+  v: V,
+): ValidationResult<LogRemoveReaction & V> {
   return validate<LogRemoveReaction & V>(v, id, hashLogRemoveReaction);
 }

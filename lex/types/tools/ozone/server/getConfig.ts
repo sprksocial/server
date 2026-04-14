@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -42,11 +43,13 @@ export interface ServiceConfig {
 
 const hashServiceConfig = "serviceConfig";
 
-export function isServiceConfig<V>(v: V) {
+export function isServiceConfig<V>(v: V): v is ServiceConfig & V {
   return is$typed(v, id, hashServiceConfig);
 }
 
-export function validateServiceConfig<V>(v: V) {
+export function validateServiceConfig<V>(
+  v: V,
+): ValidationResult<ServiceConfig & V> {
   return validate<ServiceConfig & V>(v, id, hashServiceConfig);
 }
 
@@ -62,10 +65,12 @@ export interface ViewerConfig {
 
 const hashViewerConfig = "viewerConfig";
 
-export function isViewerConfig<V>(v: V) {
+export function isViewerConfig<V>(v: V): v is ViewerConfig & V {
   return is$typed(v, id, hashViewerConfig);
 }
 
-export function validateViewerConfig<V>(v: V) {
+export function validateViewerConfig<V>(
+  v: V,
+): ValidationResult<ViewerConfig & V> {
   return validate<ViewerConfig & V>(v, id, hashViewerConfig);
 }

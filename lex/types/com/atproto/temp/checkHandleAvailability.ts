@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -48,11 +49,13 @@ export interface ResultAvailable {
 
 const hashResultAvailable = "resultAvailable";
 
-export function isResultAvailable<V>(v: V) {
+export function isResultAvailable<V>(v: V): v is ResultAvailable & V {
   return is$typed(v, id, hashResultAvailable);
 }
 
-export function validateResultAvailable<V>(v: V) {
+export function validateResultAvailable<V>(
+  v: V,
+): ValidationResult<ResultAvailable & V> {
   return validate<ResultAvailable & V>(v, id, hashResultAvailable);
 }
 
@@ -65,11 +68,13 @@ export interface ResultUnavailable {
 
 const hashResultUnavailable = "resultUnavailable";
 
-export function isResultUnavailable<V>(v: V) {
+export function isResultUnavailable<V>(v: V): v is ResultUnavailable & V {
   return is$typed(v, id, hashResultUnavailable);
 }
 
-export function validateResultUnavailable<V>(v: V) {
+export function validateResultUnavailable<V>(
+  v: V,
+): ValidationResult<ResultUnavailable & V> {
   return validate<ResultUnavailable & V>(v, id, hashResultUnavailable);
 }
 
@@ -82,10 +87,10 @@ export interface Suggestion {
 
 const hashSuggestion = "suggestion";
 
-export function isSuggestion<V>(v: V) {
+export function isSuggestion<V>(v: V): v is Suggestion & V {
   return is$typed(v, id, hashSuggestion);
 }
 
-export function validateSuggestion<V>(v: V) {
+export function validateSuggestion<V>(v: V): ValidationResult<Suggestion & V> {
   return validate<Suggestion & V>(v, id, hashSuggestion);
 }

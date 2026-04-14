@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as AppBskyRichtextFacet from "../richtext/facet.ts";
 
@@ -23,11 +24,11 @@ export interface Record {
 
 const hashRecord = "main";
 
-export function isRecord<V>(v: V) {
+export function isRecord<V>(v: V): v is Record & V {
   return is$typed(v, id, hashRecord);
 }
 
-export function validateRecord<V>(v: V) {
+export function validateRecord<V>(v: V): ValidationResult<Record & V> {
   return validate<Record & V>(v, id, hashRecord, true);
 }
 
@@ -40,10 +41,10 @@ export interface FeedItem {
 
 const hashFeedItem = "feedItem";
 
-export function isFeedItem<V>(v: V) {
+export function isFeedItem<V>(v: V): v is FeedItem & V {
   return is$typed(v, id, hashFeedItem);
 }
 
-export function validateFeedItem<V>(v: V) {
+export function validateFeedItem<V>(v: V): ValidationResult<FeedItem & V> {
   return validate<FeedItem & V>(v, id, hashFeedItem);
 }

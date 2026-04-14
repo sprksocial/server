@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -43,10 +44,10 @@ export interface Metadata {
 
 const hashMetadata = "metadata";
 
-export function isMetadata<V>(v: V) {
+export function isMetadata<V>(v: V): v is Metadata & V {
   return is$typed(v, id, hashMetadata);
 }
 
-export function validateMetadata<V>(v: V) {
+export function validateMetadata<V>(v: V): ValidationResult<Metadata & V> {
   return validate<Metadata & V>(v, id, hashMetadata);
 }

@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as ComAtprotoModerationDefs from "./defs.ts";
 import type * as ComAtprotoAdminDefs from "../admin/defs.ts";
@@ -64,10 +65,10 @@ export interface ModTool {
 
 const hashModTool = "modTool";
 
-export function isModTool<V>(v: V) {
+export function isModTool<V>(v: V): v is ModTool & V {
   return is$typed(v, id, hashModTool);
 }
 
-export function validateModTool<V>(v: V) {
+export function validateModTool<V>(v: V): ValidationResult<ModTool & V> {
   return validate<ModTool & V>(v, id, hashModTool);
 }

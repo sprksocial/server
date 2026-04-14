@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -27,11 +28,11 @@ export interface Record {
 
 const hashRecord = "main";
 
-export function isRecord<V>(v: V) {
+export function isRecord<V>(v: V): v is Record & V {
   return is$typed(v, id, hashRecord);
 }
 
-export function validateRecord<V>(v: V) {
+export function validateRecord<V>(v: V): ValidationResult<Record & V> {
   return validate<Record & V>(v, id, hashRecord, true);
 }
 
@@ -44,11 +45,13 @@ export interface MentionRule {
 
 const hashMentionRule = "mentionRule";
 
-export function isMentionRule<V>(v: V) {
+export function isMentionRule<V>(v: V): v is MentionRule & V {
   return is$typed(v, id, hashMentionRule);
 }
 
-export function validateMentionRule<V>(v: V) {
+export function validateMentionRule<V>(
+  v: V,
+): ValidationResult<MentionRule & V> {
   return validate<MentionRule & V>(v, id, hashMentionRule);
 }
 
@@ -59,11 +62,13 @@ export interface FollowerRule {
 
 const hashFollowerRule = "followerRule";
 
-export function isFollowerRule<V>(v: V) {
+export function isFollowerRule<V>(v: V): v is FollowerRule & V {
   return is$typed(v, id, hashFollowerRule);
 }
 
-export function validateFollowerRule<V>(v: V) {
+export function validateFollowerRule<V>(
+  v: V,
+): ValidationResult<FollowerRule & V> {
   return validate<FollowerRule & V>(v, id, hashFollowerRule);
 }
 
@@ -74,11 +79,13 @@ export interface FollowingRule {
 
 const hashFollowingRule = "followingRule";
 
-export function isFollowingRule<V>(v: V) {
+export function isFollowingRule<V>(v: V): v is FollowingRule & V {
   return is$typed(v, id, hashFollowingRule);
 }
 
-export function validateFollowingRule<V>(v: V) {
+export function validateFollowingRule<V>(
+  v: V,
+): ValidationResult<FollowingRule & V> {
   return validate<FollowingRule & V>(v, id, hashFollowingRule);
 }
 
@@ -90,10 +97,10 @@ export interface ListRule {
 
 const hashListRule = "listRule";
 
-export function isListRule<V>(v: V) {
+export function isListRule<V>(v: V): v is ListRule & V {
   return is$typed(v, id, hashListRule);
 }
 
-export function validateListRule<V>(v: V) {
+export function validateListRule<V>(v: V): ValidationResult<ListRule & V> {
   return validate<ListRule & V>(v, id, hashListRule);
 }

@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -38,10 +39,12 @@ export interface LiveNowConfig {
 
 const hashLiveNowConfig = "liveNowConfig";
 
-export function isLiveNowConfig<V>(v: V) {
+export function isLiveNowConfig<V>(v: V): v is LiveNowConfig & V {
   return is$typed(v, id, hashLiveNowConfig);
 }
 
-export function validateLiveNowConfig<V>(v: V) {
+export function validateLiveNowConfig<V>(
+  v: V,
+): ValidationResult<LiveNowConfig & V> {
   return validate<LiveNowConfig & V>(v, id, hashLiveNowConfig);
 }

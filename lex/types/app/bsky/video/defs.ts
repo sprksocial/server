@@ -3,6 +3,7 @@
  */
 import type { BlobRef } from "@atp/lexicon";
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -26,10 +27,10 @@ export interface JobStatus {
 
 const hashJobStatus = "jobStatus";
 
-export function isJobStatus<V>(v: V) {
+export function isJobStatus<V>(v: V): v is JobStatus & V {
   return is$typed(v, id, hashJobStatus);
 }
 
-export function validateJobStatus<V>(v: V) {
+export function validateJobStatus<V>(v: V): ValidationResult<JobStatus & V> {
   return validate<JobStatus & V>(v, id, hashJobStatus);
 }

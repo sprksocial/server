@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -45,10 +46,12 @@ export interface AccountCodes {
 
 const hashAccountCodes = "accountCodes";
 
-export function isAccountCodes<V>(v: V) {
+export function isAccountCodes<V>(v: V): v is AccountCodes & V {
   return is$typed(v, id, hashAccountCodes);
 }
 
-export function validateAccountCodes<V>(v: V) {
+export function validateAccountCodes<V>(
+  v: V,
+): ValidationResult<AccountCodes & V> {
   return validate<AccountCodes & V>(v, id, hashAccountCodes);
 }

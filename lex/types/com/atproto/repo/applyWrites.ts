@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as ComAtprotoRepoDefs from "./defs.ts";
 
@@ -56,11 +57,11 @@ export interface Create {
 
 const hashCreate = "create";
 
-export function isCreate<V>(v: V) {
+export function isCreate<V>(v: V): v is Create & V {
   return is$typed(v, id, hashCreate);
 }
 
-export function validateCreate<V>(v: V) {
+export function validateCreate<V>(v: V): ValidationResult<Create & V> {
   return validate<Create & V>(v, id, hashCreate);
 }
 
@@ -74,11 +75,11 @@ export interface Update {
 
 const hashUpdate = "update";
 
-export function isUpdate<V>(v: V) {
+export function isUpdate<V>(v: V): v is Update & V {
   return is$typed(v, id, hashUpdate);
 }
 
-export function validateUpdate<V>(v: V) {
+export function validateUpdate<V>(v: V): ValidationResult<Update & V> {
   return validate<Update & V>(v, id, hashUpdate);
 }
 
@@ -91,11 +92,11 @@ export interface Delete {
 
 const hashDelete = "delete";
 
-export function isDelete<V>(v: V) {
+export function isDelete<V>(v: V): v is Delete & V {
   return is$typed(v, id, hashDelete);
 }
 
-export function validateDelete<V>(v: V) {
+export function validateDelete<V>(v: V): ValidationResult<Delete & V> {
   return validate<Delete & V>(v, id, hashDelete);
 }
 
@@ -111,11 +112,13 @@ export interface CreateResult {
 
 const hashCreateResult = "createResult";
 
-export function isCreateResult<V>(v: V) {
+export function isCreateResult<V>(v: V): v is CreateResult & V {
   return is$typed(v, id, hashCreateResult);
 }
 
-export function validateCreateResult<V>(v: V) {
+export function validateCreateResult<V>(
+  v: V,
+): ValidationResult<CreateResult & V> {
   return validate<CreateResult & V>(v, id, hashCreateResult);
 }
 
@@ -131,11 +134,13 @@ export interface UpdateResult {
 
 const hashUpdateResult = "updateResult";
 
-export function isUpdateResult<V>(v: V) {
+export function isUpdateResult<V>(v: V): v is UpdateResult & V {
   return is$typed(v, id, hashUpdateResult);
 }
 
-export function validateUpdateResult<V>(v: V) {
+export function validateUpdateResult<V>(
+  v: V,
+): ValidationResult<UpdateResult & V> {
   return validate<UpdateResult & V>(v, id, hashUpdateResult);
 }
 
@@ -145,10 +150,12 @@ export interface DeleteResult {
 
 const hashDeleteResult = "deleteResult";
 
-export function isDeleteResult<V>(v: V) {
+export function isDeleteResult<V>(v: V): v is DeleteResult & V {
   return is$typed(v, id, hashDeleteResult);
 }
 
-export function validateDeleteResult<V>(v: V) {
+export function validateDeleteResult<V>(
+  v: V,
+): ValidationResult<DeleteResult & V> {
   return validate<DeleteResult & V>(v, id, hashDeleteResult);
 }

@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -18,10 +19,12 @@ export interface IdentityInfo {
 
 const hashIdentityInfo = "identityInfo";
 
-export function isIdentityInfo<V>(v: V) {
+export function isIdentityInfo<V>(v: V): v is IdentityInfo & V {
   return is$typed(v, id, hashIdentityInfo);
 }
 
-export function validateIdentityInfo<V>(v: V) {
+export function validateIdentityInfo<V>(
+  v: V,
+): ValidationResult<IdentityInfo & V> {
   return validate<IdentityInfo & V>(v, id, hashIdentityInfo);
 }

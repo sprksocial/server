@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -32,11 +33,11 @@ export interface Label {
 
 const hashLabel = "label";
 
-export function isLabel<V>(v: V) {
+export function isLabel<V>(v: V): v is Label & V {
   return is$typed(v, id, hashLabel);
 }
 
-export function validateLabel<V>(v: V) {
+export function validateLabel<V>(v: V): ValidationResult<Label & V> {
   return validate<Label & V>(v, id, hashLabel);
 }
 
@@ -48,11 +49,11 @@ export interface SelfLabels {
 
 const hashSelfLabels = "selfLabels";
 
-export function isSelfLabels<V>(v: V) {
+export function isSelfLabels<V>(v: V): v is SelfLabels & V {
   return is$typed(v, id, hashSelfLabels);
 }
 
-export function validateSelfLabels<V>(v: V) {
+export function validateSelfLabels<V>(v: V): ValidationResult<SelfLabels & V> {
   return validate<SelfLabels & V>(v, id, hashSelfLabels);
 }
 
@@ -65,11 +66,11 @@ export interface SelfLabel {
 
 const hashSelfLabel = "selfLabel";
 
-export function isSelfLabel<V>(v: V) {
+export function isSelfLabel<V>(v: V): v is SelfLabel & V {
   return is$typed(v, id, hashSelfLabel);
 }
 
-export function validateSelfLabel<V>(v: V) {
+export function validateSelfLabel<V>(v: V): ValidationResult<SelfLabel & V> {
   return validate<SelfLabel & V>(v, id, hashSelfLabel);
 }
 
@@ -103,11 +104,13 @@ export interface LabelValueDefinition {
 
 const hashLabelValueDefinition = "labelValueDefinition";
 
-export function isLabelValueDefinition<V>(v: V) {
+export function isLabelValueDefinition<V>(v: V): v is LabelValueDefinition & V {
   return is$typed(v, id, hashLabelValueDefinition);
 }
 
-export function validateLabelValueDefinition<V>(v: V) {
+export function validateLabelValueDefinition<V>(
+  v: V,
+): ValidationResult<LabelValueDefinition & V> {
   return validate<LabelValueDefinition & V>(v, id, hashLabelValueDefinition);
 }
 
@@ -124,11 +127,15 @@ export interface LabelValueDefinitionStrings {
 
 const hashLabelValueDefinitionStrings = "labelValueDefinitionStrings";
 
-export function isLabelValueDefinitionStrings<V>(v: V) {
+export function isLabelValueDefinitionStrings<V>(
+  v: V,
+): v is LabelValueDefinitionStrings & V {
   return is$typed(v, id, hashLabelValueDefinitionStrings);
 }
 
-export function validateLabelValueDefinitionStrings<V>(v: V) {
+export function validateLabelValueDefinitionStrings<V>(
+  v: V,
+): ValidationResult<LabelValueDefinitionStrings & V> {
   return validate<LabelValueDefinitionStrings & V>(
     v,
     id,
@@ -138,14 +145,11 @@ export function validateLabelValueDefinitionStrings<V>(v: V) {
 
 export type LabelValue =
   | "!hide"
-  | "!no-promote"
   | "!warn"
   | "!no-unauthenticated"
-  | "dmca-violation"
-  | "doxxing"
   | "porn"
   | "sexual"
   | "nudity"
-  | "nsfl"
-  | "gore"
+  | "graphic-media"
+  | "bot"
   | (string & globalThis.Record<PropertyKey, never>);

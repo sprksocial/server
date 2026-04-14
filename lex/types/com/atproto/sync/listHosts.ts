@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as ComAtprotoSyncDefs from "./defs.ts";
 
@@ -47,10 +48,10 @@ export interface Host {
 
 const hashHost = "host";
 
-export function isHost<V>(v: V) {
+export function isHost<V>(v: V): v is Host & V {
   return is$typed(v, id, hashHost);
 }
 
-export function validateHost<V>(v: V) {
+export function validateHost<V>(v: V): ValidationResult<Host & V> {
   return validate<Host & V>(v, id, hashHost);
 }

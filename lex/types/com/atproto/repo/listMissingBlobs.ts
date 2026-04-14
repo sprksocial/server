@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -41,10 +42,10 @@ export interface RecordBlob {
 
 const hashRecordBlob = "recordBlob";
 
-export function isRecordBlob<V>(v: V) {
+export function isRecordBlob<V>(v: V): v is RecordBlob & V {
   return is$typed(v, id, hashRecordBlob);
 }
 
-export function validateRecordBlob<V>(v: V) {
+export function validateRecordBlob<V>(v: V): ValidationResult<RecordBlob & V> {
   return validate<RecordBlob & V>(v, id, hashRecordBlob);
 }

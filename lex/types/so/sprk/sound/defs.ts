@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as SoSprkActorDefs from "../actor/defs.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
@@ -26,11 +27,11 @@ export interface AudioView {
 
 const hashAudioView = "audioView";
 
-export function isAudioView<V>(v: V) {
+export function isAudioView<V>(v: V): v is AudioView & V {
   return is$typed(v, id, hashAudioView);
 }
 
-export function validateAudioView<V>(v: V) {
+export function validateAudioView<V>(v: V): ValidationResult<AudioView & V> {
   return validate<AudioView & V>(v, id, hashAudioView);
 }
 
@@ -43,10 +44,12 @@ export interface AudioDetails {
 
 const hashAudioDetails = "audioDetails";
 
-export function isAudioDetails<V>(v: V) {
+export function isAudioDetails<V>(v: V): v is AudioDetails & V {
   return is$typed(v, id, hashAudioDetails);
 }
 
-export function validateAudioDetails<V>(v: V) {
+export function validateAudioDetails<V>(
+  v: V,
+): ValidationResult<AudioDetails & V> {
   return validate<AudioDetails & V>(v, id, hashAudioDetails);
 }

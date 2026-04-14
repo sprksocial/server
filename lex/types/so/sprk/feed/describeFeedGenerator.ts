@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -38,11 +39,11 @@ export interface Feed {
 
 const hashFeed = "feed";
 
-export function isFeed<V>(v: V) {
+export function isFeed<V>(v: V): v is Feed & V {
   return is$typed(v, id, hashFeed);
 }
 
-export function validateFeed<V>(v: V) {
+export function validateFeed<V>(v: V): ValidationResult<Feed & V> {
   return validate<Feed & V>(v, id, hashFeed);
 }
 
@@ -54,10 +55,10 @@ export interface Links {
 
 const hashLinks = "links";
 
-export function isLinks<V>(v: V) {
+export function isLinks<V>(v: V): v is Links & V {
   return is$typed(v, id, hashLinks);
 }
 
-export function validateLinks<V>(v: V) {
+export function validateLinks<V>(v: V): ValidationResult<Links & V> {
   return validate<Links & V>(v, id, hashLinks);
 }

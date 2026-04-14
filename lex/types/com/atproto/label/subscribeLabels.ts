@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type { ErrorFrame } from "@atp/xrpc-server";
 import type * as ComAtprotoLabelDefs from "./defs.ts";
@@ -25,11 +26,11 @@ export interface Labels {
 
 const hashLabels = "labels";
 
-export function isLabels<V>(v: V) {
+export function isLabels<V>(v: V): v is Labels & V {
   return is$typed(v, id, hashLabels);
 }
 
-export function validateLabels<V>(v: V) {
+export function validateLabels<V>(v: V): ValidationResult<Labels & V> {
   return validate<Labels & V>(v, id, hashLabels);
 }
 
@@ -41,10 +42,10 @@ export interface Info {
 
 const hashInfo = "info";
 
-export function isInfo<V>(v: V) {
+export function isInfo<V>(v: V): v is Info & V {
   return is$typed(v, id, hashInfo);
 }
 
-export function validateInfo<V>(v: V) {
+export function validateInfo<V>(v: V): ValidationResult<Info & V> {
   return validate<Info & V>(v, id, hashInfo);
 }

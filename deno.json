@@ -9,7 +9,7 @@
     "dev": {
       "dependencies": ["dev:db", "dev:api", "dev:ingest"]
     },
-    "codegen": "deno run -A jsr:@atp/lex-gen@^0.1.0-alpha.2 server -o ./lex -i ./lexicons",
+    "codegen": "deno run -A ../atp/lex-gen/mod.ts server -o ./lex -i ./lexicons",
     "start": "deno run -A main.ts",
     "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
   },

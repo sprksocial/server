@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as AppBskyFeedDefs from "../feed/defs.ts";
 import type * as AppBskyUnspeccedDefs from "./defs.ts";
@@ -65,10 +66,10 @@ export interface ThreadItem {
 
 const hashThreadItem = "threadItem";
 
-export function isThreadItem<V>(v: V) {
+export function isThreadItem<V>(v: V): v is ThreadItem & V {
   return is$typed(v, id, hashThreadItem);
 }
 
-export function validateThreadItem<V>(v: V) {
+export function validateThreadItem<V>(v: V): ValidationResult<ThreadItem & V> {
   return validate<ThreadItem & V>(v, id, hashThreadItem);
 }

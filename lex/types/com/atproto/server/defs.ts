@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -20,11 +21,11 @@ export interface InviteCode {
 
 const hashInviteCode = "inviteCode";
 
-export function isInviteCode<V>(v: V) {
+export function isInviteCode<V>(v: V): v is InviteCode & V {
   return is$typed(v, id, hashInviteCode);
 }
 
-export function validateInviteCode<V>(v: V) {
+export function validateInviteCode<V>(v: V): ValidationResult<InviteCode & V> {
   return validate<InviteCode & V>(v, id, hashInviteCode);
 }
 
@@ -36,10 +37,12 @@ export interface InviteCodeUse {
 
 const hashInviteCodeUse = "inviteCodeUse";
 
-export function isInviteCodeUse<V>(v: V) {
+export function isInviteCodeUse<V>(v: V): v is InviteCodeUse & V {
   return is$typed(v, id, hashInviteCodeUse);
 }
 
-export function validateInviteCodeUse<V>(v: V) {
+export function validateInviteCodeUse<V>(
+  v: V,
+): ValidationResult<InviteCodeUse & V> {
   return validate<InviteCodeUse & V>(v, id, hashInviteCodeUse);
 }

@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef.ts";
 import type * as AppBskyFeedDefs from "../feed/defs.ts";
@@ -24,11 +25,11 @@ export interface Main {
 
 const hashMain = "main";
 
-export function isMain<V>(v: V) {
+export function isMain<V>(v: V): v is Main & V {
   return is$typed(v, id, hashMain);
 }
 
-export function validateMain<V>(v: V) {
+export function validateMain<V>(v: V): ValidationResult<Main & V> {
   return validate<Main & V>(v, id, hashMain);
 }
 
@@ -48,11 +49,11 @@ export interface View {
 
 const hashView = "view";
 
-export function isView<V>(v: V) {
+export function isView<V>(v: V): v is View & V {
   return is$typed(v, id, hashView);
 }
 
-export function validateView<V>(v: V) {
+export function validateView<V>(v: V): ValidationResult<View & V> {
   return validate<View & V>(v, id, hashView);
 }
 
@@ -81,11 +82,11 @@ export interface ViewRecord {
 
 const hashViewRecord = "viewRecord";
 
-export function isViewRecord<V>(v: V) {
+export function isViewRecord<V>(v: V): v is ViewRecord & V {
   return is$typed(v, id, hashViewRecord);
 }
 
-export function validateViewRecord<V>(v: V) {
+export function validateViewRecord<V>(v: V): ValidationResult<ViewRecord & V> {
   return validate<ViewRecord & V>(v, id, hashViewRecord);
 }
 
@@ -97,11 +98,13 @@ export interface ViewNotFound {
 
 const hashViewNotFound = "viewNotFound";
 
-export function isViewNotFound<V>(v: V) {
+export function isViewNotFound<V>(v: V): v is ViewNotFound & V {
   return is$typed(v, id, hashViewNotFound);
 }
 
-export function validateViewNotFound<V>(v: V) {
+export function validateViewNotFound<V>(
+  v: V,
+): ValidationResult<ViewNotFound & V> {
   return validate<ViewNotFound & V>(v, id, hashViewNotFound);
 }
 
@@ -114,11 +117,13 @@ export interface ViewBlocked {
 
 const hashViewBlocked = "viewBlocked";
 
-export function isViewBlocked<V>(v: V) {
+export function isViewBlocked<V>(v: V): v is ViewBlocked & V {
   return is$typed(v, id, hashViewBlocked);
 }
 
-export function validateViewBlocked<V>(v: V) {
+export function validateViewBlocked<V>(
+  v: V,
+): ValidationResult<ViewBlocked & V> {
   return validate<ViewBlocked & V>(v, id, hashViewBlocked);
 }
 
@@ -130,10 +135,12 @@ export interface ViewDetached {
 
 const hashViewDetached = "viewDetached";
 
-export function isViewDetached<V>(v: V) {
+export function isViewDetached<V>(v: V): v is ViewDetached & V {
   return is$typed(v, id, hashViewDetached);
 }
 
-export function validateViewDetached<V>(v: V) {
+export function validateViewDetached<V>(
+  v: V,
+): ValidationResult<ViewDetached & V> {
   return validate<ViewDetached & V>(v, id, hashViewDetached);
 }

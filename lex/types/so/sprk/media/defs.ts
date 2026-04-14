@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -16,10 +17,12 @@ export interface AspectRatio {
 
 const hashAspectRatio = "aspectRatio";
 
-export function isAspectRatio<V>(v: V) {
+export function isAspectRatio<V>(v: V): v is AspectRatio & V {
   return is$typed(v, id, hashAspectRatio);
 }
 
-export function validateAspectRatio<V>(v: V) {
+export function validateAspectRatio<V>(
+  v: V,
+): ValidationResult<AspectRatio & V> {
   return validate<AspectRatio & V>(v, id, hashAspectRatio);
 }

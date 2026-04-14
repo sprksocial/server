@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as AppBskyActorDefs from "../../../app/bsky/actor/defs.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
@@ -25,10 +26,12 @@ export interface ProfileViewBasic {
 
 const hashProfileViewBasic = "profileViewBasic";
 
-export function isProfileViewBasic<V>(v: V) {
+export function isProfileViewBasic<V>(v: V): v is ProfileViewBasic & V {
   return is$typed(v, id, hashProfileViewBasic);
 }
 
-export function validateProfileViewBasic<V>(v: V) {
+export function validateProfileViewBasic<V>(
+  v: V,
+): ValidationResult<ProfileViewBasic & V> {
   return validate<ProfileViewBasic & V>(v, id, hashProfileViewBasic);
 }

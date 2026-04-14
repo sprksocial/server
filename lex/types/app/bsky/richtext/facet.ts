@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -17,11 +18,11 @@ export interface Main {
 
 const hashMain = "main";
 
-export function isMain<V>(v: V) {
+export function isMain<V>(v: V): v is Main & V {
   return is$typed(v, id, hashMain);
 }
 
-export function validateMain<V>(v: V) {
+export function validateMain<V>(v: V): ValidationResult<Main & V> {
   return validate<Main & V>(v, id, hashMain);
 }
 
@@ -33,11 +34,11 @@ export interface Mention {
 
 const hashMention = "mention";
 
-export function isMention<V>(v: V) {
+export function isMention<V>(v: V): v is Mention & V {
   return is$typed(v, id, hashMention);
 }
 
-export function validateMention<V>(v: V) {
+export function validateMention<V>(v: V): ValidationResult<Mention & V> {
   return validate<Mention & V>(v, id, hashMention);
 }
 
@@ -49,11 +50,11 @@ export interface Link {
 
 const hashLink = "link";
 
-export function isLink<V>(v: V) {
+export function isLink<V>(v: V): v is Link & V {
   return is$typed(v, id, hashLink);
 }
 
-export function validateLink<V>(v: V) {
+export function validateLink<V>(v: V): ValidationResult<Link & V> {
   return validate<Link & V>(v, id, hashLink);
 }
 
@@ -65,11 +66,11 @@ export interface Tag {
 
 const hashTag = "tag";
 
-export function isTag<V>(v: V) {
+export function isTag<V>(v: V): v is Tag & V {
   return is$typed(v, id, hashTag);
 }
 
-export function validateTag<V>(v: V) {
+export function validateTag<V>(v: V): ValidationResult<Tag & V> {
   return validate<Tag & V>(v, id, hashTag);
 }
 
@@ -82,10 +83,10 @@ export interface ByteSlice {
 
 const hashByteSlice = "byteSlice";
 
-export function isByteSlice<V>(v: V) {
+export function isByteSlice<V>(v: V): v is ByteSlice & V {
   return is$typed(v, id, hashByteSlice);
 }
 
-export function validateByteSlice<V>(v: V) {
+export function validateByteSlice<V>(v: V): ValidationResult<ByteSlice & V> {
   return validate<ByteSlice & V>(v, id, hashByteSlice);
 }

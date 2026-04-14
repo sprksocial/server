@@ -3,6 +3,7 @@
  */
 import type { BlobRef } from "@atp/lexicon";
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as AppBskyEmbedDefs from "./defs.ts";
 
@@ -16,16 +17,17 @@ export interface Main {
 
 const hashMain = "main";
 
-export function isMain<V>(v: V) {
+export function isMain<V>(v: V): v is Main & V {
   return is$typed(v, id, hashMain);
 }
 
-export function validateMain<V>(v: V) {
+export function validateMain<V>(v: V): ValidationResult<Main & V> {
   return validate<Main & V>(v, id, hashMain);
 }
 
 export interface Image {
   $type?: "app.bsky.embed.images#image";
+  /** The raw image file. May be up to 2 MB, formerly limited to 1 MB. */
   image: BlobRef;
   /** Alt text description of the image, for accessibility. */
   alt: string;
@@ -34,11 +36,11 @@ export interface Image {
 
 const hashImage = "image";
 
-export function isImage<V>(v: V) {
+export function isImage<V>(v: V): v is Image & V {
   return is$typed(v, id, hashImage);
 }
 
-export function validateImage<V>(v: V) {
+export function validateImage<V>(v: V): ValidationResult<Image & V> {
   return validate<Image & V>(v, id, hashImage);
 }
 
@@ -49,11 +51,11 @@ export interface View {
 
 const hashView = "view";
 
-export function isView<V>(v: V) {
+export function isView<V>(v: V): v is View & V {
   return is$typed(v, id, hashView);
 }
 
-export function validateView<V>(v: V) {
+export function validateView<V>(v: V): ValidationResult<View & V> {
   return validate<View & V>(v, id, hashView);
 }
 
@@ -70,10 +72,10 @@ export interface ViewImage {
 
 const hashViewImage = "viewImage";
 
-export function isViewImage<V>(v: V) {
+export function isViewImage<V>(v: V): v is ViewImage & V {
   return is$typed(v, id, hashViewImage);
 }
 
-export function validateViewImage<V>(v: V) {
+export function validateViewImage<V>(v: V): ValidationResult<ViewImage & V> {
   return validate<ViewImage & V>(v, id, hashViewImage);
 }

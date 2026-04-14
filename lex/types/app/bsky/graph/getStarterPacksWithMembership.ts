@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as AppBskyGraphDefs from "./defs.ts";
 
@@ -46,11 +47,15 @@ export interface StarterPackWithMembership {
 
 const hashStarterPackWithMembership = "starterPackWithMembership";
 
-export function isStarterPackWithMembership<V>(v: V) {
+export function isStarterPackWithMembership<V>(
+  v: V,
+): v is StarterPackWithMembership & V {
   return is$typed(v, id, hashStarterPackWithMembership);
 }
 
-export function validateStarterPackWithMembership<V>(v: V) {
+export function validateStarterPackWithMembership<V>(
+  v: V,
+): ValidationResult<StarterPackWithMembership & V> {
   return validate<StarterPackWithMembership & V>(
     v,
     id,

@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 import type * as AppBskyActorDefs from "../actor/defs.ts";
 import type * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs.ts";
@@ -60,6 +61,7 @@ export interface Notification {
     | "like-via-repost"
     | "repost-via-repost"
     | "subscribed-post"
+    | "contact-match"
     | (string & globalThis.Record<PropertyKey, never>);
   reasonSubject?: string;
   record: { [_ in string]: unknown };
@@ -70,10 +72,12 @@ export interface Notification {
 
 const hashNotification = "notification";
 
-export function isNotification<V>(v: V) {
+export function isNotification<V>(v: V): v is Notification & V {
   return is$typed(v, id, hashNotification);
 }
 
-export function validateNotification<V>(v: V) {
+export function validateNotification<V>(
+  v: V,
+): ValidationResult<Notification & V> {
   return validate<Notification & V>(v, id, hashNotification);
 }

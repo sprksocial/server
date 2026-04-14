@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as AppBskyRichtextFacet from "../richtext/facet.ts";
 import type * as AppBskyEmbedImages from "../embed/images.ts";
@@ -43,11 +44,11 @@ export interface Record {
 
 const hashRecord = "main";
 
-export function isRecord<V>(v: V) {
+export function isRecord<V>(v: V): v is Record & V {
   return is$typed(v, id, hashRecord);
 }
 
-export function validateRecord<V>(v: V) {
+export function validateRecord<V>(v: V): ValidationResult<Record & V> {
   return validate<Record & V>(v, id, hashRecord, true);
 }
 
@@ -61,11 +62,11 @@ export interface ReplyRef {
 
 const hashReplyRef = "replyRef";
 
-export function isReplyRef<V>(v: V) {
+export function isReplyRef<V>(v: V): v is ReplyRef & V {
   return is$typed(v, id, hashReplyRef);
 }
 
-export function validateReplyRef<V>(v: V) {
+export function validateReplyRef<V>(v: V): ValidationResult<ReplyRef & V> {
   return validate<ReplyRef & V>(v, id, hashReplyRef);
 }
 
@@ -80,11 +81,11 @@ export interface Entity {
 
 const hashEntity = "entity";
 
-export function isEntity<V>(v: V) {
+export function isEntity<V>(v: V): v is Entity & V {
   return is$typed(v, id, hashEntity);
 }
 
-export function validateEntity<V>(v: V) {
+export function validateEntity<V>(v: V): ValidationResult<Entity & V> {
   return validate<Entity & V>(v, id, hashEntity);
 }
 
@@ -97,10 +98,10 @@ export interface TextSlice {
 
 const hashTextSlice = "textSlice";
 
-export function isTextSlice<V>(v: V) {
+export function isTextSlice<V>(v: V): v is TextSlice & V {
   return is$typed(v, id, hashTextSlice);
 }
 
-export function validateTextSlice<V>(v: V) {
+export function validateTextSlice<V>(v: V): ValidationResult<TextSlice & V> {
   return validate<TextSlice & V>(v, id, hashTextSlice);
 }

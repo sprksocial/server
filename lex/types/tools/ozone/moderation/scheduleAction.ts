@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as ToolsOzoneModerationDefs from "./defs.ts";
 
@@ -63,11 +64,11 @@ export interface Takedown {
 
 const hashTakedown = "takedown";
 
-export function isTakedown<V>(v: V) {
+export function isTakedown<V>(v: V): v is Takedown & V {
   return is$typed(v, id, hashTakedown);
 }
 
-export function validateTakedown<V>(v: V) {
+export function validateTakedown<V>(v: V): ValidationResult<Takedown & V> {
   return validate<Takedown & V>(v, id, hashTakedown);
 }
 
@@ -84,11 +85,13 @@ export interface SchedulingConfig {
 
 const hashSchedulingConfig = "schedulingConfig";
 
-export function isSchedulingConfig<V>(v: V) {
+export function isSchedulingConfig<V>(v: V): v is SchedulingConfig & V {
   return is$typed(v, id, hashSchedulingConfig);
 }
 
-export function validateSchedulingConfig<V>(v: V) {
+export function validateSchedulingConfig<V>(
+  v: V,
+): ValidationResult<SchedulingConfig & V> {
   return validate<SchedulingConfig & V>(v, id, hashSchedulingConfig);
 }
 
@@ -100,11 +103,15 @@ export interface ScheduledActionResults {
 
 const hashScheduledActionResults = "scheduledActionResults";
 
-export function isScheduledActionResults<V>(v: V) {
+export function isScheduledActionResults<V>(
+  v: V,
+): v is ScheduledActionResults & V {
   return is$typed(v, id, hashScheduledActionResults);
 }
 
-export function validateScheduledActionResults<V>(v: V) {
+export function validateScheduledActionResults<V>(
+  v: V,
+): ValidationResult<ScheduledActionResults & V> {
   return validate<ScheduledActionResults & V>(
     v,
     id,
@@ -121,10 +128,12 @@ export interface FailedScheduling {
 
 const hashFailedScheduling = "failedScheduling";
 
-export function isFailedScheduling<V>(v: V) {
+export function isFailedScheduling<V>(v: V): v is FailedScheduling & V {
   return is$typed(v, id, hashFailedScheduling);
 }
 
-export function validateFailedScheduling<V>(v: V) {
+export function validateFailedScheduling<V>(
+  v: V,
+): ValidationResult<FailedScheduling & V> {
   return validate<FailedScheduling & V>(v, id, hashFailedScheduling);
 }

@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { type $Typed, is$typed as _is$typed } from "../../../../util.ts";
 import type * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef.ts";
 import type * as AppBskyFeedDefs from "../feed/defs.ts";
@@ -17,11 +18,11 @@ export interface Bookmark {
 
 const hashBookmark = "bookmark";
 
-export function isBookmark<V>(v: V) {
+export function isBookmark<V>(v: V): v is Bookmark & V {
   return is$typed(v, id, hashBookmark);
 }
 
-export function validateBookmark<V>(v: V) {
+export function validateBookmark<V>(v: V): ValidationResult<Bookmark & V> {
   return validate<Bookmark & V>(v, id, hashBookmark);
 }
 
@@ -38,10 +39,12 @@ export interface BookmarkView {
 
 const hashBookmarkView = "bookmarkView";
 
-export function isBookmarkView<V>(v: V) {
+export function isBookmarkView<V>(v: V): v is BookmarkView & V {
   return is$typed(v, id, hashBookmarkView);
 }
 
-export function validateBookmarkView<V>(v: V) {
+export function validateBookmarkView<V>(
+  v: V,
+): ValidationResult<BookmarkView & V> {
   return validate<BookmarkView & V>(v, id, hashBookmarkView);
 }

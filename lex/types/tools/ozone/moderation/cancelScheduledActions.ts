@@ -2,6 +2,7 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { validate as _validate } from "../../../../lexicons.ts";
+import type { ValidationResult } from "@atp/lexicon";
 import { is$typed as _is$typed } from "../../../../util.ts";
 
 const is$typed = _is$typed, validate = _validate;
@@ -46,11 +47,13 @@ export interface CancellationResults {
 
 const hashCancellationResults = "cancellationResults";
 
-export function isCancellationResults<V>(v: V) {
+export function isCancellationResults<V>(v: V): v is CancellationResults & V {
   return is$typed(v, id, hashCancellationResults);
 }
 
-export function validateCancellationResults<V>(v: V) {
+export function validateCancellationResults<V>(
+  v: V,
+): ValidationResult<CancellationResults & V> {
   return validate<CancellationResults & V>(v, id, hashCancellationResults);
 }
 
@@ -63,10 +66,12 @@ export interface FailedCancellation {
 
 const hashFailedCancellation = "failedCancellation";
 
-export function isFailedCancellation<V>(v: V) {
+export function isFailedCancellation<V>(v: V): v is FailedCancellation & V {
   return is$typed(v, id, hashFailedCancellation);
 }
 
-export function validateFailedCancellation<V>(v: V) {
+export function validateFailedCancellation<V>(
+  v: V,
+): ValidationResult<FailedCancellation & V> {
   return validate<FailedCancellation & V>(v, id, hashFailedCancellation);
 }

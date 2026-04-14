@@ -10,6 +10,9 @@ export interface OutputSchema {
   handle: string;
   did: string;
   didDoc?: { [_ in string]: unknown };
+  email?: string;
+  emailConfirmed?: boolean;
+  emailAuthFactor?: boolean;
   active?: boolean;
   /** Hosting status of the account. If not specified, then assume 'active'. */
   status?:
@@ -30,7 +33,7 @@ export interface HandlerSuccess {
 export interface HandlerError {
   status: number;
   message?: string;
-  error?: "AccountTakedown";
+  error?: "AccountTakedown" | "InvalidToken" | "ExpiredToken";
 }
 
 export type HandlerOutput = HandlerError | HandlerSuccess;
