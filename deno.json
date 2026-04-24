@@ -9,7 +9,7 @@
     "dev": {
       "dependencies": ["dev:db", "dev:api", "dev:ingest"]
     },
-    "codegen": "deno run -A jsr:@atp/lex@^0.1.0-alpha.5 build --clear",
+    "codegen": "deno run -A jsr:@atp/lex@^0.1.0-alpha.9 build",
     "start": "deno run -A main.ts",
     "docker-dev": "docker compose -f compose.dev.yaml up --build --watch"
   },
@@ -18,7 +18,7 @@
     "@atp/common": "jsr:@atp/common@^0.1.0-alpha.11",
     "@atp/crypto": "jsr:@atp/crypto@^0.1.0-alpha.3",
     "@atp/identity": "jsr:@atp/identity@^0.1.0-alpha.2",
-    "@atp/lex": "jsr:@atp/lex@^0.1.0-alpha.8",
+    "@atp/lex": "jsr:@atp/lex@^0.1.0-alpha.9",
     "@atp/lexicon": "jsr:@atp/lexicon@^0.1.0-alpha.4",
     "@atp/repo": "jsr:@atp/repo@^0.1.0-alpha.6",
     "@atp/sync": "jsr:@atp/sync@^0.1.0-alpha.10",

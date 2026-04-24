@@ -8,7 +8,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN deno task codegen
+RUN deno task codegen --skip-fmt
 RUN deno install
 
 EXPOSE 3000

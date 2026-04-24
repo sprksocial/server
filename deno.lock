@@ -9,11 +9,11 @@
     "jsr:@atp/common@~0.1.0-alpha.9": "0.1.0-alpha.11",
     "jsr:@atp/crypto@~0.1.0-alpha.3": "0.1.0-alpha.3",
     "jsr:@atp/identity@~0.1.0-alpha.2": "0.1.0-alpha.2",
-    "jsr:@atp/lex@~0.1.0-alpha.2": "0.1.0-alpha.8",
-    "jsr:@atp/lex@~0.1.0-alpha.4": "0.1.0-alpha.8",
-    "jsr:@atp/lex@~0.1.0-alpha.5": "0.1.0-alpha.8",
-    "jsr:@atp/lex@~0.1.0-alpha.6": "0.1.0-alpha.8",
-    "jsr:@atp/lex@~0.1.0-alpha.8": "0.1.0-alpha.8",
+    "jsr:@atp/lex@~0.1.0-alpha.2": "0.1.0-alpha.9",
+    "jsr:@atp/lex@~0.1.0-alpha.4": "0.1.0-alpha.9",
+    "jsr:@atp/lex@~0.1.0-alpha.5": "0.1.0-alpha.9",
+    "jsr:@atp/lex@~0.1.0-alpha.6": "0.1.0-alpha.9",
+    "jsr:@atp/lex@~0.1.0-alpha.9": "0.1.0-alpha.9",
     "jsr:@atp/lexicon@~0.1.0-alpha.4": "0.1.0-alpha.4",
     "jsr:@atp/repo@~0.1.0-alpha.5": "0.1.0-alpha.6",
     "jsr:@atp/repo@~0.1.0-alpha.6": "0.1.0-alpha.6",
@@ -37,13 +37,13 @@
     "jsr:@noble/hashes@^2.0.1": "2.2.0",
     "jsr:@std/assert@^1.0.19": "1.0.19",
     "jsr:@std/encoding@^1.0.10": "1.0.10",
-    "jsr:@std/fmt@^1.0.9": "1.0.9",
+    "jsr:@std/fmt@^1.0.9": "1.0.10",
     "jsr:@std/fs@1": "1.0.23",
     "jsr:@std/fs@^1.0.20": "1.0.23",
-    "jsr:@std/internal@^1.0.12": "1.0.12",
+    "jsr:@std/internal@^1.0.12": "1.0.13",
     "jsr:@std/path@1": "1.1.4",
     "jsr:@std/path@^1.1.4": "1.1.4",
-    "jsr:@std/text@^1.0.17": "1.0.17",
+    "jsr:@std/text@^1.0.17": "1.0.18",
     "jsr:@ts-morph/common@0.27": "0.27.0",
     "jsr:@ts-morph/ts-morph@26": "26.0.0",
     "jsr:@zod/zod@^4.1.13": "4.3.6",
@@ -109,8 +109,8 @@
         "jsr:@atp/crypto"
       ]
     },
-    "@atp/lex@0.1.0-alpha.8": {
-      "integrity": "1572a0e47aacf5ddea79cc8eb5542637959ef891b011234bbc70bff7e7fa625b",
+    "@atp/lex@0.1.0-alpha.9": {
+      "integrity": "24729ea8fcee48d82eab549b948a3cb6d11a9876bd66357a1a18be58514571da",
       "dependencies": [
         "jsr:@atp/bytes",
         "jsr:@atp/crypto",
@@ -248,8 +248,8 @@
     "@std/encoding@1.0.10": {
       "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
     },
-    "@std/fmt@1.0.9": {
-      "integrity": "2487343e8899fb2be5d0e3d35013e54477ada198854e52dd05ed0422eddcabe0"
+    "@std/fmt@1.0.10": {
+      "integrity": "90dfba288802ac6de82fb31d0917eb9e4450b9925b954d5e51fc29ac07419db5"
     },
     "@std/fs@1.0.21": {
       "integrity": "d720fe1056d78d43065a4d6e0eeb2b19f34adb8a0bc7caf3a4dbf1d4178252cd"
@@ -261,8 +261,8 @@
         "jsr:@std/path@^1.1.4"
       ]
     },
-    "@std/internal@1.0.12": {
-      "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
+    "@std/internal@1.0.13": {
+      "integrity": "2f9546691d4ac2d32859c82dff284aaeac980ddeca38430d07941e7e288725c0"
     },
     "@std/path@1.1.4": {
       "integrity": "1d2d43f39efb1b42f0b1882a25486647cb851481862dc7313390b2bb044314b5",
@@ -273,8 +273,8 @@
     "@std/streams@1.0.16": {
       "integrity": "85030627befb1767c60d4f65cb30fa2f94af1d6ee6e5b2515b76157a542e89c4"
     },
-    "@std/text@1.0.17": {
-      "integrity": "4b2c4ef67ae5b6c1dfd447c81c83a43718f52e3c7e748d8b33f694aba9895f95"
+    "@std/text@1.0.18": {
+      "integrity": "d199e516f80599813c64fd4aee5b8f26f6f7d1e1434c88fd153aeea6fea6a9b9"
     },
     "@ts-morph/common@0.27.0": {
       "integrity": "c7b73592d78ce8479b356fd4f3d6ec3c460d77753a8680ff196effea7a939052",
@@ -1343,7 +1343,7 @@
       "jsr:@atp/common@~0.1.0-alpha.11",
       "jsr:@atp/crypto@~0.1.0-alpha.3",
       "jsr:@atp/identity@~0.1.0-alpha.2",
-      "jsr:@atp/lex@~0.1.0-alpha.8",
+      "jsr:@atp/lex@~0.1.0-alpha.9",
       "jsr:@atp/lexicon@~0.1.0-alpha.4",
       "jsr:@atp/repo@~0.1.0-alpha.6",
       "jsr:@atp/sync@~0.1.0-alpha.10",
