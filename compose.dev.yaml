@@ -40,9 +40,8 @@ services:
         - path: ./api
           action: sync
           target: /app/api
-        - path: ./lexicon
-          action: sync
-          target: /app/lexicon
+        - path: ./lexicons
+          action: rebuild
         - path: ./services
           action: sync
           target: /app/services
@@ -87,9 +86,8 @@ services:
         - path: ./api
           action: sync
           target: /app/api
-        - path: ./lexicon
-          action: sync
-          target: /app/lexicon
+        - path: ./lexicons
+          action: rebuild
         - path: ./services
           action: sync
           target: /app/services

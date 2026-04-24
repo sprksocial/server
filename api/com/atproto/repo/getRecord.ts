@@ -1,10 +1,12 @@
+import type { AtUriString, CidString, UnknownObject } from "@atp/lex";
 import { AtUri } from "@atp/syntax";
-import { InvalidRequestError } from "@atp/xrpc-server";
+import { InvalidRequestError, Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
-import { Server } from "../../../../lex/index.ts";
+import * as com from "../../../../lex/com.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  server.com.atproto.repo.getRecord({
+  server.add(com.atproto.repo.getRecord, {
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ auth, params }) => {
       const { repo, collection, rkey, cid } = params;
@@ -34,9 +36,9 @@ export default function (server: Server, ctx: AppContext) {
       return {
         encoding: "application/json" as const,
         body: {
-          uri: uri,
-          cid: result.cid,
-          value: result.record,
+          uri: uri as AtUriString,
+          cid: result.cid as CidString,
+          value: result.record as UnknownObject,
         },
       };
     },

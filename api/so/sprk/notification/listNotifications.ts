@@ -1,10 +1,12 @@
-import { InvalidRequestError } from "@atp/xrpc-server";
+import type { DatetimeString } from "@atp/lex";
+import { InvalidRequestError, Server } from "@atp/xrpc-server";
+
 import { ServerConfig } from "../../../../config.ts";
 import { AppContext } from "../../../../context.ts";
 import { Notification } from "../../../../data-plane/routes/notifs.ts";
 import { HydrateCtx, Hydrator } from "../../../../hydration/index.ts";
-import { Server } from "../../../../lex/index.ts";
-import { QueryParams } from "../../../../lex/types/so/sprk/notification/listNotifications.ts";
+import * as so from "../../../../lex/so.ts";
+import { $Params } from "../../../../lex/so/sprk/notification/listNotifications.ts";
 import {
   createPipeline,
   filterSkeletonList,
@@ -24,7 +26,7 @@ export default function (server: Server, ctx: AppContext) {
     rules: noBlockOrMutesOrNeedsFiltering,
     presentation,
   });
-  server.so.sprk.notification.listNotifications({
+  server.add(so.sprk.notification.listNotifications, {
     auth: ctx.authVerifier.standard,
     handler: async ({ params, auth, req }) => {
       const viewer = auth.credentials.iss;
@@ -135,7 +137,7 @@ const skeleton = async (
       priority,
       reasons: params.reasons,
       cursor: delayedCursor,
-      limit: params.limit,
+      limit: params.limit ?? 50,
       viewer,
     }),
     ctx.hydrator.dataplane.notifications.getNotificationSeen(
@@ -220,7 +222,7 @@ const presentation = (
     notifications,
     cursor,
     priority: skeleton.priority,
-    seenAt: skeleton.lastSeenNotifs,
+    seenAt: skeleton.lastSeenNotifs as DatetimeString | undefined,
   };
 };
 
@@ -230,7 +232,7 @@ type Context = {
   cfg: ServerConfig;
 };
 
-type Params = QueryParams & {
+type Params = $Params & {
   hydrateCtx: HydrateCtx & { viewer: string };
 };
 

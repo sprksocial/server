@@ -1,9 +1,4 @@
-import { Record as FeedGenRecord } from "../lex/types/so/sprk/feed/generator.ts";
-import { Record as LikeRecord } from "../lex/types/so/sprk/feed/like.ts";
-import { Record as PostRecord } from "../lex/types/so/sprk/feed/post.ts";
-import { Record as ReplyRecord } from "../lex/types/so/sprk/feed/reply.ts";
-import { Record as RepostRecord } from "../lex/types/app/bsky/feed/repost.ts";
-import { Record as AudioRecord } from "../lex/types/so/sprk/sound/audio.ts";
+import * as so from "../lex/so.ts";
 import { uriToDid as didFromUri } from "../utils/uris.ts";
 import {
   HydrationMap,
@@ -14,6 +9,13 @@ import {
   split,
 } from "./util.ts";
 import { DataPlane } from "../data-plane/index.ts";
+
+export type FeedGenRecord = so.sprk.feed.generator.Main;
+export type LikeRecord = so.sprk.feed.like.Main;
+export type PostRecord = so.sprk.feed.post.Main;
+export type ReplyRecord = so.sprk.feed.reply.Main;
+export type RepostRecord = so.sprk.feed.repost.Main;
+export type AudioRecord = so.sprk.sound.audio.Main;
 
 export type Post = RecordInfo<PostRecord>;
 export type Posts = HydrationMap<Post>;
@@ -114,7 +116,11 @@ export class FeedHydrator {
     const res = await this.dataplane.records.getPostRecords(need);
 
     return need.reduce((acc, uri, i) => {
-      const record = parseRecord<PostRecord>(res.records[i], includeTakedowns);
+      const record = parseRecord<PostRecord>(
+        so.sprk.feed.post.main,
+        res.records[i],
+        includeTakedowns,
+      );
       return acc.set(
         uri,
         record ? record : null,
@@ -136,7 +142,11 @@ export class FeedHydrator {
     const res = await this.dataplane.records.getReplyRecords(need);
 
     return need.reduce((acc, uri, i) => {
-      const record = parseRecord<ReplyRecord>(res.records[i], includeTakedowns);
+      const record = parseRecord<ReplyRecord>(
+        so.sprk.feed.reply.main,
+        res.records[i],
+        includeTakedowns,
+      );
       return acc.set(
         uri,
         record ? record : null,
@@ -158,7 +168,11 @@ export class FeedHydrator {
     const res = await this.dataplane.records.getRecords(need);
 
     return need.reduce((acc, uri, i) => {
-      const record = parseRecord<AudioRecord>(res.records[i], includeTakedowns);
+      const record = parseRecord<AudioRecord>(
+        so.sprk.sound.audio.main,
+        res.records[i],
+        includeTakedowns,
+      );
       return acc.set(
         uri,
         record ? record : null,
@@ -273,6 +287,7 @@ export class FeedHydrator {
     const res = await this.dataplane.records.getFeedGeneratorRecords(uris);
     return uris.reduce((acc, uri, i) => {
       const record = parseRecord<FeedGenRecord>(
+        so.sprk.feed.generator.main,
         res.records[i],
         includeTakedowns,
       );
@@ -312,7 +327,11 @@ export class FeedHydrator {
     if (!uris.length) return new HydrationMap<Like>();
     const res = await this.dataplane.records.getLikeRecords(uris);
     return uris.reduce((acc, uri, i) => {
-      const record = parseRecord<LikeRecord>(res.records[i], includeTakedowns);
+      const record = parseRecord<LikeRecord>(
+        so.sprk.feed.like.main,
+        res.records[i],
+        includeTakedowns,
+      );
       return acc.set(uri, record ?? null);
     }, new HydrationMap<Like>());
   }
@@ -322,6 +341,7 @@ export class FeedHydrator {
     const res = await this.dataplane.records.getRepostRecords(uris);
     return uris.reduce((acc, uri, i) => {
       const record = parseRecord<RepostRecord>(
+        so.sprk.feed.repost.main,
         res.records[i],
         includeTakedowns,
       );

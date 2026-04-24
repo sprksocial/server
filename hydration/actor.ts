@@ -1,11 +1,13 @@
 import { DataPlane } from "../data-plane/index.ts";
-import { Record as ProfileRecord } from "../lex/types/so/sprk/actor/profile.ts";
+import * as so from "../lex/so.ts";
 import {
   HydrationMap,
   parseRecord,
   parseString,
   safeTakedownRef,
 } from "./util.ts";
+
+export type ProfileRecord = so.sprk.actor.profile.Main;
 
 export type Actor = {
   did: string;
@@ -121,7 +123,11 @@ export class ActorHydrator {
       }
 
       const profile = actor.profile
-        ? parseRecord<ProfileRecord>(actor.profile, includeTakedowns)
+        ? parseRecord<ProfileRecord>(
+          so.sprk.actor.profile.main,
+          actor.profile,
+          includeTakedowns,
+        )
         : undefined;
 
       return acc.set(did, {

@@ -1,20 +1,20 @@
-import { CID } from "multiformats/cid";
+import { Cid } from "@atp/lex";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
-import * as lex from "../../../lex/lexicons.ts";
-import * as Block from "../../../lex/types/so/sprk/graph/block.ts";
+import * as so from "../../../lex/so.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { BlockDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexId = lex.ids.SoSprkGraphBlock;
+const schema = so.sprk.graph.block.main;
+type BlockRecord = so.sprk.graph.block.Main;
 type IndexedBlock = BlockDocument;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
-  cid: CID,
-  obj: Block.Record,
+  cid: Cid,
+  obj: BlockRecord,
   timestamp: string,
 ): Promise<IndexedBlock | null> => {
   const block = {
@@ -37,7 +37,7 @@ const insertFn = async (
 const findDuplicate = async (
   db: Database,
   uri: AtUri,
-  obj: Block.Record,
+  obj: BlockRecord,
 ): Promise<AtUri | null> => {
   const found = await db.models.Block.findOne({
     authorDid: uri.host,
@@ -64,14 +64,14 @@ const notifsForDelete = () => {
   return { notifs: [], toDelete: [] };
 };
 
-export type PluginType = RecordProcessor<Block.Record, IndexedBlock>;
+export type PluginType = RecordProcessor<typeof schema, IndexedBlock>;
 
 export const makePlugin = (
   db: Database,
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexId,
+    schema,
     insertFn,
     findDuplicate,
     deleteFn,

@@ -1,8 +1,7 @@
 import { AtUri } from "@atp/syntax";
 import { DataPlane } from "../data-plane/index.ts";
-import { ids } from "../lex/lexicons.ts";
-import { Record as LabelerRecord } from "../lex/types/so/sprk/labeler/service.ts";
-import { Label } from "../lex/types/com/atproto/label/defs.ts";
+import * as com from "../lex/com.ts";
+import * as so from "../lex/so.ts";
 import { ParsedLabelers } from "../util.ts";
 import {
   HydrationMap,
@@ -12,7 +11,8 @@ import {
   RecordInfo,
 } from "./util.ts";
 
-export type { Label } from "../lex/types/com/atproto/label/defs.ts";
+export type Label = com.atproto.label.defs.Label;
+export type LabelerRecord = so.sprk.labeler.service.Main;
 
 export type SubjectLabels = {
   isImpersonation: boolean;
@@ -131,6 +131,7 @@ export class LabelHydrator {
     const res = await this.dataplane.records.getRecords(uris);
     return dids.reduce((acc, did, i) => {
       const record = parseRecord<LabelerRecord>(
+        so.sprk.labeler.service.main,
         res.records[i],
         includeTakedowns,
       );
@@ -166,7 +167,7 @@ export class LabelHydrator {
 }
 
 const labelerDidToUri = (did: string): string => {
-  return AtUri.make(did, ids.SoSprkLabelerService, "self").toString();
+  return AtUri.make(did, so.sprk.labeler.service.$type, "self").toString();
 };
 
 const IMPERSONATION_LABEL = "impersonation";

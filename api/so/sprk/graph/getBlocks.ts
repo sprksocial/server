@@ -1,8 +1,10 @@
 import { mapDefined } from "@atp/common";
+import { Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
 import { HydrateCtx, Hydrator } from "../../../../hydration/index.ts";
-import { Server } from "../../../../lex/index.ts";
-import { QueryParams } from "../../../../lex/types/so/sprk/graph/getBlocks.ts";
+import { $Params } from "../../../../lex/so/sprk/graph/getBlocks.ts";
+import * as so from "../../../../lex/so.ts";
 import {
   createPipeline,
   HydrationFnInput,
@@ -23,7 +25,7 @@ export default function (server: Server, ctx: AppContext) {
     hydration,
     presentation,
   });
-  server.so.sprk.graph.getBlocks({
+  server.add(so.sprk.graph.getBlocks, {
     auth: ctx.authVerifier.standard,
     handler: async ({ params, auth, req }) => {
       const viewer = auth.credentials.iss;
@@ -92,7 +94,7 @@ type Context = {
   views: Views;
 };
 
-type Params = QueryParams & {
+type Params = $Params & {
   hydrateCtx: HydrateCtx & { viewer: string };
 };
 

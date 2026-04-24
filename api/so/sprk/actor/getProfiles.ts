@@ -1,7 +1,9 @@
+import { Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
 import { HydrateCtx, Hydrator } from "../../../../hydration/index.ts";
-import { Server } from "../../../../lex/index.ts";
-import { QueryParams } from "../../../../lex/types/so/sprk/actor/getProfiles.ts";
+import * as so from "../../../../lex/so.ts";
+import { $Params } from "../../../../lex/so/sprk/actor/getProfiles.ts";
 import {
   createPipeline,
   mapSkeletonList,
@@ -17,7 +19,7 @@ export default function (server: Server, ctx: AppContext) {
     hydration,
     presentation,
   });
-  server.so.sprk.actor.getProfiles({
+  server.add(so.sprk.actor.getProfiles, {
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ auth, params, req }) => {
       const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
@@ -74,7 +76,7 @@ type Context = {
   views: Views;
 };
 
-type Params = QueryParams & {
+type Params = $Params & {
   hydrateCtx: HydrateCtx;
 };
 

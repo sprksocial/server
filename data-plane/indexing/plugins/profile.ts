@@ -1,20 +1,20 @@
-import { CID } from "multiformats/cid";
+import { Cid } from "@atp/lex";
 import { AtUri } from "@atp/syntax";
-import * as lex from "../../../lex/lexicons.ts";
-import * as Profile from "../../../lex/types/so/sprk/actor/profile.ts";
+import * as so from "../../../lex/so.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { ProfileDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexId = lex.ids.SoSprkActorProfile;
+const schema = so.sprk.actor.profile.main;
+type ProfileRecord = so.sprk.actor.profile.Main;
 type IndexedProfile = ProfileDocument;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
-  cid: CID,
-  obj: Profile.Record,
+  cid: Cid,
+  obj: ProfileRecord,
   timestamp: string,
 ): Promise<IndexedProfile | null> => {
   if (uri.rkey !== "self") return null;
@@ -62,14 +62,14 @@ const notifsForDelete = () => {
   return { notifs: [], toDelete: [] };
 };
 
-export type PluginType = RecordProcessor<Profile.Record, IndexedProfile>;
+export type PluginType = RecordProcessor<typeof schema, IndexedProfile>;
 
 export const makePlugin = (
   db: Database,
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexId,
+    schema,
     insertFn,
     findDuplicate,
     deleteFn,

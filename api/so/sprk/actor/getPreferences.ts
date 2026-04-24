@@ -1,15 +1,18 @@
-import { Server } from "../../../../lex/index.ts";
+import type { AtUriString, DatetimeString, DidString } from "@atp/lex";
+import { Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
+import * as so from "../../../../lex/so.ts";
 import {
   ContentLabelPref,
   MutedWord,
   Preferences,
   SavedFeed,
   ThreadViewPref,
-} from "../../../../lex/types/so/sprk/actor/defs.ts";
+} from "../../../../lex/so/sprk/actor/defs.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  server.so.sprk.actor.getPreferences({
+  server.add(so.sprk.actor.getPreferences, {
     auth: ctx.authVerifier.standard,
     handler: async ({ auth }) => {
       const userDid = auth.credentials.iss;
@@ -32,7 +35,7 @@ export default function (server: Server, ctx: AppContext) {
           for (const pref of userPref.contentLabelPrefs) {
             preferences.push({
               $type: "so.sprk.actor.defs#contentLabelPref",
-              labelerDid: pref.labelerDid,
+              labelerDid: pref.labelerDid as DidString | undefined,
               label: pref.label,
               visibility: pref.visibility as ContentLabelPref["visibility"],
             });
@@ -52,7 +55,9 @@ export default function (server: Server, ctx: AppContext) {
         if (userPref.personalDetailsPref) {
           preferences.push({
             $type: "so.sprk.actor.defs#personalDetailsPref",
-            birthDate: userPref.personalDetailsPref.birthDate,
+            birthDate: userPref.personalDetailsPref.birthDate as
+              | DatetimeString
+              | undefined,
           });
         }
 
@@ -91,6 +96,7 @@ export default function (server: Server, ctx: AppContext) {
               ...item,
               targets: item.targets as MutedWord["targets"],
               actorTarget: item.actorTarget as MutedWord["actorTarget"],
+              expiresAt: item.expiresAt as DatetimeString | undefined,
             })),
           });
         }
@@ -98,14 +104,17 @@ export default function (server: Server, ctx: AppContext) {
         if (userPref.hiddenPostsPref) {
           preferences.push({
             $type: "so.sprk.actor.defs#hiddenPostsPref",
-            items: userPref.hiddenPostsPref.items,
+            items: userPref.hiddenPostsPref.items as AtUriString[],
           });
         }
 
         if (userPref.labelersPref) {
           preferences.push({
             $type: "so.sprk.actor.defs#labelersPref",
-            labelers: userPref.labelersPref.labelers,
+            labelers: userPref.labelersPref.labelers.map((item) => ({
+              ...item,
+              did: item.did as DidString,
+            })),
           });
         }
 

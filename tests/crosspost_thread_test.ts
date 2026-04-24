@@ -1,6 +1,6 @@
 import { assertEquals } from "@std/assert";
 import { createTestApp, TEST_USERS } from "./util.ts";
-import { OutputSchema } from "../lex/types/so/sprk/feed/getCrosspostThread.ts";
+import { $OutputBody } from "../lex/so/sprk/feed/getCrosspostThread.ts";
 
 Deno.test({
   name: "Crosspost thread endpoint",
@@ -173,7 +173,7 @@ Deno.test({
           );
           assertEquals(res.status, 200);
 
-          const body = await res.json() as OutputSchema;
+          const body = await res.json() as $OutputBody;
           assertEquals(body.thread.length, 5);
           assertEquals(body.thread[0].uri, parentUri);
           assertEquals(body.thread[0].depth, 0);
@@ -195,7 +195,7 @@ Deno.test({
           }&depth=5&parentHeight=5&sort=oldest&limit=2`,
         );
         assertEquals(firstRes.status, 200);
-        const firstBody = await firstRes.json() as OutputSchema;
+        const firstBody = await firstRes.json() as $OutputBody;
         assertEquals(firstBody.thread.length, 2);
         assertEquals(firstBody.thread[0].uri, parentUri);
         assertEquals(firstBody.thread[1].uri, reply1Uri);
@@ -207,7 +207,7 @@ Deno.test({
           }&depth=5&parentHeight=5&sort=oldest&limit=2&cursor=${firstBody.cursor}`,
         );
         assertEquals(secondRes.status, 200);
-        const secondBody = await secondRes.json() as OutputSchema;
+        const secondBody = await secondRes.json() as $OutputBody;
         assertEquals(secondBody.thread.length, 2);
         assertEquals(secondBody.thread[0].uri, reply3Uri);
         assertEquals(secondBody.thread[1].uri, reply4Uri);
@@ -219,7 +219,7 @@ Deno.test({
           }&depth=5&parentHeight=5&sort=oldest&limit=2&cursor=${secondBody.cursor}`,
         );
         assertEquals(thirdRes.status, 200);
-        const thirdBody = await thirdRes.json() as OutputSchema;
+        const thirdBody = await thirdRes.json() as $OutputBody;
         assertEquals(thirdBody.thread.length, 1);
         assertEquals(thirdBody.thread[0].uri, reply2Uri);
         assertEquals(thirdBody.cursor, undefined);
@@ -233,7 +233,7 @@ Deno.test({
         );
         assertEquals(res.status, 200);
 
-        const body = await res.json() as OutputSchema;
+        const body = await res.json() as $OutputBody;
         assertEquals(body.thread.length, 4);
         assertEquals(body.thread[0].uri, parentUri);
         assertEquals(body.thread[1].uri, reply4Uri);
@@ -249,7 +249,7 @@ Deno.test({
         );
         assertEquals(res.status, 200);
 
-        const body = await res.json() as OutputSchema;
+        const body = await res.json() as $OutputBody;
         assertEquals(body.thread.length, 4);
         assertEquals(body.thread[0].uri, parentUri);
         assertEquals(body.thread[1].uri, reply4Uri);
@@ -265,7 +265,7 @@ Deno.test({
         );
         assertEquals(res.status, 200);
 
-        const body = await res.json() as OutputSchema;
+        const body = await res.json() as $OutputBody;
         assertEquals(body.thread.length, 3);
         assertEquals(body.thread[0].uri, parentUri);
         assertEquals(body.thread[0].depth, -2);
@@ -283,7 +283,7 @@ Deno.test({
         );
         assertEquals(res.status, 200);
 
-        const body = await res.json() as OutputSchema;
+        const body = await res.json() as $OutputBody;
         const blocked = body.thread.find((item) => item.uri === reply2Uri);
         assertEquals(
           blocked?.value.$type,
@@ -316,7 +316,7 @@ Deno.test({
             }&depth=5&parentHeight=5&sort=oldest&limit=50`,
           );
           assertEquals(res.status, 200);
-          const body = await res.json() as OutputSchema;
+          const body = await res.json() as $OutputBody;
           assertEquals(
             body.thread.some((item) => item.uri === reply4Uri),
             false,
@@ -334,7 +334,7 @@ Deno.test({
           );
           assertEquals(res.status, 200);
 
-          const body = await res.json() as OutputSchema;
+          const body = await res.json() as $OutputBody;
           assertEquals(body.thread.length, 2);
           assertEquals(body.thread[0].uri, cycleBUri);
           assertEquals(body.thread[0].depth, -1);

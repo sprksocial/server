@@ -1,15 +1,17 @@
-import { InvalidRequestError } from "@atp/xrpc-server";
+import type { CidString } from "@atp/lex";
+import { InvalidRequestError, Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
-import { Server } from "../../../../lex/index.ts";
-import { OutputSchema } from "../../../../lex/types/com/atproto/admin/getSubjectStatus.ts";
+import * as com from "../../../../lex/com.ts";
+import { $OutputBody } from "../../../../lex/com/atproto/admin/getSubjectStatus.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  server.com.atproto.admin.getSubjectStatus({
+  server.add(com.atproto.admin.getSubjectStatus, {
     auth: ctx.authVerifier.roleOrModService,
     handler: async ({ params }) => {
       const { did, uri, blob } = params;
 
-      let body: OutputSchema | null = null;
+      let body: $OutputBody | null = null;
       if (blob) {
         if (!did) {
           throw new InvalidRequestError(
@@ -38,7 +40,7 @@ export default function (server: Server, ctx: AppContext) {
             subject: {
               $type: "com.atproto.repo.strongRef",
               uri,
-              cid: res.cid,
+              cid: res.cid as CidString,
             },
             takedown: {
               applied: !!res.takedownRef,

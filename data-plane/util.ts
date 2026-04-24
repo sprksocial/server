@@ -1,10 +1,10 @@
-import {
-  Record as ReplyRecord,
-  ReplyRef,
-} from "../lex/types/so/sprk/feed/reply.ts";
 import { Database } from "./db/index.ts";
 import { DidDocument } from "@atp/identity";
 import * as bytes from "@atp/bytes";
+import * as so from "../lex/so.ts";
+
+type ReplyRecord = so.sprk.feed.reply.Main;
+type ReplyRef = so.sprk.feed.reply.ReplyRef;
 
 export const getDescendents = async (
   db: Database,

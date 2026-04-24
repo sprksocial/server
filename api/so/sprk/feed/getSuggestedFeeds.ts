@@ -1,11 +1,13 @@
 import { mapDefined } from "@atp/common";
+import { Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
 import { parseString } from "../../../../hydration/util.ts";
-import { Server } from "../../../../lex/index.ts";
+import * as so from "../../../../lex/so.ts";
 import { createHydrateCtxFromAuth, resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  server.so.sprk.feed.getSuggestedFeeds({
+  server.add(so.sprk.feed.getSuggestedFeeds, {
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ auth, params, req }) => {
       // @NOTE no need to coordinate the cursor for appview swap, as v1 doesn't use the cursor

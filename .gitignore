@@ -35,3 +35,4 @@ test.sqlite
 **/*.bun
 /devdb
 mongo-keyfile
+/lex/

@@ -1,20 +1,20 @@
-import { CID } from "multiformats/cid";
+import { Cid } from "@atp/lex";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
-import * as lex from "../../../lex/lexicons.ts";
-import * as Follow from "../../../lex/types/so/sprk/graph/follow.ts";
+import * as so from "../../../lex/so.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { FollowDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexId = lex.ids.SoSprkGraphFollow;
+const schema = so.sprk.graph.follow.main;
+type FollowRecord = so.sprk.graph.follow.Main;
 type IndexedFollow = FollowDocument;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
-  cid: CID,
-  obj: Follow.Record,
+  cid: Cid,
+  obj: FollowRecord,
   timestamp: string,
 ): Promise<IndexedFollow | null> => {
   const follow = {
@@ -37,7 +37,7 @@ const insertFn = async (
 const findDuplicate = async (
   db: Database,
   uri: AtUri,
-  obj: Follow.Record,
+  obj: FollowRecord,
 ): Promise<AtUri | null> => {
   const found = await db.models.Follow.findOne({
     authorDid: uri.host,
@@ -118,14 +118,14 @@ const updateAggregates = async (db: Database, follow: IndexedFollow) => {
   }
 };
 
-export type PluginType = RecordProcessor<Follow.Record, IndexedFollow>;
+export type PluginType = RecordProcessor<typeof schema, IndexedFollow>;
 
 export const makePlugin = (
   db: Database,
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexId,
+    schema,
     insertFn,
     findDuplicate,
     deleteFn,

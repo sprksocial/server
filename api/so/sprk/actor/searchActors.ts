@@ -1,9 +1,11 @@
+import { Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
 import { HydrateCtx, Hydrator } from "../../../../hydration/index.ts";
 import { parseString } from "../../../../hydration/util.ts";
-import { Server } from "../../../../lex/index.ts";
-import { QueryParams } from "../../../../lex/types/so/sprk/actor/searchActors.ts";
+import * as so from "../../../../lex/so.ts";
+import { $Params } from "../../../../lex/so/sprk/actor/searchActors.ts";
 import {
   createPipeline,
   filterSkeletonList,
@@ -23,7 +25,7 @@ export default function (server: Server, ctx: AppContext) {
     rules: noBlocks,
     presentation,
   });
-  server.so.sprk.actor.searchActors({
+  server.add(so.sprk.actor.searchActors, {
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ auth, params, req }) => {
       const cleanedQuery = params.q?.trim() ?? "";
@@ -112,7 +114,7 @@ type Context = {
   views: Views;
 };
 
-type Params = QueryParams & { hydrateCtx: HydrateCtx };
+type Params = $Params & { hydrateCtx: HydrateCtx };
 
 type Skeleton = {
   dids: string[];

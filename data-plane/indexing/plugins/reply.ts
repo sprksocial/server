@@ -1,16 +1,6 @@
-import { CID } from "multiformats/cid";
+import { Cid, lexParse } from "@atp/lex";
 import { AtUri } from "@atp/syntax";
-import * as lex from "../../../lex/lexicons.ts";
-import { isMain as isMediaImage } from "../../../lex/types/so/sprk/media/image.ts";
-import {
-  Record as ReplyRecord,
-  ReplyRef,
-} from "../../../lex/types/so/sprk/feed/reply.ts";
-import { Record as GateRecord } from "../../../lex/types/so/sprk/feed/threadgate.ts";
-import {
-  isLink,
-  isMention,
-} from "../../../lex/types/so/sprk/richtext/facet.ts";
+import * as so from "../../../lex/so.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { ReplyDocument } from "../../db/models.ts";
@@ -20,7 +10,6 @@ import {
   invalidReplyRoot as checkInvalidReplyRoot,
 } from "../../util.ts";
 import { RecordProcessor } from "../processor.ts";
-import { jsonToLex } from "@atp/lexicon";
 
 type Ancestor = {
   uri: string;
@@ -33,6 +22,9 @@ type Descendent = {
   creator: string;
   sortAt: string;
 };
+type ReplyRecord = so.sprk.feed.reply.Main;
+type ReplyRef = so.sprk.feed.reply.ReplyRef;
+type GateRecord = so.sprk.feed.threadgate.Main;
 type IndexedReply = {
   reply: ReplyDocument;
   facets?: { type: "mention" | "link"; value: string }[];
@@ -45,14 +37,17 @@ type IndexedReply = {
   threadgate?: GateRecord;
 };
 
-const lexId = lex.ids.SoSprkFeedReply;
+const schema = so.sprk.feed.reply.main;
+const isMediaImage = so.sprk.media.image.$matches;
+const isMention = so.sprk.richtext.facet.mention.$matches;
+const isLink = so.sprk.richtext.facet.link.$matches;
 
 const REPLY_NOTIF_DEPTH = 5;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
-  cid: CID,
+  cid: Cid,
   obj: ReplyRecord,
   timestamp: string,
 ): Promise<IndexedReply | null> => {
@@ -77,7 +72,7 @@ const insertFn = async (
     media: obj.media,
     langs: obj.langs || [],
     labels: obj.labels || null,
-    tags: obj.tags || [],
+    tags: (obj as { tags?: string[] }).tags || [],
     createdAt: obj.createdAt,
     indexedAt: timestamp,
   };
@@ -196,7 +191,8 @@ const notifsForInsert = (obj: IndexedReply) => {
     }
   }
 
-  const threadgateHiddenReplies = obj.threadgate?.hiddenReplies || [];
+  const threadgateHiddenReplies = (obj.threadgate?.hiddenReplies || [])
+    .map(String);
 
   // reply notifications
   for (const ancestor of obj.ancestors ?? []) {
@@ -309,14 +305,14 @@ const updateAggregates = async (db: Database, replyIdx: IndexedReply) => {
   }
 };
 
-export type PluginType = RecordProcessor<ReplyRecord, IndexedReply>;
+export type PluginType = RecordProcessor<typeof schema, IndexedReply>;
 
 export const makePlugin = (
   db: Database,
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexId,
+    schema,
     insertFn,
     findDuplicate,
     deleteFn,
@@ -354,14 +350,14 @@ async function getReplyRefs(db: Database, reply: ReplyRef) {
       ? {
         uri: root.uri,
         invalidReplyRoot: root.invalidReplyRoot ?? null,
-        record: jsonToLex(root.json) as ReplyRecord,
+        record: lexParse(root.json, { strict: false }) as ReplyRecord,
       }
       : null,
     parent: parent && parent.json
       ? {
         uri: parent.uri,
         invalidReplyRoot: parent.invalidReplyRoot ?? null,
-        record: jsonToLex(parent.json) as ReplyRecord,
+        record: lexParse(parent.json, { strict: false }) as ReplyRecord,
       }
       : null,
   };

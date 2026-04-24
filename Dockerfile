@@ -8,8 +8,9 @@ WORKDIR /app
 
 COPY . .
 
+RUN deno task codegen
 RUN deno install
 
 EXPOSE 3000
 
-CMD ["deno", "task", "start"]
+CMD ["deno", "run", "-A", "main.ts"]

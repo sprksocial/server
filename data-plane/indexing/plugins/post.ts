@@ -1,21 +1,6 @@
-import { CID } from "multiformats/cid";
+import { Cid } from "@atp/lex";
 import { AtUri } from "@atp/syntax";
-import * as lex from "../../../lex/lexicons.ts";
-import {
-  isMain as isMediaImages,
-  Main as MediaImages,
-} from "../../../lex/types/so/sprk/media/images.ts";
-import { Main as MediaImage } from "../../../lex/types/so/sprk/media/image.ts";
-import {
-  isMain as isMediaVideo,
-  Main as MediaVideo,
-} from "../../../lex/types/so/sprk/media/video.ts";
-import { Record as PostRecord } from "../../../lex/types/so/sprk/feed/post.ts";
-import { Record as GateRecord } from "../../../lex/types/so/sprk/feed/threadgate.ts";
-import {
-  isLink,
-  isMention,
-} from "../../../lex/types/so/sprk/richtext/facet.ts";
+import * as so from "../../../lex/so.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { PostDocument } from "../../db/models.ts";
@@ -33,6 +18,11 @@ type PostDescendent = {
   creator: string;
   sortAt: string;
 };
+type MediaImages = so.sprk.media.images.Main;
+type MediaImage = so.sprk.media.image.Main;
+type MediaVideo = so.sprk.media.video.Main;
+type PostRecord = so.sprk.feed.post.Main;
+type GateRecord = so.sprk.feed.threadgate.Main;
 type IndexedPost = {
   post: PostDocument;
   facets?: { type: "mention" | "link"; value: string }[];
@@ -48,14 +38,18 @@ type IndexedPost = {
   threadgate?: GateRecord;
 };
 
-const lexId = lex.ids.SoSprkFeedPost;
+const schema = so.sprk.feed.post.main;
+const isMediaImages = so.sprk.media.images.$matches;
+const isMediaVideo = so.sprk.media.video.$matches;
+const isMention = so.sprk.richtext.facet.mention.$matches;
+const isLink = so.sprk.richtext.facet.link.$matches;
 
 const REPLY_NOTIF_DEPTH = 5;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
-  cid: CID,
+  cid: Cid,
   obj: PostRecord,
   timestamp: string,
 ): Promise<IndexedPost | null> => {
@@ -190,7 +184,8 @@ const notifsForInsert = (obj: IndexedPost) => {
     }
   }
 
-  const threadgateHiddenReplies = obj.threadgate?.hiddenReplies || [];
+  const threadgateHiddenReplies = (obj.threadgate?.hiddenReplies || [])
+    .map(String);
 
   // reply notifications
   for (const ancestor of obj.ancestors ?? []) {
@@ -283,14 +278,14 @@ const updateAggregates = async (db: Database, postIdx: IndexedPost) => {
   }
 };
 
-export type PluginType = RecordProcessor<PostRecord, IndexedPost>;
+export type PluginType = RecordProcessor<typeof schema, IndexedPost>;
 
 export const makePlugin = (
   db: Database,
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexId,
+    schema,
     insertFn,
     findDuplicate,
     deleteFn,

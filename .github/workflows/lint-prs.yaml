@@ -58,6 +58,10 @@ jobs:
           deno-version: v2.x
           cache: true
 
+      - name: Generate lex bindings
+        if: steps.changed_files.outputs.all_changed_files != ''
+        run: deno task codegen
+
       - name: Lint
         if: steps.changed_files.outputs.all_changed_files != ''
         run: deno lint
@@ -85,6 +89,10 @@ jobs:
         with:
           deno-version: v2.x
           cache: true
+
+      - name: Generate lex bindings
+        if: steps.changed_files.outputs.all_changed_files != ''
+        run: deno task codegen
 
       - name: Test
         if: steps.changed_files.outputs.all_changed_files != ''

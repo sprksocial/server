@@ -1,12 +1,13 @@
-import { InvalidRequestError } from "@atp/xrpc-server";
+import { InvalidRequestError, Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
 import {
   HydrateCtx,
   Hydrator,
   mergeStates,
 } from "../../../../hydration/index.ts";
-import { Server } from "../../../../lex/index.ts";
-import { QueryParams } from "../../../../lex/types/so/sprk/graph/getFollowers.ts";
+import { $Params } from "../../../../lex/so/sprk/graph/getFollowers.ts";
+import * as so from "../../../../lex/so.ts";
 import {
   createPipeline,
   filterSkeletonList,
@@ -31,7 +32,7 @@ export default function (server: Server, ctx: AppContext) {
     rules: noBlocks,
     presentation,
   });
-  server.so.sprk.graph.getFollowers({
+  server.add(so.sprk.graph.getFollowers, {
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth, req }) => {
       const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
@@ -128,7 +129,7 @@ type Context = {
   views: Views;
 };
 
-type Params = QueryParams & {
+type Params = $Params & {
   hydrateCtx: HydrateCtx;
 };
 

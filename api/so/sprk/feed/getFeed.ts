@@ -2,6 +2,7 @@ import { noUndefinedVals } from "@atp/common";
 import { ResponseType, XrpcClient, XRPCError } from "@atp/xrpc";
 import {
   InvalidRequestError,
+  Server,
   ServerTimer,
   serverTimingHeader,
   UpstreamFailureError,
@@ -14,10 +15,9 @@ import {
 } from "../../../../data-plane/util.ts";
 import { FeedItem } from "../../../../hydration/feed.ts";
 import { HydrateCtx } from "../../../../hydration/index.ts";
-import { Server } from "../../../../lex/index.ts";
-import { ids, lexicons } from "../../../../lex/lexicons.ts";
-import { QueryParams as GetFeedParams } from "../../../../lex/types/so/sprk/feed/getFeed.ts";
-import { OutputSchema as SkeletonOutput } from "../../../../lex/types/so/sprk/feed/getFeedSkeleton.ts";
+import * as so from "../../../../lex/so.ts";
+import { $Params as GetFeedParams } from "../../../../lex/so/sprk/feed/getFeed.ts";
+import { $OutputBody as SkeletonOutput } from "../../../../lex/so/sprk/feed/getFeedSkeleton.ts";
 import {
   createPipeline,
   filterSkeletonList,
@@ -48,12 +48,12 @@ export default function (server: Server, ctx: AppContext) {
     rules: noBlocksOrMutes,
     presentation,
   });
-  server.so.sprk.feed.getFeed({
+  server.add(so.sprk.feed.getFeed, {
     auth: ctx.authVerifier.standardOptionalParameterized({
       lxmCheck: (method) => {
         return (
-          method === ids.SoSprkFeedGetFeedSkeleton ||
-          method === ids.SoSprkFeedGetFeed
+          method === so.sprk.feed.getFeedSkeleton.$lxm ||
+          method === so.sprk.feed.getFeed.$lxm
         );
       },
       skipAudCheck: true,
@@ -206,25 +206,21 @@ const skeletonFromFeedGen = async (
     );
   }
 
-  const client = new XrpcClient(fgEndpoint, lexicons);
+  const client = new XrpcClient(fgEndpoint);
 
   let skeleton: SkeletonOutput;
   let resHeaders: Record<string, string> | undefined = undefined;
   try {
     // @TODO currently passthrough auth headers from pds
-    const result = await client.call(
-      "so.sprk.feed.getFeedSkeleton",
-      {
+    const result = await client.call(so.sprk.feed.getFeedSkeleton, {
+      params: {
         feed: params.feed,
         // The feedgen is not guaranteed to honor the limit, but we try it.
         limit: params.limit,
         cursor: params.cursor,
       },
-      undefined,
-      {
-        headers,
-      },
-    );
+      headers,
+    });
 
     skeleton = result.data;
 

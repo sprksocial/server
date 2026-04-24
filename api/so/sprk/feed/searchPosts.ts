@@ -1,10 +1,12 @@
+import { Server } from "@atp/xrpc-server";
+
 import { ServerConfig } from "../../../../config.ts";
 import { AppContext } from "../../../../context.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
 import { HydrateCtx, Hydrator } from "../../../../hydration/index.ts";
 import { parseString } from "../../../../hydration/util.ts";
-import { Server } from "../../../../lex/index.ts";
-import { QueryParams } from "../../../../lex/types/so/sprk/feed/searchPosts.ts";
+import * as so from "../../../../lex/so.ts";
+import { $Params } from "../../../../lex/so/sprk/feed/searchPosts.ts";
 import {
   createPipeline,
   filterSkeletonList,
@@ -25,7 +27,7 @@ export default function (server: Server, ctx: AppContext) {
     rules: noBlocksOrTagged,
     presentation,
   });
-  server.so.sprk.feed.searchPosts({
+  server.add(so.sprk.feed.searchPosts, {
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ auth, params, req }) => {
       const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
@@ -111,7 +113,7 @@ type Context = {
   views: Views;
 };
 
-type Params = QueryParams & {
+type Params = $Params & {
   hydrateCtx: HydrateCtx;
 };
 

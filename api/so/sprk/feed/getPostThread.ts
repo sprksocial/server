@@ -1,15 +1,15 @@
-import { InvalidRequestError } from "@atp/xrpc-server";
+import { Server } from "@atp/xrpc-server";
+
 import { ServerConfig } from "../../../../config.ts";
 import { AppContext } from "../../../../context.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
 import { Code, isDataPlaneError } from "../../../../data-plane/util.ts";
 import { HydrateCtx, Hydrator } from "../../../../hydration/index.ts";
-import { Server } from "../../../../lex/index.ts";
-import { isNotFoundPost } from "../../../../lex/types/app/bsky/feed/defs.ts";
+import * as so from "../../../../lex/so.ts";
 import {
-  OutputSchema,
-  QueryParams,
-} from "../../../../lex/types/so/sprk/feed/getPostThread.ts";
+  $OutputBody,
+  $Params,
+} from "../../../../lex/so/sprk/feed/getPostThread.ts";
 import {
   createPipeline,
   HydrationFnInput,
@@ -30,7 +30,7 @@ export default function (server: Server, ctx: AppContext) {
     hydration,
     presentation,
   });
-  server.so.sprk.feed.getPostThread({
+  server.add(so.sprk.feed.getPostThread, {
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth, req, res }) => {
       const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
@@ -40,7 +40,7 @@ export default function (server: Server, ctx: AppContext) {
         hydrateCtx.viewer,
       );
 
-      let result: OutputSchema;
+      let result: $OutputBody;
       try {
         result = await getPostThread({ ...params, hydrateCtx }, ctx);
       } catch (err) {
@@ -67,13 +67,14 @@ export default function (server: Server, ctx: AppContext) {
 const skeleton = async (inputs: SkeletonFnInput<Context, Params>) => {
   const { ctx, params } = inputs;
   const anchor = await ctx.hydrator.resolveUri(params.anchor);
+  const depth = params.depth ?? 6;
   try {
     const res = await ctx.dataplane.threads.getThread(
       anchor,
       params.parentHeight,
       getThreadDepth({
         anchor,
-        depth: params.depth,
+        depth,
         maxThreadDepth: ctx.cfg.maxThreadDepth,
         bigThreadUris: ctx.cfg.bigThreadUris,
         bigThreadDepth: ctx.cfg.bigThreadDepth,
@@ -112,19 +113,12 @@ const presentation = (
   const thread = ctx.views.thread(skeleton, hydration, {
     depth: getThreadDepth({
       anchor: skeleton.anchor,
-      depth: params.depth,
+      depth: params.depth ?? 6,
       maxThreadDepth: ctx.cfg.maxThreadDepth,
       bigThreadUris: ctx.cfg.bigThreadUris,
       bigThreadDepth: ctx.cfg.bigThreadDepth,
     }),
   });
-  if (isNotFoundPost(thread)) {
-    // @TODO technically this could be returned as a NotFoundPost based on lexicon
-    throw new InvalidRequestError(
-      `Post not found: ${skeleton.anchor}`,
-      "NotFound",
-    );
-  }
   return { thread };
 };
 
@@ -135,7 +129,7 @@ type Context = {
   cfg: ServerConfig;
 };
 
-type Params = QueryParams & { hydrateCtx: HydrateCtx };
+type Params = $Params & { hydrateCtx: HydrateCtx };
 
 type Skeleton = {
   anchor: string;

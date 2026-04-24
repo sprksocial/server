@@ -1,20 +1,20 @@
-import { CID } from "multiformats/cid";
+import { Cid } from "@atp/lex";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
-import * as lex from "../../../lex/lexicons.ts";
-import * as FeedGenerator from "../../../lex/types/so/sprk/feed/generator.ts";
+import * as so from "../../../lex/so.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { GeneratorDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexId = lex.ids.SoSprkFeedGenerator;
+const schema = so.sprk.feed.generator.main;
+type FeedGeneratorRecord = so.sprk.feed.generator.Main;
 type IndexedFeedGenerator = GeneratorDocument;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
-  cid: CID,
-  obj: FeedGenerator.Record,
+  cid: Cid,
+  obj: FeedGeneratorRecord,
   timestamp: string,
 ): Promise<IndexedFeedGenerator | null> => {
   // Extract and clean avatar to ensure it matches MediaRef format
@@ -71,7 +71,7 @@ const notifsForDelete = () => {
 };
 
 export type PluginType = RecordProcessor<
-  FeedGenerator.Record,
+  typeof schema,
   IndexedFeedGenerator
 >;
 
@@ -80,7 +80,7 @@ export const makePlugin = (
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexId,
+    schema,
     insertFn,
     findDuplicate,
     deleteFn,

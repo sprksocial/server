@@ -1,9 +1,8 @@
 import { AtUri } from "@atp/syntax";
-import { ids } from "../lex/lexicons.ts";
-import {
-  Main as StrongRef,
-  validateMain as validateStrongRef,
-} from "../lex/types/com/atproto/repo/strongRef.ts";
+import * as app from "../lex/app.ts";
+import * as com from "../lex/com.ts";
+
+type StrongRef = com.atproto.repo.strongRef.Main;
 
 /**
  * Convert a post URI to a threadgate URI. If the URI is not a valid
@@ -12,8 +11,8 @@ import {
  */
 export function postUriToThreadgateUri(postUri: string) {
   const urip = new AtUri(postUri);
-  if (urip.collection === ids.AppBskyFeedPost) {
-    urip.collection = ids.AppBskyFeedThreadgate;
+  if (urip.collection === app.bsky.feed.post.$type) {
+    urip.collection = app.bsky.feed.threadgate.$type;
   }
   return urip.toString();
 }
@@ -25,8 +24,8 @@ export function postUriToThreadgateUri(postUri: string) {
  */
 export function postUriToPostgateUri(postUri: string) {
   const urip = new AtUri(postUri);
-  if (urip.collection === ids.AppBskyFeedPost) {
-    urip.collection = ids.AppBskyFeedPostgate;
+  if (urip.collection === app.bsky.feed.post.$type) {
+    urip.collection = app.bsky.feed.postgate.$type;
   }
   return urip.toString();
 }
@@ -40,7 +39,7 @@ export function safePinnedPost(value: unknown) {
   if (!value || typeof value !== "object") {
     return;
   }
-  const validated = validateStrongRef(value);
+  const validated = com.atproto.repo.strongRef.$safeParse(value);
   if (!validated.success) {
     return;
   }

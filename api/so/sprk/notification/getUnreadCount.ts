@@ -1,8 +1,9 @@
-import { InvalidRequestError } from "@atp/xrpc-server";
+import { InvalidRequestError, Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
 import { Hydrator } from "../../../../hydration/index.ts";
-import { Server } from "../../../../lex/index.ts";
-import { QueryParams } from "../../../../lex/types/so/sprk/notification/getUnreadCount.ts";
+import * as so from "../../../../lex/so.ts";
+import { $Params } from "../../../../lex/so/sprk/notification/getUnreadCount.ts";
 import {
   createPipeline,
   HydrationFnInput,
@@ -16,7 +17,7 @@ export default function (server: Server, ctx: AppContext) {
     hydration,
     presentation,
   });
-  server.so.sprk.notification.getUnreadCount({
+  server.add(so.sprk.notification.getUnreadCount, {
     auth: ctx.authVerifier.standard,
     handler: async ({ auth, params }) => {
       const viewer = auth.credentials.iss;
@@ -70,7 +71,7 @@ type Context = {
   hydrator: Hydrator;
 };
 
-type Params = QueryParams & {
+type Params = $Params & {
   viewer: string;
 };
 

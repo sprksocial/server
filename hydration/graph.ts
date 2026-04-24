@@ -1,7 +1,9 @@
 import { DataPlane } from "../data-plane/index.ts";
-import { Record as BlockRecord } from "../lex/types/app/bsky/graph/block.ts";
-import { Record as FollowRecord } from "../lex/types/app/bsky/graph/follow.ts";
+import * as so from "../lex/so.ts";
 import { HydrationMap, parseRecord, RecordInfo } from "./util.ts";
+
+export type BlockRecord = so.sprk.graph.block.Main;
+export type FollowRecord = so.sprk.graph.follow.Main;
 
 export type Follow = RecordInfo<FollowRecord>;
 export type Follows = HydrationMap<Follow>;
@@ -79,6 +81,7 @@ export class GraphHydrator {
     const res = await this.dataplane.records.getFollowRecords(uris);
     return uris.reduce((acc, uri, i) => {
       const record = parseRecord<FollowRecord>(
+        so.sprk.graph.follow.main,
         res.records[i],
         includeTakedowns,
       );
@@ -93,7 +96,11 @@ export class GraphHydrator {
     if (!uris.length) return new HydrationMap<Block>();
     const res = await this.dataplane.records.getBlockRecords(uris);
     return uris.reduce((acc, uri, i) => {
-      const record = parseRecord<BlockRecord>(res.records[i], includeTakedowns);
+      const record = parseRecord<BlockRecord>(
+        so.sprk.graph.block.main,
+        res.records[i],
+        includeTakedowns,
+      );
       return acc.set(uri, record ?? null);
     }, new HydrationMap<Block>());
   }

@@ -1,8 +1,8 @@
 import { Database } from "../db/index.ts";
 import { AtUri } from "@atp/syntax";
-import { ids } from "../../lex/lexicons.ts";
 import { keyBy } from "@atp/common";
 import { Code, compositeTime, DataPlaneError } from "../util.ts";
+import * as so from "../../lex/so.ts";
 
 export type Record = {
   record: string;
@@ -68,7 +68,7 @@ async function getPostRecords(
   records: Array<Record>;
 }> {
   const [{ records }] = await Promise.all([
-    getRecords(db, uris, ids.SoSprkFeedPost),
+    getRecords(db, uris, so.sprk.feed.post.$type),
     uris.length
       ? db.models.Post.find({
         uri: { $in: uris },
@@ -87,7 +87,7 @@ async function getReplyRecords(
   records: Array<Record>;
 }> {
   const [{ records }] = await Promise.all([
-    getRecords(db, uris, ids.SoSprkFeedReply),
+    getRecords(db, uris, so.sprk.feed.reply.$type),
     uris.length
       ? db.models.Reply.find({
         uri: { $in: uris },
@@ -106,13 +106,17 @@ export class Records {
   }
 
   async getBlockRecords(uris: string[]) {
-    const result = await getRecords(this.db, uris, ids.SoSprkGraphBlock);
+    const result = await getRecords(this.db, uris, so.sprk.graph.block.$type);
     return result;
   }
 
   async getFeedGeneratorRecords(uris: string[]) {
     try {
-      const result = await getRecords(this.db, uris, ids.SoSprkFeedGenerator);
+      const result = await getRecords(
+        this.db,
+        uris,
+        so.sprk.feed.generator.$type,
+      );
       return result;
     } catch (error) {
       console.error("Error fetching feed generator records:", error);
@@ -121,12 +125,12 @@ export class Records {
   }
 
   async getFollowRecords(uris: string[]) {
-    const result = await getRecords(this.db, uris, ids.SoSprkGraphFollow);
+    const result = await getRecords(this.db, uris, so.sprk.graph.follow.$type);
     return result;
   }
 
   async getLikeRecords(uris: string[]) {
-    const result = await getRecords(this.db, uris, ids.SoSprkFeedLike);
+    const result = await getRecords(this.db, uris, so.sprk.feed.like.$type);
     return result;
   }
 
@@ -141,12 +145,12 @@ export class Records {
   }
 
   async getProfileRecords(uris: string[]) {
-    const result = await getRecords(this.db, uris, ids.SoSprkActorProfile);
+    const result = await getRecords(this.db, uris, so.sprk.actor.profile.$type);
     return result;
   }
 
   async getRepostRecords(uris: string[]) {
-    const result = await getRecords(this.db, uris, ids.SoSprkFeedRepost);
+    const result = await getRecords(this.db, uris, so.sprk.feed.repost.$type);
     return result;
   }
 
@@ -156,7 +160,7 @@ export class Records {
   }
 
   async getStoryRecords(uris: string[]) {
-    const result = await getRecords(this.db, uris, ids.SoSprkStoryPost);
+    const result = await getRecords(this.db, uris, so.sprk.story.post.$type);
     return result;
   }
 }

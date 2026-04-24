@@ -1,5 +1,5 @@
 import { IdResolver } from "@atp/identity";
-import { WriteOpAction } from "@atp/repo";
+import { type RepoRecord, WriteOpAction } from "@atp/repo";
 import { Event as FirehoseEvent, Firehose, MemoryRunner } from "@atp/sync";
 import { BackgroundQueue } from "./background.ts";
 import { Database } from "./db/index.ts";
@@ -191,7 +191,7 @@ function createFirehose(opts: {
           : indexingSvc.indexRecord(
             evt.uri,
             evt.cid,
-            evt.record,
+            evt.record as unknown as RepoRecord,
             evt.event === "create"
               ? WriteOpAction.Create
               : WriteOpAction.Update,

@@ -50,7 +50,7 @@ This runs three parallel services:
 - `hydration/` - Data enrichment layer (actors, feeds, graphs)
 - `views/` - Presentation layer transforming hydrated data to API responses
 - `lexicons/` - AT Protocol lexicon definitions (JSON)
-- `lex/` - Generated TypeScript types from lexicons
+- `lex/` - Generated TypeScript types from lexicons (`deno task codegen`)
 - `utils/` - Shared utilities (transformers, logger, retry logic)
 
 ### Data Flow

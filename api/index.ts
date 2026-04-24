@@ -1,4 +1,5 @@
-import { Server } from "../lex/index.ts";
+import { Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../context.ts";
 import getAccountInfos from "./com/atproto/admin/getAccountInfos.ts";
 import getSubjectStatus from "./com/atproto/admin/getSubjectStatus.ts";

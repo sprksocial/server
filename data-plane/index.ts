@@ -23,8 +23,6 @@ import { Labels } from "./routes/labels.ts";
 import { PushTokens } from "./routes/push-tokens.ts";
 import { CrosspostThread } from "./routes/crosspost-threads.ts";
 
-export { RepoSubscription } from "./subscription.ts";
-
 export type ServerContext = {
   db: Database;
   idResolver?: IdResolver;

@@ -1,9 +1,6 @@
-import { CID } from "multiformats/cid";
-
+import { l, lexParse } from "@atp/lex";
 import { AtUri } from "@atp/syntax";
-import { lexicons } from "../lex/lexicons.ts";
 import { Record } from "../data-plane/routes/records.ts";
-import { jsonStringToLex, RepoRecord } from "@atp/lexicon";
 
 export class HydrationMap<T> extends Map<string, T | null> implements Merges {
   merge(map: HydrationMap<T>): this {
@@ -59,18 +56,24 @@ export const mergeManyMaps = <T>(...maps: HydrationMap<T>[]) => {
 export type ItemRef = { uri: string; cid?: string };
 
 export const parseRecord = <T extends UnknownRecord>(
+  recordSchema: l.RecordSchema,
   entry: Record,
   includeTakedowns: boolean,
 ): RecordInfo<T> | undefined => {
   if (!includeTakedowns && entry.takenDown) {
     return undefined;
   }
-  const record = JSON.parse(entry.record);
+  let record: unknown;
+  try {
+    record = lexParse(entry.record, { strict: false });
+  } catch {
+    return;
+  }
   const cid = entry.cid;
   const sortedAt = new Date(entry.sortedAt ?? 0);
   const indexedAt = new Date(entry.indexedAt ?? 0);
   if (!record || !cid) return;
-  if (!isValidRecord(entry.record)) {
+  if (!recordSchema.$matches(record)) {
     return;
   }
   return {
@@ -82,31 +85,8 @@ export const parseRecord = <T extends UnknownRecord>(
   };
 };
 
-const isValidRecord = (record: string) => {
-  const lex = jsonStringToLex(record);
-  const lexRecord = lex as RepoRecord;
-  if (typeof lexRecord["$type"] !== "string") {
-    return false;
-  }
-  try {
-    lexicons.assertValidRecord(lexRecord["$type"], lexRecord);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
 export const parseString = (str: string | undefined): string | undefined => {
   return str && str.length > 0 ? str : undefined;
-};
-
-export const parseCid = (cidStr: string | undefined): CID | undefined => {
-  if (!cidStr || cidStr.length === 0) return;
-  try {
-    return CID.parse(cidStr);
-  } catch {
-    return;
-  }
 };
 
 export const urisByCollection = (uris: string[]): Map<string, string[]> => {

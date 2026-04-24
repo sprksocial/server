@@ -1,12 +1,13 @@
-import { InvalidRequestError } from "@atp/xrpc-server";
+import { InvalidRequestError, Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
 import {
   HydrateCtx,
   HydrationState,
   Hydrator,
 } from "../../../../hydration/index.ts";
-import { Server } from "../../../../lex/index.ts";
-import { QueryParams } from "../../../../lex/types/so/sprk/actor/getProfile.ts";
+import * as so from "../../../../lex/so.ts";
+import { $Params } from "../../../../lex/so/sprk/actor/getProfile.ts";
 import { createPipeline } from "../../../../pipeline.ts";
 import { Views } from "../../../../views/index.ts";
 import { createHydrateCtxFromAuth, resHeaders } from "../../../util.ts";
@@ -17,7 +18,7 @@ export default function (server: Server, ctx: AppContext) {
     hydration,
     presentation,
   });
-  server.so.sprk.actor.getProfile({
+  server.add(so.sprk.actor.getProfile, {
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ auth, params, req }) => {
       const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
@@ -95,7 +96,7 @@ type Context = {
   views: Views;
 };
 
-type Params = QueryParams & {
+type Params = $Params & {
   hydrateCtx: HydrateCtx;
 };
 

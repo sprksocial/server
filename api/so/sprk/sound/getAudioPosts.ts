@@ -1,4 +1,5 @@
-import { InvalidRequestError } from "@atp/xrpc-server";
+import { InvalidRequestError, Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
 import {
@@ -6,8 +7,8 @@ import {
   Hydrator,
   mergeManyStates,
 } from "../../../../hydration/index.ts";
-import { Server } from "../../../../lex/index.ts";
-import { QueryParams } from "../../../../lex/types/so/sprk/sound/getAudioPosts.ts";
+import * as so from "../../../../lex/so.ts";
+import { $Params } from "../../../../lex/so/sprk/sound/getAudioPosts.ts";
 import {
   createPipeline,
   filterSkeletonList,
@@ -26,7 +27,7 @@ export default function (server: Server, ctx: AppContext) {
     rules: noBlocks,
     presentation,
   });
-  server.so.sprk.sound.getAudioPosts({
+  server.add(so.sprk.sound.getAudioPosts, {
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth, req }) => {
       const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
@@ -105,7 +106,7 @@ type Context = {
   views: Views;
 };
 
-type Params = QueryParams & { hydrateCtx: HydrateCtx };
+type Params = $Params & { hydrateCtx: HydrateCtx };
 
 type Skeleton = {
   posts: string[];

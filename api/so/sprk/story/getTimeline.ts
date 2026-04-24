@@ -1,12 +1,13 @@
-import { InvalidRequestError } from "@atp/xrpc-server";
+import { InvalidRequestError, Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
 import { HydrateCtx, HydrationState } from "../../../../hydration/index.ts";
 import { parseString } from "../../../../hydration/util.ts";
-import { Server } from "../../../../lex/index.ts";
+import * as so from "../../../../lex/so.ts";
 import {
-  OutputSchema,
-  QueryParams,
-} from "../../../../lex/types/so/sprk/story/getTimeline.ts";
+  $OutputBody,
+  $Params,
+} from "../../../../lex/so/sprk/story/getTimeline.ts";
 import {
   createPipeline,
   filterSkeletonList,
@@ -30,7 +31,7 @@ export default function (server: Server, ctx: AppContext) {
     rules,
     presentation,
   });
-  server.so.sprk.story.getTimeline({
+  server.add(so.sprk.story.getTimeline, {
     auth: ctx.authVerifier.standard,
     handler: async ({ params, auth, req }) => {
       const viewer = auth.credentials.iss;
@@ -129,7 +130,7 @@ const rules = (inputs: RulesFnInput<Context, Params, Skeleton>): Skeleton => {
 
 const presentation = (
   inputs: PresentationFnInput<Context, Params, Skeleton>,
-): OutputSchema => {
+): $OutputBody => {
   const { ctx, skeleton, hydration } = inputs;
   const storyViews = mapSkeletonList(
     skeleton,
@@ -148,7 +149,7 @@ const presentation = (
 
 type Context = AppContext;
 
-type Params = QueryParams & {
+type Params = $Params & {
   hydrateCtx: HydrateCtx & { viewer: string };
   limit: number;
 };

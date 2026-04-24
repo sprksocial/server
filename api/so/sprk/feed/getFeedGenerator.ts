@@ -1,9 +1,11 @@
+import { Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
-import { Server } from "../../../../lex/index.ts";
+import * as so from "../../../../lex/so.ts";
 import { createHydrateCtxFromAuth, resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  server.so.sprk.feed.getFeedGenerator({
+  server.add(so.sprk.feed.getFeedGenerator, {
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth, req }) => {
       const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);

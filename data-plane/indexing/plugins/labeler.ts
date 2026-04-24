@@ -1,20 +1,20 @@
-import { CID } from "multiformats/cid";
+import { Cid } from "@atp/lex";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
-import * as lex from "../../../lex/lexicons.ts";
-import * as Labeler from "../../../lex/types/so/sprk/labeler/service.ts";
+import * as so from "../../../lex/so.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { LabelerDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexId = lex.ids.SoSprkLabelerService;
+const schema = so.sprk.labeler.service.main;
+type LabelerRecord = so.sprk.labeler.service.Main;
 type IndexedLabeler = LabelerDocument;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
-  cid: CID,
-  obj: Labeler.Record,
+  cid: Cid,
+  obj: LabelerRecord,
   timestamp: string,
 ): Promise<IndexedLabeler | null> => {
   if (uri.rkey !== "self") return null;
@@ -57,14 +57,14 @@ const notifsForDelete = () => {
   return { notifs: [], toDelete: [] };
 };
 
-export type PluginType = RecordProcessor<Labeler.Record, IndexedLabeler>;
+export type PluginType = RecordProcessor<typeof schema, IndexedLabeler>;
 
 export const makePlugin = (
   db: Database,
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexId,
+    schema,
     insertFn,
     findDuplicate,
     deleteFn,

@@ -1,4 +1,4 @@
-import { Record as StoryRecord } from "../lex/types/so/sprk/story/post.ts";
+import * as so from "../lex/so.ts";
 import {
   HydrationMap,
   ItemRef,
@@ -7,6 +7,8 @@ import {
   split,
 } from "./util.ts";
 import { DataPlane } from "../data-plane/index.ts";
+
+export type StoryRecord = so.sprk.story.post.Main;
 
 export type Story = RecordInfo<StoryRecord>;
 export type Stories = HydrationMap<Story>;
@@ -39,7 +41,11 @@ export class StoryHydrator {
     const res = await this.dataplane.records.getStoryRecords(need);
 
     return need.reduce((acc, uri, i) => {
-      const record = parseRecord<StoryRecord>(res.records[i], includeTakedowns);
+      const record = parseRecord<StoryRecord>(
+        so.sprk.story.post.main,
+        res.records[i],
+        includeTakedowns,
+      );
       return acc.set(
         uri,
         record ?? null,

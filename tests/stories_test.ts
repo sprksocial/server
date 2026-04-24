@@ -2,10 +2,12 @@ import { assertEquals } from "@std/assert";
 import { HydrationState } from "../hydration/index.ts";
 import { Actor } from "../hydration/actor.ts";
 import { HydrationMap, RecordInfo } from "../hydration/util.ts";
-import { Record as PostRecord } from "../lex/types/so/sprk/feed/post.ts";
-import { Record as StoryRecord } from "../lex/types/so/sprk/story/post.ts";
+import * as so from "../lex/so.ts";
 import { Views } from "../views/index.ts";
 import { createTestContext, TEST_USERS } from "./util.ts";
+
+type PostRecord = so.sprk.feed.post.Main;
+type StoryRecord = so.sprk.story.post.Main;
 
 const VALID_BLOB_CID =
   "bafyreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku";
@@ -831,7 +833,7 @@ Deno.test({
 
           assertEquals(profile?.stories?.length, 1);
           assertEquals(profile?.stories?.[0].uri, storyUri);
-          assertEquals(profile?.stories?.[0].author.did, did);
+          assertEquals(profile?.stories?.[0].author.did as string, did);
           assertEquals(
             (profile?.stories?.[0].record as { $type?: string }).$type,
             "so.sprk.story.post",

@@ -1,20 +1,20 @@
-import { CID } from "multiformats/cid";
+import { Cid } from "@atp/lex";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
-import * as lex from "../../../lex/lexicons.ts";
-import * as Repost from "../../../lex/types/so/sprk/feed/repost.ts";
+import * as so from "../../../lex/so.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { RepostDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexId = lex.ids.SoSprkFeedRepost;
+const schema = so.sprk.feed.repost.main;
+type RepostRecord = so.sprk.feed.repost.Main;
 type IndexedRepost = RepostDocument;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
-  cid: CID,
-  obj: Repost.Record,
+  cid: Cid,
+  obj: RepostRecord,
   timestamp: string,
 ): Promise<IndexedRepost | null> => {
   const viaObj = obj.via as { uri: string; cid: string } | undefined;
@@ -45,7 +45,7 @@ const insertFn = async (
 const findDuplicate = async (
   db: Database,
   uri: AtUri,
-  obj: Repost.Record,
+  obj: RepostRecord,
 ): Promise<AtUri | null> => {
   const found = await db.models.Repost.findOne({
     authorDid: uri.host,
@@ -158,14 +158,14 @@ const updateAggregates = async (db: Database, repost: IndexedRepost) => {
   }
 };
 
-export type PluginType = RecordProcessor<Repost.Record, IndexedRepost>;
+export type PluginType = RecordProcessor<typeof schema, IndexedRepost>;
 
 export const makePlugin = (
   db: Database,
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexId,
+    schema,
     insertFn,
     findDuplicate,
     deleteFn,

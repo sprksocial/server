@@ -1,4 +1,8 @@
-import { Server } from "../../../../lex/index.ts";
+import { Server } from "@atp/xrpc-server";
+
+import { PreferenceDocument } from "../../../../data-plane/db/models.ts";
+import { AppContext } from "../../../../context.ts";
+import * as so from "../../../../lex/so.ts";
 import {
   ContentLabelPref,
   FeedViewPref,
@@ -9,12 +13,10 @@ import {
   PersonalDetailsPref,
   SavedFeedsPref,
   ThreadViewPref,
-} from "../../../../lex/types/so/sprk/actor/defs.ts";
-import { PreferenceDocument } from "../../../../data-plane/db/models.ts";
-import { AppContext } from "../../../../context.ts";
+} from "../../../../lex/so/sprk/actor/defs.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  server.so.sprk.actor.putPreferences({
+  server.add(so.sprk.actor.putPreferences, {
     auth: ctx.authVerifier.standard,
     handler: async ({ input, auth }) => {
       const userDid = auth.credentials.iss;
@@ -63,7 +65,7 @@ export default function (server: Server, ctx: AppContext) {
               feedViewPrefs.push({
                 feed: p.feed,
                 hideReplies: p.hideReplies,
-                hideRepliesByUnfollowed: p.hideRepliesByUnfollowed,
+                hideRepliesByUnfollowed: p.hideRepliesByUnfollowed ?? true,
                 hideRepliesByLikeCount: p.hideRepliesByLikeCount,
                 hideReposts: p.hideReposts,
                 hideQuotePosts: p.hideQuotePosts,
@@ -87,7 +89,10 @@ export default function (server: Server, ctx: AppContext) {
             case "so.sprk.actor.defs#mutedWordsPref": {
               const p = pref as MutedWordsPref;
               updateData.mutedWordsPref = {
-                items: p.items ?? [],
+                items: (p.items ?? []).map((item) => ({
+                  ...item,
+                  actorTarget: item.actorTarget ?? "all",
+                })),
               };
               break;
             }

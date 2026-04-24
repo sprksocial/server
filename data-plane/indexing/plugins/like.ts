@@ -1,20 +1,20 @@
-import { CID } from "multiformats/cid";
+import { Cid } from "@atp/lex";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
-import * as lex from "../../../lex/lexicons.ts";
-import * as Like from "../../../lex/types/so/sprk/feed/like.ts";
+import * as so from "../../../lex/so.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { LikeDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexId = lex.ids.SoSprkFeedLike;
+const schema = so.sprk.feed.like.main;
+type LikeRecord = so.sprk.feed.like.Main;
 type IndexedLike = LikeDocument;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
-  cid: CID,
-  obj: Like.Record,
+  cid: Cid,
+  obj: LikeRecord,
   timestamp: string,
 ): Promise<IndexedLike | null> => {
   // Handle via property safely with type assertion
@@ -45,7 +45,7 @@ const insertFn = async (
 const findDuplicate = async (
   db: Database,
   uri: AtUri,
-  obj: Like.Record,
+  obj: LikeRecord,
 ): Promise<AtUri | null> => {
   const found = await db.models.Like.findOne({
     authorDid: uri.host,
@@ -182,14 +182,14 @@ const updateAggregates = async (db: Database, like: IndexedLike) => {
   }
 };
 
-export type PluginType = RecordProcessor<Like.Record, IndexedLike>;
+export type PluginType = RecordProcessor<typeof schema, IndexedLike>;
 
 export const makePlugin = (
   db: Database,
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexId,
+    schema,
     insertFn,
     findDuplicate,
     deleteFn,

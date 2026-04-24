@@ -1,11 +1,13 @@
-import { CID } from "multiformats/cid";
 import { AtpAgent, ComAtprotoSyncGetLatestCommit } from "@atproto/api";
 import { DAY, HOUR } from "@atp/common";
 import { getPds, IdResolver } from "@atp/identity";
-import { RepoRecord, ValidationError } from "@atp/lexicon";
+import { Cid, l } from "@atp/lex";
+import { parseCid } from "@atp/lex/data";
+
 import {
   getAndParseRecord,
   readCarWithRoot,
+  type RepoRecord,
   VerifiedRepo,
   verifyRepo,
   WriteOpAction,
@@ -88,7 +90,7 @@ export class IndexingService {
 
   async indexRecord(
     uri: AtUri,
-    cid: CID,
+    cid: Cid,
     obj: RepoRecord,
     action: WriteOpAction.Create | WriteOpAction.Update,
     timestamp: string,
@@ -208,7 +210,7 @@ export class IndexingService {
             );
           }
         } catch (err) {
-          if (err instanceof ValidationError) {
+          if (err instanceof l.ValidationError) {
             console.warn(
               "skipping indexing of invalid record",
               { did, commit, uri: uri.toString(), cid: cid.toString() },
@@ -234,15 +236,15 @@ export class IndexingService {
       (acc, cur) => {
         acc[cur.uri] = {
           uri: new AtUri(cur.uri),
-          cid: CID.parse(cur.cid),
+          cid: parseCid(cur.cid),
         };
         return acc;
       },
-      {} as Record<string, { uri: AtUri; cid: CID }>,
+      {} as Record<string, { uri: AtUri; cid: Cid }>,
     );
   }
 
-  async setCommitLastSeen(did: string, commit: CID, rev: string) {
+  async setCommitLastSeen(did: string, commit: Cid, rev: string) {
     await this.db.models.ActorSync.findOneAndUpdate(
       { did },
       {
@@ -256,7 +258,7 @@ export class IndexingService {
 
   findIndexerForCollection(collection: string) {
     const indexers = Object.values(
-      this.records as Record<string, RecordProcessor<unknown, unknown>>,
+      this.records as Record<string, RecordProcessor<l.RecordSchema, unknown>>,
     );
     return indexers.find((indexer) => indexer.collection === collection);
   }
@@ -327,7 +329,7 @@ export class IndexingService {
 
 type UriAndCid = {
   uri: AtUri;
-  cid: CID;
+  cid: Cid;
 };
 
 type IndexOp =

@@ -4,7 +4,7 @@ import { logger } from "hono/logger";
 import { Database } from "./data-plane/db/index.ts";
 import { createAuthVerifier } from "./auth-verifier.ts";
 import API from "./api/index.ts";
-import { createServer } from "./lex/index.ts";
+import { createServer } from "@atp/xrpc-server";
 import wellKnown from "./api/well-known.ts";
 import health from "./api/health.ts";
 import { IdResolver, MemoryCache } from "@atp/identity";
@@ -33,7 +33,7 @@ export function createApp(ctx: AppContext): Hono<AppEnv> {
 
   app.route("/.well-known", wellKnown);
   app.route("/", health);
-  app.route("/", lexServer.xrpc.app);
+  app.route("/", lexServer.app);
 
   return app;
 }

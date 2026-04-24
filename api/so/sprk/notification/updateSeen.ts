@@ -1,8 +1,10 @@
+import { Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
-import { Server } from "../../../../lex/index.ts";
+import * as so from "../../../../lex/so.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  server.so.sprk.notification.updateSeen({
+  server.add(so.sprk.notification.updateSeen, {
     auth: ctx.authVerifier.standard,
     handler: async ({ input, auth }) => {
       const viewer = auth.credentials.iss;

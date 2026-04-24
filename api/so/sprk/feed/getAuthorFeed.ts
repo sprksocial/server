@@ -1,4 +1,5 @@
-import { InvalidRequestError } from "@atp/xrpc-server";
+import { InvalidRequestError, Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
 import { Actor } from "../../../../hydration/actor.ts";
@@ -10,8 +11,8 @@ import {
   mergeStates,
 } from "../../../../hydration/index.ts";
 import { parseString } from "../../../../hydration/util.ts";
-import { Server } from "../../../../lex/index.ts";
-import { QueryParams } from "../../../../lex/types/so/sprk/feed/getAuthorFeed.ts";
+import * as so from "../../../../lex/so.ts";
+import { $Params } from "../../../../lex/so/sprk/feed/getAuthorFeed.ts";
 import {
   createPipeline,
   filterSkeletonList,
@@ -32,7 +33,7 @@ export default function (server: Server, ctx: AppContext) {
     rules: noBlocksOrMutes,
     presentation,
   });
-  server.so.sprk.feed.getAuthorFeed({
+  server.add(so.sprk.feed.getAuthorFeed, {
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth, req }) => {
       const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
@@ -181,13 +182,13 @@ type Context = {
   dataplane: DataPlane;
 };
 
-type Params = QueryParams & {
+type Params = $Params & {
   hydrateCtx: HydrateCtx;
 };
 
 type Skeleton = {
   actor: Actor;
   items: FeedItem[];
-  filter: QueryParams["filter"];
+  filter: $Params["filter"];
   cursor?: string;
 };

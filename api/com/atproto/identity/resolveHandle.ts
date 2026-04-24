@@ -1,10 +1,12 @@
+import type { DidString } from "@atp/lex";
 import * as ident from "@atp/syntax";
-import { InvalidRequestError } from "@atp/xrpc-server";
-import { Server } from "../../../../lex/index.ts";
+import { InvalidRequestError, Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
+import * as com from "../../../../lex/com.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  server.com.atproto.identity.resolveHandle({
+  server.add(com.atproto.identity.resolveHandle, {
     handler: async ({ params }) => {
       const { handle } = params;
       if (!handle) {
@@ -21,7 +23,7 @@ export default function (server: Server, ctx: AppContext) {
 
       return {
         encoding: "application/json",
-        body: { did: actor.did },
+        body: { did: actor.did as DidString },
       };
     },
   });

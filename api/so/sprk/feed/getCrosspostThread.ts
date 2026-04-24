@@ -1,4 +1,6 @@
-import { InvalidRequestError } from "@atp/xrpc-server";
+import type { AtUriString, CidString, DatetimeString } from "@atp/lex";
+import { InvalidRequestError, Server } from "@atp/xrpc-server";
+
 import { ServerConfig } from "../../../../config.ts";
 import { AppContext } from "../../../../context.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
@@ -11,12 +13,12 @@ import {
   PostBlock,
 } from "../../../../hydration/index.ts";
 import { HydrationMap } from "../../../../hydration/util.ts";
-import { Server } from "../../../../lex/index.ts";
+import * as so from "../../../../lex/so.ts";
 import {
-  OutputSchema,
-  QueryParams,
+  $OutputBody,
+  $Params,
   ThreadItem,
-} from "../../../../lex/types/so/sprk/feed/getCrosspostThread.ts";
+} from "../../../../lex/so/sprk/feed/getCrosspostThread.ts";
 import { createPipeline } from "../../../../pipeline.ts";
 import { uriToDid } from "../../../../utils/uris.ts";
 import { Views } from "../../../../views/index.ts";
@@ -34,7 +36,7 @@ export default function (server: Server, ctx: AppContext) {
     presentation,
   });
 
-  server.so.sprk.feed.getCrosspostThread({
+  server.add(so.sprk.feed.getCrosspostThread, {
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth, req, res }) => {
       const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
@@ -42,7 +44,7 @@ export default function (server: Server, ctx: AppContext) {
       const repoRevPromise = ctx.hydrator.actor.getRepoRevSafe(
         hydrateCtx.viewer,
       );
-      let result: OutputSchema;
+      let result: $OutputBody;
       try {
         result = await getCrosspostThread({ ...params, hydrateCtx }, ctx);
       } catch (err) {
@@ -71,6 +73,8 @@ const skeleton = async (
 ): Promise<Skeleton> => {
   const { ctx, params } = inputs;
   const anchor = await ctx.hydrator.resolveUri(params.anchor);
+  const depth = params.depth ?? 6;
+  const limit = params.limit ?? 50;
 
   try {
     const result = await ctx.dataplane.crosspostThread.getThread(
@@ -78,7 +82,7 @@ const skeleton = async (
       params.parentHeight,
       getThreadDepth({
         anchor,
-        depth: params.depth,
+        depth,
         maxThreadDepth: ctx.cfg.maxThreadDepth,
         bigThreadUris: ctx.cfg.bigThreadUris,
         bigThreadDepth: ctx.cfg.bigThreadDepth,
@@ -89,7 +93,7 @@ const skeleton = async (
       ? result.items
       : await filterTakenDownItems(ctx.dataplane, result.items);
     const anchorFound = visibleItems.some((item) => item.uri === anchor);
-    const page = paginateThreadItems(visibleItems, params.limit, params.cursor);
+    const page = paginateThreadItems(visibleItems, limit, params.cursor);
     return {
       anchor,
       anchorFound,
@@ -140,7 +144,7 @@ const presentation = (
     skeleton: Skeleton;
     hydration: HydrationState;
   },
-): OutputSchema => {
+): $OutputBody => {
   const { ctx, skeleton, hydration } = inputs;
 
   if (!skeleton.anchorFound) {
@@ -153,7 +157,7 @@ const presentation = (
   const thread = skeleton.items.map((item) => {
     return {
       $type: "so.sprk.feed.getCrosspostThread#threadItem",
-      uri: item.uri,
+      uri: item.uri as AtUriString,
       depth: item.depth,
       value: toThreadValue(ctx, hydration, item),
     } as ThreadItem;
@@ -193,14 +197,14 @@ const toThreadValue = (
       $type: "so.sprk.feed.defs#threadViewPost",
       post: {
         $type: "so.sprk.feed.defs#postView",
-        uri: item.uri,
-        cid: item.cid,
+        uri: item.uri as AtUriString,
+        cid: item.cid as CidString,
         author,
         record,
         replyCount: item.replyCount,
         repostCount: item.repostCount,
         likeCount: item.likeCount,
-        indexedAt: item.indexedAt,
+        indexedAt: item.indexedAt as DatetimeString,
       },
     };
   }
@@ -209,13 +213,13 @@ const toThreadValue = (
     $type: "so.sprk.feed.defs#threadViewPost",
     post: {
       $type: "so.sprk.feed.defs#replyView",
-      uri: item.uri,
-      cid: item.cid,
+      uri: item.uri as AtUriString,
+      cid: item.cid as CidString,
       author,
       record,
       replyCount: item.replyCount,
       likeCount: item.likeCount,
-      indexedAt: item.indexedAt,
+      indexedAt: item.indexedAt as DatetimeString,
     },
   };
 };
@@ -359,7 +363,7 @@ type Context = {
   cfg: ServerConfig;
 };
 
-type Params = QueryParams & { hydrateCtx: HydrateCtx };
+type Params = $Params & { hydrateCtx: HydrateCtx };
 
 type Skeleton = {
   anchor: string;

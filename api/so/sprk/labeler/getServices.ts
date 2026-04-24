@@ -1,10 +1,11 @@
 import { mapDefined } from "@atp/common";
 import { AppContext } from "../../../../context.ts";
-import { Server } from "../../../../lex/index.ts";
+import { Server } from "@atp/xrpc-server";
+import * as so from "../../../../lex/so.ts";
 import { createHydrateCtxFromAuth, resHeaders } from "../../../util.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  server.so.sprk.labeler.getServices({
+  server.add(so.sprk.labeler.getServices, {
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth, req }) => {
       const { dids, detailed } = params;
@@ -13,19 +14,9 @@ export default function (server: Server, ctx: AppContext) {
 
       const views = mapDefined(dids, (did) => {
         if (detailed) {
-          const view = ctx.views.labelerDetailed(did, hydration);
-          if (!view) return;
-          return {
-            ...view,
-            $type: "so.sprk.labeler.defs#labelerViewDetailed",
-          };
+          return ctx.views.labelerDetailed(did, hydration);
         } else {
-          const view = ctx.views.labeler(did, hydration);
-          if (!view) return;
-          return {
-            ...view,
-            $type: "so.sprk.labeler.defs#labelerView",
-          };
+          return ctx.views.labeler(did, hydration);
         }
       });
 

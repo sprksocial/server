@@ -1,20 +1,20 @@
-import { CID } from "multiformats/cid";
+import { Cid } from "@atp/lex";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
-import * as lex from "../../../lex/lexicons.ts";
-import * as Audio from "../../../lex/types/so/sprk/sound/audio.ts";
+import * as so from "../../../lex/so.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { AudioDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexId = lex.ids.SoSprkSoundAudio;
+const schema = so.sprk.sound.audio.main;
+type AudioRecord = so.sprk.sound.audio.Main;
 type IndexedAudio = AudioDocument;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
-  cid: CID,
-  obj: Audio.Record,
+  cid: Cid,
+  obj: AudioRecord,
   timestamp: string,
 ): Promise<IndexedAudio | null> => {
   const audio: Record<string, unknown> = {
@@ -61,14 +61,14 @@ const notifsForDelete = () => {
   return { notifs: [], toDelete: [] };
 };
 
-export type PluginType = RecordProcessor<Audio.Record, IndexedAudio>;
+export type PluginType = RecordProcessor<typeof schema, IndexedAudio>;
 
 export const makePlugin = (
   db: Database,
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexId,
+    schema,
     insertFn,
     findDuplicate,
     deleteFn,

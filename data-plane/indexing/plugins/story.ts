@@ -1,20 +1,20 @@
-import { CID } from "multiformats/cid";
+import { Cid } from "@atp/lex";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
-import * as lex from "../../../lex/lexicons.ts";
-import * as Story from "../../../lex/types/so/sprk/story/post.ts";
+import * as so from "../../../lex/so.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
 import { StoryDocument } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const lexId = lex.ids.SoSprkStoryPost;
+const schema = so.sprk.story.post.main;
+type StoryRecord = so.sprk.story.post.Main;
 type IndexedStory = StoryDocument;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
-  cid: CID,
-  obj: Story.Record,
+  cid: Cid,
+  obj: StoryRecord,
   timestamp: string,
 ): Promise<IndexedStory | null> => {
   const story = {
@@ -59,14 +59,14 @@ const notifsForDelete = () => {
   return { notifs: [], toDelete: [] };
 };
 
-export type PluginType = RecordProcessor<Story.Record, IndexedStory>;
+export type PluginType = RecordProcessor<typeof schema, IndexedStory>;
 
 export const makePlugin = (
   db: Database,
   background: BackgroundQueue,
 ): PluginType => {
   return new RecordProcessor(db, background, {
-    lexId,
+    schema,
     insertFn,
     findDuplicate,
     deleteFn,

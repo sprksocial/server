@@ -1,15 +1,17 @@
 import { dedupeStrs } from "@atp/common";
+import { InvalidRequestError, Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
 import {
   HydrateCtx,
   HydrationState,
   Hydrator,
 } from "../../../../hydration/index.ts";
-import { Server } from "../../../../lex/index.ts";
+import * as so from "../../../../lex/so.ts";
 import {
-  OutputSchema,
-  QueryParams,
-} from "../../../../lex/types/so/sprk/story/getStories.ts";
+  $OutputBody,
+  $Params,
+} from "../../../../lex/so/sprk/story/getStories.ts";
 import {
   createPipeline,
   filterSkeletonList,
@@ -62,7 +64,7 @@ export default function (server: Server, ctx: AppContext) {
     rules,
     presentation,
   });
-  server.so.sprk.story.getStories({
+  server.add(so.sprk.story.getStories, {
     auth: ctx.authVerifier.standardOptional,
     handler: async ({ params, auth, req }) => {
       const hydrateCtx = await createHydrateCtxFromAuth(ctx, req, auth);
@@ -74,16 +76,15 @@ export default function (server: Server, ctx: AppContext) {
       if (uriArray.length === 0) {
         return {
           encoding: "application/json",
-          body: { stories: [] } as OutputSchema,
+          body: { stories: [] } as $OutputBody,
         };
       }
 
       // Enforce maximum limit
       if (uriArray.length > MAX_STORIES_LIMIT) {
-        return {
-          status: 400,
-          message: `Too many URIs requested. Maximum is ${MAX_STORIES_LIMIT}`,
-        };
+        throw new InvalidRequestError(
+          `Too many URIs requested. Maximum is ${MAX_STORIES_LIMIT}`,
+        );
       }
 
       // Validate URIs
@@ -100,12 +101,17 @@ export default function (server: Server, ctx: AppContext) {
       if (validUris.length === 0) {
         return {
           encoding: "application/json",
-          body: { stories: [] } as OutputSchema,
+          body: { stories: [] } as $OutputBody,
         };
       }
 
       const result = await getStories(
-        { ...params, uris: validUris, hydrateCtx, viewer: hydrateCtx.viewer },
+        {
+          ...params,
+          uris: validUris as $Params["uris"],
+          hydrateCtx,
+          viewer: hydrateCtx.viewer,
+        },
         ctx,
       );
 
@@ -153,7 +159,7 @@ const rules = (inputs: RulesFnInput<Context, Params, Skeleton>): Skeleton => {
 
 const presentation = (
   inputs: PresentationFnInput<Context, Params, Skeleton>,
-): OutputSchema => {
+): $OutputBody => {
   const { ctx, skeleton, hydration } = inputs;
   const storyViews = mapSkeletonList(
     skeleton,
@@ -169,7 +175,7 @@ type Context = {
   views: Views;
 };
 
-type Params = QueryParams & {
+type Params = $Params & {
   hydrateCtx: HydrateCtx;
   viewer: string | null;
 };

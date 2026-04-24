@@ -1,3 +1,5 @@
+import { Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
 import { DataPlane } from "../../../../data-plane/index.ts";
 import { FeedItem } from "../../../../hydration/feed.ts";
@@ -7,8 +9,8 @@ import {
   Hydrator,
 } from "../../../../hydration/index.ts";
 import { parseString } from "../../../../hydration/util.ts";
-import { Server } from "../../../../lex/index.ts";
-import { QueryParams } from "../../../../lex/types/so/sprk/feed/getTimeline.ts";
+import * as so from "../../../../lex/so.ts";
+import { $Params } from "../../../../lex/so/sprk/feed/getTimeline.ts";
 import {
   createPipeline,
   filterSkeletonList,
@@ -28,7 +30,7 @@ export default function (server: Server, ctx: AppContext) {
     rules: noBlocksOrMutes,
     presentation,
   });
-  server.so.sprk.feed.getTimeline({
+  server.add(so.sprk.feed.getTimeline, {
     auth: ctx.authVerifier.standard,
     handler: async ({ params, auth, req }) => {
       const viewer = auth.credentials.iss;
@@ -124,7 +126,7 @@ type Context = {
   dataplane: DataPlane;
 };
 
-type Params = QueryParams & { hydrateCtx: HydrateCtx & { viewer: string } };
+type Params = $Params & { hydrateCtx: HydrateCtx & { viewer: string } };
 
 type Skeleton = {
   items: FeedItem[];

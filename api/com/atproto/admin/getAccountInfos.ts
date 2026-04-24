@@ -1,10 +1,14 @@
 import { mapDefined } from "@atp/common";
+import type { DatetimeString, HandleString, UnknownObject } from "@atp/lex";
 import { INVALID_HANDLE } from "@atp/syntax";
+import { Server } from "@atp/xrpc-server";
+
 import { AppContext } from "../../../../context.ts";
-import { Server } from "../../../../lex/index.ts";
+import * as com from "../../../../lex/com.ts";
+import type { $OutputBody } from "../../../../lex/com/atproto/admin/getAccountInfos.ts";
 
 export default function (server: Server, ctx: AppContext) {
-  server.com.atproto.admin.getAccountInfos({
+  server.add(com.atproto.admin.getAccountInfos, {
     auth: ctx.authVerifier.optionalStandardOrRole,
     handler: async ({ params, auth }) => {
       const { dids } = params;
@@ -14,7 +18,7 @@ export default function (server: Server, ctx: AppContext) {
         includeTakedowns: true,
       });
 
-      const infos = mapDefined(dids, (did) => {
+      const infos: $OutputBody["infos"] = mapDefined(dids, (did) => {
         const info = actors.get(did);
         if (!info) return;
         if (info.takedownRef && !includeTakedowns) return;
@@ -24,9 +28,12 @@ export default function (server: Server, ctx: AppContext) {
 
         return {
           did,
-          handle: info.handle ?? INVALID_HANDLE,
-          relatedRecords: profileRecord ? [profileRecord] : undefined,
-          indexedAt: (info.sortedAt ?? new Date(0)).toISOString(),
+          handle: (info.handle ?? INVALID_HANDLE) as HandleString,
+          relatedRecords: profileRecord
+            ? [profileRecord as UnknownObject]
+            : undefined,
+          indexedAt: (info.sortedAt ?? new Date(0))
+            .toISOString() as DatetimeString,
         };
       });
 

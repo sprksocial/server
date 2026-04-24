@@ -1,9 +1,7 @@
 import { assert } from "@std/assert";
 import { AtUri } from "@atp/syntax";
 import { DataPlane } from "../data-plane/index.ts";
-import { ids } from "../lex/lexicons.ts";
-import { Record as ProfileRecord } from "../lex/types/so/sprk/actor/profile.ts";
-import { Record as StoryRecord } from "../lex/types/so/sprk/story/post.ts";
+import * as so from "../lex/so.ts";
 import { uriToDid as didFromUri } from "../utils/uris.ts";
 import {
   ActivitySubscriptionStates,
@@ -11,6 +9,7 @@ import {
   Actors,
   KnownFollowersStates,
   ProfileAggs,
+  ProfileRecord,
   ProfileViewerStates,
 } from "./actor.ts";
 import {
@@ -34,7 +33,7 @@ import {
   ThreadContexts,
   ThreadRef,
 } from "./feed.ts";
-import { Stories, StoryHydrator } from "./story.ts";
+import { Stories, StoryHydrator, StoryRecord } from "./story.ts";
 
 import {
   BlockEntry,
@@ -46,6 +45,7 @@ import {
   HydrationMap,
   ItemRef,
   mergeMaps,
+  parseRecord,
   RecordInfo,
   urisByCollection,
 } from "./util.ts";
@@ -319,10 +319,10 @@ export class Hydrator {
     state: HydrationState = {},
   ): Promise<HydrationState> {
     const postRefs = refs.filter((ref) =>
-      new AtUri(ref.uri).collection === ids.SoSprkFeedPost
+      new AtUri(ref.uri).collection === so.sprk.feed.post.$type
     );
     const replyRefs = refs.filter((ref) =>
-      new AtUri(ref.uri).collection === ids.SoSprkFeedReply
+      new AtUri(ref.uri).collection === so.sprk.feed.reply.$type
     );
 
     const allUris = refs.map((ref) => ref.uri);
@@ -366,7 +366,7 @@ export class Hydrator {
     const threadRefs: ThreadRef[] = [];
     for (const ref of refs) {
       const collection = new AtUri(ref.uri).collection;
-      if (collection === ids.SoSprkFeedPost) {
+      if (collection === so.sprk.feed.post.$type) {
         const post = state.posts!.get(ref.uri);
         if (!post) continue;
         threadRefs.push({
@@ -374,7 +374,7 @@ export class Hydrator {
           cid: post.cid,
           threadRoot: ref.uri,
         });
-      } else if (collection === ids.SoSprkFeedReply) {
+      } else if (collection === so.sprk.feed.reply.$type) {
         const reply = state.replies!.get(ref.uri);
         if (!reply) continue;
         const rootUri = reply.record.reply?.root.uri ?? ref.uri;
@@ -553,9 +553,9 @@ export class Hydrator {
 
     for (const { post } of items) {
       const collection = new AtUri(post.uri).collection;
-      if (collection === ids.SoSprkFeedPost) {
+      if (collection === so.sprk.feed.post.$type) {
         postUris.push(post.uri);
-      } else if (collection === ids.SoSprkFeedReply) {
+      } else if (collection === so.sprk.feed.reply.$type) {
         replyUris.push(post.uri);
         replyRefs.push(post);
       }
@@ -770,11 +770,11 @@ export class Hydrator {
   ): Promise<HydrationState> {
     const uris = notifs.map((notif) => notif.uri);
     const collections = urisByCollection(uris);
-    const postUris = collections.get(ids.SoSprkFeedPost) ?? [];
-    const replyUris = collections.get(ids.SoSprkFeedReply) ?? [];
-    const likeUris = collections.get(ids.SoSprkFeedLike) ?? [];
-    const repostUris = collections.get(ids.SoSprkFeedRepost) ?? [];
-    const followUris = collections.get(ids.SoSprkGraphFollow) ?? [];
+    const postUris = collections.get(so.sprk.feed.post.$type) ?? [];
+    const replyUris = collections.get(so.sprk.feed.reply.$type) ?? [];
+    const likeUris = collections.get(so.sprk.feed.like.$type) ?? [];
+    const repostUris = collections.get(so.sprk.feed.repost.$type) ?? [];
+    const followUris = collections.get(so.sprk.graph.follow.$type) ?? [];
 
     // Collect subject URIs for like/repost/reply notifications to hydrate their content
     const subjectPostUris: string[] = [];
@@ -787,9 +787,9 @@ export class Hydrator {
           notif.reason === "reply")
       ) {
         const subjectUri = new AtUri(notif.reasonSubject);
-        if (subjectUri.collection === ids.SoSprkFeedPost) {
+        if (subjectUri.collection === so.sprk.feed.post.$type) {
           subjectPostUris.push(notif.reasonSubject);
-        } else if (subjectUri.collection === ids.SoSprkFeedReply) {
+        } else if (subjectUri.collection === so.sprk.feed.reply.$type) {
           subjectReplyUris.push(notif.reasonSubject);
         }
       }
@@ -955,54 +955,54 @@ export class Hydrator {
   async getRecord(uri: string, includeTakedowns = false) {
     const parsed = new AtUri(uri);
     const collection = parsed.collection;
-    if (collection === ids.SoSprkFeedPost) {
+    if (collection === so.sprk.feed.post.$type) {
       return (
         (await this.feed.getPosts([uri], includeTakedowns)).get(uri) ??
           undefined
       );
-    } else if (collection === ids.SoSprkFeedReply) {
+    } else if (collection === so.sprk.feed.reply.$type) {
       return (
         (await this.feed.getReplies([uri], includeTakedowns)).get(uri) ??
           undefined
       );
-    } else if (collection === ids.SoSprkFeedRepost) {
+    } else if (collection === so.sprk.feed.repost.$type) {
       return (
         (await this.feed.getReposts([uri], includeTakedowns)).get(uri) ??
           undefined
       );
-    } else if (collection === ids.SoSprkFeedLike) {
+    } else if (collection === so.sprk.feed.like.$type) {
       return (
         (await this.feed.getLikes([uri], includeTakedowns)).get(uri) ??
           undefined
       );
-    } else if (collection === ids.SoSprkSoundAudio) {
+    } else if (collection === so.sprk.sound.audio.$type) {
       return (
         (await this.feed.getSounds([uri], includeTakedowns)).get(uri) ??
           undefined
       );
-    } else if (collection === ids.SoSprkGraphFollow) {
+    } else if (collection === so.sprk.graph.follow.$type) {
       return (
         (await this.graph.getFollows([uri], includeTakedowns)).get(uri) ??
           undefined
       );
-    } else if (collection === ids.SoSprkGraphBlock) {
+    } else if (collection === so.sprk.graph.block.$type) {
       return (
         (await this.graph.getBlocks([uri], includeTakedowns)).get(uri) ??
           undefined
       );
-    } else if (collection === ids.SoSprkFeedGenerator) {
+    } else if (collection === so.sprk.feed.generator.$type) {
       return (
         (await this.feed.getFeedGens([uri], includeTakedowns)).get(uri) ??
           undefined
       );
-    } else if (collection === ids.SoSprkLabelerService) {
+    } else if (collection === so.sprk.labeler.service.$type) {
       if (parsed.rkey !== "self") return;
       const did = parsed.hostname;
       return (
         (await this.label.getLabelers([did], includeTakedowns)).get(did) ??
           undefined
       );
-    } else if (collection === ids.SoSprkActorProfile) {
+    } else if (collection === so.sprk.actor.profile.$type) {
       const did = parsed.hostname;
       const actor = (
         await this.actor.getActors([did], { includeTakedowns })
@@ -1017,30 +1017,18 @@ export class Hydrator {
       };
 
       return recordInfo;
-    } else if (collection === ids.SoSprkStoryPost) {
+    } else if (collection === so.sprk.story.post.$type) {
       // Get story records through dataplane
       const res = await this.dataplane.records.getStoryRecords([uri]);
       const storyRecord = res.records[0];
 
       if (!storyRecord || !storyRecord.cid) return undefined;
 
-      // Parse the record JSON
-      const record = JSON.parse(storyRecord.record);
-      if (!record) return undefined;
-
-      const recordInfo: RecordInfo<typeof record> = {
-        record,
-        cid: storyRecord.cid,
-        sortedAt: storyRecord.sortedAt
-          ? new Date(storyRecord.sortedAt)
-          : new Date(storyRecord.createdAt || storyRecord.indexedAt || 0),
-        indexedAt: storyRecord.indexedAt
-          ? new Date(storyRecord.indexedAt)
-          : new Date(0),
-        takedownRef: storyRecord.takedownRef,
-      };
-
-      return recordInfo;
+      return parseRecord<StoryRecord>(
+        so.sprk.story.post.main,
+        storyRecord,
+        includeTakedowns,
+      );
     }
   }
 
@@ -1087,7 +1075,7 @@ const labelSubjectsForDid = (dids: string[]) => {
   return [
     ...dids,
     ...dids.map((did) =>
-      AtUri.make(did, ids.SoSprkActorProfile, "self").toString()
+      AtUri.make(did, so.sprk.actor.profile.$type, "self").toString()
     ),
   ];
 };

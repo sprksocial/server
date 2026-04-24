@@ -1,19 +1,26 @@
-import { BlobRef } from "@atp/lexicon";
+import type { BlobRef } from "@atp/lex";
+
+type BlobJson = BlobRef | {
+  $type?: string;
+  ref?: {
+    $link?: string;
+    toString?: () => string;
+  };
+  cid?: string;
+};
 
 // Simple string format function to replace util.format
 const format = (template: string, ...args: string[]): string => {
   return template.replace(/%s/g, () => args.shift() || "");
 };
 
-export const cidFromBlobJson = (json: BlobRef) => {
-  if (json instanceof BlobRef) {
-    return json.ref.toString();
-  }
+export const cidFromBlobJson = (json: BlobJson) => {
   // @NOTE below handles the fact that parseRecordBytes() produces raw json rather than lexicon values
-  if (json["$type"] === "blob") {
-    return (json["ref"]?.["$link"] ?? "") as string;
+  if (json.$type === "blob") {
+    const ref = json.ref as { $link?: string; toString?: () => string };
+    return ref?.$link ?? ref?.toString?.() ?? "";
   }
-  return (json["cid"] ?? "") as string;
+  return "cid" in json ? json.cid ?? "" : "";
 };
 
 export class VideoUriBuilder {

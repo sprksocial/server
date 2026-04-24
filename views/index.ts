@@ -1,100 +1,97 @@
 import { HydrationState } from "../hydration/index.ts";
-import {
-  isRecord as isPostRecord,
-  Record as PostRecord,
-} from "../lex/types/so/sprk/feed/post.ts";
-import { Record as LikeRecord } from "../lex/types/so/sprk/feed/like.ts";
-import { Record as RepostRecord } from "../lex/types/so/sprk/feed/repost.ts";
-import { Record as FollowRecord } from "../lex/types/so/sprk/graph/follow.ts";
-import {
-  isRecord as isProfileRecord,
-  Record as ProfileRecord,
-} from "../lex/types/so/sprk/actor/profile.ts";
-import { Label } from "../lex/types/com/atproto/label/defs.ts";
-import {
-  FeedViewPost,
-  isPostView,
-  isReplyView,
-  KnownLike,
-  KnownReply,
-  KnownRepost,
-  PostView,
-  ReplyRef,
-  ReplyView,
-  ThreadContext,
-  ThreadViewPost,
-} from "../lex/types/so/sprk/feed/defs.ts";
-import { StoriesByAuthor, StoryView } from "../lex/types/so/sprk/story/defs.ts";
-import { Main as MentionEmbed } from "../lex/types/so/sprk/embed/mention.ts";
-import { Main as RecordEmbed } from "../lex/types/so/sprk/embed/record.ts";
-import {
-  isRecord as isReplyRecord,
-  Record as ReplyRecord,
-} from "../lex/types/so/sprk/feed/reply.ts";
-import { ids } from "../lex/lexicons.ts";
-import {
-  KnownFollowers,
-  ProfileView,
-  ProfileViewBasic,
-  ProfileViewDetailed,
-  ViewerState as ProfileViewer,
-} from "../lex/types/so/sprk/actor/defs.ts";
-import {
-  BlockedPost,
-  GeneratorView,
-  ImagesMedia,
-  ImagesMediaView,
-  isImagesMedia,
-  isVideoMedia,
-  MaybePostView,
-  Media,
-  MediaView,
-  NotFoundPost,
-  NotificationView,
-  VideoMedia,
-  VideoMediaView,
-} from "./types.ts";
-import {
-  isMain as isImageMedia,
-  Main as ImageMedia,
-  View as ImageView,
-} from "../lex/types/so/sprk/media/image.ts";
-import {
-  isMain as isVideoMediaMain,
-} from "../lex/types/so/sprk/media/video.ts";
-import type { Main as VideoMediaMainType } from "../lex/types/so/sprk/media/video.ts";
-import { AudioView } from "../lex/types/so/sprk/sound/defs.ts";
+import type {
+  AtUriString,
+  BlobRef,
+  CidString,
+  DatetimeString,
+  DidString,
+  HandleString,
+  UriString,
+} from "@atp/lex";
 import { AtUri, INVALID_HANDLE, normalizeDatetimeAlways } from "@atp/syntax";
-import { Main as StrongRef } from "../lex/types/com/atproto/repo/strongRef.ts";
+import { mapDefined } from "@atp/common";
+import * as so from "../lex/so.ts";
 import { cidFromBlobJson } from "./util.ts";
 import { uriToDid } from "../utils/uris.ts";
-import { mapDefined } from "@atp/common";
 import { FeedItem, Like, Post, Reply, Repost } from "../hydration/feed.ts";
-import {
-  QueryParams as GetThreadQueryParams,
-  ThreadItem,
-} from "../lex/types/so/sprk/feed/getPostThread.ts";
-import { $Typed, Un$Typed } from "../lex/util.ts";
-import { BlobRef } from "@atp/lexicon";
-import {
-  isRecord as isLabelerRecord,
-  Record as LabelerRecord,
-} from "../lex/types/so/sprk/labeler/service.ts";
-import {
-  LabelerView,
-  LabelerViewDetailed,
-} from "../lex/types/so/sprk/labeler/defs.ts";
-import { isSelfLabels } from "../lex/types/com/atproto/label/defs.ts";
 import { Follow } from "../hydration/graph.ts";
 import { RecordInfo } from "../hydration/util.ts";
 import { Notification } from "../data-plane/routes/notifs.ts";
+import {
+  $Typed,
+  AudioView,
+  BlockedPost,
+  FeedViewPost,
+  FollowRecord,
+  GeneratorView,
+  GetThreadQueryParams,
+  ImageMedia,
+  ImagesMedia,
+  ImagesMediaView,
+  ImageView,
+  isImageMedia,
+  isImagesMedia,
+  isLabelerRecord,
+  isPostRecord,
+  isPostView,
+  isProfileRecord,
+  isReplyRecord,
+  isReplyView,
+  isSelfLabels,
+  isVideoMedia,
+  isVideoMediaMain,
+  KnownFollowers,
+  KnownLike,
+  KnownReply,
+  KnownRepost,
+  Label,
+  LabelerRecord,
+  LabelerView,
+  LabelerViewDetailed,
+  LikeRecord,
+  MaybePostView,
+  Media,
+  MediaView,
+  MentionEmbed,
+  NotFoundPost,
+  NotificationView,
+  PostRecord,
+  PostView,
+  ProfileRecord,
+  ProfileView,
+  ProfileViewBasic,
+  ProfileViewDetailed,
+  ProfileViewer,
+  RecordEmbed,
+  ReplyRecord,
+  ReplyRef,
+  ReplyView,
+  RepostRecord,
+  StoriesByAuthor,
+  StoryView,
+  StrongRef,
+  ThreadContext,
+  ThreadItem,
+  ThreadViewPost,
+  Un$Typed,
+  VideoMedia,
+  VideoMediaMainType,
+  VideoMediaView,
+} from "./types.ts";
+
+const asAtUri = (value: string) => value as AtUriString;
+const asCid = (value: string) => value as CidString;
+const asDatetime = (value: string) => value as DatetimeString;
+const asDid = (value: string) => value as DidString;
+const asHandle = (value: string) => value as HandleString;
+const asUri = (value: string) => value as UriString;
 
 export class Views {
   public indexedAtEpoch?: Date | undefined;
 
-  private videoCdn?: string;
-  private mediaCdn?: string;
-  private thumbCdn?: string;
+  private videoCdn: string;
+  private mediaCdn: string;
+  private thumbCdn: string;
 
   constructor(
     opts: {
@@ -105,9 +102,9 @@ export class Views {
     },
   ) {
     this.indexedAtEpoch = opts?.indexedAtEpoch;
-    this.videoCdn = opts?.videoCdn;
-    this.mediaCdn = opts?.mediaCdn;
-    this.thumbCdn = opts?.thumbCdn;
+    this.videoCdn = opts?.videoCdn ?? "https://video.sprk.so";
+    this.mediaCdn = opts?.mediaCdn ?? "https://media.sprk.so";
+    this.thumbCdn = opts?.thumbCdn ?? "https://thumb.sprk.so";
   }
 
   // Labels
@@ -139,8 +136,10 @@ export class Views {
       return [];
     }
 
+    const selfLabels = "labels" in record ? record.labels : undefined;
+
     // Ignore if no labels defines
-    if (!isSelfLabels(record.labels) || !record.labels.values.length) {
+    if (!isSelfLabels(selfLabels) || !selfLabels.values.length) {
       return [];
     }
 
@@ -148,15 +147,21 @@ export class Views {
     const cts = typeof record.createdAt === "string"
       ? normalizeDatetimeAlways(record.createdAt)
       : new Date(0).toISOString();
-    return record.labels.values.map(({ val }) => {
-      return { src, uri, cid, val, cts };
+    return selfLabels.values.map(({ val }) => {
+      return {
+        src: asDid(src),
+        uri: asUri(uri),
+        cid: asCid(cid),
+        val,
+        cts: asDatetime(cts),
+      };
     });
   }
 
   labeler(
     did: string,
     state: HydrationState,
-  ): Un$Typed<LabelerView> | undefined {
+  ): $Typed<LabelerView, "so.sprk.labeler.defs#labelerView"> | undefined {
     const labeler = state.labelers?.get(did);
     if (!labeler) return;
     const creator = this.profile(did, state);
@@ -164,7 +169,11 @@ export class Views {
     const viewer = state.labelerViewers?.get(did);
     const aggs = state.labelerAggs?.get(did);
 
-    const uri = AtUri.make(did, ids.SoSprkLabelerService, "self").toString();
+    const uri = AtUri.make(
+      did,
+      so.sprk.labeler.service.$type,
+      "self",
+    ).toString();
     const labels = [
       ...(state.labels?.getBySubject(uri) ?? []),
       ...this.selfLabels({
@@ -175,16 +184,17 @@ export class Views {
     ];
 
     return {
-      uri,
-      cid: labeler.cid.toString(),
+      $type: "so.sprk.labeler.defs#labelerView",
+      uri: asAtUri(uri),
+      cid: asCid(labeler.cid.toString()),
       creator,
       likeCount: aggs?.likes ?? 0,
       viewer: viewer
         ? {
-          like: viewer.like,
+          like: viewer.like ? asAtUri(viewer.like) : undefined,
         }
         : undefined,
-      indexedAt: this.indexedAt(labeler).toISOString(),
+      indexedAt: asDatetime(this.indexedAt(labeler).toISOString()),
       labels,
     };
   }
@@ -192,7 +202,9 @@ export class Views {
   labelerDetailed(
     did: string,
     state: HydrationState,
-  ): Un$Typed<LabelerViewDetailed> | undefined {
+  ):
+    | $Typed<LabelerViewDetailed, "so.sprk.labeler.defs#labelerViewDetailed">
+    | undefined {
     const baseView = this.labeler(did, state);
     if (!baseView) return;
     const labeler = state.labelers?.get(did);
@@ -200,6 +212,7 @@ export class Views {
 
     return {
       ...baseView,
+      $type: "so.sprk.labeler.defs#labelerViewDetailed",
       policies: labeler.record.policies,
       reasonTypes: labeler.record.reasonTypes,
       subjectTypes: labeler.record.subjectTypes,
@@ -257,7 +270,7 @@ export class Views {
       const value = this.threadItemValue(uri, state);
       items.push({
         $type: "so.sprk.feed.getPostThread#threadItem",
-        uri,
+        uri: asAtUri(uri),
         depth,
         value,
       });
@@ -313,7 +326,7 @@ export class Views {
     const { like } = context;
     return {
       $type: "so.sprk.feed.defs#threadContext",
-      ...(like ? { rootAuthorLike: like } : {}),
+      ...(like ? { rootAuthorLike: asAtUri(like) } : {}),
     };
   }
 
@@ -329,7 +342,7 @@ export class Views {
 
     const parsedUri = new AtUri(uri);
     const collection = parsedUri.collection;
-    const isReply = collection === ids.SoSprkFeedReply;
+    const isReply = collection === so.sprk.feed.reply.$type;
     const authorDid = parsedUri.hostname;
     const author = this.profileBasic(authorDid, state);
     if (!author) return;
@@ -352,8 +365,8 @@ export class Views {
 
     return {
       $type: "so.sprk.feed.defs#postView",
-      uri,
-      cid: recordInfo.cid,
+      uri: asAtUri(uri),
+      cid: asCid(recordInfo.cid),
       author,
       record: recordInfo.record,
       media: mediaRecord ? this.media(uri, mediaRecord as Media) : undefined,
@@ -361,12 +374,13 @@ export class Views {
       replyCount: repliesCount,
       repostCount,
       likeCount,
-      indexedAt: this.indexedAt(recordInfo)?.toISOString() ??
-        new Date().toISOString(),
+      indexedAt: asDatetime(
+        this.indexedAt(recordInfo)?.toISOString() ?? new Date().toISOString(),
+      ),
       viewer: viewer
         ? {
-          repost: viewer.repost,
-          like: viewer.like,
+          repost: viewer.repost ? asAtUri(viewer.repost) : undefined,
+          like: viewer.like ? asAtUri(viewer.like) : undefined,
           knownInteractions: this.knownInteractions(uri, state),
         }
         : undefined,
@@ -390,8 +404,8 @@ export class Views {
 
     return {
       $type: "so.sprk.feed.defs#replyView",
-      uri,
-      cid: replyInfo.cid,
+      uri: asAtUri(uri),
+      cid: asCid(replyInfo.cid),
       author,
       record: replyInfo.record,
       media: replyInfo.record.media
@@ -399,11 +413,12 @@ export class Views {
         : undefined,
       replyCount: aggs?.replies ?? 0,
       likeCount: aggs?.likes ?? 0,
-      indexedAt: this.indexedAt(replyInfo)?.toISOString() ??
-        new Date().toISOString(),
+      indexedAt: asDatetime(
+        this.indexedAt(replyInfo)?.toISOString() ?? new Date().toISOString(),
+      ),
       viewer: viewer
         ? {
-          like: viewer.like,
+          like: viewer.like ? asAtUri(viewer.like) : undefined,
         }
         : undefined,
     };
@@ -424,14 +439,15 @@ export class Views {
     const mediaRecord = storyInfo.record.media;
 
     return {
-      uri,
-      cid: storyInfo.cid,
+      uri: asAtUri(uri),
+      cid: asCid(storyInfo.cid),
       author,
       record: storyInfo.record,
       media: mediaRecord ? this.storyMedia(uri, mediaRecord) : undefined,
       embeds: this.storyEmbeds(storyInfo.record.embeds, state),
-      indexedAt: this.indexedAt(storyInfo)?.toISOString() ??
-        new Date().toISOString(),
+      indexedAt: asDatetime(
+        this.indexedAt(storyInfo)?.toISOString() ?? new Date().toISOString(),
+      ),
     };
   }
 
@@ -619,7 +635,7 @@ export class Views {
     }
 
     return {
-      root,
+      root: isReplyView(root) ? this.notFoundPost(root.uri) : root,
       parent,
       grandparentAuthor,
     };
@@ -651,10 +667,10 @@ export class Views {
   ): $Typed<BlockedPost> {
     return {
       $type: "so.sprk.feed.defs#blockedPost",
-      uri,
+      uri: asAtUri(uri),
       blocked: true,
       author: {
-        did: authorDid,
+        did: asDid(authorDid),
         viewer: this.blockedProfileViewer(authorDid, state),
       },
     };
@@ -663,7 +679,7 @@ export class Views {
   notFoundPost(uri: string): $Typed<NotFoundPost> {
     return {
       $type: "so.sprk.feed.defs#notFoundPost",
-      uri,
+      uri: asAtUri(uri),
       notFound: true,
     };
   }
@@ -696,26 +712,28 @@ export class Views {
     const aggs = state.feedgenAggs?.get(uri);
 
     return {
-      uri,
-      cid: feedgen.cid,
-      did: feedgen.record.did,
+      uri: asAtUri(uri),
+      cid: asCid(feedgen.cid),
+      did: asDid(feedgen.record.did),
       creator,
       displayName: feedgen.record.displayName,
       description: feedgen.record.description,
       descriptionFacets: feedgen.record.descriptionFacets,
       avatar: feedgen.record?.avatar
-        ? `${this.mediaCdn}/avatar/medium/${creatorDid}/${
-          cidFromBlobJson(feedgen.record.avatar)
-        }/webp`
+        ? asUri(
+          `${this.mediaCdn}/avatar/medium/${creatorDid}/${
+            cidFromBlobJson(feedgen.record.avatar)
+          }/webp`,
+        )
         : undefined,
       likeCount: aggs?.likes ?? 0,
       acceptsInteractions: feedgen.record.acceptsInteractions,
       viewer: viewer
         ? {
-          like: viewer.like,
+          like: viewer.like ? asAtUri(viewer.like) : undefined,
         }
         : undefined,
-      indexedAt: this.indexedAt(feedgen).toISOString(),
+      indexedAt: asDatetime(this.indexedAt(feedgen).toISOString()),
     };
   }
 
@@ -736,10 +754,12 @@ export class Views {
       $type: "so.sprk.actor.defs#profileView",
       description: actor.profile?.description || undefined,
       indexedAt: actor.indexedAt && actor.sortedAt
-        ? this.indexedAt({
-          sortedAt: actor.sortedAt,
-          indexedAt: actor.indexedAt,
-        }).toISOString()
+        ? asDatetime(
+          this.indexedAt({
+            sortedAt: actor.sortedAt,
+            indexedAt: actor.indexedAt,
+          }).toISOString(),
+        )
         : undefined,
       stories: stories.length > 0 ? stories : undefined,
     };
@@ -781,16 +801,20 @@ export class Views {
     const actor = state.actors?.get(did);
     if (!actor) return;
     return {
-      did,
-      handle: actor.handle ?? INVALID_HANDLE,
+      did: asDid(did),
+      handle: asHandle(actor.handle ?? INVALID_HANDLE),
       displayName: actor.profile?.displayName,
       avatar: actor.profile?.avatar
-        ? `${this.mediaCdn}/avatar/medium/${did}/${
-          cidFromBlobJson(actor.profile.avatar)
-        }/webp`
+        ? asUri(
+          `${this.mediaCdn}/avatar/medium/${did}/${
+            cidFromBlobJson(actor.profile.avatar)
+          }/webp`,
+        )
         : undefined,
       viewer: this.profileViewer(did, state),
-      createdAt: actor.createdAt?.toISOString(),
+      createdAt: actor.createdAt
+        ? asDatetime(actor.createdAt.toISOString())
+        : undefined,
     };
   }
 
@@ -802,9 +826,13 @@ export class Views {
     const block = !!blockedByUri || !!blockingUri;
     return {
       blockedBy: !!blockedByUri,
-      blocking: blockingUri,
-      following: viewer.following && !block ? viewer.following : undefined,
-      followedBy: viewer.followedBy && !block ? viewer.followedBy : undefined,
+      blocking: blockingUri ? asAtUri(blockingUri) : undefined,
+      following: viewer.following && !block
+        ? asAtUri(viewer.following)
+        : undefined,
+      followedBy: viewer.followedBy && !block
+        ? asAtUri(viewer.followedBy)
+        : undefined,
     };
   }
 
@@ -824,7 +852,7 @@ export class Views {
     const blockingUri = viewer.blocking;
     return {
       blockedBy: !!blockedByUri,
-      blocking: blockingUri,
+      blocking: blockingUri ? asAtUri(blockingUri) : undefined,
     };
   }
 
@@ -874,9 +902,9 @@ export class Views {
 
       const base = {
         by,
-        uri: interaction.uri,
-        cid: interaction.cid,
-        indexedAt: interaction.indexedAt.toISOString(),
+        uri: asAtUri(interaction.uri),
+        cid: asCid(interaction.cid),
+        indexedAt: asDatetime(interaction.indexedAt.toISOString()),
       };
 
       switch (interaction.type) {
@@ -923,8 +951,8 @@ export class Views {
     const cid = cidFromBlobJson(image.image);
     return {
       $type: "so.sprk.media.image#view" as const,
-      thumb: `${this.mediaCdn}/img/medium/${did}/${cid}/webp`,
-      fullsize: `${this.mediaCdn}/img/full/${did}/${cid}/webp`,
+      thumb: asUri(`${this.mediaCdn}/img/medium/${did}/${cid}/webp`),
+      fullsize: asUri(`${this.mediaCdn}/img/full/${did}/${cid}/webp`),
       alt: image.alt,
       aspectRatio: image.aspectRatio,
     };
@@ -935,12 +963,12 @@ export class Views {
     media: ImagesMedia,
   ): ImagesMediaView & { $type: string } {
     const imgViews = media.images.map((img) => ({
-      thumb: `${this.mediaCdn}/img/medium/${did}/${
-        cidFromBlobJson(img.image)
-      }/webp`,
-      fullsize: `${this.mediaCdn}/img/full/${did}/${
-        cidFromBlobJson(img.image)
-      }/webp`,
+      thumb: asUri(
+        `${this.mediaCdn}/img/medium/${did}/${cidFromBlobJson(img.image)}/webp`,
+      ),
+      fullsize: asUri(
+        `${this.mediaCdn}/img/full/${did}/${cidFromBlobJson(img.image)}/webp`,
+      ),
       alt: img.alt,
       aspectRatio: img.aspectRatio,
     }));
@@ -961,9 +989,9 @@ export class Views {
 
     return {
       $type: "so.sprk.media.video#view",
-      cid,
-      playlist,
-      thumbnail,
+      cid: asCid(cid),
+      playlist: asUri(playlist),
+      thumbnail: asUri(thumbnail),
       alt: media.alt,
       aspectRatio: media.aspectRatio,
     };
@@ -987,13 +1015,15 @@ export class Views {
 
     const soundAgg = state.soundAggs?.get(uri);
 
-    let coverArtUrl: string;
-    if (soundInfo.record.coverArt) {
-      const coverArtCid = cidFromBlobJson(soundInfo.record.coverArt as BlobRef);
-      coverArtUrl =
-        `${this.mediaCdn}/img/medium/${authorDid}/${coverArtCid}/webp`;
+    let coverArtUrl: UriString;
+    const coverArt = (soundInfo.record as { coverArt?: BlobRef }).coverArt;
+    if (coverArt) {
+      const coverArtCid = cidFromBlobJson(coverArt);
+      coverArtUrl = asUri(
+        `${this.mediaCdn}/img/medium/${authorDid}/${coverArtCid}/webp`,
+      );
     } else {
-      coverArtUrl = author.avatar ?? "";
+      coverArtUrl = author.avatar ?? asUri("https://media.sprk.so");
     }
 
     const details = soundInfo.record.details
@@ -1012,16 +1042,19 @@ export class Views {
     } as Record<string, unknown>;
 
     const audioCid = cidFromBlobJson(soundInfo.record.sound);
-    const audioUrl = `https://media.sprk.so/sound/${
-      encodeURIComponent(authorDid)
-    }/${encodeURIComponent(audioCid)}`;
+    const audioUrl = asUri(
+      `https://media.sprk.so/sound/${encodeURIComponent(authorDid)}/${
+        encodeURIComponent(audioCid)
+      }`,
+    );
 
-    const indexedAt = this.indexedAt(soundInfo)?.toISOString() ??
-      new Date().toISOString();
+    const indexedAt = asDatetime(
+      this.indexedAt(soundInfo)?.toISOString() ?? new Date().toISOString(),
+    );
 
     const audioView = {
-      uri,
-      cid: soundInfo.cid,
+      uri: asAtUri(uri),
+      cid: asCid(soundInfo.cid),
       author,
       title: soundInfo.record.title,
       coverArt: coverArtUrl,
@@ -1052,15 +1085,17 @@ export class Views {
     const viewer = state.feedgenViewers?.get(uri);
 
     const avatar = generatorInfo.record.avatar
-      ? `${this.mediaCdn}/avatar/medium/${authorDid}/${
-        cidFromBlobJson(generatorInfo.record.avatar as BlobRef)
-      }/webp`
+      ? asUri(
+        `${this.mediaCdn}/avatar/medium/${authorDid}/${
+          cidFromBlobJson(generatorInfo.record.avatar as BlobRef)
+        }/webp`,
+      )
       : undefined;
 
     return {
-      uri,
-      cid: generatorInfo.cid,
-      did: generatorInfo.record.did,
+      uri: asAtUri(uri),
+      cid: asCid(generatorInfo.cid),
+      did: asDid(generatorInfo.record.did),
       creator,
       displayName: generatorInfo.record.displayName,
       description: generatorInfo.record.description,
@@ -1068,9 +1103,11 @@ export class Views {
       avatar,
       likeCount: generatorAgg?.likes ?? 0,
       acceptsInteractions: generatorInfo.record.acceptsInteractions,
-      viewer: viewer?.like ? { like: viewer.like } : undefined,
-      indexedAt: this.indexedAt(generatorInfo)?.toISOString() ??
-        new Date().toISOString(),
+      viewer: viewer?.like ? { like: asAtUri(viewer.like) } : undefined,
+      indexedAt: asDatetime(
+        this.indexedAt(generatorInfo)?.toISOString() ??
+          new Date().toISOString(),
+      ),
     };
   }
   indexedAt({ sortedAt, indexedAt }: { sortedAt: Date; indexedAt: Date }) {
@@ -1143,17 +1180,17 @@ export class Views {
       | undefined
       | null;
 
-    if (uri.collection === ids.SoSprkFeedPost) {
+    if (uri.collection === so.sprk.feed.post.$type) {
       recordInfo = state.posts?.get(notif.uri);
-    } else if (uri.collection === ids.SoSprkFeedReply) {
+    } else if (uri.collection === so.sprk.feed.reply.$type) {
       recordInfo = state.replies?.get(notif.uri);
-    } else if (uri.collection === ids.SoSprkFeedLike) {
+    } else if (uri.collection === so.sprk.feed.like.$type) {
       recordInfo = state.likes?.get(notif.uri);
-    } else if (uri.collection === ids.SoSprkFeedRepost) {
+    } else if (uri.collection === so.sprk.feed.repost.$type) {
       recordInfo = state.reposts?.get(notif.uri);
-    } else if (uri.collection === ids.SoSprkGraphFollow) {
+    } else if (uri.collection === so.sprk.graph.follow.$type) {
       recordInfo = state.follows?.get(notif.uri);
-    } else if (uri.collection === ids.SoSprkActorProfile) {
+    } else if (uri.collection === so.sprk.actor.profile.$type) {
       const actor = state.actors?.get(authorDid);
       recordInfo = actor && actor.profile && actor.profileCid
         ? {
@@ -1189,8 +1226,8 @@ export class Views {
     ) {
       const subjectUri = new AtUri(notif.reasonSubject);
       let subjectRecord: Post | Reply | undefined;
-      const isSubjectReply = subjectUri.collection === ids.SoSprkFeedReply;
-      if (subjectUri.collection === ids.SoSprkFeedPost) {
+      const isSubjectReply = subjectUri.collection === so.sprk.feed.reply.$type;
+      if (subjectUri.collection === so.sprk.feed.post.$type) {
         subjectRecord = state.posts?.get(notif.reasonSubject) ?? undefined;
       } else if (isSubjectReply) {
         subjectRecord = state.replies?.get(notif.reasonSubject) ?? undefined;
@@ -1221,22 +1258,24 @@ export class Views {
           ...recordInfo.record,
           subject: subjectRecord.record,
           subjectMedia: mediaView,
-        } as typeof recordInfo.record;
+        } as unknown as typeof recordInfo.record;
       }
     }
 
     return {
-      uri: notif.uri,
-      cid: recordInfo.cid,
+      uri: asAtUri(notif.uri),
+      cid: asCid(recordInfo.cid),
       author,
       reason: notif.reason as NotificationView["reason"],
-      reasonSubject: notif.reasonSubject || undefined,
+      reasonSubject: notif.reasonSubject
+        ? asAtUri(notif.reasonSubject)
+        : undefined,
       record: recordWithSubject,
       // @NOTE works with a hack in listNotifications so that when there's no last-seen time,
       // the user's first notification is marked unread, and all previous read. in this case,
       // the last seen time will be equal to the first notification's indexed time.
       isRead: lastSeenAt ? lastSeenAt >= indexedAt : true,
-      indexedAt: notif.sortAt,
+      indexedAt: asDatetime(notif.sortAt),
       labels: [...labels, ...selfLabels],
     };
   }
