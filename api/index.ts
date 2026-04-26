@@ -15,6 +15,7 @@ import getAudios from "./so/sprk/sound/getAudios.ts";
 import getAudioPosts from "./so/sprk/sound/getAudioPosts.ts";
 import getFollows from "./so/sprk/graph/getFollows.ts";
 import getFollowers from "./so/sprk/graph/getFollowers.ts";
+import getKnownFollowers from "./so/sprk/graph/getKnownFollowers.ts";
 import getBlocks from "./so/sprk/graph/getBlocks.ts";
 import putPreferences from "./so/sprk/actor/putPreferences.ts";
 import getPreferences from "./so/sprk/actor/getPreferences.ts";
@@ -56,6 +57,7 @@ export default function (server: Server, ctx: AppContext) {
   getAudioPosts(server, ctx);
   getFollows(server, ctx);
   getFollowers(server, ctx);
+  getKnownFollowers(server, ctx);
   getBlocks(server, ctx);
   putPreferences(server, ctx);
   getPreferences(server, ctx);
