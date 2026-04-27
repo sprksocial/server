@@ -1,8 +1,8 @@
-import { AtpAgent, ComAtprotoSyncGetLatestCommit } from "@atproto/api";
 import { DAY, HOUR } from "@atp/common";
 import { getPds, IdResolver } from "@atp/identity";
-import { Cid, l } from "@atp/lex";
+import { Cid, type DidString, l } from "@atp/lex";
 import { parseCid } from "@atp/lex/data";
+import { Client, XRPCError } from "@atp/xrpc";
 
 import {
   getAndParseRecord,
@@ -14,6 +14,7 @@ import {
 } from "@atp/repo";
 import { AtUri } from "@atp/syntax";
 import { retryXrpc } from "../../utils/retry.ts";
+import * as com from "../../lex/com.ts";
 import { BackgroundQueue } from "../background.ts";
 import { Database } from "../db/index.ts";
 import { ActorDocument } from "../db/models.ts";
@@ -179,10 +180,12 @@ export class IndexingService {
       did,
       true,
     );
-    const agent = new AtpAgent({ service: pds });
+    const client = new Client(pds);
 
     const { data: car } = await retryXrpc(() =>
-      agent.com.atproto.sync.getRepo({ did })
+      client.call(com.atproto.sync.getRepo, {
+        params: { did: did as DidString },
+      })
     );
     const { root, blocks } = await readCarWithRoot(car);
     const verifiedRepo = await verifyRepo(blocks, root, did, signingKey);
@@ -292,12 +295,16 @@ export class IndexingService {
       const doc = await this.idResolver.did.resolve(did, true);
       const pds = doc && getPds(doc);
       if (!pds) return false;
-      const agent = new AtpAgent({ service: pds });
+      const client = new Client(pds);
       try {
-        await retryXrpc(() => agent.com.atproto.sync.getLatestCommit({ did }));
+        await retryXrpc(() =>
+          client.call(com.atproto.sync.getLatestCommit, {
+            params: { did: did as DidString },
+          })
+        );
         return true;
       } catch (err) {
-        if (err instanceof ComAtprotoSyncGetLatestCommit.RepoNotFoundError) {
+        if (err instanceof XRPCError && err.error === "RepoNotFound") {
           return false;
         }
         return null;
