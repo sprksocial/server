@@ -50,7 +50,7 @@
     "npm:jose@^6.2.3": "6.2.3",
     "npm:lodash@*": "4.17.21",
     "npm:mongodb-memory-server-core@^11.1.0": "11.1.0",
-    "npm:mongoose@^9.6.1": "9.6.1",
+    "npm:mongoose@9.5.0": "9.5.0",
     "npm:multiformats@^13.4.1": "13.4.2",
     "npm:p-queue@^8.1.1": "8.1.1",
     "npm:p-queue@^9.2.0": "9.2.0",
@@ -88,6 +88,7 @@
       "integrity": "806baa0ab1d399e7fe182a8ac4c6b9da076fcc965537dfbde81e464889492b7c",
       "dependencies": [
         "jsr:@atp/bytes",
+        "jsr:@atp/crypto",
         "jsr:@noble/curves",
         "jsr:@noble/hashes@^2.0.1"
       ]
@@ -141,6 +142,7 @@
       "dependencies": [
         "jsr:@atp/common@~0.1.0-alpha.12",
         "jsr:@atp/identity",
+        "jsr:@atp/lex",
         "jsr:@atp/lexicon",
         "jsr:@atp/repo",
         "jsr:@atp/syntax",
@@ -925,12 +927,20 @@
         "find-cache-dir",
         "follow-redirects",
         "https-proxy-agent",
-        "mongodb",
+        "mongodb@7.2.0",
         "new-find-package-json",
         "semver@7.7.4",
         "tar-stream",
         "tslib",
         "yauzl"
+      ]
+    },
+    "mongodb@7.1.1": {
+      "integrity": "sha512-067DXiMjcpYQl6bGjWQoTUEE9UoRViTtKFcoqX7z08I+iDZv/emH1g8XEFiO3qiDfXAheT5ozl1VffDTKhIW/w==",
+      "dependencies": [
+        "@mongodb-js/saslprep",
+        "bson",
+        "mongodb-connection-string-url"
       ]
     },
     "mongodb@7.2.0": {
@@ -941,11 +951,11 @@
         "mongodb-connection-string-url"
       ]
     },
-    "mongoose@9.6.1": {
-      "integrity": "sha512-3T8/b0plM3ZJPW3WjlzVMIGJEYYTjgDPQ05Qzru3xu3/wOPSFKWYxdwUF2dl8h3NG5dVkzIuOkZdLacnlLf/sA==",
+    "mongoose@9.5.0": {
+      "integrity": "sha512-B4blGFkFL1s0G24URuMvx0qTlx+gRVLmfO7WcSz8NcmW/XHEJ3G69capdyW1iRsGKiycp1tkwKHnxHbnwjwmPw==",
       "dependencies": [
         "kareem",
-        "mongodb",
+        "mongodb@7.1.1",
         "mpath",
         "mquery",
         "ms@2.1.3",
@@ -1374,7 +1384,7 @@
       "npm:dotenv@^17.4.2",
       "npm:jose@^6.2.3",
       "npm:mongodb-memory-server-core@^11.1.0",
-      "npm:mongoose@^9.6.1",
+      "npm:mongoose@9.5.0",
       "npm:p-queue@^9.2.0",
       "npm:structured-headers@^2.0.2"
     ]
