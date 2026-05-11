@@ -21,6 +21,50 @@ export class Sounds {
   }
 
   /**
+   * Search audios by title and details metadata
+   */
+  async searchAudios(
+    term: string,
+    limit = 25,
+    cursor?: string,
+  ): Promise<{ audios: SoundItem[]; cursor?: string }> {
+    const cleanedTerm = term.trim();
+    if (!cleanedTerm) {
+      return { audios: [] };
+    }
+
+    let skip = 0;
+    if (cursor) {
+      const parsed = parseInt(cursor, 10);
+      if (!isNaN(parsed) && parsed > 0) skip = parsed;
+    }
+
+    const audios = await this.db.models.Audio.find({
+      $text: { $search: cleanedTerm },
+    })
+      .sort({
+        score: { $meta: "textScore" },
+        useCount: -1,
+        createdAt: -1,
+      })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const transformedAudios = audios.map(toSoundItem);
+
+    let nextCursor: string | undefined;
+    if (transformedAudios.length === limit) {
+      nextCursor = (skip + limit).toString();
+    }
+
+    return {
+      audios: transformedAudios,
+      cursor: nextCursor,
+    };
+  }
+
+  /**
    * Get audios by URIs
    */
   async getAudios(uris: string[]): Promise<SoundItem[]> {
@@ -30,15 +74,7 @@ export class Sounds {
       uri: { $in: uris },
     }).lean();
 
-    return audios.map((audio) => ({
-      uri: audio.uri,
-      cid: audio.cid,
-      authorDid: audio.authorDid,
-      createdAt: audio.createdAt,
-      indexedAt: audio.indexedAt,
-      sortAt: compositeTime(audio.createdAt, audio.indexedAt) ||
-        audio.createdAt,
-    }));
+    return audios.map(toSoundItem);
   }
 
   /**
@@ -49,15 +85,7 @@ export class Sounds {
 
     if (!audio) return null;
 
-    return {
-      uri: audio.uri,
-      cid: audio.cid,
-      authorDid: audio.authorDid,
-      createdAt: audio.createdAt,
-      indexedAt: audio.indexedAt,
-      sortAt: compositeTime(audio.createdAt, audio.indexedAt) ||
-        audio.createdAt,
-    };
+    return toSoundItem(audio);
   }
 
   /**
@@ -83,15 +111,7 @@ export class Sounds {
     const hasMore = audios.length > limit;
     const resultAudios = hasMore ? audios.slice(0, limit) : audios;
 
-    const transformedAudios: SoundItem[] = resultAudios.map((audio) => ({
-      uri: audio.uri,
-      cid: audio.cid,
-      authorDid: audio.authorDid,
-      createdAt: audio.createdAt,
-      indexedAt: audio.indexedAt,
-      sortAt: compositeTime(audio.createdAt, audio.indexedAt) ||
-        audio.createdAt,
-    }));
+    const transformedAudios = resultAudios.map(toSoundItem);
 
     let nextCursor: string | undefined;
     if (hasMore && transformedAudios.length > 0) {
@@ -127,15 +147,7 @@ export class Sounds {
       .limit(limit)
       .lean();
 
-    const transformedAudios: SoundItem[] = audios.map((audio) => ({
-      uri: audio.uri,
-      cid: audio.cid,
-      authorDid: audio.authorDid,
-      createdAt: audio.createdAt,
-      indexedAt: audio.indexedAt,
-      sortAt: compositeTime(audio.createdAt, audio.indexedAt) ||
-        audio.createdAt,
-    }));
+    const transformedAudios = audios.map(toSoundItem);
 
     let nextCursor: string | undefined;
     if (transformedAudios.length === limit) {
@@ -191,3 +203,18 @@ export class Sounds {
     };
   }
 }
+
+const toSoundItem = (audio: {
+  uri: string;
+  cid: string;
+  authorDid: string;
+  createdAt: string;
+  indexedAt: string;
+}): SoundItem => ({
+  uri: audio.uri,
+  cid: audio.cid,
+  authorDid: audio.authorDid,
+  createdAt: audio.createdAt,
+  indexedAt: audio.indexedAt,
+  sortAt: compositeTime(audio.createdAt, audio.indexedAt) || audio.createdAt,
+});

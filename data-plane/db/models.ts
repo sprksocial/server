@@ -256,6 +256,7 @@ export const audioSchema = new Schema<AudioDocument>({
   labels: { type: [Object], required: false },
   useCount: { type: Number, required: true, default: 0 },
 })
+  .index({ title: "text", "details.artist": "text", "details.title": "text" })
   .index({ authorDid: 1, createdAt: -1 })
   .index({ useCount: -1, createdAt: -1 });
 

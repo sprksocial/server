@@ -60,6 +60,7 @@
             "so.sprk.sound.getActorAudios",
             "so.sprk.sound.getAudioPosts",
             "so.sprk.sound.getAudios",
+            "so.sprk.sound.searchAudios",
             "so.sprk.sound.getTrendingAudios",
             "so.sprk.story.getStories",
             "so.sprk.story.getTimeline",
