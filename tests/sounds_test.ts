@@ -29,6 +29,7 @@ Deno.test({
 
     try {
       await ctx.db.models.Audio.init();
+      await ctx.db.models.Profile.init();
 
       const nowIso = new Date().toISOString();
       const authorDid = TEST_USERS[1].did;
@@ -153,6 +154,30 @@ Deno.test({
         const body = await res.json() as SearchAudiosOutput;
         assertEquals(body.audios.length, 1);
         assertEquals(body.audios[0].uri, chillUri);
+      });
+
+      await t.step("searches sounds by author handle", async () => {
+        const res = await app.request(
+          "/xrpc/so.sprk.sound.searchAudios?q=@sound-author",
+        );
+        assertEquals(res.status, 200);
+
+        const body = await res.json() as SearchAudiosOutput;
+        assertEquals(body.audios.length, 2);
+        assertEquals(body.audios[0].uri, chillUri);
+        assertEquals(body.audios[1].uri, summerUri);
+      });
+
+      await t.step("searches sounds by author display name", async () => {
+        const res = await app.request(
+          "/xrpc/so.sprk.sound.searchAudios?q=author",
+        );
+        assertEquals(res.status, 200);
+
+        const body = await res.json() as SearchAudiosOutput;
+        assertEquals(body.audios.length, 2);
+        assertEquals(body.audios[0].uri, chillUri);
+        assertEquals(body.audios[1].uri, summerUri);
       });
 
       await t.step("returns an empty result for blank queries", async () => {
