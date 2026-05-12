@@ -28,6 +28,7 @@ import * as Profile from "./plugins/profile.ts";
 import * as Repost from "./plugins/repost.ts";
 import * as Story from "./plugins/story.ts";
 import * as Audio from "./plugins/audio.ts";
+import * as PlyrTrack from "./plugins/plyr-track.ts";
 import * as Labeler from "./plugins/labeler.ts";
 import { RecordProcessor } from "./processor.ts";
 import { ServerConfig } from "../../config.ts";
@@ -45,6 +46,7 @@ export class IndexingService {
     generator: Generator.PluginType;
     story: Story.PluginType;
     audio: Audio.PluginType;
+    plyrTrack: PlyrTrack.PluginType;
     labeler: Labeler.PluginType;
   };
   private pushService?: PushService;
@@ -68,6 +70,7 @@ export class IndexingService {
       generator: Generator.makePlugin(this.db, this.background),
       story: Story.makePlugin(this.db, this.background),
       audio: Audio.makePlugin(this.db, this.background),
+      plyrTrack: PlyrTrack.makePlugin(this.db, this.background),
       labeler: Labeler.makePlugin(this.db, this.background),
     };
 

@@ -207,6 +207,7 @@ function createFirehose(opts: {
     },
     filterCollections: [
       "so.sprk.*",
+      "fm.plyr.track",
     ],
   });
   return { firehose, runner };

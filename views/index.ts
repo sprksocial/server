@@ -11,6 +11,7 @@ import type {
 import { AtUri, INVALID_HANDLE, normalizeDatetimeAlways } from "@atp/syntax";
 import { mapDefined } from "@atp/common";
 import * as so from "../lex/so.ts";
+import * as fm from "../lex/fm.ts";
 import { cidFromBlobJson } from "./util.ts";
 import { uriToDid } from "../utils/uris.ts";
 import { FeedItem, Like, Post, Reply, Repost } from "../hydration/feed.ts";
@@ -1014,10 +1015,20 @@ export class Views {
     }
 
     const soundAgg = state.soundAggs?.get(uri);
+    const record = soundInfo.record;
+    const isPlyrTrack = fm.plyr.track.$matches(record);
+    const plyrRecord = isPlyrTrack ? record as fm.plyr.track.Main : undefined;
+    const sparkRecord = !isPlyrTrack
+      ? record as so.sprk.sound.audio.Main
+      : undefined;
 
     let coverArtUrl: UriString;
-    const coverArt = (soundInfo.record as { coverArt?: BlobRef }).coverArt;
-    if (coverArt) {
+    const coverArt = sparkRecord
+      ? (sparkRecord as { coverArt?: BlobRef }).coverArt
+      : undefined;
+    if (plyrRecord?.imageUrl) {
+      coverArtUrl = asUri(plyrRecord.imageUrl);
+    } else if (coverArt) {
       const coverArtCid = cidFromBlobJson(coverArt);
       coverArtUrl = asUri(
         `${this.mediaCdn}/img/medium/${authorDid}/${coverArtCid}/webp`,
@@ -1026,27 +1037,39 @@ export class Views {
       coverArtUrl = author.avatar ?? asUri("https://media.sprk.so");
     }
 
-    const details = soundInfo.record.details
+    const details = plyrRecord
+      ? { artist: plyrRecord.artist, title: plyrRecord.title }
+      : sparkRecord?.details
       ? {
-        artist: soundInfo.record.details.artist,
-        title: soundInfo.record.details.title,
+        artist: sparkRecord.details.artist,
+        title: sparkRecord.details.title,
       }
       : undefined;
 
-    const record = {
-      title: soundInfo.record.title,
-      origin: soundInfo.record.origin ?? undefined,
-      sound: soundInfo.record.sound ?? undefined,
-      labels: soundInfo.record.labels ?? undefined,
-      createdAt: soundInfo.record.createdAt,
-    } as Record<string, unknown>;
+    const isGatedPlyrTrack = !!plyrRecord?.supportGate;
+    const viewRecord = plyrRecord
+      ? isGatedPlyrTrack
+        ? (({ audioBlob: _audioBlob, audioUrl: _audioUrl, ...record }) =>
+          record)(plyrRecord)
+        : plyrRecord as Record<string, unknown>
+      : {
+        title: sparkRecord?.title,
+        origin: sparkRecord?.origin ?? undefined,
+        sound: sparkRecord?.sound ?? undefined,
+        labels: sparkRecord?.labels ?? undefined,
+        createdAt: sparkRecord?.createdAt,
+      } as Record<string, unknown>;
 
-    const audioCid = cidFromBlobJson(soundInfo.record.sound);
-    const audioUrl = asUri(
-      `https://media.sprk.so/sound/${encodeURIComponent(authorDid)}/${
-        encodeURIComponent(audioCid)
-      }`,
-    );
+    let audioUrl: UriString | undefined;
+    const audioBlob = plyrRecord ? plyrRecord.audioBlob : sparkRecord?.sound;
+    if (audioBlob && !isGatedPlyrTrack) {
+      const audioCid = cidFromBlobJson(audioBlob);
+      audioUrl = asUri(
+        `https://media.sprk.so/sound/${encodeURIComponent(authorDid)}/${
+          encodeURIComponent(audioCid)
+        }`,
+      );
+    }
 
     const indexedAt = asDatetime(
       this.indexedAt(soundInfo)?.toISOString() ?? new Date().toISOString(),
@@ -1056,9 +1079,9 @@ export class Views {
       uri: asAtUri(uri),
       cid: asCid(soundInfo.cid),
       author,
-      title: soundInfo.record.title,
+      title: record.title,
       coverArt: coverArtUrl,
-      record,
+      record: viewRecord,
       useCount: soundAgg?.uses ?? 0,
       details,
       indexedAt,

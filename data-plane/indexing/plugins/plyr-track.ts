@@ -1,36 +1,40 @@
 import { Cid } from "@atp/lex";
 import { AtUri, normalizeDatetimeAlways } from "@atp/syntax";
-import * as so from "../../../lex/so.ts";
+import * as fm from "../../../lex/fm.ts";
 import { BackgroundQueue } from "../../background.ts";
 import { Database } from "../../db/index.ts";
-import { AudioDocument } from "../../db/models.ts";
+import { AudioDocument, MediaRef } from "../../db/models.ts";
 import { RecordProcessor } from "../processor.ts";
 
-const schema = so.sprk.sound.audio.main;
-type AudioRecord = so.sprk.sound.audio.Main;
+const schema = fm.plyr.track.main;
+type PlyrTrackRecord = fm.plyr.track.Main;
 type IndexedAudio = AudioDocument;
 
 const insertFn = async (
   db: Database,
   uri: AtUri,
   cid: Cid,
-  obj: AudioRecord,
+  obj: PlyrTrackRecord,
   timestamp: string,
 ): Promise<IndexedAudio | null> => {
-  const audio: Record<string, unknown> = {
+  if (obj.supportGate || !obj.audioBlob) {
+    return null;
+  }
+
+  const audio: Omit<AudioDocument, "actor" | "useCount"> = {
     uri: uri.toString(),
     cid: cid.toString(),
     authorDid: uri.host,
-    sound: obj.sound || null,
-    origin: obj.origin ? { uri: obj.origin.uri, cid: obj.origin.cid } : null,
+    sound: obj.audioBlob as unknown as MediaRef,
     title: obj.title,
-    labels: obj.labels || null,
-    details: obj.details || null,
+    details: {
+      artist: obj.artist,
+      title: obj.title,
+    },
     createdAt: normalizeDatetimeAlways(obj.createdAt),
     indexedAt: timestamp,
   };
 
-  // Use findOneAndUpdate with upsert to handle potential duplicate key errors
   const insertedAudio = await db.models.Audio.findOneAndUpdate(
     { uri: uri.toString() },
     { $set: audio, $setOnInsert: { useCount: 0 } },

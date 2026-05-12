@@ -1,0 +1,119 @@
+{
+  "lexicon": 1,
+  "id": "fm.plyr.track",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A music track published to the AT Protocol network.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["title", "artist", "fileType", "createdAt"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "The title of the track.",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "artist": {
+            "type": "string",
+            "description": "The artist name (display name of the uploader).",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "audioUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to the audio file. Optional when audioBlob is present."
+          },
+          "fileType": {
+            "type": "string",
+            "description": "Audio file format extension (e.g., mp3, wav, flac).",
+            "minLength": 1,
+            "maxLength": 16
+          },
+          "album": {
+            "type": "string",
+            "description": "Album name this track belongs to.",
+            "maxLength": 256
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Duration in seconds.",
+            "minimum": 0
+          },
+          "features": {
+            "type": "array",
+            "description": "Featured artists on this track.",
+            "items": {
+              "type": "ref",
+              "ref": "#featuredArtist"
+            },
+            "maxLength": 10
+          },
+          "imageUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to cover artwork image."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when the track was uploaded."
+          },
+          "supportGate": {
+            "type": "ref",
+            "ref": "#supportGate",
+            "description": "If set, this track requires viewer to be a supporter of the artist via atprotofans."
+          },
+          "description": {
+            "type": "string",
+            "description": "Track description (liner notes, show notes, etc.).",
+            "maxLength": 5000
+          },
+          "audioBlob": {
+            "type": "blob",
+            "description": "Audio file stored on the user's PDS. When present, this is the canonical source; audioUrl is the CDN fallback.",
+            "accept": ["audio/*"],
+            "maxSize": 104857600
+          }
+        }
+      }
+    },
+    "supportGate": {
+      "type": "object",
+      "description": "Configuration for supporter-gated content.",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "The type of support required to access this content.",
+          "knownValues": ["any"]
+        }
+      }
+    },
+    "featuredArtist": {
+      "type": "object",
+      "description": "A featured artist on a track. Identified by DID — the canonical, immutable identifier. handle and displayName are legacy denormalized snapshots; readers should resolve fresh metadata from the DID rather than trusting these fields.",
+      "required": ["did"],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did",
+          "description": "The DID of the featured artist. Canonical, stable identifier."
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle",
+          "description": "DEPRECATED snapshot — mutable, may be stale. Resolve from `did` instead. Older records include this; new records may omit it."
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "DEPRECATED snapshot — mutable, may be stale. Resolve from `did` instead. Older records include this; new records may omit it."
+        }
+      }
+    }
+  }
+}

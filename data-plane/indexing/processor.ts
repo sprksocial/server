@@ -29,7 +29,6 @@ type RecordProcessorOptions<TSchema extends l.RecordSchema, TRow> = {
     replacedBy: TRow | null,
   ) => { notifs: Notif[]; toDelete: string[] };
   updateAggregates?: (db: Database, obj: TRow) => Promise<void>;
-  deleteRecordIfInsertReturnsNull?: boolean;
 };
 
 type Notif = {
@@ -154,12 +153,6 @@ export class RecordProcessor<TSchema extends l.RecordSchema, TRow> {
       timestamp,
     );
     if (!inserted) {
-      if (this.options.deleteRecordIfInsertReturnsNull) {
-        await this.db.models.Record.deleteOne({ uri: uri.toString() });
-        await this.db.models.DuplicateRecord.deleteOne({
-          uri: uri.toString(),
-        });
-      }
       return;
     }
 
@@ -239,19 +232,10 @@ export class RecordProcessor<TSchema extends l.RecordSchema, TRow> {
       timestamp,
     );
     if (!inserted) {
-      if (this.options.deleteRecordIfInsertReturnsNull) {
-        await this.db.models.Record.deleteOne({ uri: uri.toString() });
-        await this.db.models.DuplicateRecord.deleteOne({
-          uri: uri.toString(),
-        });
-        if (!opts?.disableNotifs) {
-          await this.handleNotifs({ deleted });
-        }
-        return;
+      if (!opts?.disableNotifs) {
+        await this.handleNotifs({ deleted });
       }
-      throw new Error(
-        "Record update failed: removed from index but could not be replaced",
-      );
+      return;
     }
     this.aggregateOnCommit(inserted);
     if (!opts?.disableNotifs) {

@@ -1,4 +1,6 @@
 import * as so from "../lex/so.ts";
+import * as fm from "../lex/fm.ts";
+import { AtUri } from "@atp/syntax";
 import { uriToDid as didFromUri } from "../utils/uris.ts";
 import {
   HydrationMap,
@@ -9,6 +11,7 @@ import {
   split,
 } from "./util.ts";
 import { DataPlane } from "../data-plane/index.ts";
+import { Record as DataPlaneRecord } from "../data-plane/routes/records.ts";
 
 export type FeedGenRecord = so.sprk.feed.generator.Main;
 export type LikeRecord = so.sprk.feed.like.Main;
@@ -16,12 +19,14 @@ export type PostRecord = so.sprk.feed.post.Main;
 export type ReplyRecord = so.sprk.feed.reply.Main;
 export type RepostRecord = so.sprk.feed.repost.Main;
 export type AudioRecord = so.sprk.sound.audio.Main;
+export type PlyrTrackRecord = fm.plyr.track.Main;
+export type SoundRecord = AudioRecord | PlyrTrackRecord;
 
 export type Post = RecordInfo<PostRecord>;
 export type Posts = HydrationMap<Post>;
 export type Reply = RecordInfo<ReplyRecord>;
 export type Replies = HydrationMap<Reply>;
-export type Sound = RecordInfo<AudioRecord>;
+export type Sound = RecordInfo<SoundRecord>;
 export type Sounds = HydrationMap<Sound>;
 
 export type SoundAgg = {
@@ -168,11 +173,7 @@ export class FeedHydrator {
     const res = await this.dataplane.records.getRecords(need);
 
     return need.reduce((acc, uri, i) => {
-      const record = parseRecord<AudioRecord>(
-        so.sprk.sound.audio.main,
-        res.records[i],
-        includeTakedowns,
-      );
+      const record = parseSoundRecord(res.records[i], includeTakedowns);
       return acc.set(
         uri,
         record ? record : null,
@@ -381,3 +382,22 @@ export class FeedHydrator {
     }, new HydrationMap<KnownInteractionState[] | undefined>());
   }
 }
+
+const parseSoundRecord = (
+  record: DataPlaneRecord,
+  includeTakedowns: boolean,
+): Sound | undefined => {
+  const collection = new AtUri(record.uri).collection;
+  if (collection === fm.plyr.track.$type) {
+    return parseRecord<PlyrTrackRecord>(
+      fm.plyr.track.main,
+      record,
+      includeTakedowns,
+    );
+  }
+  return parseRecord<AudioRecord>(
+    so.sprk.sound.audio.main,
+    record,
+    includeTakedowns,
+  );
+};
