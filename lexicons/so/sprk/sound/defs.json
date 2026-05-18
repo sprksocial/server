@@ -4,15 +4,7 @@
   "defs": {
     "audioView": {
       "type": "object",
-      "required": [
-        "uri",
-        "cid",
-        "author",
-        "title",
-        "coverArt",
-        "record",
-        "indexedAt"
-      ],
+      "required": ["uri", "cid", "author", "coverArt", "record", "indexedAt"],
       "properties": {
         "uri": { "type": "string", "format": "at-uri" },
         "cid": { "type": "string", "format": "cid" },
