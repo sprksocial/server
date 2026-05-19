@@ -30,7 +30,7 @@
     "hono": "jsr:@hono/hono@^4.12.15",
     "@std/encoding": "jsr:@std/encoding@^1.0.10",
     "jose": "npm:jose@^6.2.3",
-    "mongoose": "npm:mongoose@9.5.0",
+    "mongoose": "npm:mongoose@9.6.2",
     "p-queue": "npm:p-queue@^9.2.0",
     "mongodb-memory-server-core": "npm:mongodb-memory-server-core@^11.1.0",
     "structured-headers": "npm:structured-headers@^2.0.2"
