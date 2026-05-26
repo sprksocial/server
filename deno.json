@@ -27,7 +27,7 @@
     "@atp/xrpc-server": "jsr:@atp/xrpc-server@^0.1.0-alpha.12",
     "@std/assert": "jsr:@std/assert@^1.0.19",
     "dotenv": "npm:dotenv@^17.4.2",
-    "hono": "jsr:@hono/hono@^4.12.15",
+    "hono": "jsr:@hono/hono@^4.12.23",
     "@std/encoding": "jsr:@std/encoding@^1.0.10",
     "jose": "npm:jose@^6.2.3",
     "mongoose": "npm:mongoose@9.5.0",
