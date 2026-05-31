@@ -33,7 +33,7 @@ export default function (server: Server, ctx: AppContext) {
       return {
         encoding: "application/json",
         body: results,
-        headers: resHeaders({}),
+        headers: resHeaders({ labelers: hydrateCtx.labelers }),
       };
     },
   });

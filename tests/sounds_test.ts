@@ -7,31 +7,37 @@ import { IndexingService } from "../data-plane/indexing/index.ts";
 import { createTestApp, TEST_USERS } from "./util.ts";
 import { $OutputBody as SearchAudiosOutput } from "../lex/so/sprk/sound/searchAudios.ts";
 import { $OutputBody as GetAudiosOutput } from "../lex/so/sprk/sound/getAudios.ts";
+import { ATPROTO_CONTENT_LABELERS } from "../api/util.ts";
 
 const VALID_BLOB_CID =
   "bafyreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku";
+const TEST_LABELER_DID = "did:plc:testlabeler";
+const TEST_LABELER_HEADER = `${TEST_LABELER_DID};redact`;
 
 Deno.test({
   name: "Sound search",
   sanitizeOps: false,
   sanitizeResources: false,
   fn: async (t) => {
-    const { app, ctx, cleanup } = await createTestApp({
-      actors: false,
-      profiles: false,
-      posts: false,
-      replies: false,
-      stories: false,
-      likes: false,
-      reposts: false,
-      follows: false,
-      blocks: false,
-      audio: false,
-      generators: false,
-      preferences: false,
-      records: false,
-      actorSync: false,
-    });
+    const { app, ctx, cleanup } = await createTestApp(
+      {
+        actors: false,
+        profiles: false,
+        posts: false,
+        replies: false,
+        stories: false,
+        likes: false,
+        reposts: false,
+        follows: false,
+        blocks: false,
+        audio: false,
+        generators: false,
+        preferences: false,
+        records: false,
+        actorSync: false,
+      },
+      { labelsFromIssuerDids: [TEST_LABELER_DID] },
+    );
 
     try {
       await ctx.db.models.Audio.init();
@@ -194,6 +200,35 @@ Deno.test({
 
         const body = await res.json() as SearchAudiosOutput;
         assertEquals(body.audios, []);
+      });
+
+      await t.step("returns labeler headers for sound views", async () => {
+        const audioParams = new URLSearchParams();
+        audioParams.append("uris", chillUri);
+        const responses = await Promise.all([
+          app.request(
+            `/xrpc/so.sprk.sound.getAudios?${audioParams.toString()}`,
+          ),
+          app.request(
+            `/xrpc/so.sprk.sound.getActorAudios?actor=${
+              encodeURIComponent(authorDid)
+            }`,
+          ),
+          app.request(
+            `/xrpc/so.sprk.sound.getAudioPosts?uri=${
+              encodeURIComponent(chillUri)
+            }`,
+          ),
+          app.request("/xrpc/so.sprk.sound.getTrendingAudios?limit=2"),
+        ]);
+
+        for (const res of responses) {
+          assertEquals(res.status, 200);
+          assertEquals(
+            res.headers.get(ATPROTO_CONTENT_LABELERS),
+            TEST_LABELER_HEADER,
+          );
+        }
       });
 
       await t.step("preserves Spark audio use counts on reindex", async () => {

@@ -35,6 +35,7 @@ export const isReplyView = so.sprk.feed.defs.replyView.$isTypeOf.bind(
 );
 
 export type FeedGenRecord = so.sprk.feed.generator.Main;
+export const isFeedGenRecord = so.sprk.feed.generator.$matches;
 export type LikeRecord = so.sprk.feed.like.Main;
 export type PostRecord = so.sprk.feed.post.Main;
 export const isPostRecord = so.sprk.feed.post.$matches;
@@ -67,6 +68,8 @@ export type VideoMediaMainType = so.sprk.media.video.Main;
 export type NotificationView =
   so.sprk.notification.listNotifications.Notification;
 
+export type AudioRecord = so.sprk.sound.audio.Main;
+export const isAudioRecord = so.sprk.sound.audio.$matches;
 export type AudioView = so.sprk.sound.defs.AudioView;
 
 export type StoriesByAuthor = so.sprk.story.defs.StoriesByAuthor;

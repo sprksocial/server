@@ -852,12 +852,13 @@ export class Hydrator {
     uris: string[],
     ctx: HydrateCtx,
   ): Promise<HydrationState> {
-    const [sounds, soundAggs, profileState] = await Promise.all([
+    const [sounds, soundAggs, labels, profileState] = await Promise.all([
       this.feed.getSounds(uris, ctx.includeTakedowns),
       this.feed.getSoundAggregates(uris.map((uri) => ({ uri }))),
+      this.label.getLabelsForSubjects(uris, ctx.labelers),
       this.hydrateProfilesBasic(uris.map(didFromUri), ctx),
     ]);
-    return mergeStates(profileState, { sounds, soundAggs, ctx });
+    return mergeStates(profileState, { sounds, soundAggs, labels, ctx });
   }
 
   // provides partial hydration state within getFollows / getFollowers, mainly for applying rules

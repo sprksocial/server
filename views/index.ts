@@ -20,8 +20,10 @@ import { RecordInfo } from "../hydration/util.ts";
 import { Notification } from "../data-plane/routes/notifs.ts";
 import {
   $Typed,
+  AudioRecord,
   AudioView,
   BlockedPost,
+  FeedGenRecord,
   FeedViewPost,
   FollowRecord,
   GeneratorView,
@@ -30,6 +32,8 @@ import {
   ImagesMedia,
   ImagesMediaView,
   ImageView,
+  isAudioRecord,
+  isFeedGenRecord,
   isImageMedia,
   isImagesMedia,
   isLabelerRecord,
@@ -120,9 +124,12 @@ export class Views {
     cid?: string;
     record?:
       | PostRecord
+      | ReplyRecord
       | LikeRecord
       | RepostRecord
       | FollowRecord
+      | FeedGenRecord
+      | AudioRecord
       | ProfileRecord
       | LabelerRecord;
   }): Label[] {
@@ -131,6 +138,9 @@ export class Views {
     // Only these have a "labels" property:
     if (
       !isPostRecord(record) &&
+      !isReplyRecord(record) &&
+      !isFeedGenRecord(record) &&
+      !isAudioRecord(record) &&
       !isProfileRecord(record) &&
       !isLabelerRecord(record)
     ) {
@@ -157,6 +167,29 @@ export class Views {
         cts: asDatetime(cts),
       };
     });
+  }
+
+  labels({
+    uri,
+    cid,
+    record,
+    state,
+  }: {
+    uri: string;
+    cid?: string;
+    record?:
+      | PostRecord
+      | ReplyRecord
+      | FeedGenRecord
+      | AudioRecord
+      | ProfileRecord
+      | LabelerRecord;
+    state: HydrationState;
+  }): Label[] {
+    return [
+      ...(state.labels?.getBySubject(uri) ?? []),
+      ...this.selfLabels({ uri, cid, record }),
+    ];
   }
 
   labeler(
@@ -363,6 +396,12 @@ export class Views {
     const soundRecord = "sound" in recordInfo.record
       ? recordInfo.record.sound as StrongRef
       : undefined;
+    const labels = this.labels({
+      uri,
+      cid: recordInfo.cid,
+      record: recordInfo.record,
+      state,
+    });
 
     return {
       $type: "so.sprk.feed.defs#postView",
@@ -385,6 +424,7 @@ export class Views {
           knownInteractions: this.knownInteractions(uri, state),
         }
         : undefined,
+      labels,
     };
   }
 
@@ -402,6 +442,12 @@ export class Views {
 
     const aggs = state.replyAggs?.get(uri);
     const viewer = state.postViewers?.get(uri);
+    const labels = this.labels({
+      uri,
+      cid: replyInfo.cid,
+      record: replyInfo.record,
+      state,
+    });
 
     return {
       $type: "so.sprk.feed.defs#replyView",
@@ -422,6 +468,7 @@ export class Views {
           like: viewer.like ? asAtUri(viewer.like) : undefined,
         }
         : undefined,
+      labels,
     };
   }
 
@@ -711,6 +758,12 @@ export class Views {
     if (!creator) return;
     const viewer = state.feedgenViewers?.get(uri);
     const aggs = state.feedgenAggs?.get(uri);
+    const labels = this.labels({
+      uri,
+      cid: feedgen.cid,
+      record: feedgen.record,
+      state,
+    });
 
     return {
       uri: asAtUri(uri),
@@ -729,6 +782,7 @@ export class Views {
         : undefined,
       likeCount: aggs?.likes ?? 0,
       acceptsInteractions: feedgen.record.acceptsInteractions,
+      labels,
       viewer: viewer
         ? {
           like: viewer.like ? asAtUri(viewer.like) : undefined,
@@ -801,6 +855,20 @@ export class Views {
   ): ProfileViewBasic | undefined {
     const actor = state.actors?.get(did);
     if (!actor) return;
+    const profileUri = AtUri.make(
+      did,
+      so.sprk.actor.profile.$type,
+      "self",
+    ).toString();
+    const labels = [
+      ...(state.labels?.getBySubject(did) ?? []),
+      ...this.labels({
+        uri: profileUri,
+        cid: actor.profileCid,
+        record: actor.profile,
+        state,
+      }),
+    ];
     return {
       did: asDid(did),
       handle: asHandle(actor.handle ?? INVALID_HANDLE),
@@ -813,6 +881,7 @@ export class Views {
         )
         : undefined,
       viewer: this.profileViewer(did, state),
+      labels,
       createdAt: actor.createdAt
         ? asDatetime(actor.createdAt.toISOString())
         : undefined,
@@ -1018,9 +1087,7 @@ export class Views {
     const record = soundInfo.record;
     const isPlyrTrack = fm.plyr.track.$matches(record);
     const plyrRecord = isPlyrTrack ? record as fm.plyr.track.Main : undefined;
-    const sparkRecord = !isPlyrTrack
-      ? record as so.sprk.sound.audio.Main
-      : undefined;
+    const sparkRecord = !isPlyrTrack ? record as AudioRecord : undefined;
 
     let coverArtUrl: UriString;
     const coverArt = sparkRecord
@@ -1074,6 +1141,12 @@ export class Views {
     const indexedAt = asDatetime(
       this.indexedAt(soundInfo)?.toISOString() ?? new Date().toISOString(),
     );
+    const labels = this.labels({
+      uri,
+      cid: soundInfo.cid,
+      record: sparkRecord,
+      state,
+    });
 
     const audioView = {
       uri: asAtUri(uri),
@@ -1086,7 +1159,7 @@ export class Views {
       details,
       indexedAt,
       audio: audioUrl,
-      labels: undefined,
+      labels,
     };
 
     return audioView;
@@ -1106,6 +1179,12 @@ export class Views {
 
     const generatorAgg = state.feedgenAggs?.get(uri);
     const viewer = state.feedgenViewers?.get(uri);
+    const labels = this.labels({
+      uri,
+      cid: generatorInfo.cid,
+      record: generatorInfo.record,
+      state,
+    });
 
     const avatar = generatorInfo.record.avatar
       ? asUri(
@@ -1126,6 +1205,7 @@ export class Views {
       avatar,
       likeCount: generatorAgg?.likes ?? 0,
       acceptsInteractions: generatorInfo.record.acceptsInteractions,
+      labels,
       viewer: viewer?.like ? { like: asAtUri(viewer.like) } : undefined,
       indexedAt: asDatetime(
         this.indexedAt(generatorInfo)?.toISOString() ??
