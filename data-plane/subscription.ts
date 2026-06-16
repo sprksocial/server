@@ -93,7 +93,7 @@ export class RepoSubscription {
       if (this.opts.cfg.debugMode) {
         const timeoutMs = 10000;
         // Runner destroy with timeout and proper timer cleanup
-        let destroyTimeoutId: number | undefined;
+        let destroyTimeoutId: ReturnType<typeof setTimeout> | undefined;
         try {
           const timeoutPromise = new Promise<never>((_, reject) => {
             destroyTimeoutId = setTimeout(
@@ -113,7 +113,7 @@ export class RepoSubscription {
           }
         }
         // Background drain with timeout and proper timer cleanup
-        let bgTimeoutId: number | undefined;
+        let bgTimeoutId: ReturnType<typeof setTimeout> | undefined;
         try {
           const timeoutPromise = new Promise<never>((_, reject) => {
             bgTimeoutId = setTimeout(

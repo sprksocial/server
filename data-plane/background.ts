@@ -6,7 +6,7 @@ import { Database } from "./db/index.ts";
 export class BackgroundQueue {
   queue = new PQueue();
   destroyed = false;
-  private processAllInterval: number | null = null;
+  private processAllInterval: ReturnType<typeof setInterval> | null = null;
   private isProcessingAll = false;
 
   constructor(public db: Database) {}
@@ -59,7 +59,7 @@ export class BackgroundQueue {
       }
     }, 10000); // Log every 10 seconds
 
-    let timeoutId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     try {
       // Add timeout protection to prevent hanging
       const processPromise = this.queue.onIdle();
