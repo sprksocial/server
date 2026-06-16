@@ -88,12 +88,10 @@ const skeleton = async (
         bigThreadDepth: ctx.cfg.bigThreadDepth,
       }),
       params.sort,
+      { includeTakedowns: !!params.hydrateCtx.includeTakedowns },
     );
-    const visibleItems = params.hydrateCtx.includeTakedowns
-      ? result.items
-      : await filterTakenDownItems(ctx.dataplane, result.items);
-    const anchorFound = visibleItems.some((item) => item.uri === anchor);
-    const page = paginateThreadItems(visibleItems, limit, params.cursor);
+    const anchorFound = result.items.some((item) => item.uri === anchor);
+    const page = paginateThreadItems(result.items, limit, params.cursor);
     return {
       anchor,
       anchorFound,
@@ -251,23 +249,6 @@ const paginateThreadItems = (
   const end = Math.min(start + pageSize, items.length);
   const nextCursor = end < items.length ? end.toString(36) : undefined;
   return { items: items.slice(start, end), cursor: nextCursor };
-};
-
-const filterTakenDownItems = async (
-  dataplane: DataPlane,
-  items: CrosspostThreadItem[],
-): Promise<CrosspostThreadItem[]> => {
-  if (items.length === 0) {
-    return items;
-  }
-  const uris = Array.from(new Set(items.map((item) => item.uri)));
-  const records = await dataplane.records.getRecords(uris);
-  const takenDownUris = new Set(
-    records.records
-      .filter((record) => record.takenDown)
-      .map((record) => record.uri),
-  );
-  return items.filter((item) => !takenDownUris.has(item.uri));
 };
 
 type RelationshipPair = [didA: string, didB: string];

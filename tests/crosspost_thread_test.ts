@@ -54,7 +54,7 @@ Deno.test({
         uri: parentUri,
         cid: parentCid,
         authorDid: TEST_USERS[0].did,
-        caption: { text: "root" },
+        caption: { text: "root from model" },
         media: {
           $type: "so.sprk.media.images",
           images: [],
@@ -64,6 +64,25 @@ Deno.test({
         likeCount: 1,
         replyCount: 2,
         repostCount: 0,
+      });
+
+      await ctx.db.models.Record.create({
+        uri: parentUri,
+        cid: parentCid,
+        did: TEST_USERS[0].did,
+        collectionName: "so.sprk.feed.post",
+        rkey: "post1",
+        createdAt: time0,
+        indexedAt: time0,
+        json: JSON.stringify({
+          $type: "so.sprk.feed.post",
+          caption: { text: "root from canonical record" },
+          media: {
+            $type: "so.sprk.media.images",
+            images: [],
+          },
+          createdAt: time0,
+        }),
       });
 
       await ctx.db.models.CrosspostReply.create([
@@ -177,6 +196,12 @@ Deno.test({
           assertEquals(body.thread.length, 5);
           assertEquals(body.thread[0].uri, parentUri);
           assertEquals(body.thread[0].depth, 0);
+          assertEquals(
+            (body.thread[0].value as {
+              post: { record: { caption?: { text?: string } } };
+            }).post.record.caption?.text,
+            "root from canonical record",
+          );
           assertEquals(body.thread[1].uri, reply1Uri);
           assertEquals(body.thread[1].depth, 1);
           assertEquals(body.thread[2].uri, reply3Uri);

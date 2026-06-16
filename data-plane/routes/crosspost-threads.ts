@@ -5,6 +5,7 @@ import {
 } from "../db/models.ts";
 import { Database } from "../db/index.ts";
 import { Code, DataPlaneError } from "../util.ts";
+import { getRecords } from "./records.ts";
 
 type NodeKind = "post" | "reply" | "crosspostReply";
 
@@ -25,6 +26,9 @@ type CrosspostReplyThreadNode = {
 
 type ThreadNode = PostThreadNode | ReplyThreadNode | CrosspostReplyThreadNode;
 type ThreadSort = "oldest" | "newest" | "top";
+type CrosspostThreadOptions = {
+  includeTakedowns?: boolean;
+};
 
 export type CrosspostThreadItem = {
   uri: string;
@@ -136,6 +140,51 @@ function toThreadItem(node: ThreadNode, depth: number): CrosspostThreadItem {
   };
 }
 
+const applyCanonicalRecords = async (
+  db: Database,
+  items: CrosspostThreadItem[],
+  includeTakedowns = false,
+): Promise<CrosspostThreadItem[]> => {
+  if (items.length === 0) {
+    return items;
+  }
+
+  const uris = Array.from(new Set(items.map((item) => item.uri)));
+  const { records } = await getRecords(db, uris);
+  const canonicalRecords = new Map<string, Record<string, unknown>>();
+  const takenDownUris = new Set<string>();
+
+  for (const record of records) {
+    const canonicalRecord = parseCanonicalRecord(record.record);
+    if (canonicalRecord) {
+      canonicalRecords.set(record.uri, canonicalRecord);
+    }
+    if (record.takenDown) {
+      takenDownUris.add(record.uri);
+    }
+  }
+
+  const canonicalItems = items.map((item) => {
+    const canonicalRecord = canonicalRecords.get(item.uri);
+    return canonicalRecord ? { ...item, record: canonicalRecord } : item;
+  });
+
+  return includeTakedowns
+    ? canonicalItems
+    : canonicalItems.filter((item) => !takenDownUris.has(item.uri));
+};
+
+const parseCanonicalRecord = (
+  record: string,
+): Record<string, unknown> | undefined => {
+  const parsed = JSON.parse(record) as unknown;
+  return isObject(parsed) ? parsed : undefined;
+};
+
+const isObject = (value: unknown): value is Record<string, unknown> => {
+  return !!value && typeof value === "object";
+};
+
 const parentUriFromNode = (node: ThreadNode): string | undefined => {
   if (node.kind === "post") return undefined;
   return node.doc.reply?.parent?.uri;
@@ -179,6 +228,7 @@ export class CrosspostThread {
     parentHeight = 80,
     depth = 6,
     sort: string = "oldest",
+    options: CrosspostThreadOptions = {},
   ): Promise<{ items: CrosspostThreadItem[] }> {
     validateThreadParams(parentHeight, depth);
 
@@ -264,7 +314,13 @@ export class CrosspostThread {
         }
       }
 
-      return { items };
+      return {
+        items: await applyCanonicalRecords(
+          this.db,
+          items,
+          !!options.includeTakedowns,
+        ),
+      };
     } catch (error) {
       if (error instanceof DataPlaneError) {
         throw error;
