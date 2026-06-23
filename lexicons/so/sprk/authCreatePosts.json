@@ -6,7 +6,7 @@
       "type": "permission-set",
       "title": "Create Spark Posts",
       "title:lang": {},
-      "detail": "Create Spark posts, replies, stories, and upload media, but can not update or delete them.",
+      "detail": "Create Spark posts, replies, stories, audio records, and upload media, but can not update or delete them.",
       "detail:lang": {},
       "permissions": [
         {
@@ -27,6 +27,7 @@
             "so.sprk.feed.post",
             "so.sprk.feed.reply",
             "so.sprk.feed.threadgate",
+            "so.sprk.sound.audio",
             "so.sprk.story.post"
           ]
         }

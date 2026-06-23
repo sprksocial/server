@@ -84,6 +84,7 @@
             "so.sprk.graph.block",
             "so.sprk.graph.follow",
             "so.sprk.labeler.service",
+            "so.sprk.sound.audio",
             "so.sprk.story.post"
           ]
         }

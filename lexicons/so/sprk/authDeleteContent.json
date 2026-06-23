@@ -6,7 +6,7 @@
       "type": "permission-set",
       "title": "Delete Spark Content",
       "title:lang": {},
-      "detail": "Clean up Spark account history: posts, replies, reposts, likes, thread controls, and stories.",
+      "detail": "Clean up Spark account history: posts, replies, reposts, likes, thread controls, stories, and audio records.",
       "detail:lang": {},
       "permissions": [
         {
@@ -19,6 +19,7 @@
             "so.sprk.feed.reply",
             "so.sprk.feed.repost",
             "so.sprk.feed.threadgate",
+            "so.sprk.sound.audio",
             "so.sprk.story.post"
           ]
         }
