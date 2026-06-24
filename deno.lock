@@ -13,37 +13,38 @@
     "jsr:@atp/sync@~0.1.0-alpha.12": "0.1.0-alpha.12",
     "jsr:@atp/syntax@~0.1.0-alpha.2": "0.1.0-alpha.2",
     "jsr:@atp/xrpc-server@~0.1.0-alpha.12": "0.1.0-alpha.12",
-    "jsr:@atp/xrpc@~0.1.0-alpha.7": "0.1.0-alpha.7",
-    "jsr:@cliffy/command@^1.0.0-rc.8": "1.0.1",
-    "jsr:@cliffy/flags@1.0.1": "1.0.1",
-    "jsr:@cliffy/internal@1.0.1": "1.0.1",
-    "jsr:@cliffy/table@1.0.1": "1.0.1",
+    "jsr:@atp/xrpc@~0.1.0-alpha.7": "0.1.0-alpha.8",
+    "jsr:@cliffy/command@^1.0.0-rc.8": "1.2.1",
+    "jsr:@cliffy/flags@1.2.1": "1.2.1",
+    "jsr:@cliffy/internal@1.2.1": "1.2.1",
+    "jsr:@cliffy/table@1.2.1": "1.2.1",
     "jsr:@david/code-block-writer@13": "13.0.3",
-    "jsr:@hono/hono@^4.10.8": "4.12.15",
-    "jsr:@hono/hono@^4.12.15": "4.12.15",
-    "jsr:@logtape/file@^1.2.2": "1.3.7",
-    "jsr:@logtape/logtape@^1.2.2": "1.3.7",
-    "jsr:@logtape/logtape@^1.3.7": "1.3.7",
+    "jsr:@hono/hono@^4.10.8": "4.12.24",
+    "jsr:@hono/hono@^4.12.24": "4.12.24",
+    "jsr:@logtape/file@^1.2.2": "1.3.10",
+    "jsr:@logtape/logtape@^1.2.2": "1.3.10",
+    "jsr:@logtape/logtape@^1.3.10": "1.3.10",
     "jsr:@noble/curves@^2.0.1": "2.2.0",
     "jsr:@noble/hashes@2.2.0": "2.2.0",
     "jsr:@noble/hashes@^2.0.1": "2.2.0",
     "jsr:@std/assert@^1.0.19": "1.0.19",
     "jsr:@std/encoding@^1.0.10": "1.0.10",
-    "jsr:@std/fmt@^1.0.9": "1.0.10",
-    "jsr:@std/fs@1": "1.0.23",
-    "jsr:@std/fs@^1.0.20": "1.0.23",
-    "jsr:@std/internal@^1.0.12": "1.0.13",
-    "jsr:@std/path@1": "1.1.4",
-    "jsr:@std/path@^1.1.4": "1.1.4",
-    "jsr:@std/text@^1.0.17": "1.0.18",
+    "jsr:@std/fmt@^1.0.10": "1.0.10",
+    "jsr:@std/fs@1": "1.0.24",
+    "jsr:@std/fs@^1.0.20": "1.0.24",
+    "jsr:@std/internal@^1.0.12": "1.0.14",
+    "jsr:@std/internal@^1.0.14": "1.0.14",
+    "jsr:@std/path@1": "1.1.5",
+    "jsr:@std/path@^1.1.5": "1.1.5",
+    "jsr:@std/text@^1.0.19": "1.0.19",
     "jsr:@ts-morph/common@0.27": "0.27.0",
     "jsr:@ts-morph/ts-morph@26": "26.0.0",
-    "jsr:@zod/zod@^4.1.13": "4.3.6",
+    "jsr:@zod/zod@^4.1.13": "4.4.3",
     "npm:@atproto/sync@*": "0.1.39",
     "npm:@bufbuild/protobuf@1.5.0": "1.5.0",
     "npm:@dprint/formatter@~0.5.1": "0.5.1",
     "npm:@dprint/typescript@~0.95.15": "0.95.15",
-    "npm:@ipld/dag-cbor@^9.2.5": "9.2.6",
+    "npm:@ipld/dag-cbor@^9.2.5": "9.2.7",
     "npm:@opentelemetry/api@^1.9.0": "1.9.1",
     "npm:cborg@^4.2.15": "4.5.8",
     "npm:dotenv@^17.4.2": "17.4.2",
@@ -154,8 +155,8 @@
     "@atp/syntax@0.1.0-alpha.2": {
       "integrity": "f7ab598b6b3c3b01dc446077b4c57acc1f1cb8a45f91bd3eb394997408a712a2"
     },
-    "@atp/xrpc@0.1.0-alpha.7": {
-      "integrity": "440dbb70dc1b3c5ff9d7cb9b96b35ba9de698488020d3e0d4a65af8bfbb7764a",
+    "@atp/xrpc@0.1.0-alpha.8": {
+      "integrity": "34542efd61e20443a78047f9910b5acd7e9a7a2bfbc4d82935f6ff38a1a9bb73",
       "dependencies": [
         "jsr:@atp/lex",
         "jsr:@atp/lexicon",
@@ -177,8 +178,8 @@
         "npm:rate-limiter-flexible"
       ]
     },
-    "@cliffy/command@1.0.1": {
-      "integrity": "0172d9c7d8aeb26b8f4f44ffa833247e4fbab707e258ee271e10a2a2f87b531d",
+    "@cliffy/command@1.2.1": {
+      "integrity": "b7b017c81560d96580ea810c8564566884d8194416f6fc06bfdc8846e8fd590f",
       "dependencies": [
         "jsr:@cliffy/flags",
         "jsr:@cliffy/internal",
@@ -187,18 +188,18 @@
         "jsr:@std/text"
       ]
     },
-    "@cliffy/flags@1.0.1": {
-      "integrity": "468dcf65acb33b51ecb2e232c30603209c528b1d1bd9e065921b57fcb342cb01",
+    "@cliffy/flags@1.2.1": {
+      "integrity": "10034920ef7595db586fecec5a3b10a4ec800c513cbbc368414cd748dac706fb",
       "dependencies": [
         "jsr:@cliffy/internal",
         "jsr:@std/text"
       ]
     },
-    "@cliffy/internal@1.0.1": {
-      "integrity": "9e2bba59ad559b790f09c57219c727a69f0179ebabc07f1bf9db25232b606760"
+    "@cliffy/internal@1.2.1": {
+      "integrity": "e398f41c6839d3d4d249c963bfcb1058013091425926d53a3cb482b1ca70684b"
     },
-    "@cliffy/table@1.0.1": {
-      "integrity": "2b1baa3ef9e16ecb7f3fdcf1deb9f5fa5ffa308ea0e68478224a4c2d44d58166",
+    "@cliffy/table@1.2.1": {
+      "integrity": "be333e62f2c754f8bf75a38c8177515b152040572c9f75298e9bcef1314b82ff",
       "dependencies": [
         "jsr:@std/fmt"
       ]
@@ -209,17 +210,17 @@
     "@hono/hono@4.9.8": {
       "integrity": "908150f13e90181a051a3af3bf15203aff00190682afedfd38824d0cb9299a95"
     },
-    "@hono/hono@4.12.15": {
-      "integrity": "06a0aef73d9072e73b8db570b81a5b56a94095d697578202a87fccdf04ce352d"
+    "@hono/hono@4.12.24": {
+      "integrity": "a74a40f06ae6704ddd0e8e576f6da9d34666c3e1e0f5412a2c1ff800ffd092f4"
     },
-    "@logtape/file@1.3.7": {
-      "integrity": "8cacd752ac49671135e80abc8cf4a843c377ab80906d075ece0e9105fc24677e",
+    "@logtape/file@1.3.10": {
+      "integrity": "24cb8fc17363d17f8a8de60c3d6a241f72db3f08f6b49df011984a9aff132c22",
       "dependencies": [
-        "jsr:@logtape/logtape@^1.3.7"
+        "jsr:@logtape/logtape@^1.3.10"
       ]
     },
-    "@logtape/logtape@1.3.7": {
-      "integrity": "d9dc1f8c7e2e1e4e3998006ea84eaf4054e40ad39325b056b3f517c013286bed"
+    "@logtape/logtape@1.3.10": {
+      "integrity": "a499f5417acbbff82bda8baa28208db42cdf16149144f29d47d8d0b56367a728"
     },
     "@noble/curves@2.2.0": {
       "integrity": "3eae7794c79c03fc92b082e988393369960cf998cbd9622d328720ca8adad6c3",
@@ -233,7 +234,7 @@
     "@std/assert@1.0.19": {
       "integrity": "eaada96ee120cb980bc47e040f82814d786fe8162ecc53c91d8df60b8755991e",
       "dependencies": [
-        "jsr:@std/internal"
+        "jsr:@std/internal@^1.0.12"
       ]
     },
     "@std/encoding@1.0.10": {
@@ -245,27 +246,27 @@
     "@std/fs@1.0.21": {
       "integrity": "d720fe1056d78d43065a4d6e0eeb2b19f34adb8a0bc7caf3a4dbf1d4178252cd"
     },
-    "@std/fs@1.0.23": {
-      "integrity": "3ecbae4ce4fee03b180fa710caff36bb5adb66631c46a6460aaad49515565a37",
+    "@std/fs@1.0.24": {
+      "integrity": "f3061b45b81673a2bece689da041df32d174be064c89eb6397fb5718d3fb7877",
       "dependencies": [
-        "jsr:@std/internal",
-        "jsr:@std/path@^1.1.4"
+        "jsr:@std/internal@^1.0.14",
+        "jsr:@std/path@^1.1.5"
       ]
     },
-    "@std/internal@1.0.13": {
-      "integrity": "2f9546691d4ac2d32859c82dff284aaeac980ddeca38430d07941e7e288725c0"
+    "@std/internal@1.0.14": {
+      "integrity": "291516b3d4c35024d6ffbc0a9df5bf4c64116e05b50012cf846710152d2ffdf7"
     },
-    "@std/path@1.1.4": {
-      "integrity": "1d2d43f39efb1b42f0b1882a25486647cb851481862dc7313390b2bb044314b5",
+    "@std/path@1.1.5": {
+      "integrity": "ccea00982ea28c36becaf6e62f855406c76a8c32d462f66f415bbb7d83a271bc",
       "dependencies": [
-        "jsr:@std/internal"
+        "jsr:@std/internal@^1.0.14"
       ]
     },
     "@std/streams@1.0.16": {
       "integrity": "85030627befb1767c60d4f65cb30fa2f94af1d6ee6e5b2515b76157a542e89c4"
     },
-    "@std/text@1.0.18": {
-      "integrity": "d199e516f80599813c64fd4aee5b8f26f6f7d1e1434c88fd153aeea6fea6a9b9"
+    "@std/text@1.0.19": {
+      "integrity": "003a0e032d360e8c3a4e0410fb792c77a66bd6553fee9d60c6ec1bce30d29223"
     },
     "@ts-morph/common@0.27.0": {
       "integrity": "c7b73592d78ce8479b356fd4f3d6ec3c460d77753a8680ff196effea7a939052",
@@ -284,8 +285,8 @@
     "@zod/zod@4.2.1": {
       "integrity": "693a557fccaf73bfcbcd132ca286929f3343cda9efb56e9780985aa41d229b38"
     },
-    "@zod/zod@4.3.6": {
-      "integrity": "7144e5e11f8ffc3cf6e2fca624f6597a8762898aac9868cc8938e9398b96ffe4"
+    "@zod/zod@4.4.3": {
+      "integrity": "4712ac0967efaa718b37c36eaffb4e1d4457e1a266aef6efb3ab36f54a6fefe4"
     }
   },
   "npm": {
@@ -454,8 +455,8 @@
         "multiformats@9.9.0"
       ]
     },
-    "@ipld/dag-cbor@9.2.6": {
-      "integrity": "sha512-vZGJ84Em2jCVAS7td5gc08YTVN8/s4bTQxg4pU77PAXDAR/yLYOthOvkCu01fdl1lrZwz47RdUterxdkrs3p5A==",
+    "@ipld/dag-cbor@9.2.7": {
+      "integrity": "sha512-ZmfXmElRWATr+hoUTSAOr6HUcjVhOcNHDqgczc76qte2DHHFEK0ZhNzUcdTDQhF/VSIvf2ioaRTRLWwLc83sNw==",
       "dependencies": [
         "cborg@5.1.1",
         "multiformats@13.4.2"
@@ -1378,7 +1379,7 @@
       "jsr:@atp/syntax@~0.1.0-alpha.2",
       "jsr:@atp/xrpc-server@~0.1.0-alpha.12",
       "jsr:@atp/xrpc@~0.1.0-alpha.7",
-      "jsr:@hono/hono@^4.12.15",
+      "jsr:@hono/hono@^4.12.24",
       "jsr:@std/assert@^1.0.19",
       "jsr:@std/encoding@^1.0.10",
       "npm:dotenv@^17.4.2",
