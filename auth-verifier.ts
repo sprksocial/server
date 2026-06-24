@@ -135,7 +135,7 @@ export function createAuthVerifier(
 
   // Add properties and methods
   verifier.ownDid = opts.ownDid;
-  verifier.standardAudienceDids = new Set([
+  verifier.standardAudienceDids = standardAudienceDidsFrom([
     opts.ownDid,
     ...opts.alternateAudienceDids,
   ]);
@@ -180,7 +180,7 @@ class AuthVerifierImpl {
     opts: AuthVerifierOpts,
   ) {
     this.ownDid = opts.ownDid;
-    this.standardAudienceDids = new Set([
+    this.standardAudienceDids = standardAudienceDidsFrom([
       opts.ownDid,
       ...opts.alternateAudienceDids,
     ]);
@@ -221,7 +221,7 @@ class AuthVerifierImpl {
           iss: null,
           aud: null,
         });
-        if (!opts.skipAudCheck && !this.standardAudienceDids.has(aud)) {
+        if (!opts.skipAudCheck && !this.isStandardAudience(aud)) {
           throw new AuthRequiredError(
             "jwt audience does not match service did",
             "BadJwtAudience",
@@ -491,6 +491,10 @@ class AuthVerifierImpl {
     ].includes(iss);
   }
 
+  private isStandardAudience(aud: string): boolean {
+    return this.standardAudienceDids.has(aud);
+  }
+
   nullCreds(): NullOutput {
     return {
       credentials: {
@@ -560,6 +564,17 @@ export const parseBasicAuth = (
   const [username, password] = parsed;
   if (!username || !password) return null;
   return { username, password };
+};
+
+export const standardAudienceDidsFrom = (dids: string[]): Set<string> => {
+  const audiences = new Set<string>();
+  for (const did of dids) {
+    audiences.add(did);
+    if (!did.includes("#")) {
+      audiences.add(`${did}#sprk_appview`);
+    }
+  }
+  return audiences;
 };
 
 export const buildBasicAuth = (username: string, password: string): string => {
