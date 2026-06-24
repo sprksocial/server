@@ -32,7 +32,7 @@
     "jose": "npm:jose@^6.2.3",
     "mongoose": "npm:mongoose@9.5.0",
     "p-queue": "npm:p-queue@^9.2.0",
-    "mongodb-memory-server-core": "npm:mongodb-memory-server-core@^11.1.0",
+    "mongodb-memory-server-core": "npm:mongodb-memory-server-core@^11.2.0",
     "structured-headers": "npm:structured-headers@^2.0.2"
   },
   "test": {
