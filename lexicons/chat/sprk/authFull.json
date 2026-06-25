@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "chat.sprk.authFull",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Full Spark Chat Permissions",
+      "title:lang": {},
+      "detail": "Control of all Spark chat conversations and configuration management.",
+      "detail:lang": {
+        "en": "All Spark Chat Conversations"
+      },
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "inheritAud": true,
+          "lxm": [
+            "chat.sprk.convo.acceptConvo",
+            "chat.sprk.convo.addReaction",
+            "chat.sprk.convo.getConvo",
+            "chat.sprk.convo.getConvoAvailability",
+            "chat.sprk.convo.getConvoForMembers",
+            "chat.sprk.convo.getLog",
+            "chat.sprk.convo.getMessages",
+            "chat.sprk.convo.leaveConvo",
+            "chat.sprk.convo.listConvos",
+            "chat.sprk.convo.muteConvo",
+            "chat.sprk.convo.removeReaction",
+            "chat.sprk.convo.sendMessage",
+            "chat.sprk.convo.sendMessageBatch",
+            "chat.sprk.convo.unmuteConvo",
+            "chat.sprk.convo.updateAllRead",
+            "chat.sprk.convo.updateRead"
+          ]
+        },
+        {
+          "type": "permission",
+          "resource": "repo",
+          "action": ["create", "update", "delete"],
+          "collection": ["chat.sprk.actor.declaration"]
+        }
+      ]
+    }
+  }
+}

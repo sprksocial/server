@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "chat.sprk.convo.getLog",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [],
+        "properties": {
+          "cursor": { "type": "string" }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["logs"],
+          "properties": {
+            "cursor": { "type": "string" },
+            "logs": {
+              "type": "array",
+              "items": {
+                "type": "union",
+                "refs": [
+                  "chat.sprk.convo.defs#logBeginConvo",
+                  "chat.sprk.convo.defs#logAcceptConvo",
+                  "chat.sprk.convo.defs#logLeaveConvo",
+                  "chat.sprk.convo.defs#logMuteConvo",
+                  "chat.sprk.convo.defs#logUnmuteConvo",
+                  "chat.sprk.convo.defs#logCreateMessage",
+                  "chat.sprk.convo.defs#logDeleteMessage",
+                  "chat.sprk.convo.defs#logReadMessage",
+                  "chat.sprk.convo.defs#logAddReaction",
+                  "chat.sprk.convo.defs#logRemoveReaction"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
