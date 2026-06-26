@@ -3,8 +3,21 @@ import { PushToken, PushTokens } from "../data-plane/routes/push-tokens.ts";
 import { Database } from "../data-plane/db/index.ts";
 
 export interface PushPayload {
-  recipientDid: string;
+  // Canonical native push fields
+  recipient: string;
   reason: string;
+  uri: string;
+  subject?: string;
+
+  // Backend-only context for rendering and deriving `subject`.
+  actorDid: string;
+  sourceSubject?: string;
+
+  // Temporary legacy data
+  legacy?: LegacyPushData;
+}
+
+interface LegacyPushData {
   author: string;
   recordUri: string;
   reasonSubject?: string;
@@ -238,7 +251,23 @@ export class PushService {
       return true; // Don't mark as invalid if we can't get a token
     }
 
-    const notification = await this.buildNotificationContent(payload);
+    const subject = payload.subject ?? await this.getNotificationSubject(
+      payload,
+    );
+    const pushPayload = subject ? { ...payload, subject } : payload;
+    const legacyData = pushPayload.legacy
+      ? {
+        // Kept for older clients. New push handlers derive actors from `uri`.
+        author: pushPayload.legacy.author,
+        // Kept for older clients. New push handlers should read `uri`.
+        recordUri: pushPayload.legacy.recordUri,
+        // Kept for context/back-compat only. Push navigation should use
+        // `subject`, matching Bluesky native push payloads.
+        ...(pushPayload.legacy.reasonSubject &&
+          { reasonSubject: pushPayload.legacy.reasonSubject }),
+      }
+      : {};
+    const notification = await this.buildNotificationContent(pushPayload);
 
     // Build base message
     const message: FcmMessage = {
@@ -250,10 +279,10 @@ export class PushService {
         },
         data: {
           reason: payload.reason,
-          author: payload.author,
-          recordUri: payload.recordUri,
-          ...(payload.reasonSubject &&
-            { reasonSubject: payload.reasonSubject }),
+          recipient: payload.recipient,
+          uri: payload.uri,
+          ...(pushPayload.subject && { subject: pushPayload.subject }),
+          ...legacyData,
         },
       },
     };
@@ -327,7 +356,7 @@ export class PushService {
   ): Promise<{ title: string; body: string }> {
     // Get author handle
     const author = await this.db.models.Actor.findOne({
-      did: payload.author,
+      did: payload.actorDid,
     }).lean();
     const handle = author?.handle ? `${author.handle}` : "Someone";
 
@@ -335,8 +364,8 @@ export class PushService {
     if (payload.reason === "follow") {
       // Check if recipient follows the author back (making this a "followed you back")
       const recipientFollowsAuthor = await this.db.models.Follow.findOne({
-        authorDid: payload.recipientDid,
-        subject: payload.author,
+        authorDid: payload.recipient,
+        subject: payload.actorDid,
       }).lean();
 
       const body = recipientFollowsAuthor
@@ -366,17 +395,15 @@ export class PushService {
     let body = "";
 
     if (
-      payload.reason === "like" || payload.reason === "repost" ||
-      payload.reason === "like-via-repost" ||
-      payload.reason === "repost-via-repost"
+      this.isReactionReason(payload.reason)
     ) {
-      // For likes/reposts, show the reasonSubject (the post that was liked/reposted)
-      if (payload.reasonSubject) {
-        body = await this.getRecordText(payload.reasonSubject);
+      const subject = payload.subject ?? payload.sourceSubject;
+      if (subject) {
+        body = await this.getRecordText(subject);
       }
     } else if (payload.reason === "reply" || payload.reason === "mention") {
       // For replies/mentions, show the record text (the reply or post with mention)
-      body = await this.getRecordText(payload.recordUri);
+      body = await this.getRecordText(payload.uri);
     }
 
     return { title, body };
@@ -402,6 +429,49 @@ export class PushService {
       return text;
     } catch {
       return "";
+    }
+  }
+
+  private isReactionReason(reason: string): boolean {
+    return reason === "like" ||
+      reason === "repost" ||
+      reason === "like-via-repost" ||
+      reason === "repost-via-repost";
+  }
+
+  private async getNotificationSubject(
+    payload: PushPayload,
+  ): Promise<string | undefined> {
+    if (!this.isReactionReason(payload.reason)) {
+      if (payload.reason === "follow") {
+        return `at://${payload.recipient}`;
+      }
+      return payload.sourceSubject ?? payload.uri;
+    }
+
+    if (
+      payload.reason === "like" ||
+      payload.reason === "repost"
+    ) {
+      return payload.sourceSubject;
+    }
+
+    return await this.getRecordSubjectUri(payload.uri);
+  }
+
+  private async getRecordSubjectUri(uri: string): Promise<string | undefined> {
+    try {
+      const record = await this.db.models.Record.findOne({ uri }).lean();
+      if (!record?.json) return undefined;
+
+      const parsed = jsonStringToLex(record.json) as {
+        subject?: { uri?: unknown };
+      };
+      return typeof parsed.subject?.uri === "string"
+        ? parsed.subject.uri
+        : undefined;
+    } catch {
+      return undefined;
     }
   }
 
@@ -514,10 +584,10 @@ export class PushService {
     if (payload.reason === "follow") {
       return "follows";
     }
-    if (payload.reasonSubject) {
-      return payload.reasonSubject;
+    if (payload.sourceSubject) {
+      return payload.sourceSubject;
     }
-    return payload.recordUri;
+    return payload.uri;
   }
 }
 

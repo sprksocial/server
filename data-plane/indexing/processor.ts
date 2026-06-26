@@ -354,11 +354,16 @@ export class RecordProcessor<TSchema extends l.RecordSchema, TRow> {
       for (const notif of notifs) {
         this.background.add(async () => {
           await this.pushService?.sendPush(notif.did, {
-            recipientDid: notif.did,
+            recipient: notif.did,
             reason: notif.reason,
-            author: notif.author,
-            recordUri: notif.recordUri,
-            reasonSubject: notif.reasonSubject,
+            actorDid: notif.author,
+            uri: notif.recordUri,
+            sourceSubject: notif.reasonSubject,
+            legacy: {
+              author: notif.author,
+              recordUri: notif.recordUri,
+              reasonSubject: notif.reasonSubject,
+            },
           });
         });
       }
