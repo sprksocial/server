@@ -23,15 +23,7 @@
           "type": "array",
           "items": { "type": "ref", "ref": "com.atproto.label.defs#label" }
         },
-        "createdAt": { "type": "string", "format": "datetime" },
-        "stories": {
-          "type": "array",
-          "description": "Recent stories from this profile author.",
-          "items": {
-            "type": "ref",
-            "ref": "com.atproto.repo.strongRef"
-          }
-        }
+        "createdAt": { "type": "string", "format": "datetime" }
       }
     },
     "profileView": {
