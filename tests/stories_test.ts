@@ -292,6 +292,7 @@ Deno.test({
                 post: { uri: postUri, cid: VALID_BLOB_CID },
               },
             ],
+            sound: { uri: soundUri, cid: VALID_BLOB_CID },
             createdAt: nowIso,
           };
 
@@ -385,6 +386,15 @@ Deno.test({
           assertEquals(embed?.post.repostCount, 2);
           assertEquals(embed?.post.viewer !== undefined, true);
           assertEquals(embed?.post.sound?.uri, soundUri);
+          assertEquals(storyView?.sound?.uri, soundUri);
+          assertEquals(storyView?.sound?.title, "Hydrated Sound");
+          assertEquals(storyView?.sound?.author.did as string, postAuthorDid);
+          assertEquals(
+            storyView?.sound?.audio,
+            `https://media.sprk.so/sound/${encodeURIComponent(postAuthorDid)}/${
+              encodeURIComponent(VALID_BLOB_CID)
+            }`,
+          );
         } finally {
           await cleanup();
         }

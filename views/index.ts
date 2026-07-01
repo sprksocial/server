@@ -492,6 +492,9 @@ export class Views {
       author,
       record: storyInfo.record,
       media: mediaRecord ? this.storyMedia(uri, mediaRecord) : undefined,
+      sound: storyInfo.record.sound
+        ? this.sound(storyInfo.record.sound.uri, state)
+        : undefined,
       embeds: this.storyEmbeds(storyInfo.record.embeds, state),
       indexedAt: asDatetime(
         this.indexedAt(storyInfo)?.toISOString() ?? new Date().toISOString(),

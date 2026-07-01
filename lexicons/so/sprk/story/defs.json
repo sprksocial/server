@@ -17,6 +17,7 @@
           "type": "union",
           "refs": ["so.sprk.media.image#view", "so.sprk.media.video#view"]
         },
+        "sound": { "type": "ref", "ref": "so.sprk.sound.defs#audioView" },
         "embeds": {
           "type": "ref",
           "ref": "so.sprk.embed.defs#views"

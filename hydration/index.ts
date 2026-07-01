@@ -611,6 +611,9 @@ export class Hydrator {
   // - story
   //   - profile
   //     - list basic
+  //   - sound
+  //     - profile
+  //       - list basic
   // - embeds (story record)
   //   - mention
   //     - profile
@@ -626,12 +629,16 @@ export class Hydrator {
     const stories = await this.story.getStories(uris, ctx.includeTakedowns);
 
     const storyAuthorDids = uris.map(didFromUri);
+    const soundUris = new Set<string>();
     const embedPostUris = new Set<string>();
     const mentionDids = new Set<string>();
 
     for (const story of stories.values()) {
       if (!story) continue;
       const record = story.record as StoryRecord;
+      if (record.sound?.uri) {
+        soundUris.add(record.sound.uri);
+      }
       for (const embed of record.embeds ?? []) {
         if (
           embed &&
@@ -673,14 +680,18 @@ export class Hydrator {
       ]),
     );
 
-    const [postState, profileState] = await Promise.all([
+    const [postState, profileState, soundState] = await Promise.all([
       postUris.length > 0
         ? this.hydratePosts(postUris.map((uri) => ({ uri })), ctx)
         : Promise.resolve<HydrationState>({}),
       this.hydrateProfilesBasic(profileDids, ctx),
+      this.hydrateSounds(Array.from(soundUris), ctx),
     ]);
 
-    return mergeManyStates(profileState, postState, { stories, ctx });
+    return mergeManyStates(profileState, postState, soundState, {
+      stories,
+      ctx,
+    });
   }
 
   // so.sprk.feed.defs#generatorView
