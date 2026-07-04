@@ -4,6 +4,7 @@
 
 - **Format**: `deno fmt`
 - **Lint**: `deno lint`
+- **Typecheck**: `deno check`
 - **Test all**: `deno test -P`
 - **Test single**: `deno test -P tests/main_test.ts`
 - **Dev**: `deno task dev` (requires MongoDB)

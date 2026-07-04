@@ -27,7 +27,7 @@ jobs:
       - uses: denoland/setup-deno@v2
         if: steps.changed_files.outputs.all_changed_files != ''
         with:
-          deno-version: v2.x
+          deno-version: v2.9.1
           cache: true
 
       - name: Check formatting
@@ -55,7 +55,7 @@ jobs:
       - uses: denoland/setup-deno@v2
         if: steps.changed_files.outputs.all_changed_files != ''
         with:
-          deno-version: v2.x
+          deno-version: v2.9.1
           cache: true
 
       - name: Generate lex bindings
@@ -87,7 +87,7 @@ jobs:
       - uses: denoland/setup-deno@v2
         if: steps.changed_files.outputs.all_changed_files != ''
         with:
-          deno-version: v2.x
+          deno-version: v2.9.1
           cache: true
 
       - name: Generate lex bindings
