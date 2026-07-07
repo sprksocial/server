@@ -53,7 +53,7 @@
     "npm:mongoose@9.7.3": "9.7.3",
     "npm:multiformats@^13.4.1": "13.4.2",
     "npm:p-queue@^8.1.1": "8.1.1",
-    "npm:p-queue@^9.2.0": "9.2.0",
+    "npm:p-queue@^9.3.1": "9.3.1",
     "npm:rate-limiter-flexible@9": "9.1.1",
     "npm:structured-headers@^2.0.2": "2.0.2"
   },
@@ -1026,8 +1026,8 @@
         "p-timeout@6.1.4"
       ]
     },
-    "p-queue@9.2.0": {
-      "integrity": "sha512-dWgLE8AH0HjQ9fe74pUkKkvzzYT18Inp4zra3lKHnnwqGvcfcUBrvF2EAVX+envufDNBOzpPq/IBUONDbI7+3g==",
+    "p-queue@9.3.1": {
+      "integrity": "sha512-POWdiIPmsUPGwb4FeQ4OBg46aqmcInSWe45CKDsGHiOBiVQM9chqfQTuqhuTzcg2Vz9faTI65at0KkVyVEiCHw==",
       "dependencies": [
         "eventemitter3@5.0.4",
         "p-timeout@7.0.1"
@@ -1381,7 +1381,7 @@
       "npm:jose@^6.2.3",
       "npm:mongodb-memory-server-core@^11.1.0",
       "npm:mongoose@9.7.3",
-      "npm:p-queue@^9.2.0",
+      "npm:p-queue@^9.3.1",
       "npm:structured-headers@^2.0.2"
     ]
   }
