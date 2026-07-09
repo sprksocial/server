@@ -19,8 +19,14 @@ export class Likes {
       return { uris: [], cursor: undefined };
     }
 
-    // Build query for likes on this subject
-    const likesQuery = this.db.models.Like.find({ subject: subject.uri });
+    const query: { subject: string; subjectCid?: string } = {
+      subject: subject.uri,
+    };
+    if (subject.cid) {
+      query.subjectCid = subject.cid;
+    }
+
+    const likesQuery = this.db.models.Like.find(query);
 
     // Apply pagination using TimeCidKeyset
     const paginatedQuery = this.timeCidKeyset.paginate(likesQuery, {
@@ -43,6 +49,15 @@ export class Likes {
 
     return {
       uris: likes.map((l) => l.uri),
+      likes: likes.map((l) => ({
+        uri: l.uri,
+        cid: l.cid,
+        authorDid: l.authorDid,
+        createdAt: l.createdAt,
+        indexedAt: l.indexedAt,
+        subject: l.subject,
+        subjectCid: l.subjectCid,
+      })),
       cursor: nextCursor,
     };
   }
