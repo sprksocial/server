@@ -105,6 +105,7 @@ export class Search {
     const candidateLimit = safeLimit * 3;
     const handlePrefix = cleanedTerm.toLowerCase();
     const handleRangeEnd = `${handlePrefix}\uffff`;
+    const handleOnly = cleanedTerm.includes(".") && !/\s/.test(cleanedTerm);
 
     const matchingActors = await this.db.models.Actor.find({
       handle: {
@@ -112,13 +113,18 @@ export class Search {
         $lt: handleRangeEnd,
       },
     })
-      .select("did -_id")
+      .select("did handle -_id")
       .sort({ handle: 1 })
       .limit(candidateLimit)
       .lean();
 
     const handleDids = matchingActors.map((actor) => actor.did);
-    const profileQuery = handleDids.length > 0
+    const exactHandleDid = matchingActors.find((actor) =>
+      actor.handle === handlePrefix
+    )?.did;
+    const profileQuery = handleOnly
+      ? { authorDid: { $in: handleDids } }
+      : handleDids.length > 0
       ? {
         $or: [
           { authorDid: { $in: handleDids } },
@@ -139,8 +145,12 @@ export class Search {
     const handleProfileDidSet = new Set(
       matchingProfiles.map((p) => p.authorDid),
     );
+    const exactHandleProfileDid = exactHandleDid &&
+        handleProfileDidSet.has(exactHandleDid)
+      ? exactHandleDid
+      : undefined;
     const handleProfileDids = handleDids.filter((did) =>
-      handleProfileDidSet.has(did)
+      did !== exactHandleProfileDid && handleProfileDidSet.has(did)
     );
     const includedDids = new Set(handleProfileDids);
     const textProfileDids = matchingProfiles
@@ -153,9 +163,11 @@ export class Search {
     handleProfileDids.sort(byFollowers);
     textProfileDids.sort(byFollowers);
 
+    const candidatePoolLimit = safeLimit * 2 -
+      (exactHandleProfileDid ? 1 : 0);
     let candidates = [...handleProfileDids, ...textProfileDids].slice(
       0,
-      safeLimit * 2,
+      candidatePoolLimit,
     );
 
     // Boost accounts the viewer already follows to the front
@@ -172,7 +184,9 @@ export class Search {
     }
 
     return {
-      dids: candidates.slice(0, safeLimit),
+      dids: exactHandleProfileDid
+        ? [exactHandleProfileDid, ...candidates].slice(0, safeLimit)
+        : candidates.slice(0, safeLimit),
     };
   }
 

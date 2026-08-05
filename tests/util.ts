@@ -41,6 +41,23 @@ export interface TestDataOptions {
   actorSync?: boolean;
 }
 
+export const EMPTY_TEST_DATA: Required<TestDataOptions> = {
+  actors: false,
+  profiles: false,
+  posts: false,
+  replies: false,
+  stories: false,
+  likes: false,
+  reposts: false,
+  follows: false,
+  blocks: false,
+  audio: false,
+  generators: false,
+  preferences: false,
+  records: false,
+  actorSync: false,
+};
+
 // ============================================================================
 // Test Database Types
 // ============================================================================
