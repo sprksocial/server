@@ -4,6 +4,7 @@ import { PreferenceDocument } from "../../../../data-plane/db/models.ts";
 import { AppContext } from "../../../../context.ts";
 import * as so from "../../../../lex/so.ts";
 import {
+  AdultContentPref,
   ContentLabelPref,
   FeedViewPref,
   HiddenPostsPref,
@@ -39,6 +40,13 @@ export default function (server: Server, ctx: AppContext) {
 
         for (const pref of body.preferences) {
           switch (pref.$type) {
+            case "so.sprk.actor.defs#adultContentPref": {
+              const p = pref as AdultContentPref;
+              updateData.adultContentPref = {
+                enabled: p.enabled,
+              };
+              break;
+            }
             case "so.sprk.actor.defs#contentLabelPref": {
               const p = pref as ContentLabelPref;
               contentLabelPrefs.push({

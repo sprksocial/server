@@ -31,6 +31,13 @@ export default function (server: Server, ctx: AppContext) {
           };
         }
 
+        if (userPref.adultContentPref) {
+          preferences.push({
+            $type: "so.sprk.actor.defs#adultContentPref",
+            enabled: userPref.adultContentPref.enabled,
+          });
+        }
+
         if (userPref.contentLabelPrefs?.length) {
           for (const pref of userPref.contentLabelPrefs) {
             preferences.push({

@@ -945,6 +945,7 @@ async function seedTestData(
   if (options.preferences) {
     await models.Preference.create({
       userDid: TEST_USERS[0].did,
+      adultContentPref: { enabled: true },
       contentLabelPrefs: [],
       savedFeeds: [],
       personalDetailsPref: {},
@@ -961,6 +962,7 @@ async function seedTestData(
 
     await models.Preference.create({
       userDid: TEST_USERS[1].did,
+      adultContentPref: { enabled: false },
       contentLabelPrefs: [],
       savedFeeds: [],
       personalDetailsPref: {},

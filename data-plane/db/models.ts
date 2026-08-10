@@ -577,6 +577,9 @@ export const actorSchema = new Schema<ActorDocument>({
 
 export interface PreferenceDocument {
   userDid: string;
+  adultContentPref?: {
+    enabled: boolean;
+  };
   contentLabelPrefs?: Array<{
     labelerDid?: string;
     label: string;
@@ -633,6 +636,7 @@ export interface PreferenceDocument {
 }
 export const preferenceSchema = new Schema<PreferenceDocument>({
   userDid: { type: String, required: true, unique: true, index: true },
+  adultContentPref: { type: Object, required: false },
   contentLabelPrefs: { type: [Object], required: false },
   savedFeeds: { type: [Object], required: false },
   personalDetailsPref: { type: Object, required: false },
