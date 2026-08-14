@@ -50,7 +50,9 @@ export default function (server: Server, ctx: AppContext) {
             case "so.sprk.actor.defs#contentLabelPref": {
               const p = pref as ContentLabelPref;
               contentLabelPrefs.push({
-                labelerDid: p.labelerDid,
+                ...(p.labelerDid === undefined
+                  ? {}
+                  : { labelerDid: p.labelerDid }),
                 label: p.label,
                 visibility: p.visibility,
               });

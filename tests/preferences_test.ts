@@ -18,7 +18,10 @@ interface PutPreferencesArgs {
     body: {
       preferences: Array<{
         $type: string;
-        enabled: boolean;
+        enabled?: boolean;
+        labelerDid?: string;
+        label?: string;
+        visibility?: string;
       }>;
     };
   };
@@ -113,5 +116,79 @@ Deno.test("Spark adult content preference round-trips when disabled", async () =
   assertEquals(response.body.preferences, [{
     $type: "so.sprk.actor.defs#adultContentPref",
     enabled: false,
+  }]);
+});
+
+Deno.test("global content label preference omits labelerDid", async () => {
+  const userDid = "did:plc:testuser";
+  let storedPreferences: Partial<PreferenceDocument> = {};
+
+  const ctx = {
+    authVerifier: {
+      standard: {},
+    },
+    dataplane: {
+      preferences: {
+        putPreferences: (
+          did: string,
+          preferences: Partial<PreferenceDocument>,
+        ) => {
+          assertEquals(did, userDid);
+          storedPreferences = preferences;
+          return Promise.resolve();
+        },
+        getPreferences: (did: string) => {
+          assertEquals(did, userDid);
+          return Promise.resolve({
+            userDid,
+            createdAt: "2026-08-14T00:00:00.000Z",
+            updatedAt: "2026-08-14T00:00:00.000Z",
+            ...storedPreferences,
+          });
+        },
+      },
+    },
+  } as unknown as AppContext;
+
+  let putHandler: PutPreferencesHandler = () =>
+    Promise.reject(new Error("putPreferences handler was not registered"));
+  putPreferences(
+    handlerServer((handler: PutPreferencesHandler) => putHandler = handler),
+    ctx,
+  );
+
+  await putHandler({
+    auth: { credentials: { iss: userDid } },
+    input: {
+      body: {
+        preferences: [{
+          $type: "so.sprk.actor.defs#contentLabelPref",
+          label: "sexual",
+          visibility: "warn",
+        }],
+      },
+    },
+  });
+
+  assertEquals(storedPreferences.contentLabelPrefs, [{
+    label: "sexual",
+    visibility: "warn",
+  }]);
+
+  let getHandler: GetPreferencesHandler = () =>
+    Promise.reject(new Error("getPreferences handler was not registered"));
+  getPreferences(
+    handlerServer((handler: GetPreferencesHandler) => getHandler = handler),
+    ctx,
+  );
+
+  const response = await getHandler({
+    auth: { credentials: { iss: userDid } },
+  });
+
+  assertEquals(response.body.preferences, [{
+    $type: "so.sprk.actor.defs#contentLabelPref",
+    label: "sexual",
+    visibility: "warn",
   }]);
 });

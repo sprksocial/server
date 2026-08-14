@@ -42,7 +42,9 @@ export default function (server: Server, ctx: AppContext) {
           for (const pref of userPref.contentLabelPrefs) {
             preferences.push({
               $type: "so.sprk.actor.defs#contentLabelPref",
-              labelerDid: pref.labelerDid as DidString | undefined,
+              ...(pref.labelerDid === undefined
+                ? {}
+                : { labelerDid: pref.labelerDid as DidString }),
               label: pref.label,
               visibility: pref.visibility as ContentLabelPref["visibility"],
             });
