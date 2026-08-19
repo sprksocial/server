@@ -96,20 +96,17 @@ export class Views {
 
   private videoCdn: string;
   private mediaCdn: string;
-  private thumbCdn: string;
 
   constructor(
     opts: {
       indexedAtEpoch?: Date | undefined;
       videoCdn?: string;
       mediaCdn?: string;
-      thumbCdn?: string;
     },
   ) {
     this.indexedAtEpoch = opts?.indexedAtEpoch;
     this.videoCdn = opts?.videoCdn ?? "https://video.sprk.so";
     this.mediaCdn = opts?.mediaCdn ?? "https://media.sprk.so";
-    this.thumbCdn = opts?.thumbCdn ?? "https://thumb.sprk.so";
   }
 
   // Labels
@@ -1057,8 +1054,9 @@ export class Views {
   ): VideoMediaView & { $type: string } {
     const cid = cidFromBlobJson(media.video);
 
-    const playlist = `${this.videoCdn}/watch/${did}/${cid}/playlist.m3u8`;
-    const thumbnail = `${this.thumbCdn}/${did}/${cid}/thumbnail`;
+    const videoUrl = `${this.videoCdn}/watch/${did}/${cid}`;
+    const playlist = `${videoUrl}/playlist.m3u8`;
+    const thumbnail = `${videoUrl}/thumbnail.jpg`;
 
     return {
       $type: "so.sprk.media.video#view",

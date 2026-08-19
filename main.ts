@@ -56,7 +56,6 @@ export function setupApp(): { app: Hono<AppEnv>; ctx: AppContext } {
     indexedAtEpoch: cfg.indexedAtEpoch,
     videoCdn: cfg.videoCdn,
     mediaCdn: cfg.mediaCdn,
-    thumbCdn: cfg.thumbCdn,
   });
 
   const authVerifier = createAuthVerifier(dataplane, {

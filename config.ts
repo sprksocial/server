@@ -23,7 +23,6 @@ export interface ServerConfigValues {
 
   videoCdn?: string;
   mediaCdn?: string;
-  thumbCdn?: string;
 
   dbUri?: string;
   dbName?: string;
@@ -67,7 +66,6 @@ export class ServerConfig {
 
     const videoCdn = envStr("SPRK_VIDEO_CDN") ?? "https://video.sprk.so";
     const mediaCdn = envStr("SPRK_MEDIA_CDN") ?? "https://media.sprk.so";
-    const thumbCdn = envStr("SPRK_THUMB_CDN") ?? "https://thumb.sprk.so";
 
     const dbUri = envStr("SPRK_DB_URI") ??
       "mongodb://mongo:mongo@localhost:27017/dev";
@@ -102,7 +100,6 @@ export class ServerConfig {
       notificationsDelayMs,
       videoCdn,
       mediaCdn,
-      thumbCdn,
       dbUri,
       dbName,
       dbUser,
@@ -170,10 +167,6 @@ export class ServerConfig {
   get mediaCdn() {
     return this.cfg.mediaCdn;
   }
-  get thumbCdn() {
-    return this.cfg.thumbCdn;
-  }
-
   get dbUri() {
     return this.cfg.dbUri;
   }

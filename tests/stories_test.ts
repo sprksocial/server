@@ -510,7 +510,6 @@ Deno.test({
 
         const views = new Views({
           mediaCdn: "https://media.example.com",
-          thumbCdn: "https://thumb.example.com",
           videoCdn: "https://video.example.com",
         });
 
@@ -591,7 +590,6 @@ Deno.test({
 
         const views = new Views({
           mediaCdn: "https://media.example.com",
-          thumbCdn: "https://thumb.example.com",
           videoCdn: "https://video.example.com",
         });
 
@@ -653,7 +651,6 @@ Deno.test({
 
         const views = new Views({
           mediaCdn: "https://media.example.com",
-          thumbCdn: "https://thumb.example.com",
           videoCdn: "https://video.example.com",
         });
 
@@ -732,7 +729,6 @@ Deno.test({
 
         const views = new Views({
           mediaCdn: "https://media.example.com",
-          thumbCdn: "https://thumb.example.com",
           videoCdn: "https://video.example.com",
         });
 
