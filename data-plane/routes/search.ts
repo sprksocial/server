@@ -6,6 +6,10 @@ import { compositeTime } from "../util.ts";
 // Remove leading @ in case a handle is input that way
 const cleanQuery = (query: string) => query.trim().replace(/^@/g, "");
 
+const MAX_ACTOR_SEARCH_CANDIDATES = 400;
+const MIN_ACTOR_SEARCH_CANDIDATES = 100;
+const ACTOR_SEARCH_CANDIDATE_MULTIPLIER = 4;
+
 export class Search {
   private db: Database;
   private indexedAtDidKeyset: IndexedAtDidKeyset;
@@ -28,17 +32,59 @@ export class Search {
 
     const handlePrefix = cleanedTerm.toLowerCase();
     const handleRangeEnd = `${handlePrefix}\uffff`;
+    const safeLimit = Math.max(1, Math.min(limit, 100));
+    const candidateLimit = Math.min(
+      MAX_ACTOR_SEARCH_CANDIDATES,
+      Math.max(
+        MIN_ACTOR_SEARCH_CANDIDATES,
+        safeLimit * ACTOR_SEARCH_CANDIDATE_MULTIPLIER,
+      ),
+    );
 
     const [matchingActors, matchingProfiles] = await Promise.all([
-      this.db.models.Actor.find({
-        handle: {
-          $gte: handlePrefix,
-          $lt: handleRangeEnd,
+      this.db.models.Actor.aggregate<{ did: string }>([
+        {
+          $match: {
+            handle: {
+              $gte: handlePrefix,
+              $lt: handleRangeEnd,
+            },
+          },
         },
-      }).select("did -_id").lean(),
+        {
+          $lookup: {
+            from: this.db.models.Profile.collection.name,
+            localField: "did",
+            foreignField: "authorDid",
+            as: "profile",
+            pipeline: [
+              { $project: { authorDid: 1, indexedAt: 1, _id: 0 } },
+            ],
+          },
+        },
+        { $unwind: "$profile" },
+        {
+          $project: {
+            did: 1,
+            indexedAt: "$profile.indexedAt",
+          },
+        },
+        {
+          $sort: {
+            indexedAt: -1,
+            did: -1,
+          },
+        },
+        { $limit: candidateLimit },
+        { $project: { did: 1, _id: 0 } },
+      ]),
       this.db.models.Profile.find({
         $text: { $search: cleanedTerm },
-      }).select("authorDid -_id").lean(),
+      })
+        .select("authorDid -_id")
+        .sort({ indexedAt: -1, authorDid: -1 })
+        .limit(candidateLimit)
+        .lean(),
     ]);
 
     const matchingActorDids = matchingActors.map((actor) => actor.did);
@@ -63,7 +109,7 @@ export class Search {
     const paginatedQuery = this.indexedAtDidKeyset.paginate(
       profilesQuery,
       {
-        limit: limit + 1, // Fetch one extra to check if more results exist
+        limit: safeLimit + 1, // Fetch one extra to check if more results exist
         cursor,
         direction: "desc",
       },
@@ -72,8 +118,8 @@ export class Search {
     const profiles = await paginatedQuery.exec();
 
     // Check if there are more results
-    const hasMore = profiles.length > limit;
-    const results = hasMore ? profiles.slice(0, limit) : profiles;
+    const hasMore = profiles.length > safeLimit;
+    const results = hasMore ? profiles.slice(0, safeLimit) : profiles;
 
     // Generate cursor from the last item if we have more results
     let nextCursor: string | undefined;
