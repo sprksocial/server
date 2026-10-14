@@ -41,8 +41,6 @@ type IndexedPost = {
 const schema = so.sprk.feed.post.main;
 const isMediaImages = so.sprk.media.images.$matches;
 const isMediaVideo = so.sprk.media.video.$matches;
-const isMention = so.sprk.richtext.facet.mention.$matches;
-const isLink = so.sprk.richtext.facet.link.$matches;
 
 const REPLY_NOTIF_DEPTH = 5;
 
@@ -82,13 +80,13 @@ const insertFn = async (
   const facets = (obj.caption?.facets || [])
     .flatMap((facet) => facet.features)
     .flatMap((feature) => {
-      if (isMention(feature)) {
+      if (so.sprk.richtext.facet.mention.$matches(feature)) {
         return {
           type: "mention" as const,
           value: feature.did,
         };
       }
-      if (isLink(feature)) {
+      if (so.sprk.richtext.facet.link.$matches(feature)) {
         return {
           type: "link" as const,
           value: feature.uri,

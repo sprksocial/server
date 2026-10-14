@@ -39,8 +39,6 @@ type IndexedReply = {
 
 const schema = so.sprk.feed.reply.main;
 const isMediaImage = so.sprk.media.image.$matches;
-const isMention = so.sprk.richtext.facet.mention.$matches;
-const isLink = so.sprk.richtext.facet.link.$matches;
 
 const REPLY_NOTIF_DEPTH = 5;
 
@@ -101,13 +99,13 @@ const insertFn = async (
   const facets = (obj.facets || [])
     .flatMap((facet) => facet.features)
     .flatMap((feature) => {
-      if (isMention(feature)) {
+      if (so.sprk.richtext.facet.mention.$matches(feature)) {
         return {
           type: "mention" as const,
           value: feature.did,
         };
       }
-      if (isLink(feature)) {
+      if (so.sprk.richtext.facet.link.$matches(feature)) {
         return {
           type: "link" as const,
           value: feature.uri,
