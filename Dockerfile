@@ -1,4 +1,4 @@
-FROM denoland/deno:alpine-2.9.1
+FROM denoland/deno:alpine-2.9.8
 ARG COMMIT_SHA
 ENV COMMIT_SHA=$COMMIT_SHA
 
